@@ -2,6 +2,10 @@
 
 First attempt at prototype movein app
 
+## Resources
+https://docs.flutter.dev/cookbook/animation/physics-simulation
+
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
