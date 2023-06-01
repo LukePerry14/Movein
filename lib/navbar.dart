@@ -19,13 +19,6 @@ class custom_navbar extends StatelessWidget {
           ),
           IconButton(
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/Messages');
-            },
-            icon: Icon(Icons.message),
-            color: Colors.white,
-          ),
-          IconButton(
-            onPressed: () {
               Navigator.pushReplacementNamed(context, '/Groups');
             },
             icon: Icon(Icons.group),

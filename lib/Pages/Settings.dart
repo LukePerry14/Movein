@@ -4,7 +4,6 @@ import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Pages/Messages.dart';
 import 'package:movein/Pages/Groups.dart';
 import 'package:movein/Pages/Houses.dart';
-import 'package:movein/Pages/Loading.dart';
 import 'package:movein/Pages/Profile.dart';
 
 class Settings extends StatefulWidget {

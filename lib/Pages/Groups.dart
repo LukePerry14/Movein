@@ -46,6 +46,12 @@ class Groups extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.orange[300],
+          centerTitle: true,
+          elevation: 0,
+          title: const Text('Groups'),
+        ),
         body: ListView.builder(
           itemCount: userGroups.length,
           itemBuilder: (context, index) {
@@ -64,7 +70,12 @@ class Groups extends StatelessWidget {
                     ),
                   ),
                   child: ListTile(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, '/Messages', arguments: {
+                        'members': userGroups[index].members,
+                        'groupName': userGroups[index].name(),
+                      });
+                    },
                     title: Text(userGroups[index].name()),
                   ),
                 ),

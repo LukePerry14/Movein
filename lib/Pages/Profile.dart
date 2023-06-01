@@ -5,7 +5,6 @@ import 'package:movein/Pages/Messages.dart';
 import 'package:movein/Pages/Groups.dart';
 import 'package:movein/Pages/Settings.dart';
 import 'package:movein/Pages/Houses.dart';
-import 'package:movein/Pages/Loading.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
