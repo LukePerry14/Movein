@@ -2,6 +2,11 @@
 
 First attempt at prototype movein app
 
+## Resources
+- animate card - https://docs.flutter.dev/cookbook/animation/physics-simulation
+- animate routing - https://docs.flutter.dev/cookbook/animation/page-route-animation
+
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
