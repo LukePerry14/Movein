@@ -9,22 +9,18 @@ import 'package:movein/Pages/Settings.dart';
 import 'package:movein/Pages/Houses.dart';
 import 'package:movein/Pages/Profile.dart';
 
-class loading extends StatefulWidget {
-  const loading({Key? key}) : super(key: key);
+class Loading extends StatefulWidget {
+  const Loading({Key? key}) : super(key: key);
 
   @override
-  State<loading> createState() => _loadingState();
+  State<Loading> createState() => _LoadingState();
 }
 
-class _loadingState extends State<loading> {
-
-  void GetData() async {
-
-    Response response = await get('http://jsonplaceholder.typicode.com/todos/1' as Uri);
-    
+class _LoadingState extends State<Loading> {
+  void getData() async {
+    Response response = await get(Uri.parse('http://jsonplaceholder.typicode.com/todos/1'));
     Map data = jsonDecode(response.body);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -33,19 +29,17 @@ class _loadingState extends State<loading> {
         body: SafeArea(
           child: Text('example Loading'),
         ),
-
         bottomNavigationBar: custom_navbar(),
       ),
       routes: {
-        '/': (context) => loading(),
-        '/Scroller': (context) => scroller(),
-        '/Messages': (context) => messages(),
-        '/Groups': (context) => groups(),
-        '/Profile': (context) => profile(),
-        '/Settings': (context) => settings(),
-        '/Houses': (context) => houses(),
+        '/': (context) => Loading(),
+        '/Scroller': (context) => Scroller(),
+        '/Messages': (context) => Messages(),
+        '/Groups': (context) => Groups(),
+        '/Profile': (context) => Profile(),
+        '/Settings': (context) => Settings(),
+        '/Houses': (context) => Houses(),
       },
-
     );
   }
 }

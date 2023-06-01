@@ -7,14 +7,14 @@ import 'package:movein/Pages/Houses.dart';
 import 'package:movein/Pages/Loading.dart';
 import 'package:movein/Pages/Profile.dart';
 
-class settings extends StatefulWidget {
-  const settings({Key? key}) : super(key: key);
+class Settings extends StatefulWidget {
+  const Settings({Key? key}) : super(key: key);
 
   @override
-  State<settings> createState() => _settingsState();
+  State<Settings> createState() => _SettingsState();
 }
 
-class _settingsState extends State<settings> {
+class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,18 +22,16 @@ class _settingsState extends State<settings> {
         body: SafeArea(
           child: Text('example Settings'),
         ),
-
         bottomNavigationBar: custom_navbar(),
       ),
       routes: {
-        '/Scroller': (context) => scroller(),
-        '/Messages': (context) => messages(),
-        '/Groups': (context) => groups(),
-        '/Profile': (context) => profile(),
-        '/Settings': (context) => settings(),
-        '/Houses': (context) => houses(),
+        '/Scroller': (context) => Scroller(),
+        '/Messages': (context) => Messages(),
+        '/Groups': (context) => Groups(),
+        '/Profile': (context) => Profile(),
+        '/Settings': (context) => Settings(),
+        '/Houses': (context) => Houses(),
       },
-
     );
   }
 }

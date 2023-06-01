@@ -11,13 +11,13 @@ void main() {
   runApp(MaterialApp(
     initialRoute: '/Scroller',
     routes: {
-      '/': (context) => loading(),
-      '/Scroller': (context) => scroller(),
-      '/Messages': (context) => messages(),
-      '/Groups': (context) => groups(),
-      '/Profile': (context) => profile(),
-      '/Settings': (context) => settings(),
-      '/Houses': (context) => houses(),
+      '/': (context) => Loading(),
+      '/Scroller': (context) => Scroller(),
+      '/Messages': (context) => Messages(),
+      '/Groups': (context) => Groups(),
+      '/Profile': (context) => Profile(),
+      '/Settings': (context) => Settings(),
+      '/Houses': (context) => Houses(),
     },
   ));
 }

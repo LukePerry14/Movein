@@ -5,22 +5,19 @@ import 'package:movein/Pages/Messages.dart';
 import 'package:movein/Pages/Groups.dart';
 import 'package:movein/Pages/Settings.dart';
 import 'package:movein/Pages/Houses.dart';
-import 'package:movein/Pages/Loading.dart';
 import 'package:movein/Pages/Profile.dart';
 
-class scroller extends StatefulWidget {
-  const scroller({Key? key}) : super(key: key);
+class Scroller extends StatefulWidget {
+  const Scroller({Key? key}) : super(key: key);
 
   @override
-  State<scroller> createState() => _scrollerState();
+  State<Scroller> createState() => _ScrollerState();
 }
 
-class _scrollerState extends State<scroller> {
-
+class _ScrollerState extends State<Scroller> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-
       home: Material(
         color: Colors.transparent,
         child: SafeArea(
@@ -31,7 +28,6 @@ class _scrollerState extends State<scroller> {
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.end,
-
                 children: [
                   Container(
                     height: 20.0,
@@ -47,24 +43,18 @@ class _scrollerState extends State<scroller> {
                 ],
               ),
             ),
-
             bottomNavigationBar: custom_navbar(),
           ),
-
         ),
-
       ),
       routes: {
-        '/Scroller': (context) => scroller(),
-        '/Messages': (context) => messages(),
-        '/Groups': (context) => groups(),
-        '/Profile': (context) => profile(),
-        '/Settings': (context) => settings(),
-        '/Houses': (context) => houses(),
+        '/Scroller': (context) => Scroller(),
+        '/Messages': (context) => Messages(),
+        '/Groups': (context) => Groups(),
+        '/Profile': (context) => Profile(),
+        '/Settings': (context) => Settings(),
+        '/Houses': (context) => Houses(),
       },
-
-
     );
   }
 }
-

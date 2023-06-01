@@ -11,10 +11,12 @@ class Swiper extends StatefulWidget {
   State<Swiper> createState() => _SwiperState();
 }
 
-class _SwiperState extends State<Swiper> {
+class _SwiperState extends State<Swiper> with SingleTickerProviderStateMixin{
 
   int Stack_pos = 0;
-  double Swipe_Threshhold = 250.0;
+  double swipeThreshhold = 350.0;
+  double defaultPositionX = 0.0;
+  double defaultPositionY = 0.0;
 
   List<Profile> profiles = <Profile>[];
 
@@ -29,9 +31,9 @@ class _SwiperState extends State<Swiper> {
   }
 
   void evaluateSwipe(dx) {
-    if (dx > Swipe_Threshhold) {
+    if (dx > swipeThreshhold) {
       saveGroup();
-    } else if (dx < -Swipe_Threshhold) {
+    } else if (dx < -swipeThreshhold) {
       blockGroup();
     }
 
