@@ -32,10 +32,16 @@ class Group {
 
 class Groups extends StatelessWidget {
   final List<Group> userGroups;
+  final List<Group> shortList;
 
   const Groups({
     Key? key,
     this.userGroups = const [
+      Group(members:{1423: "Meghan", 5678: "Jack", 8471: "Tiffany"}, groupName: ""),
+      Group(members: {5341: "Petes", 5478: "Pomps", 8472: "Brian"}, groupName: "gcgc"),
+      Group(members: {9801: "Dum", 7854: "Dee", 9071: "Me"}, groupName: "Helen Keller"),
+    ],
+    this.shortList = const [
       Group(members:{1423: "Meghan", 5678: "Jack", 8471: "Tiffany"}, groupName: ""),
       Group(members: {5341: "Petes", 5478: "Pomps", 8472: "Brian"}, groupName: "gcgc"),
       Group(members: {9801: "Dum", 7854: "Dee", 9071: "Me"}, groupName: "Helen Keller"),
@@ -52,38 +58,96 @@ class Groups extends StatelessWidget {
           elevation: 0,
           title: const Text('Groups'),
         ),
-        body: ListView.builder(
-          itemCount: userGroups.length,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: EdgeInsets.zero,
-              child: Card(
-                elevation: 0, // Optional: Set elevation to 0 to remove the shadow
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                color: Colors.transparent, // Set the background color of the Card to transparent
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey[500]!,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Enrolled Groups',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Flexible(
+              child: ListView.builder(
+                itemCount: userGroups.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: EdgeInsets.zero,
+                    child: Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                      color: Colors.transparent,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Colors.grey[300]!,
+                            ),
+                          ),
+                        ),
+                        child: ListTile(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/Messages', arguments: {
+                              'members': userGroups[index].members,
+                              'groupName': userGroups[index].name(),
+                            });
+                          },
+                          title: Text(userGroups[index].name()),
+                        ),
                       ),
                     ),
-                  ),
-                  child: ListTile(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/Messages', arguments: {
-                        'members': userGroups[index].members,
-                        'groupName': userGroups[index].name(),
-                      });
-                    },
-                    title: Text(userGroups[index].name()),
-                  ),
+                  );
+                },
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'Shortlist',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Flexible(
+
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ListView.builder(
+                  itemCount: userGroups.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: EdgeInsets.zero,
+                      child: Card(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                        color: Colors.transparent,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Colors.grey[300]!,
+                              ),
+                            ),
+                          ),
+                          child: ListTile(
+                            onTap: () {
+                              Navigator.pushNamed(context, '/Messages', arguments: {
+                                'members': shortList[index].members,
+                                'groupName': shortList[index].name(),
+                              });
+                            },
+                            title: Text(shortList[index].name()),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-            );
-
-          },
+            ),
+          ],
         ),
+
         bottomNavigationBar: custom_navbar(),
       ),
       routes: {
