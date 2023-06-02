@@ -5,18 +5,18 @@ import 'package:movein/Pages/Messages.dart';
 import 'package:movein/Pages/Groups.dart';
 import 'package:movein/Pages/Settings.dart';
 import 'package:movein/Pages/Houses.dart';
-import 'package:movein/Pages/Login.dart';
+import 'package:movein/Pages/Profile.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
-class Profile extends StatelessWidget {
-  const Profile({Key? key}) : super(key: key);
+class Login extends StatelessWidget {
+  const Login({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         body: SafeArea(
-          child: Text('example Profile'),
+          child: Text('example Login'),
         ),
         bottomNavigationBar: custom_navbar(),
       ),
@@ -27,7 +27,6 @@ class Profile extends StatelessWidget {
         '/Profile': (context) => Profile(),
         '/Settings': (context) => Settings(),
         '/Houses': (context) => Houses(),
-        '/Login': (context) => Login(),
       },
     );
   }
