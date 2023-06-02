@@ -5,6 +5,7 @@ First attempt at prototype movein app
 ## Resources
 - animate card - https://docs.flutter.dev/cookbook/animation/physics-simulation
 - animate routing - https://docs.flutter.dev/cookbook/animation/page-route-animation
+- sexy login skeleton - https://codingwitht.com/flutter-login-app (coding with tea)
 
 
 ## Getting Started
