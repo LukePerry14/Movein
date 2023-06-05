@@ -18,6 +18,27 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        appBar: AppBar( //maybe replace with a sliverappbar to improve polish
+          backgroundColor: Colors.orange[300],
+          title: Text('Settings'),
+          centerTitle: true,
+          elevation: 0,
+          leading: BackButton(
+            color: Colors.grey[500],
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          actions: [
+            IconButton(
+              color: Colors.grey[500],
+              icon: Icon(Icons.more_vert), //Icon not showing
+              onPressed: () {
+                // Handle settings button press
+              },
+            ),
+          ],
+        ),
         body: SafeArea(
           child: Text('example Settings'),
         ),
