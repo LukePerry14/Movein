@@ -20,7 +20,7 @@ class _SettingsState extends State<Settings> {
       home: Scaffold(
         appBar: AppBar( //maybe replace with a sliverappbar to improve polish
           backgroundColor: Colors.orange[300],
-          title: Text('Settings'),
+          title: const Text('Settings'),
           centerTitle: true,
           elevation: 0,
           leading: BackButton(

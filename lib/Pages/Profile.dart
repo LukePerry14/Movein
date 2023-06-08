@@ -16,8 +16,8 @@ class Profile extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          elevation: 10.0,
-          leading: IconButton(onPressed: () {}, icon: const Icon(LineAwesomeIcons.angle_left)),
+          elevation: 0.0,
+          centerTitle: true,
           title: const Text("Profile"),
           backgroundColor: Colors.orange[300],
 

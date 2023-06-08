@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 class custom_navbar extends StatelessWidget {
   const custom_navbar({Key? key}) : super(key: key);
@@ -14,7 +15,7 @@ class custom_navbar extends StatelessWidget {
             onPressed: () {
               Navigator.pushReplacementNamed(context, '/Scroller');
             },
-            icon: Icon(Icons.view_headline),
+            icon: Icon(LineAwesomeIcons.bars),
             color: Colors.white,
           ),
           IconButton(
