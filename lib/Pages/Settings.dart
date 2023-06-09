@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:movein/navbar.dart';
-import 'package:movein/Pages/Scroller.dart';
-import 'package:movein/Pages/Messages.dart';
-import 'package:movein/Pages/Groups.dart';
-import 'package:movein/Pages/Houses.dart';
-import 'package:movein/Pages/Profile.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -19,11 +14,12 @@ class _SettingsState extends State<Settings> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar( //maybe replace with a sliverappbar to improve polish
-          backgroundColor: Colors.orange[300],
-          title: const Text('Settings'),
+          backgroundColor: const Color(0xFFfafafa),
+          title: Text('Settings', style: Theme.of(context).textTheme.headlineMedium),
           centerTitle: true,
           elevation: 0,
-          leading: BackButton(
+          leading: IconButton(
+            icon: Icon(LineAwesomeIcons.angle_left, color: Colors.black),
             color: Colors.grey[500],
             onPressed: () {
               Navigator.pop(context);
@@ -39,19 +35,12 @@ class _SettingsState extends State<Settings> {
             ),
           ],
         ),
-        body: SafeArea(
+        body: const SafeArea(
           child: Text('example Settings'),
         ),
-        bottomNavigationBar: custom_navbar(),
+
       ),
-      routes: {
-        '/Scroller': (context) => Scroller(),
-        '/Messages': (context) => Messages(),
-        '/Groups': (context) => Groups(),
-        '/Profile': (context) => Profile(),
-        '/Settings': (context) => Settings(),
-        '/Houses': (context) => Houses(),
-      },
+
     );
   }
 }

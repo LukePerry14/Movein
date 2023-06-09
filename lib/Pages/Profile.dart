@@ -18,8 +18,8 @@ class Profile extends StatelessWidget {
         appBar: AppBar(
           elevation: 0.0,
           centerTitle: true,
-          title: const Text("Profile"),
-          backgroundColor: Colors.orange[300],
+          title: Text("Profile", style: Theme.of(context).textTheme.headlineMedium),
+          backgroundColor: Color(0xFFfafafa),
 
         ),
         body: SingleChildScrollView(

@@ -5,6 +5,7 @@ import 'package:movein/Pages/Groups.dart';
 import 'package:movein/Pages/Settings.dart';
 import 'package:movein/Pages/Houses.dart';
 import 'package:movein/Pages/Profile.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 class Messages extends StatefulWidget {
   const Messages({Key? key}) : super(key: key);
@@ -25,11 +26,12 @@ class _MessagesState extends State<Messages> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar( //maybe replace with a sliverappbar to improve polish
-          backgroundColor: Colors.orange[300],
-          title: Text('${data['groupName']}'),
+          backgroundColor: const Color(0xFFfafafa),
+          title: Text('${data['groupName']}', style: Theme.of(context).textTheme.headlineMedium),
           centerTitle: true,
           elevation: 0,
-          leading: BackButton(
+          leading: IconButton(
+            icon: Icon(LineAwesomeIcons.angle_left, color: Colors.black),
             color: Colors.grey[500],
             onPressed: () {
               Navigator.pop(context);
@@ -38,7 +40,7 @@ class _MessagesState extends State<Messages> {
           actions: [
             IconButton(
               color: Colors.grey[500],
-              icon: Icon(Icons.more_vert), //Icon not showing
+              icon: Icon(Icons.more_vert, color: Colors.black), //Icon not showing
               onPressed: () {
                 // Handle settings button press
               },
@@ -48,16 +50,7 @@ class _MessagesState extends State<Messages> {
         body: SafeArea(
           child: Text('example Messages'),
         ),
-        bottomNavigationBar: custom_navbar(),
       ),
-      routes: {
-        '/Scroller': (context) => Scroller(),
-        '/Messages': (context) => Messages(),
-        '/Groups': (context) => Groups(),
-        '/Profile': (context) => Profile(),
-        '/Settings': (context) => Settings(),
-        '/Houses': (context) => Houses(),
-      },
     );
   }
 }

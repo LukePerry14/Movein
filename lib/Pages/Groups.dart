@@ -53,10 +53,10 @@ class Groups extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.orange[300],
+          backgroundColor: Color(0xFFfafafa),
           centerTitle: true,
           elevation: 0,
-          title: const Text('Groups'),
+          title: Text('Groups', style: Theme.of(context).textTheme.headlineMedium),
         ),
         body: Column(
           children: [
