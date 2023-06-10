@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LAppTheme{
-  static TextStyle header = GoogleFonts.sourceCodePro(color: Colors.black54);
-  static TextStyle sHeader = GoogleFonts.sourceCodePro(color: Colors.black45, fontWeight: FontWeight.bold);
-  static TextStyle body = GoogleFonts.roboto(color: Colors.black87);
+  static TextStyle header = GoogleFonts.sourceCodePro(color: Colors.black, fontWeight: FontWeight.bold);
+  static TextStyle sHeader = GoogleFonts.sourceCodePro(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 20.0);
+  static TextStyle body = GoogleFonts.roboto(color: Colors.black87, fontSize: 16.5);
+  static TextStyle sBody = GoogleFonts.roboto(color: Colors.black87, fontSize: 12.0);
 
 
-  static TextStyle d_header = GoogleFonts.sourceCodePro(color: Colors.white);
-  static TextStyle d_sHeader = GoogleFonts.sourceCodePro(color: Colors.white);
-  static TextStyle d_body = GoogleFonts.roboto(color: Colors.white70);
+  static TextStyle d_header = GoogleFonts.sourceCodePro(color: Colors.white, fontWeight: FontWeight.bold);
+  static TextStyle d_sHeader = GoogleFonts.sourceCodePro(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.0);
+  static TextStyle d_body = GoogleFonts.roboto(color: Colors.white70, fontSize: 16.5);
+  static TextStyle d_sBody = GoogleFonts.roboto(color: Colors.white70, fontSize: 12.0);
 
   static ThemeData lightTheme = ThemeData(
       brightness: Brightness.light,
@@ -30,6 +32,7 @@ class LAppTheme{
       headlineMedium: header,
       headlineSmall: sHeader,
       bodyMedium: body,
+      bodySmall: sBody,
     ),
 
   );
@@ -53,6 +56,7 @@ class LAppTheme{
       headlineMedium: d_header,
       headlineSmall: d_sHeader,
       bodyMedium: d_body,
+      bodySmall: d_sBody,
     ),
   );
 }

@@ -15,7 +15,7 @@ class _MessagesState extends State<Messages> {
 
     //retrieves data from previous page to display relevant groupName
     data = ModalRoute.of(context)?.settings.arguments as Map;
-
+    print(data);
     return Builder(
         builder: (context) {
           final navigator = Navigator.of(context);
@@ -28,6 +28,14 @@ class _MessagesState extends State<Messages> {
                   .headlineSmall),
               centerTitle: true,
               elevation: 0,
+              backgroundColor: Theme.of(context).canvasColor,
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(1.0),
+                child: Container(
+                  color: Theme.of(context).primaryColor,
+                  height: 1.0,
+                ),
+              ),
               leading: IconButton(
                 icon: const Icon(LineAwesomeIcons.angle_left),
                 color: Colors.grey[500],
@@ -41,7 +49,10 @@ class _MessagesState extends State<Messages> {
                   icon: const Icon(Icons.more_vert, color: Colors.black),
                   //Icon not showing
                   onPressed: () {
-                    // Handle settings button press
+                    Navigator.pushNamed(context, '/GroupOptions', arguments: {
+                      'members': data['members'],
+                      'groupName': data['groupName'],
+                    });
                   },
                 ),
               ],

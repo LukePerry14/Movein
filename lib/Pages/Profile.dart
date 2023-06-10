@@ -15,6 +15,7 @@ class Profile extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               automaticallyImplyLeading: false,
+
               elevation: 0.0,
               centerTitle: true,
               title: Text("Profile", style: Theme
@@ -23,8 +24,7 @@ class Profile extends StatelessWidget {
                   .headlineMedium),
               backgroundColor: Theme
                   .of(context)
-                  .colorScheme
-                  .background,
+                  .canvasColor,
 
             ),
             body: SingleChildScrollView(
@@ -42,8 +42,7 @@ class Profile extends StatelessWidget {
                             width: 100, height: 100,
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(100),
-                              child: const Image(image: AssetImage(
-                                  "assets/Pictures/bud-dha.png")),
+                              child: const Image(image: AssetImage("assets/Pictures/ph.png")),
                             ),
                           ),
                         ),
@@ -55,7 +54,7 @@ class Profile extends StatelessWidget {
                             height: 30.0,
                             width: 30.0,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Colors.white60,
                               borderRadius: BorderRadius.circular(100),
                             ),
                             child: const Icon(LineAwesomeIcons.pen_nib,
@@ -69,7 +68,7 @@ class Profile extends StatelessWidget {
 
                     const SizedBox(height: 20.0),
 
-                    const Text("Buddha"),
+                    const Text("Place Holder"),
 
                     const SizedBox(height: 30.0),
 
@@ -89,12 +88,9 @@ class Profile extends StatelessWidget {
                           color: Colors.grey[200]?.withOpacity(0.1),
                         ),
                         child: const Icon(
-                          LineAwesomeIcons.cog, color: Colors.black38,),
+                          LineAwesomeIcons.cog, color: Colors.black38),
                       ),
-                      title: Text("Settings", style: Theme
-                          .of(context)
-                          .textTheme
-                          .bodyMedium,),
+                      title: Text("Settings", style: Theme.of(context).textTheme.bodyMedium,),
                     ),
 
                     ListTile(

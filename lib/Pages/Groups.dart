@@ -56,7 +56,7 @@ class Groups extends StatelessWidget {
       return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: Theme.of(context).colorScheme.background,
+          backgroundColor: Theme.of(context).canvasColor,
           centerTitle: true,
           elevation: 0,
           title: Text('Groups', style: Theme.of(context).textTheme.headlineMedium),
