@@ -8,68 +8,62 @@ import 'package:movein/Pages/Houses.dart';
 import 'package:movein/Pages/Profile.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
-class Scroller extends StatefulWidget {
+class Scroller extends StatelessWidget {
   const Scroller({Key? key}) : super(key: key);
 
   @override
-  State<Scroller> createState() => _ScrollerState();
-}
-
-class _ScrollerState extends State<Scroller> {
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Material(
-        color: Colors.transparent,
-        child: SafeArea(
-          child: Scaffold(
-            body: Container(
-              alignment: Alignment.center,
-              color: Colors.white,
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.end,
+    return Builder(
+      builder: (context) {
+        final navigator = Navigator.of(context);
+
+        return Material(
+          color: Colors.transparent,
+          child: SafeArea(
+            child: Scaffold(
+              body: Container(
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Container(
+                      height: 20.0,
+                      alignment: Alignment.bottomCenter,
+                      child: null,
+                    ),
+                    const Gscroller(),
+                  ],
+                ),
+              ),
+              floatingActionButton: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Container(
-                    height: 20.0,
-                    alignment: Alignment.bottomCenter,
-                    child: null,
+                  FloatingActionButton(
+                    backgroundColor: Theme.of(context).primaryColor?.withOpacity(0.5),
+                    onPressed: () {},
+                    child: const Icon(LineAwesomeIcons.angle_right, color: Colors.white),
                   ),
-                  const Gscroller(),
+                  FloatingActionButton(
+                    backgroundColor: Theme.of(context).primaryColor?.withOpacity(0.5),
+                    onPressed: () {},
+                    child: const Icon(LineAwesomeIcons.times, color: Colors.white),
+                  ),
+                  FloatingActionButton(
+                    backgroundColor: Theme.of(context).primaryColor?.withOpacity(0.5),
+                    onPressed: () {},
+                    child: const Icon(LineAwesomeIcons.check, color: Colors.white),
+                  ),
                 ],
               ),
+              bottomNavigationBar: CustomNavbar(
+                onItemSelected: (route) {
+                  navigator.pushNamed(route);
+                },
+              ),
             ),
-            floatingActionButton: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                FloatingActionButton(
-                  child: Icon(LineAwesomeIcons.angle_right),
-                  backgroundColor: Colors.orange[300]?.withOpacity(0.5),
-                  onPressed: () {},
-                ),
-                FloatingActionButton(
-                  child: Icon(LineAwesomeIcons.times),
-                  backgroundColor: Colors.orange[300]?.withOpacity(0.5),
-                  onPressed: () {},
-                ),
-                FloatingActionButton(
-                  child: Icon(LineAwesomeIcons.check),
-                  backgroundColor: Colors.orange[300]?.withOpacity(0.5),
-                  onPressed: () {},
-                ),
-              ],
-            ),
-            bottomNavigationBar: custom_navbar(),
           ),
-        ),
-      ),
-      routes: {
-        '/Scroller': (context) => Scroller(),
-        '/Messages': (context) => Messages(),
-        '/Groups': (context) => Groups(),
-        '/Profile': (context) => Profile(),
-        '/Settings': (context) => Settings(),
-        '/Houses': (context) => Houses(),
+        );
       },
     );
   }

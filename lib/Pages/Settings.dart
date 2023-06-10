@@ -19,7 +19,7 @@ class _SettingsState extends State<Settings> {
           centerTitle: true,
           elevation: 0,
           leading: IconButton(
-            icon: Icon(LineAwesomeIcons.angle_left, color: Colors.black),
+            icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.black),
             color: Colors.grey[500],
             onPressed: () {
               Navigator.pop(context);
@@ -28,7 +28,7 @@ class _SettingsState extends State<Settings> {
           actions: [
             IconButton(
               color: Colors.grey[500],
-              icon: Icon(Icons.more_vert), //Icon not showing
+              icon: const Icon(Icons.more_vert), //Icon not showing
               onPressed: () {
                 // Handle settings button press
               },

@@ -1,42 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
-class custom_navbar extends StatelessWidget {
-  const custom_navbar({Key? key}) : super(key: key);
+class CustomNavbar extends StatelessWidget {
+  const CustomNavbar({Key? key, required this.onItemSelected}) : super(key: key);
+
+  final Function(String) onItemSelected;
 
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      color: Colors.orange[300],
+      color: Theme.of(context).primaryColor,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           IconButton(
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/Scroller');
+              onItemSelected('/Scroller');
             },
-            icon: Icon(LineAwesomeIcons.bars),
+            icon: const Icon(LineAwesomeIcons.bars),
             color: Colors.white,
           ),
           IconButton(
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/Groups');
+              onItemSelected('/Groups');
             },
-            icon: Icon(Icons.group),
+            icon: const Icon(Icons.group),
             color: Colors.white,
           ),
           IconButton(
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/Profile');
+              onItemSelected('/Profile');
             },
-            icon: Icon(Icons.person),
+            icon: const Icon(Icons.person),
             color: Colors.white,
           ),
           IconButton(
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/Houses');
+              onItemSelected('/Houses');
             },
-            icon: Icon(Icons.home),
+            icon: const Icon(Icons.home),
             color: Colors.white,
           ),
         ],
@@ -44,3 +46,4 @@ class custom_navbar extends StatelessWidget {
     );
   }
 }
+

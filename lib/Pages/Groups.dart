@@ -50,10 +50,13 @@ class Groups extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    return Builder(
+        builder: (context) {
+          final navigator = Navigator.of(context);
+      return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(0xFFfafafa),
+          automaticallyImplyLeading: false,
+          backgroundColor: Theme.of(context).colorScheme.background,
           centerTitle: true,
           elevation: 0,
           title: Text('Groups', style: Theme.of(context).textTheme.headlineMedium),
@@ -65,19 +68,19 @@ class Groups extends StatelessWidget {
                   itemCount: userGroups.length + shortList.length + 2,
                   itemBuilder: (context, index) {
                     if (index == 0){
-                      return const Padding(
-                        padding: EdgeInsets.all(8.0),
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
                         child: Text(
                           'Enrolled Groups',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: Theme.of(context).textTheme.headlineSmall,
                         ),
                       );
                     }else if(index == userGroups.length+1){
-                      return const Padding(
-                        padding: EdgeInsets.all(8.0),
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
                         child: Text(
                           'Shortlist',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: Theme.of(context).textTheme.headlineSmall,
                         ),
                       );
                     }else if(index < userGroups.length+1){
@@ -85,7 +88,7 @@ class Groups extends StatelessWidget {
                         padding: EdgeInsets.zero,
                         child: Card(
                           elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                           color: Colors.transparent,
                           child: Container(
                             decoration: BoxDecoration(
@@ -102,7 +105,7 @@ class Groups extends StatelessWidget {
                                   'groupName': userGroups[index-1].name(),
                                 });
                               },
-                              title: Text(userGroups[index-1].name()),
+                              title: Text(userGroups[index-1].name(), style: Theme.of(context).textTheme.bodyMedium),
                             ),
                           ),
                         ),
@@ -112,7 +115,7 @@ class Groups extends StatelessWidget {
                         padding: EdgeInsets.zero,
                         child: Card(
                           elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                           color: Colors.transparent,
                           child: Container(
                             decoration: BoxDecoration(
@@ -129,7 +132,7 @@ class Groups extends StatelessWidget {
                                   'groupName': shortList[index - userGroups.length - 2].name(),
                                 });
                               },
-                              title: Text(shortList[index - userGroups.length - 2].name()),
+                              title: Text(shortList[index - userGroups.length - 2].name(), style: Theme.of(context).textTheme.bodyMedium),
                             ),
                           ),
                         ),
@@ -142,16 +145,13 @@ class Groups extends StatelessWidget {
       ]
         ),
 
-        bottomNavigationBar: custom_navbar(),
-      ),
-      routes: {
-        '/Scroller': (context) => Scroller(),
-        '/Messages': (context) => Messages(),
-        '/Groups': (context) => Groups(),
-        '/Profile': (context) => Profile(),
-        '/Settings': (context) => Settings(),
-        '/Houses': (context) => Houses(),
-      },
+        bottomNavigationBar: CustomNavbar(
+          onItemSelected: (route) {
+            navigator.pushNamed(route);
+          },
+        ),
+      );
+  }
     );
   }
 }
