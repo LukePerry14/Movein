@@ -35,6 +35,13 @@ class CustomNavbar extends StatelessWidget {
             color: Colors.white,
           ),
           IconButton(
+              onPressed: () {
+                onItemSelected('/Friends');
+              },
+              icon: const Icon(Icons.mail),
+              color: Colors.white,
+          ),
+          IconButton(
             onPressed: () {
               onItemSelected('/Houses');
             },

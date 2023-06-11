@@ -31,12 +31,12 @@ class Group {
 }
 
 class Groups extends StatelessWidget {
-  final List<Group> userGroups;
+  final List<Group> applications;
   final List<Group> shortList;
 
   const Groups({
     Key? key,
-    this.userGroups = const [
+    this.applications = const [
       Group(members:{1423: "Meghan", 5678: "Jack", 8471: "Tiffany"}, groupName: ""),
       Group(members: {5341: "Petes", 5478: "Pomps", 8472: "Brian"}, groupName: "gcgc"),
       Group(members: {9801: "Dum", 7854: "Dee", 9071: "Me"}, groupName: "Helen Keller"),
@@ -47,6 +47,8 @@ class Groups extends StatelessWidget {
       Group(members: {9801: "Dum", 7854: "Dee", 9071: "Me"}, groupName: "Helen Keller"),
     ],
   }) : super(key: key);
+  final int appsNum = 0;
+  final int appsMax = 3;
 
   @override
   Widget build(BuildContext context) {
@@ -60,22 +62,42 @@ class Groups extends StatelessWidget {
           centerTitle: true,
           elevation: 0,
           title: Text('Groups', style: Theme.of(context).textTheme.headlineMedium),
+          actions: [
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Container(
+                decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(8)
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("Applied: ${applications.length}/$appsMax", style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+              ),
+            ),
+
+
+
+            const SizedBox(width: 20.0),
+          ],
         ),
         body: Column(
           children: [
             Expanded(
                 child: ListView.builder(
-                  itemCount: userGroups.length + shortList.length + 2,
+                  itemCount: applications.length + shortList.length + 2,
                   itemBuilder: (context, index) {
                     if (index == 0){
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          'Enrolled Groups',
+                          'Applications',
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                       );
-                    }else if(index == userGroups.length+1){
+                    }else if(index == applications.length+1){
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
@@ -83,7 +105,7 @@ class Groups extends StatelessWidget {
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                       );
-                    }else if(index < userGroups.length+1){
+                    }else if(index < applications.length+1){
                       return Padding(
                         padding: EdgeInsets.zero,
                         child: Card(
@@ -101,11 +123,11 @@ class Groups extends StatelessWidget {
                             child: ListTile(
                               onTap: () {
                                 Navigator.pushNamed(context, '/Messages', arguments: {
-                                  'members': userGroups[index-1].members,
-                                  'groupName': userGroups[index-1].name(),
+                                  'members': applications[index-1].members,
+                                  'groupName': applications[index-1].name(),
                                 });
                               },
-                              title: Text(userGroups[index-1].name(), style: Theme.of(context).textTheme.bodyMedium),
+                              title: Text(applications[index-1].name(), style: Theme.of(context).textTheme.bodyMedium),
                             ),
                           ),
                         ),
@@ -128,11 +150,11 @@ class Groups extends StatelessWidget {
                             child: ListTile(
                               onTap: () {
                                 Navigator.pushNamed(context, '/Messages', arguments: {
-                                  'members': shortList[index - userGroups.length - 2].members,
-                                  'groupName': shortList[index - userGroups.length - 2].name(),
+                                  'members': shortList[index - applications.length - 2].members,
+                                  'groupName': shortList[index - applications.length - 2].name(),
                                 });
                               },
-                              title: Text(shortList[index - userGroups.length - 2].name(), style: Theme.of(context).textTheme.bodyMedium),
+                              title: Text(shortList[index - applications.length - 2].name(), style: Theme.of(context).textTheme.bodyMedium),
                             ),
                           ),
                         ),

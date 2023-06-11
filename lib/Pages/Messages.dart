@@ -15,7 +15,6 @@ class _MessagesState extends State<Messages> {
 
     //retrieves data from previous page to display relevant groupName
     data = ModalRoute.of(context)?.settings.arguments as Map;
-    print(data);
     return Builder(
         builder: (context) {
           final navigator = Navigator.of(context);
