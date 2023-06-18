@@ -102,6 +102,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: LAppTheme.lightTheme,
       darkTheme: LAppTheme.darkTheme,
       themeMode: ThemeMode.light,

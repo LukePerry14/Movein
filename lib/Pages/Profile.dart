@@ -13,55 +13,72 @@ class Profile extends StatelessWidget {
           final navigator = Navigator.of(context);
 
           return Scaffold(
-            appBar: AppBar(
-              automaticallyImplyLeading: false,
+            // appBar: AppBar(
+            //   automaticallyImplyLeading: false,
+            //   elevation: 0.0,
+            //   centerTitle: true,
+            //   title: Text("Profile", style: Theme
+            //       .of(context)
+            //       .textTheme
+            //       .headlineMedium),
+            //   backgroundColor: Theme
+            //       .of(context)
+            //       .canvasColor,
 
-              elevation: 0.0,
-              centerTitle: true,
-              title: Text("Profile", style: Theme
-                  .of(context)
-                  .textTheme
-                  .headlineMedium),
-              backgroundColor: Theme
-                  .of(context)
-                  .canvasColor,
-
-            ),
+            // ),
             body: SingleChildScrollView(
               child: Container(
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
                   children: [
-                    Stack(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            print("testing");
-                          },
-                          child: SizedBox(
-                            width: 100, height: 100,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(100),
-                              child: const Image(image: AssetImage("assets/Pictures/ph.png")),
-                            ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        const Padding(
+                          padding: EdgeInsets.all(40.0),
+                          child: Icon(
+                            LineAwesomeIcons.sun,
                           ),
                         ),
-
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            height: 30.0,
-                            width: 30.0,
-                            decoration: BoxDecoration(
-                              color: Colors.white60,
-                              borderRadius: BorderRadius.circular(100),
+                        Stack(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                print("testing");
+                              },
+                              child: SizedBox(
+                                width: 100, height: 100,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(100),
+                                  child: const Image(image: AssetImage("assets/Pictures/ph.png")),
+                                ),
+                              ),
                             ),
-                            child: const Icon(LineAwesomeIcons.pen_nib,
-                                color: Colors.grey),
 
-                          ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                height: 30.0,
+                                width: 30.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.white60,
+                                  borderRadius: BorderRadius.circular(100),
+                                ),
+                                child: const Icon(LineAwesomeIcons.pen_nib,
+                                    color: Colors.grey),
+
+                              ),
+                            ),
+                          ],
                         ),
+                        const Padding(
+                          padding: EdgeInsets.all(40.0),
+                          child: Icon(
+                            LineAwesomeIcons.share_square_1,
+                          ),
+                        )
                       ],
                     ),
 
@@ -70,11 +87,22 @@ class Profile extends StatelessWidget {
 
                     const Text("Name"),
 
+                    const SizedBox(height: 15.0),
+
+                    const Text('Email'),
+
                     const SizedBox(height: 30.0),
 
                     const Divider(),
 
                     const SizedBox(height: 60.0),
+
+                    ListTile(
+                      onTap: () => {
+                        print('Upgrade account')
+                      },
+                      title: Text('Upgrade to Premium :)'),
+                    ),
 
                     ListTile(
                       onTap: () {
