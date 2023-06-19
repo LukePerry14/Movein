@@ -11,21 +11,7 @@ class Profile extends StatelessWidget {
     return Builder(
         builder: (context) {
           final navigator = Navigator.of(context);
-
           return Scaffold(
-            // appBar: AppBar(
-            //   automaticallyImplyLeading: false,
-            //   elevation: 0.0,
-            //   centerTitle: true,
-            //   title: Text("Profile", style: Theme
-            //       .of(context)
-            //       .textTheme
-            //       .headlineMedium),
-            //   backgroundColor: Theme
-            //       .of(context)
-            //       .canvasColor,
-
-            // ),
             body: SingleChildScrollView(
               child: Container(
                 padding: const EdgeInsets.all(10.0),
