@@ -3,7 +3,7 @@ import 'package:movein/navbar.dart';
 import 'package:movein/HScroll.dart';
 import 'package:movein/Pages/Messages.dart';
 import 'package:movein/Pages/Groups.dart';
-import 'package:movein/Pages/Settings.dart';
+import 'package:movein/Pages/SettingsPage.dart';
 import 'package:movein/Pages/Houses.dart';
 import 'package:movein/Pages/Profile.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
