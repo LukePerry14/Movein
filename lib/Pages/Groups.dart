@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movein/navbar.dart';
-import 'package:movein/Pages/Scroller.dart';
-import 'package:movein/Pages/Messages.dart';
-import 'package:movein/Pages/Houses.dart';
-import 'package:movein/Pages/Settings.dart';
-import 'package:movein/Pages/Profile.dart';
+
 
 class Group {
   final Map<int, String> members;

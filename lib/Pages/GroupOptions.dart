@@ -29,17 +29,6 @@ class _GroupOptionsState extends State<GroupOptions> {
 
     //Example Data
 
-    List<Profile> applicants = [
-      Profile(id: '8591', userName: 'Greg', userAge: 21, userDescription: 'likes long wanks', profileImageSrc: 'assets/Pictures/ph.png'),
-      Profile(id: '8591', userName: 'Greg', userAge: 21, userDescription: 'likes long wanks', profileImageSrc: 'assets/Pictures/ph.png'),
-      Profile(id: '8591', userName: 'Greg', userAge: 21, userDescription: 'likes long wanks', profileImageSrc: 'assets/Pictures/ph.png'),
-    ];
-
-    List<Profile> kicks = [
-      Profile(id: '8591', userName: 'Greg', userAge: 21, userDescription: 'likes long wanks', profileImageSrc: 'assets/Pictures/ph.png'),
-      Profile(id: '8591', userName: 'Greg', userAge: 21, userDescription: 'likes long wanks', profileImageSrc: 'assets/Pictures/ph.png'),
-      Profile(id: '8591', userName: 'Greg', userAge: 21, userDescription: 'likes long wanks', profileImageSrc: 'assets/Pictures/ph.png'),
-    ];
 
 
     return Scaffold(
@@ -188,85 +177,85 @@ class _GroupOptionsState extends State<GroupOptions> {
                   ),
 
                   // Votes Builder
-                  LayoutBuilder( // Voting Section
-                      builder: (context, constraints) {
-
-                        return Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: BorderRadius.circular(8)
-                            ),
-                            child: ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: applicants.length + kicks.length + 2,
-                                itemBuilder: (context, index) {
-                                  if (index == 0){
-                                    return Text("Applications", style: Theme.of(context).textTheme.bodyLarge);
-                                  }
-                                  else if (index < applicants.length+1){
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 50, height: 50,
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(100),
-                                              child: Image(image: AssetImage(applicants[index-1].profileImageSrc)),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(applicants[index-1].userName, style: Theme.of(context).textTheme.headlineSmall,),
-                                              Text(applicants[index-1].id, style: Theme.of(context).textTheme.bodySmall,)
-                                            ],
-                                          )
-                                        ],
-
-                                      ),
-                                    );
-                                  }
-                                  else if (index == applicants.length+1){
-                                    return Text("Kicks", style: Theme.of(context).textTheme.bodyLarge);
-                                  }
-                                  else{
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 50, height: 50,
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(100),
-                                              child: Image(image: AssetImage(kicks[index-applicants.length-2].profileImageSrc)),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(kicks[index-applicants.length-2].userName, style: Theme.of(context).textTheme.headlineSmall,),
-                                              Text(kicks[index-applicants.length-2].id, style: Theme.of(context).textTheme.bodySmall,)
-                                            ],
-                                          )
-                                        ],
-
-                                      ),
-                                    );
-                                  }
-                                }
-                            ),
-                          ),
-                        );
-                      }
-                  ),
+                  // LayoutBuilder( // Voting Section
+                  //     builder: (context, constraints) {
+                  //
+                  //       return Padding(
+                  //         padding: const EdgeInsets.all(10.0),
+                  //         child: Container(
+                  //           decoration: BoxDecoration(
+                  //               color: Theme.of(context).primaryColor,
+                  //               borderRadius: BorderRadius.circular(8)
+                  //           ),
+                  //           child: ListView.builder(
+                  //               shrinkWrap: true,
+                  //               physics: const NeverScrollableScrollPhysics(),
+                  //               itemCount: applicants.length + kicks.length + 2,
+                  //               itemBuilder: (context, index) {
+                  //                 if (index == 0){
+                  //                   return Text("Applications", style: Theme.of(context).textTheme.bodyLarge);
+                  //                 }
+                  //                 else if (index < applicants.length+1){
+                  //                   return Padding(
+                  //                     padding: const EdgeInsets.all(8.0),
+                  //                     child: Row(
+                  //                       children: [
+                  //                         SizedBox(
+                  //                           width: 50, height: 50,
+                  //                           child: ClipRRect(
+                  //                             borderRadius: BorderRadius.circular(100),
+                  //                             child: Image(image: AssetImage(applicants[index-1].profileImageSrc)),
+                  //                           ),
+                  //                         ),
+                  //                         const SizedBox(width: 8),
+                  //
+                  //                         Column(
+                  //                           crossAxisAlignment: CrossAxisAlignment.start,
+                  //                           children: [
+                  //                             Text(applicants[index-1].userName, style: Theme.of(context).textTheme.headlineSmall,),
+                  //                             Text(applicants[index-1].id, style: Theme.of(context).textTheme.bodySmall,)
+                  //                           ],
+                  //                         )
+                  //                       ],
+                  //
+                  //                     ),
+                  //                   );
+                  //                 }
+                  //                 else if (index == applicants.length+1){
+                  //                   return Text("Kicks", style: Theme.of(context).textTheme.bodyLarge);
+                  //                 }
+                  //                 else{
+                  //                   return Padding(
+                  //                     padding: const EdgeInsets.all(8.0),
+                  //                     child: Row(
+                  //                       children: [
+                  //                         SizedBox(
+                  //                           width: 50, height: 50,
+                  //                           child: ClipRRect(
+                  //                             borderRadius: BorderRadius.circular(100),
+                  //                             child: Image(image: AssetImage(kicks[index-applicants.length-2].profileImageSrc)),
+                  //                           ),
+                  //                         ),
+                  //                         const SizedBox(width: 8),
+                  //
+                  //                         Column(
+                  //                           crossAxisAlignment: CrossAxisAlignment.start,
+                  //                           children: [
+                  //                             Text(kicks[index-applicants.length-2].userName, style: Theme.of(context).textTheme.headlineSmall,),
+                  //                             Text(kicks[index-applicants.length-2].id, style: Theme.of(context).textTheme.bodySmall,)
+                  //                           ],
+                  //                         )
+                  //                       ],
+                  //
+                  //                     ),
+                  //                   );
+                  //                 }
+                  //               }
+                  //           ),
+                  //         ),
+                  //       );
+                  //     }
+                  // ),
 
                   const SizedBox(width: 20),
 

@@ -94,6 +94,22 @@ class Profile extends StatelessWidget {
                     ),
 
                     ListTile(
+                      onTap: () {
+                        // open preferences
+                      },
+                      leading: Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(100),
+                          color: Colors.grey[200]?.withOpacity(0.1),
+                        ),
+                        child: const Icon(LineAwesomeIcons.heart, color: Colors.black38,),
+                      ),
+                      title: Text("Preferences", style: Theme.of(context).textTheme.bodyMedium,),
+                    ),
+
+                    ListTile(
                       leading: Container(
                         width: 30,
                         height: 30,

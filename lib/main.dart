@@ -8,8 +8,18 @@ import 'package:movein/Pages/Profile.dart';
 import 'package:movein/Pages/Settings.dart';
 import 'package:movein/Pages/GroupOptions.dart';
 import 'package:movein/Pages/Friends.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() => runApp(const App());
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Run the app
+  runApp(const App());
+
+}
 
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
@@ -17,9 +27,10 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: LAppTheme.lightTheme,
       darkTheme: LAppTheme.darkTheme,
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
 
       initialRoute: '/Scroller',
 

@@ -1,66 +1,101 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:movein/swipe_card.dart';
-import 'dart:convert';
 import 'package:movein/profile-data.dart';
-import 'package:flutter/services.dart';
 
 class Gscroller extends StatefulWidget {
-  const Gscroller({Key? key}) : super(key: key);
+  final String groupName;
+  final List<String> members;
+
+  const Gscroller({
+    Key? key,
+    required this.groupName,
+    required this.members,
+  }) : super(key: key);
 
   @override
   State<Gscroller> createState() => _GscrollerState();
 }
 
 class _GscrollerState extends State<Gscroller> {
+  late Future<List<CardProfile>> loadProfilesFuture;
+  late List<CardProfile> profiles;
 
-  int Stack_pos = 0;
-  List<Profile> profiles = <Profile>[];
-
-  loadJsonData() async {
-    String jsonData = await rootBundle.loadString('assets/JSON/profiles.json');
-    setState(() {
-      profiles = json
-          .decode(jsonData)
-          .map<Profile>((dataPoint) => Profile.fromJson(dataPoint))
-          .toList();
-    });
+  @override
+  void initState() {
+    super.initState();
+    loadProfilesFuture = loadProfiles();
   }
 
-  void shortListGroup() {
-    // do some magic
-    increaseStackCounter();
+  Future<List<CardProfile>> loadProfiles() async {
+    List<CardProfile> loadedProfiles = [];
+
+    for (String id in widget.members) {
+      try {
+        final cardProfile = await CardProfile.fetchCardProfile(id);
+        if (cardProfile != null) {
+          loadedProfiles.add(cardProfile);
+        }
+        else{
+          print("here");
+        }
+      } catch (e) {
+        throw FirebaseException(
+            message: 'Error creating cardProfile: $e',
+            plugin: 'cloud_firestore');
+      }
+    }
+
+    return loadedProfiles;
   }
 
-  void rejectGroup() {
-    // do some other magic
-    increaseStackCounter();
-  }
-
-  void increaseStackCounter() {
-    setState(() {
-      Stack_pos = (Stack_pos + 1)%5;
-    });
-  }
-
-
-  _GscrollerState() {
-    loadJsonData();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: ListView.builder(
-        itemCount: profiles.length + 1,
-        itemBuilder: (context, index){
-          if(index < profiles.length){
-            return SwipeCard(id: profiles[index].id, userName: profiles[index].userName, userAge: profiles[index].userAge, userDescription: profiles[index].userDescription, profileImageSrc: profiles[index].profileImageSrc);
-          }else{
-            return const SizedBox(
-              height: 70.0,
-            );
+      child: FutureBuilder<List<CardProfile>>(
+        future: loadProfilesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator(); // Show a loading indicator while waiting for data
           }
 
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}'); // Show an error message if data retrieval fails
+          }
+
+          profiles = snapshot.data ?? []; // Assign the fetched data to the profiles list
+
+          return ListView.builder(
+            itemCount: profiles.length + 2,
+            itemBuilder: (context, index) {
+              if(index == 0){
+                return Container(
+                  alignment: Alignment.center,
+                  child: Text(
+                    widget.groupName,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                );
+              } else if (index < profiles.length+1) {
+                return SwipeCard(
+                  id: profiles[index-1].id,
+                  foreName: profiles[index-1].foreName,
+                  age: profiles[index-1].age,
+                  uni: profiles[index-1].uni,
+                  preferences: profiles[index-1].preferences,
+                  images: profiles[index-1].images,
+                  bio: profiles[index-1].bio,
+                  subject: profiles[index-1].subject,
+                  yearOfStudy: profiles[index-1].yearOfStudy,
+                );
+              } else {
+                return const SizedBox(
+                  height: 70.0,
+                );
+              }
+            },
+          );
         },
       ),
     );

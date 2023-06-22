@@ -1,25 +1,62 @@
-class Profile {
-  final String id;
-  final String userName;
-  final int userAge;
-  final String userDescription;
-  final String profileImageSrc;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
-  Profile({
+class CardProfile {
+  final String id;
+  final String foreName;
+  final int age;
+  final String uni;
+  final Map<String,dynamic> preferences;
+  final List<String> images;
+  final String bio;
+  final String subject;
+  final int yearOfStudy;
+
+  CardProfile({
     required this.id,
-    required this.userName,
-    required this.userAge,
-    required this.userDescription,
-    required this.profileImageSrc,
+    required this.foreName,
+    required this.age,
+    required this.uni,
+    required this.preferences,
+    required this.images,
+    required this.bio,
+    required this.subject,
+    required this.yearOfStudy,
   });
 
-  factory Profile.fromJson(Map<String, dynamic> json) {
-    return Profile(
-      id: json['id'],
-      userName: json['userName'],
-      userAge: json['userAge'],
-      userDescription: json['userDescription'],
-      profileImageSrc: json['profileImageSrc'],
+  factory CardProfile.fromFirestore(DocumentSnapshot document) {
+    final data = document.data() as Map<String, dynamic>;
+    final dateTime = data['DOB'].toDate();
+    final currentDate = DateTime.now();
+    final difference = currentDate.difference(dateTime);
+    final yearsAgo = difference.inDays ~/ 365;
+
+    final preferencesData = data['Preferences'] as Map<String, dynamic>?; // Check if 'Preferences' exists and assign it to preferencesData
+
+    final bed_dateTime = preferencesData?['BedTime']?.toDate(); // Check if 'BedTime' exists within preferencesData and assign it to bed_dateTime
+    final timeFormat = DateFormat('hh:mm a');
+    final timeOfDay = bed_dateTime != null ? timeFormat.format(bed_dateTime) : ''; // Format the time only if bed_dateTime is not null
+
+    return CardProfile(
+      id: document.id,
+      foreName: data['Forename'],
+      age: yearsAgo,
+      uni: data['UniAttended'],
+      preferences: preferencesData ?? {}, // Use preferencesData if not null, otherwise use an empty map
+      images: List<String>.from(data['Images']),
+      bio: data['Bio'],
+      subject: data['Subject'],
+      yearOfStudy: data['YearOfStudy'],
     );
+  }
+
+  static Future<CardProfile> fetchCardProfile(String id) async {
+    final document = await FirebaseFirestore.instance.collection('Users').doc(id).get();
+
+    if (document.exists) {
+      return CardProfile.fromFirestore(document);
+    } else {
+      throw Exception('CardProfile not found for id: $id');
+    }
   }
 }
