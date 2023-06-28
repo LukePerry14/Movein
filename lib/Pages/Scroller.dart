@@ -50,7 +50,15 @@ class _ScrollerState extends State<Scroller> {
       future: getGroups(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const Center(
+            child: FractionallySizedBox(
+              heightFactor: 0.3,
+              child: AspectRatio(
+                aspectRatio: 1.0,
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          );
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
@@ -81,6 +89,7 @@ class _ScrollerState extends State<Scroller> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         FloatingActionButton(
+                          heroTag: "next",
                           backgroundColor: Theme.of(context).primaryColor?.withOpacity(0.5),
                           onPressed: () {
                             if(index < groupData.length-1){
@@ -92,6 +101,7 @@ class _ScrollerState extends State<Scroller> {
                           child: const Icon(LineAwesomeIcons.angle_right, color: Colors.white),
                         ),
                         FloatingActionButton(
+                          heroTag: "reject",
                           backgroundColor: Theme.of(context).primaryColor?.withOpacity(0.5),
                           onPressed: () {
                             if(index < groupData.length-1){
@@ -103,6 +113,7 @@ class _ScrollerState extends State<Scroller> {
                           child: const Icon(LineAwesomeIcons.times, color: Colors.white),
                         ),
                         FloatingActionButton(
+                          heroTag: "apply",
                           backgroundColor: Theme.of(context).primaryColor?.withOpacity(0.5),
                           onPressed: () {
                             if(index < groupData.length-1){

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
+
 class Messages extends StatefulWidget {
   const Messages({Key? key}) : super(key: key);
 
@@ -15,6 +16,7 @@ class _MessagesState extends State<Messages> {
 
     //retrieves data from previous page to display relevant groupName
     data = ModalRoute.of(context)?.settings.arguments as Map;
+
     return Builder(
         builder: (context) {
           final navigator = Navigator.of(context);
@@ -50,14 +52,15 @@ class _MessagesState extends State<Messages> {
                   onPressed: () {
                     Navigator.pushNamed(context, '/GroupOptions', arguments: {
                       'members': data['members'],
+                      'groupId': data['groupId'],
                       'groupName': data['groupName'],
                     });
                   },
                 ),
               ],
             ),
-            body: const SafeArea(
-              child: Text('example Messages'),
+            body: SafeArea(
+              child: Text("example")
             ),
           );
 
