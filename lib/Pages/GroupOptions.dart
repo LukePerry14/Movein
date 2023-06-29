@@ -19,9 +19,9 @@ class _GroupOptionsState extends State<GroupOptions> {
   }
 
   Future<List<List<dynamic>>> getUsers(idList, groupId) async {
-    var memberDetails = [];
-    var applicants = [];
-    var voteKicks = [];
+    List<Map<String,dynamic>> memberDetails = [];
+    List<Map<String,dynamic>> applicants = [];
+    List<String> voteKicks = [];
 
     final CollectionReference docUsers = FirebaseFirestore.instance.collection("Users");
 
@@ -30,8 +30,8 @@ class _GroupOptionsState extends State<GroupOptions> {
       Map<String, dynamic>? groupData = groupSnapshot.data() as Map<String, dynamic>?;
 
       if (groupData != null) {
-        List<String> applicantIds = groupData["Applicants"];
-        List<String>  kickIds = groupData["Kicks"];
+        List<String> applicantIds = List<String>.from(groupData["Applicants"]);
+        List<String> kickIds = List<String>.from(groupData["Kicks"]);
 
         for (String aId in applicantIds){
           DocumentSnapshot docSnapshot = await docUsers.doc(aId).get();
@@ -81,8 +81,8 @@ class _GroupOptionsState extends State<GroupOptions> {
   Widget build(BuildContext context) {
 
     data = ModalRoute.of(context)?.settings.arguments as Map;
-    List<String> members = data['members'];
-    String groupId = data['groupId'];
+    List<String> members = data['members'] as List<String>;
+    String groupId = data['groupId'] as String;
 
 
 
