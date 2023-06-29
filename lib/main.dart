@@ -8,6 +8,7 @@ import 'package:movein/Pages/Profile.dart';
 import 'package:movein/Pages/Settings.dart';
 import 'package:movein/Pages/GroupOptions.dart';
 import 'package:movein/Pages/Friends.dart';
+import 'package:movein/Pages/ScrollRefresh.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -36,6 +37,7 @@ class App extends StatelessWidget {
 
       routes: {
         '/Scroller': (context) => const Scroller(),
+        '/ScrollRefresh': (context) => const RanOut(),
         '/Messages': (context) => const Messages(),
         '/Groups': (context) => const Groups(),
         '/Profile': (context) => const Profile(),
