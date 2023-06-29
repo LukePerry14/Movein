@@ -72,6 +72,7 @@ class _ScrollerState extends State<Scroller> {
                 color: Colors.transparent,
                 child: SafeArea(
                   child: Scaffold(
+                    floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
                     body: Container(
                       alignment: Alignment.center,
                       child: Column(
@@ -89,7 +90,19 @@ class _ScrollerState extends State<Scroller> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         FloatingActionButton(
-                          heroTag: "next",
+                          heroTag: "Block",
+                          backgroundColor: Theme.of(context).primaryColor?.withOpacity(0.5),
+                          onPressed: () {
+                            if(index < groupData.length-1){
+                              setState(() {
+                                index++;
+                              });
+                            }
+                            },
+                          child: const Icon(LineAwesomeIcons.times, color: Colors.white),
+                        ),
+                        FloatingActionButton(
+                          heroTag: "Next",
                           backgroundColor: Theme.of(context).primaryColor?.withOpacity(0.5),
                           onPressed: () {
                             if(index < groupData.length-1){
@@ -101,7 +114,7 @@ class _ScrollerState extends State<Scroller> {
                           child: const Icon(LineAwesomeIcons.angle_right, color: Colors.white),
                         ),
                         FloatingActionButton(
-                          heroTag: "reject",
+                          heroTag: "Shortlist",
                           backgroundColor: Theme.of(context).primaryColor?.withOpacity(0.5),
                           onPressed: () {
                             if(index < groupData.length-1){
@@ -110,10 +123,10 @@ class _ScrollerState extends State<Scroller> {
                               });
                             }
                           },
-                          child: const Icon(LineAwesomeIcons.times, color: Colors.white),
+                          child: const Icon(LineAwesomeIcons.archive, color: Colors.white),
                         ),
                         FloatingActionButton(
-                          heroTag: "apply",
+                          heroTag: "Apply",
                           backgroundColor: Theme.of(context).primaryColor?.withOpacity(0.5),
                           onPressed: () {
                             if(index < groupData.length-1){
