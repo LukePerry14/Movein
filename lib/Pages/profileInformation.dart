@@ -19,7 +19,6 @@ class _ProfileInfoState extends State<ProfileInfo> {
           home: Scaffold(
             appBar: AppBar( //maybe replace with a sliverappbar to improve polish
               backgroundColor: const Color(0xFFfafafa),
-              title: Text('Profile Information', style: Theme.of(context).textTheme.headlineMedium),
               centerTitle: true,
               elevation: 0,
               leading: IconButton(

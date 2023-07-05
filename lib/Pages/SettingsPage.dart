@@ -12,7 +12,6 @@ class SettingsPage extends StatefulWidget {
 class _SettingsState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    final navigator = Navigator.of(context);
     return Builder(
       builder: (context) {
         final navigator = Navigator.of(context);
