@@ -64,7 +64,7 @@ class RanOut extends StatelessWidget {
           ),
           bottomNavigationBar: CustomNavbar(
             onItemSelected: (route) {
-              navigator.pushNamed(route);
+              navigator.pushReplacementNamed(route);
             },
           ),
         );

@@ -59,7 +59,7 @@ class _MessagesState extends State<Messages> {
                 ),
               ],
             ),
-            body: SafeArea(
+            body: const SafeArea(
               child: Text("example")
             ),
           );

@@ -245,7 +245,7 @@ class _GroupsState extends State<Groups> {
                 ),
                 bottomNavigationBar: CustomNavbar(
                   onItemSelected: (route) {
-                    navigator.pushNamed(route);
+                    navigator.pushReplacementNamed(route);
                   },
                 ),
               );

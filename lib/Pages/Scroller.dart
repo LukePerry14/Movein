@@ -228,7 +228,7 @@ class _ScrollerState extends State<Scroller> {
 
                     bottomNavigationBar: CustomNavbar(
                       onItemSelected: (route) {
-                        navigator.pushNamed(route);
+                        navigator.pushReplacementNamed(route);
                       },
                     ),
                   ),

@@ -23,7 +23,7 @@ class _HousesState extends State<Houses> {
             ),
           bottomNavigationBar: CustomNavbar(
             onItemSelected: (route) {
-              navigator.pushNamed(route);
+              navigator.pushReplacementNamed(route);
             },
           ),
           );
