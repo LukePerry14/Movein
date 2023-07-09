@@ -1,11 +1,17 @@
+import 'dart:js';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:movein/navbar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
-class Profile extends StatelessWidget {
-  const Profile({Key? key}) : super(key: key);
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({Key? key}) : super(key: key);
 
+  @override
+  State<ProfilePage> createState() => Profile();
+}
+class Profile extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Builder(
@@ -78,7 +84,7 @@ class Profile extends StatelessWidget {
 
                     upgradeAccountButton(),
 
-                    const SizedBox(height: 40.0),
+                    // const SizedBox(height: 40.0),
 
                     // ListTile(
                     //   onTap: () {
@@ -116,6 +122,8 @@ class Profile extends StatelessWidget {
                     //   ),
                     //   title: Text("Settings", style: Theme.of(context).textTheme.bodyMedium,),
                     // ),
+
+                    const SizedBox(height: 20),
                   
                     profileInformationButton(),
 
@@ -316,8 +324,10 @@ class ButtonWidgetLogOut extends StatelessWidget {
 }
 
 Widget upgradeAccountButton() => ButtonWidget(text: 'Upgrade Account', onClicked: () {});
+
 Widget backgroundButton() => ButtonWidgetBackground(onClicked: () {});
 Widget shareProfileButton() => ButtonWidgetShareProfile(onClicked: () {});
-Widget profileInformationButton() => ButtonWidgetProfileInformation(text: 'Profile Information', onClicked: (){});
+Widget profileInformationButton() => ButtonWidgetProfileInformation(text: 'Profile Information', onClicked: (){
+});
 Widget settingsButton() => ButtonWidgetSettings(text: 'Settings', onClicked: () {});
 Widget logOutButton() => ButtonWidgetLogOut(text: 'Log Out', onClicked: () {} );

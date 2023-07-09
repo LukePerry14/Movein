@@ -113,7 +113,7 @@ class App extends StatelessWidget {
         '/Scroller': (context) => const Scroller(),
         '/Messages': (context) => const Messages(),
         '/Groups': (context) => const Groups(),
-        '/Profile': (context) => const Profile(),
+        '/Profile': (context) => const ProfilePage(),
         '/SettingsPage': (context) => const SettingsPage(),
         '/Friends': (context) => const Friends(),
         '/Houses': (context) => const Houses(),
