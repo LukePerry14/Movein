@@ -5,11 +5,9 @@ class CustomNavbar extends StatelessWidget {
   const CustomNavbar({Key? key, required this.onItemSelected}) : super(key: key);
 
   final Function(String) onItemSelected;
-
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      color: Theme.of(context).primaryColor,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[

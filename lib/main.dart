@@ -10,6 +10,7 @@ import 'package:movein/Pages/SettingsPage.dart';
 import 'package:movein/Pages/GroupOptions.dart';
 import 'package:movein/Pages/Friends.dart';
 import 'package:movein/Pages/profileInformation.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   await Settings.init(cacheProvider: CustomCacheProvider());
@@ -97,10 +98,16 @@ class CustomCacheProvider extends CacheProvider {
 }
 
 class App extends StatelessWidget {
-  const App({Key? key}) : super(key: key);
+  App({Key? key}) : super(key: key);
+  // This is for the themes
+  var lightTheme = ThemeData.light();
+  var darkTheme = ThemeData.dark();
+  bool darkMode = false;
+
 
   @override
   Widget build(BuildContext context) {
+    final themeMode = Provider.of<darkMode>(context);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: LAppTheme.lightTheme,

@@ -7,19 +7,17 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
-
   @override
   State<ProfilePage> createState() => Profile();
 }
 class Profile extends State<ProfilePage> {
   @override
+  bool background = true;
   Widget build(BuildContext context) {
     return Builder(
         builder: (context) {
           final navigator = Navigator.of(context);
           return Scaffold(
-            backgroundColor: Color.fromARGB(255, 196, 194, 194),
-
             body: SingleChildScrollView(
               child: Container(
                 padding: const EdgeInsets.all(10.0),
@@ -84,71 +82,82 @@ class Profile extends State<ProfilePage> {
 
                     upgradeAccountButton(),
 
-                    // const SizedBox(height: 40.0),
+                    const SizedBox(height: 40.0),
 
-                    // ListTile(
-                    //   onTap: () {
-                    //     Navigator.pushNamed(context, '/profileInformation');
-                    //   },
-                    //   leading: Container(
-                    //     width: 30,
-                    //     height: 30,
-                    //     decoration: BoxDecoration(
-                    //       borderRadius: BorderRadius.circular(100),
-                    //       color: Colors.grey[200]?.withOpacity(0.1),
-                    //     ),
-                    //     child: const Icon(
-                    //       LineAwesomeIcons.user, color: Colors.black38,),
-                    //   ),
-                    //   title: Text("Profile information", style: Theme
-                    //       .of(context)
-                    //       .textTheme
-                    //       .bodyMedium,),
-                    // ),
+                    Container(
+                      // color: Theme.of(context).primaryColor.withOpacity(0.7),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        color: Theme.of(context).primaryColor.withOpacity(0.7)
+                      ),
+                      child: ListTile(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/profileInformation');
+                        },
+                        leading: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: const Icon(
+                            LineAwesomeIcons.user, color: Colors.white,),
+                        ),
+                        title: Container(
+                          child: Text("Profile information", style: Theme
+                              .of(context)
+                              .textTheme
+                              .bodyMedium),
+                        ),
+                      ),
+                    ), 
 
-                    // ListTile(
-                    //   onTap: () {
-                    //     Navigator.pushNamed(context, '/SettingsPage');
-                    //   },
-                    //   leading: Container(
-                    //     width: 30,
-                    //     height: 30,
-                    //     decoration: BoxDecoration(
-                    //       borderRadius: BorderRadius.circular(100),
-                    //       color: Colors.grey[200]?.withOpacity(0.1),
-                    //     ),
-                    //     child: const Icon(
-                    //       LineAwesomeIcons.cog, color: Colors.black38),
-                    //   ),
-                    //   title: Text("Settings", style: Theme.of(context).textTheme.bodyMedium,),
-                    // ),
+                    const SizedBox(height: 30.0),
 
-                    const SizedBox(height: 20),
-                  
-                    profileInformationButton(),
-
-                    const SizedBox(height: 20),
-
-                    settingsButton(),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        color: Theme.of(context).primaryColor.withOpacity(0.7)
+                      ),
+                      child: ListTile(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/SettingsPage');
+                        },
+                        leading: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                            color: Colors.grey[200]?.withOpacity(0.1),
+                          ),
+                          child: const Icon(
+                            LineAwesomeIcons.cog, color: Colors.white),
+                        ),
+                        title: Text("Settings", style: Theme.of(context).textTheme.bodyMedium,),
+                      ),
+                    ),
 
                     const SizedBox(height: 30),
-
-                    logOutButton()
-
-                    // ListTile(
-                    //   leading: Container(
-                    //     width: 30,
-                    //     height: 30,
-                    //     decoration: BoxDecoration(
-                    //       borderRadius: BorderRadius.circular(100),
-                    //       color: Colors.grey[200]?.withOpacity(0.1),
-                    //     ),
-                    //     child: const Icon(LineAwesomeIcons.alternate_sign_out,
-                    //       color: Colors.black38,),
-                    //   ),
-                    //   title: Text("Logout",
-                    //       style: GoogleFonts.roboto(color: Colors.red)),
-                    // ),
+                  
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        color: Theme.of(context).primaryColor
+                      ),
+                      child: ListTile(
+                        leading: Container(
+                          width: 30,
+                          height: 30,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: const Icon(LineAwesomeIcons.alternate_sign_out,
+                            color: Colors.white,),
+                        ),
+                        title: Text("Logout",
+                            style:Theme.of(context).textTheme.bodyMedium),
+                      ),
+                    ),
                   
                   ],
                 ),
@@ -197,7 +206,6 @@ class ButtonWidgetProfileInformation extends StatelessWidget {
     required this.onClicked
   }) : super(key : key);
 
-  @override
   Widget build(BuildContext context) => ElevatedButton(
     style: ElevatedButton.styleFrom(
       shape: const StadiumBorder(),
@@ -265,7 +273,10 @@ class ButtonWidgetBackground extends StatelessWidget {
     onPressed: onClicked, 
     child: Row(
       children: const <Widget>[
-        Icon(LineAwesomeIcons.sun, color: Colors.white, size: 24,),
+        Padding(
+          padding: EdgeInsets.all(5.0),
+          child: Icon(LineAwesomeIcons.sun, color: Colors.white, size: 24,),
+        ),
       ],
     )); 
 }
@@ -288,7 +299,10 @@ class ButtonWidgetShareProfile extends StatelessWidget {
     onPressed: onClicked, 
     child: Row(
       children: const <Widget>[
-        Icon(LineAwesomeIcons.share_square, color: Colors.white, size: 24,),
+        Padding(
+          padding: EdgeInsets.all(5.0),
+          child: Icon(LineAwesomeIcons.share_square, color: Colors.white, size: 24,),
+        ),
       ],
     )); 
 }
