@@ -14,7 +14,7 @@ import 'package:provider/provider.dart';
 
 void main() async {
   await Settings.init(cacheProvider: CustomCacheProvider());
-  runApp(const App());
+  runApp(App());
 } 
 
 class CustomCacheProvider extends CacheProvider {
@@ -107,7 +107,6 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeMode = Provider.of<darkMode>(context);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: LAppTheme.lightTheme,
