@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/navbar.dart';
+import 'package:settings_ui/settings_ui.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -18,12 +19,11 @@ class _SettingsState extends State<Settings> {
 
           return Scaffold(
             appBar: AppBar( //maybe replace with a sliverappbar to improve polish
-              backgroundColor: const Color(0xFFfafafa),
-              title: Text('Settings', style: Theme.of(context).textTheme.headlineMedium),
+              backgroundColor: Theme.of(context).primaryColor,
               centerTitle: true,
               elevation: 0,
               leading: IconButton(
-                icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.black),
+                icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.white),
                 color: Colors.grey[500],
                 onPressed: () {
                   Navigator.pop(context);
@@ -31,7 +31,7 @@ class _SettingsState extends State<Settings> {
               ),
               actions: [
                 IconButton(
-                  color: Colors.grey[500],
+                  color: Colors.white,
                   icon: const Icon(Icons.more_vert), //Icon not showing
                   onPressed: () {
                     // Handle settings button press
@@ -39,9 +39,9 @@ class _SettingsState extends State<Settings> {
                 ),
               ],
             ),
-            body: const SafeArea(
-              child: Text('example Settings'),
-            ),
+            body: 
+              SettingsPage()
+            ,
             bottomNavigationBar: CustomNavbar(
               onItemSelected: (route) {
                 navigator.pushReplacementNamed(route);
@@ -52,4 +52,89 @@ class _SettingsState extends State<Settings> {
         }
     );
   }
+}
+
+class SettingsPage extends StatefulWidget {
+  @override
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      child: ListView(
+        children: [
+          const SizedBox(height:30),
+          Row(
+            children: [
+              Icon(
+                Icons.person,
+                color: Theme.of(context).primaryColor,
+                size: 50,
+              ),
+              const SizedBox(width: 10),
+              const Text("Account", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 22))
+            ],
+          ),
+          const Divider(height: 20, thickness: 1),
+          const SizedBox(height: 10),
+          buildAccountOption(context, 'Change Password'),
+          buildAccountOption(context, 'Change Email'),
+          buildAccountOption(context, 'Language'),
+          buildAccountOption(context, 'Ads'),
+          buildAccountOption(context, 'Privacy and Security'),
+          buildAccountOption(context, 'Terms and Conditions'),
+          buildAccountOption(context, 'Billing'),
+        ],
+      ),
+    );
+  }
+}
+
+
+// Template for making a settings button
+GestureDetector buildAccountOption(BuildContext context, String title) {
+  return GestureDetector(
+    onTap: () {
+      showDialog(context: context, builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Option'),
+              Text('Option')
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            )
+          ],
+        );
+      });
+    },
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[600]
+            ),
+          ),
+          const Icon(Icons.arrow_forward_ios, color: Colors.grey)
+        ],
+      ),
+    ),
+  );
 }
