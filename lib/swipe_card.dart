@@ -150,7 +150,7 @@ class RoundedBox extends StatelessWidget {
 }
 
 class CustomDialog extends StatelessWidget {
-  final List<String> images;
+  final List<dynamic> images;
   final String id;
   final String foreName;
   final int age;
