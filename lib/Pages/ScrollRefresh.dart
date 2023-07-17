@@ -18,15 +18,22 @@ class RanOut extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.3,
-                    height: MediaQuery.of(context).size.width * 0.3,
-                    child: const CircularProgressIndicator()
+                  width: MediaQuery.of(context).size.width * 0.3,
+                  height: MediaQuery.of(context).size.width * 0.3,
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: Icon(
+                        LineAwesomeIcons.exclamation_circle,
+                        color: Theme.of(context).primaryColor,
+                        fill: 1,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.7,
 
-                  child: Text("You've seen to have run out of groups for now, Consider making your own or refresh to have another look",
+                  child: Text("You've seen to have run out of groups for now, Consider making your own or refresh to try and have another look",
                       style: Theme.of(context).textTheme.bodyMedium,
                       textAlign: TextAlign.center
                   ),

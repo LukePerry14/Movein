@@ -5,12 +5,16 @@ import 'package:movein/profile-data.dart';
 
 class Gscroller extends StatefulWidget {
   final String groupName;
-  final List<String> members;
+  final dynamic members;
+  final String groupPicture;
+  final bool showFriend;
 
   const Gscroller({
     Key? key,
     required this.groupName,
     required this.members,
+    required this.groupPicture,
+    this.showFriend = false,
   }) : super(key: key);
 
   @override
@@ -20,6 +24,7 @@ class Gscroller extends StatefulWidget {
 class _GscrollerState extends State<Gscroller> {
   late Future<List<CardProfile>> loadProfilesFuture;
   late List<CardProfile> profiles;
+
 
   @override
   void initState() {
@@ -37,7 +42,6 @@ class _GscrollerState extends State<Gscroller> {
           loadedProfiles.add(cardProfile);
         }
         else{
-          print("here");
         }
       } catch (e) {
         throw FirebaseException(
@@ -56,9 +60,6 @@ class _GscrollerState extends State<Gscroller> {
       child: FutureBuilder<List<CardProfile>>(
         future: loadProfilesFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator(); // Show a loading indicator while waiting for data
-          }
 
           if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}'); // Show an error message if data retrieval fails
@@ -67,27 +68,41 @@ class _GscrollerState extends State<Gscroller> {
           profiles = snapshot.data ?? []; // Assign the fetched data to the profiles list
 
           return ListView.builder(
-            itemCount: profiles.length + 2,
+            itemCount: profiles.length + 3,
             itemBuilder: (context, index) {
-              if(index == 0){
+              if (index == 0){
+                return CircleAvatar(
+                  radius: 75, // Adjust the size as needed
+                  backgroundColor: Colors.transparent, // Set the background color to transparent
+                  child: ClipOval(
+                    child: Image(
+                      image: AssetImage(widget.groupPicture),
+                      fit: BoxFit.cover, // Adjust the fit as needed
+                    ),
+                  ),
+                );
+              }
+
+              else if(index == 1){
                 return Container(
                   alignment: Alignment.center,
                   child: Text(
                     widget.groupName,
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    style: Theme.of(context).textTheme.headlineLarge,
                   ),
                 );
-              } else if (index < profiles.length+1) {
+              } else if (index < profiles.length+2) {
                 return SwipeCard(
-                  id: profiles[index-1].id,
-                  foreName: profiles[index-1].foreName,
-                  age: profiles[index-1].age,
-                  uni: profiles[index-1].uni,
-                  preferences: profiles[index-1].preferences,
-                  images: profiles[index-1].images,
-                  bio: profiles[index-1].bio,
-                  subject: profiles[index-1].subject,
-                  yearOfStudy: profiles[index-1].yearOfStudy,
+                  id: profiles[index-2].id,
+                  foreName: profiles[index-2].foreName,
+                  age: profiles[index-2].age,
+                  uni: profiles[index-2].uni,
+                  preferences: profiles[index-2].preferences,
+                  images: profiles[index-2].images,
+                  bio: profiles[index-2].bio,
+                  subject: profiles[index-2].subject,
+                  yearOfStudy: profiles[index-2].yearOfStudy,
+                  showFriend: widget.showFriend,
                 );
               } else {
                 return const SizedBox(

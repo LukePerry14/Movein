@@ -2,9 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:intl/intl.dart';
-import 'package:movein/profile-data.dart';
 import 'package:movein/swipe_card.dart';
+import 'package:movein/GroupFunctions.dart';
 
 class GroupOptions extends StatefulWidget {
   const GroupOptions({Key? key}) : super(key: key);
@@ -27,11 +26,11 @@ class _GroupOptionsState extends State<GroupOptions> {
     try {
       DocumentSnapshot groupSnapshot = await FirebaseFirestore.instance.collection("Groups").doc(groupId).get();
       Map<String, dynamic>? groupData = groupSnapshot.data() as Map<String, dynamic>?;
+      groupPic = groupData?["GroupPicture"];
 
       if (groupData != null) {
         var applicantIds = groupData["Applicants"];
         var kickIds = groupData["Kicks"];
-        var groupPic = groupData["GroupPicture"];
 
         for (var aId in applicantIds){
           if (!(aId == "")){
@@ -151,7 +150,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            print("testing");
+                            //add way to upload new picture
                           },
                           child: SizedBox(
                             width: 100, height: 100,
@@ -182,11 +181,13 @@ class _GroupOptionsState extends State<GroupOptions> {
                     const SizedBox(height: 20.0),
 
                     GestureDetector(
-                      onTap: () {
-                        //gNameChange();
+                      onTap: () async {
+                        await showDialog<String>(
+                          context: context,
+                            builder: (BuildContext context) => EditGroupName(name: groupName, groupId: groupId));
                       },
-                      child: Text(groupName, style: Theme.of(context).textTheme.headlineSmall),
 
+                      child: Text(groupName, style: Theme.of(context).textTheme.headlineSmall),
                     ),
 
                     const SizedBox(height: 30.0),
@@ -383,7 +384,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                               Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Text("${applicants[index]["Forename"]} ${applicants[index]["SurName"]}", style: Theme.of(context).textTheme.headlineSmall,),
+                                                  Text("${applicants[index]["ForeName"]} ${applicants[index]["SurName"]}", style: Theme.of(context).textTheme.headlineSmall,),
                                                   Text(applicants[index]["Id"], style: Theme.of(context).textTheme.bodySmall,)
                                                 ],
                                               ),
@@ -416,15 +417,19 @@ class _GroupOptionsState extends State<GroupOptions> {
                       child: Column(
                         children: [
                           ListTile(
-                            onTap: () {
-                              //gNameChange();
+                            onTap: () async {
+                              await showDialog<String>(
+                                  context: context,
+                                  builder: (BuildContext context) => EditGroupName(name: groupName, groupId: groupId));
                             },
                             title: Text("Edit Group Name", style: Theme.of(context).textTheme.bodyMedium,),
                           ),
 
                           ListTile(
-                            onTap: () {
-                              // edit leave group
+                            onTap: () async {
+                              await showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) =>ConfirmLeave(groupId: groupId));
                             },
                             title: Text("Leave Group", style: GoogleFonts.roboto(color: Colors.red, fontSize: 16.5)),
                           ),

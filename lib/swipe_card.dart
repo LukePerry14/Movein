@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:movein/FriendFunctions.dart';
 
 class SwipeCard extends StatelessWidget {
   final String id;
@@ -13,6 +14,7 @@ class SwipeCard extends StatelessWidget {
   final String subject;
   final int yearOfStudy;
   final List<String> images;
+  final bool showFriend;
 
   const SwipeCard({
     Key? key,
@@ -25,6 +27,8 @@ class SwipeCard extends StatelessWidget {
     required this.bio,
     required this.subject,
     required this.yearOfStudy,
+    this.showFriend = false,
+
   }) : super(key: key);
 
   @override
@@ -38,7 +42,7 @@ class SwipeCard extends StatelessWidget {
           onTap: () {
             showDialog<String>(
                 context: context,
-                builder: (BuildContext context) => CustomDialog(id: id,foreName: foreName,age: age, uni: uni, preferences: preferences,images: images,bio: bio, subject: subject, yearOfStudy: yearOfStudy)
+                builder: (BuildContext context) => CustomDialog(id: id,foreName: foreName,age: age, uni: uni, preferences: preferences,images: images,bio: bio, subject: subject, yearOfStudy: yearOfStudy, showFriend: showFriend)
             );
           },
           child: Container(
@@ -56,8 +60,7 @@ class SwipeCard extends StatelessWidget {
                 )
               ],
               image: DecorationImage(
-                image: AssetImage(images?[0] ?? "assets/Pictures/ph.png"),
-                //replace with images[0] when we figure out image storage
+                image: AssetImage(images[0]),
                 fit: BoxFit.cover,
               ),
             ),
@@ -159,6 +162,8 @@ class CustomDialog extends StatelessWidget {
   final String bio;
   final String subject;
   final int yearOfStudy;
+  final bool showFriend;
+
   const CustomDialog({
     Key? key,
     required this.id,
@@ -170,11 +175,11 @@ class CustomDialog extends StatelessWidget {
     required this.bio,
     required this.subject,
     required this.yearOfStudy,
+    this.showFriend = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
     DateTime? dateTime;
     String formattedTime = '';
 
@@ -205,170 +210,200 @@ class CustomDialog extends StatelessWidget {
 
 
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
-      ),
       backgroundColor: Theme.of(context).canvasColor,
-      child: Container(
-        width: MediaQuery.of(context).size.width * 0.95,
-        height: MediaQuery.of(context).size.height * 0.95,
-        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-        child: Stack(
-          children: [
-            SizedBox(
-              width: double.maxFinite,
-              height: MediaQuery.of(context).size.height,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: images.length+5,
-                itemBuilder: (context, index) {
-                  switch(index){
-                    case 0 :{
-                      return const SizedBox(
-                        height: 25,
-                      );
-                    }
-                    case 1 :{
-                      return Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          //width: MediaQuery.of(context).size.width,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5), // Shadow color
-                                spreadRadius: 2, // Spread radius
-                                blurRadius: 5, // Blur radius
-                                offset: const Offset(0, 2), // Offset of the shadow
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("$foreName ($age)", style: Theme.of(context).textTheme.headlineMedium,),
-                              Text(id, style: Theme.of(context).textTheme.bodySmall),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-                    case 2: {
-                      return RoundedBox(image: images[index-2]);
-                    }
-                    case 3: {
-                      return Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          //width: MediaQuery.of(context).size.width,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5), // Shadow color
-                                spreadRadius: 2, // Spread radius
-                                blurRadius: 5, // Blur radius
-                                offset: const Offset(0, 2), // Offset of the shadow
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Attends: $uni", style: Theme.of(context).textTheme.headlineSmall),
-                              const SizedBox(height:5),
-                              Text("Studying: $subject", style: Theme.of(context).textTheme.headlineSmall),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-                    case 4: {
-                      return RoundedBox(image: images[index-3]);
-                    }
-                    case 5: {
-                      return Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          //width: MediaQuery.of(context).size.width,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5), // Shadow color
-                                spreadRadius: 2, // Spread radius
-                                blurRadius: 5, // Blur radius
-                                offset: const Offset(0, 2), // Offset of the shadow
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Bio:", style: Theme.of(context).textTheme.headlineSmall),
-                              Text(bio, style: Theme.of(context).textTheme.bodyMedium),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-                    case 6: {
-                      return RoundedBox(image: images[index-4]);
-                    }
-                    case 7: {
-                      return Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          //width: MediaQuery.of(context).size.width,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5), // Shadow color
-                                spreadRadius: 2, // Spread radius
-                                blurRadius: 5, // Blur radius
-                                offset: const Offset(0, 2), // Offset of the shadow
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: preferenceWidgets,
-                          ),
-                        ),
-                      );
-                    }
-                    default: {
-                      return RoundedBox(image: images[index-5]);
-                    }
-                  }
-                },
-              ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10.0),
+        child: Scaffold(
+          body: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).canvasColor,
+              borderRadius: BorderRadius.circular(10.0),
             ),
-            Positioned(
-              top: 0,
-              right: 0,
-              child: IconButton(
-                splashRadius: 20,
-                icon: const Icon(LineAwesomeIcons.times_circle),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-
+            width: MediaQuery.of(context).size.width * 0.95,
+            height: MediaQuery.of(context).size.height * 0.95,
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child: Stack(
+              children: [
+                SizedBox(
+                  width: double.maxFinite,
+                  height: MediaQuery.of(context).size.height,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: images.length+5,
+                    itemBuilder: (context, index) {
+                      switch(index){
+                        case 0 :{
+                          return const SizedBox(
+                            height: 25,
+                          );
+                        }
+                        case 1 :{
+                          return Padding(
+                            padding: const EdgeInsets.all(15),
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              //width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(0.0), // Adjust the radius as needed
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5), // Shadow color
+                                    spreadRadius: 2, // Spread radius
+                                    blurRadius: 5, // Blur radius
+                                    offset: const Offset(0, 2), // Offset of the shadow
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("$foreName ($age)", style: Theme.of(context).textTheme.headlineMedium,),
+                                  Text(id, style: Theme.of(context).textTheme.bodySmall),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                        case 2: {
+                          return RoundedBox(image: images[index-2]);
+                        }
+                        case 3: {
+                          return Padding(
+                            padding: const EdgeInsets.all(15),
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              //width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5), // Shadow color
+                                    spreadRadius: 2, // Spread radius
+                                    blurRadius: 5, // Blur radius
+                                    offset: const Offset(0, 2), // Offset of the shadow
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Attends: $uni", style: Theme.of(context).textTheme.headlineSmall),
+                                  const SizedBox(height:5),
+                                  Text("Studying: $subject", style: Theme.of(context).textTheme.headlineSmall),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                        case 4: {
+                          return RoundedBox(image: images[index-3]);
+                        }
+                        case 5: {
+                          return Padding(
+                            padding: const EdgeInsets.all(15),
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              //width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5), // Shadow color
+                                    spreadRadius: 2, // Spread radius
+                                    blurRadius: 5, // Blur radius
+                                    offset: const Offset(0, 2), // Offset of the shadow
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Bio:", style: Theme.of(context).textTheme.headlineSmall),
+                                  Text(bio, style: Theme.of(context).textTheme.bodyMedium),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                        case 6: {
+                          return RoundedBox(image: images[index-4]);
+                        }
+                        case 7: {
+                          return Padding(
+                            padding: const EdgeInsets.all(15),
+                            child: Container(
+                              padding: const EdgeInsets.all(10),
+                              //width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5), // Shadow color
+                                    spreadRadius: 2, // Spread radius
+                                    blurRadius: 5, // Blur radius
+                                    offset: const Offset(0, 2), // Offset of the shadow
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: preferenceWidgets,
+                              ),
+                            ),
+                          );
+                        }
+                        default: {
+                          return RoundedBox(image: images[index-5]);
+                        }
+                      }
+                    },
+                  ),
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: IconButton(
+                    splashRadius: 20,
+                    icon: const Icon(LineAwesomeIcons.times_circle),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+                Visibility(
+                  visible: showFriend,
+                  child: Positioned(
+                    top: 0,
+                    left: 0,
+                    child: IconButton(
+                      splashRadius: 20,
+                      icon: const Icon(LineAwesomeIcons.user_plus),
+                      onPressed: () {
+                        sendFriendInvite(id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                backgroundColor: Theme.of(context).primaryColor,
+                                content: Text('Friend invite sent')
+                            )
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
+  }
+
+  void showSnackbar(BuildContext context) {
+    final snackBar = SnackBar(content: Text('Friend invite sent'));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

@@ -186,7 +186,7 @@ class _GroupsState extends State<Groups> {
                                     onTap: () {
                                       Navigator.pushNamed(context, '/Messages', arguments: {
                                         'members': applications[applicationIndex]["Members"],
-                                        'groupId': joined[applicationIndex]["GroupId"],
+                                        'groupId': applications[applicationIndex]["GroupId"],
                                         'groupName': applications[applicationIndex]["GroupName"],
                                       });
                                     },
@@ -200,7 +200,7 @@ class _GroupsState extends State<Groups> {
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                'Shortlist',
+                                'ShortList',
                                 style: Theme.of(context).textTheme.headlineSmall,
                               ),
                             );
@@ -225,7 +225,7 @@ class _GroupsState extends State<Groups> {
                                     onTap: () {
                                       Navigator.pushNamed(context, '/Messages', arguments: {
                                         'members': shortList[shortlistIndex]["Members"],
-                                        'groupId': joined[shortlistIndex]["GroupId"],
+                                        'groupId': shortList[shortlistIndex]["GroupId"],
                                         'groupName': shortList[shortlistIndex]["GroupName"],
                                       });
                                     },
