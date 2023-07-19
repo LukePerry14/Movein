@@ -356,6 +356,30 @@ Future<void> removeFriendInvite(String inviteId) async {
   }
 }
 
+Future<void> removeOutFriendInvite(String inviteId) async {
+  final CollectionReference usersCollection =
+  FirebaseFirestore.instance.collection('Users');
+
+  try {
+    // Remove inviteId from FriendInvites field in the user's document
+    await usersCollection
+        .doc(inviteId)
+        .update({'FriendInvites': FieldValue.arrayRemove([userId])});
+
+    // Remove userId from OutgoingFriendInvites field in the invitee's document
+    await usersCollection
+        .doc(userId)
+        .update({'OutgoingFriendInvites': FieldValue.arrayRemove([inviteId])});
+
+    // Success!
+  } catch (e) {
+    // Error occurred
+    throw FirebaseException(
+        message: 'Error removing friend invite: $e',
+        plugin: 'cloud_firestore');
+  }
+}
+
 Future<void> sendFriendInvite(String invitee) async {
 
   try {
@@ -380,3 +404,123 @@ Future<void> sendFriendInvite(String invitee) async {
     throw FirebaseException(message: 'Error sending friend invite: $e', plugin: 'cloud_firestore');
   }
 }
+
+Future<void> kickUser(String kickId, String groupId) async {
+  try {
+    final CollectionReference groupsCollection =
+    FirebaseFirestore.instance.collection('Groups');
+
+    // Access the group's document
+    final DocumentReference groupDocRef = groupsCollection.doc(groupId);
+
+    // Update Kicks field in the group's document
+    await groupDocRef.update({
+      'Kicks': FieldValue.arrayUnion([kickId]),
+    });
+    final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
+    final Map<String, dynamic>? kickVals = groupSnapshot.data()?['KickVals'];
+
+    if (kickVals != null) {
+      // Update the KickVals field with the new key-value pair
+      kickVals[kickId] = {userId: 1};
+      await groupDocRef.update({'KickVals': kickVals});
+    }
+
+  } catch (e) {
+    throw FirebaseException(
+      message: 'Error kicking user: $e',
+      plugin: 'cloud_firestore',
+    );
+  }
+}
+
+Future<void> isKickVotesThresholdReached(
+    String groupId, String kickId, int groupSize) async {
+  try {
+    final DocumentReference groupRef =
+    FirebaseFirestore.instance.collection('Groups').doc(groupId);
+
+    final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
+
+
+    final Map<String, dynamic>? kickVals = groupSnapshot.data()?['KickVals'];
+
+    if (kickVals != null && kickVals.containsKey(kickId)) {
+      final Map<String, dynamic>? kickVotes =
+      kickVals[kickId] as Map<String, dynamic>?;
+
+      if (kickVotes != null) {
+        int posSum = 0;
+        int negSum = 0;
+        kickVotes.forEach((key, value) {
+          if (value is int) {
+            if (value > 0) {
+              posSum += value;
+            } else {
+              negSum += value;
+            }
+          }
+        });
+
+        if ((posSum > groupSize / 2) | (negSum.abs() >= groupSize / 2)) {
+          if (posSum > groupSize / 2) {
+            await groupRef.update({
+              'Members': FieldValue.arrayRemove([kickId])
+            });
+          }
+          // Remove kickId from 'Kicks' array field
+          await groupRef.update({
+            'Kicks': FieldValue.arrayRemove([kickId])
+          });
+
+          // Remove key-value pair with key kickId from 'KickVals' map field
+          kickVals.remove(kickId);
+          await groupRef.update({'KickVals': kickVals});
+          // Remove kickId from 'Kicks' array field
+        }
+      }
+    }
+  } catch (e) {
+    // Error occurred
+    throw FirebaseException(
+      message: 'Error checking kick votes threshold: $e',
+      plugin: 'cloud_firestore',
+    );
+  }
+}
+
+Future<void> updateKickVote(String groupId, bool agree, String kickId, int groupSize) async {
+  try {
+    final DocumentReference groupRef = FirebaseFirestore.instance.collection('Groups').doc(groupId);
+
+
+    final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
+
+    final kickVals = groupSnapshot.data()?['KickVals'];
+
+
+    if (kickVals != null && kickVals.containsKey(kickId)) {
+      final Map<String, dynamic>? kickVotes = kickVals[kickId] as Map<String, dynamic>?;
+
+      if (kickVotes != null) {
+          int vote = agree ? 1 : -1;
+          kickVotes[userId] = vote;
+
+        await groupRef.update({'KickVals.$kickId': kickVotes});
+      }
+    }
+    await isKickVotesThresholdReached(groupId,kickId,groupSize);
+  } catch (e) {
+    throw FirebaseException(
+      message: 'Error updating kick vote: $e',
+      plugin: 'cloud_firestore',
+    );
+  }
+}
+
+
+
+
+
+
+

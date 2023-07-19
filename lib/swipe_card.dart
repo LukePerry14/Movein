@@ -387,7 +387,7 @@ class CustomDialog extends StatelessWidget {
                         ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                                 backgroundColor: Theme.of(context).primaryColor,
-                                content: Text('Friend invite sent')
+                                content: const Text('Friend invite sent')
                             )
                         );
                       },

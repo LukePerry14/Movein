@@ -19,17 +19,25 @@ class _FriendsState extends State<Friends> {
   late List<dynamic> groupSearchResults;
   late List<dynamic> friendInvites;
   late List<dynamic> friendSearchResults;
+  late List<dynamic> outgoingFriendInvites;
+  List<dynamic> outgoingFriendInvitesResults = [];
   late bool isLoading;
   late bool isSearchLoading;
   late List<dynamic> fSSearchResults;
   bool loadExtra = false;
   String searchText = "";
 
-
+  int stampToYear(var dateTime) {
+    final currentDate = DateTime.now();
+    final difference = currentDate.difference(dateTime);
+    final yearsAgo = difference.inDays ~/ 365;
+    return yearsAgo;
+  }
   Future<List<List<dynamic>>> fetchFriendsData() async {
     List<Map<String,dynamic>> friends = [];
     List<Map<String,dynamic>> groupInvites = [];
     List<Map<String,dynamic>> friendInvites = [];
+    List<Map<String,dynamic>> outgoingFriendInvites = [];
 
     try {
       final usersSnapshot = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
@@ -55,7 +63,8 @@ class _FriendsState extends State<Friends> {
 
       final inviteIds = List<String>.from(usersSnapshot.data()?['FriendInvites'] ?? []);
       final friendsIds = List<String>.from(usersSnapshot.data()?['Friends'] ?? []);
-      if (!inviteIds.contains("")){
+      final outgoingIds = List<String>.from(usersSnapshot.data()?['OutgoingFriendInvites'] ?? []);
+
         for (String inviteId in inviteIds) {
           final friendSnapshot = await FirebaseFirestore.instance
               .collection('Users')
@@ -63,12 +72,8 @@ class _FriendsState extends State<Friends> {
               .get();
           final friendData = friendSnapshot.data();
 
-          final dateTime = friendData?['DOB'].toDate();
-          final currentDate = DateTime.now();
-          final difference = currentDate.difference(dateTime);
-          final yearsAgo = difference.inDays ~/ 365;
-
           if (friendData != null) {
+            int yearsAgo = stampToYear(friendData['DOB'].toDate());
             friendInvites.add({
               "ForeName": friendData['Forename'],
               "SurName": friendData['Surname'],
@@ -83,7 +88,7 @@ class _FriendsState extends State<Friends> {
             });
           }
         }
-      }
+
 
 
       for (String friendId in friendsIds) {
@@ -93,13 +98,8 @@ class _FriendsState extends State<Friends> {
             .get();
         final friendData = friendSnapshot.data();
 
-        final dateTime = friendData?['DOB'].toDate();
-        final currentDate = DateTime.now();
-        final difference = currentDate.difference(dateTime);
-        final yearsAgo = difference.inDays ~/ 365;
-
         if (friendData != null) {
-
+          int yearsAgo = stampToYear(friendData['DOB'].toDate());
           friends.add({
             "ForeName": friendData['Forename'],
             "SurName": friendData['Surname'],
@@ -114,13 +114,37 @@ class _FriendsState extends State<Friends> {
           });
         }
       }
+
+      for (String outgoingId in outgoingIds) {
+        final friendSnapshot = await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(outgoingId)
+            .get();
+        final friendData = friendSnapshot.data();
+
+        if (friendData != null) {
+          int yearsAgo = stampToYear(friendData['DOB'].toDate());
+          outgoingFriendInvites.add({
+            "ForeName": friendData['Forename'],
+            "SurName": friendData['Surname'],
+            "Age": yearsAgo,
+            "Uni": friendData['UniAttended'],
+            "Preferences": friendData['Preferences'],
+            "Images": friendData['Images'],
+            "Bio": friendData['Bio'],
+            "Subject": friendData['Subject'],
+            "YearOfStudy": friendData['YearOfStudy'],
+            "Id": outgoingId,
+          });
+        }
+      }
     } catch (e) {
       throw FirebaseException(
         message: 'Error fetching friends data: $e',
         plugin: 'cloud_firestore',
       );
     }
-    return [friends,friendInvites,groupInvites];
+    return [friends,friendInvites,groupInvites,outgoingFriendInvites];
   }
 
   Future<List<Friend>> searchUsers(String searchQuery) async {
@@ -194,6 +218,12 @@ class _FriendsState extends State<Friends> {
             '${friend["ForeName"]} ${friend["SurName"]}'.toLowerCase().contains(query.toLowerCase()))
             .toList();
 
+      friendSearchResults = friendInvites
+          .where((friend) =>
+            friend["Id"].toLowerCase().contains(query.toLowerCase()) ||
+            '${friend["ForeName"]} ${friend["SurName"]}'.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+
     });
   }
 
@@ -209,6 +239,8 @@ class _FriendsState extends State<Friends> {
         friendSearchResults = data[1];
         groupInvites = data[2];
         groupSearchResults = data[2];
+        outgoingFriendInvites = data[3];
+        outgoingFriendInvitesResults = data[3];
         isLoading = false;
       });
     });
@@ -339,6 +371,82 @@ class _FriendsState extends State<Friends> {
 
                             },
                           ),
+                          if (outgoingFriendInvitesResults.isNotEmpty)
+                            SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.9,
+                                child: Text("OutGoing Friend Invites", style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)
+                            ),
+                          if (outgoingFriendInvitesResults.isNotEmpty)
+                            ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: outgoingFriendInvitesResults.length,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) => CustomDialog(id: outgoingFriendInvitesResults[index]["Id"], foreName: outgoingFriendInvitesResults[index]["ForeName"], age: outgoingFriendInvitesResults[index]["Age"], uni: outgoingFriendInvitesResults[index]["Uni"], preferences: outgoingFriendInvitesResults[index]["Preferences"], images: outgoingFriendInvitesResults[index]["Images"], bio: outgoingFriendInvitesResults[index]["Bio"], subject: outgoingFriendInvitesResults[index]["Subject"], yearOfStudy: outgoingFriendInvitesResults[index]["YearOfStudy"])
+                                    );
+                                    },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: Colors.grey[300]!,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 40,
+                                          height: 40,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(100),
+                                            child: Image.asset(outgoingFriendInvitesResults[index]["Images"][0]),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "${outgoingFriendInvitesResults[index]['ForeName']} ${outgoingFriendInvitesResults[index]['SurName']}",
+                                                style: Theme.of(context).textTheme.headlineSmall,
+                                              ),
+                                              Text(
+                                                outgoingFriendInvitesResults[index]["Id"],
+                                                style: Theme.of(context).textTheme.bodySmall,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        PopupMenuButton<String>(
+                                          itemBuilder: (context) => [
+                                            PopupMenuItem<String>(
+                                              value: 'remove',
+                                              child: Text('Cancel invite', style: Theme.of(context).textTheme.bodyMedium),
+                                            ),
+                                          ],
+                                          onSelected: (value) async {
+                                            if (value == 'remove') {
+                                              await removeOutFriendInvite(outgoingFriendInvitesResults[index]['Id']);
+                                              Navigator.of(context).pushReplacementNamed("/Friends");
+                                            }
+                                          },
+                                          icon: const Icon(Icons.more_vert),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -418,12 +526,12 @@ class _FriendsState extends State<Friends> {
                                               child: Text('Reject group', style: Theme.of(context).textTheme.bodyMedium),
                                             ),
                                           ],
-                                          onSelected: (value) {
+                                          onSelected: (value) async{
                                             if (value == 'accept') {
-                                              joinGroup(groupSearchResults[index]["Id"]);
+                                              await joinGroup(groupSearchResults[index]["Id"]);
                                               Navigator.of(context).pushReplacementNamed("/Friends");
                                             } else if (value == 'reject') {
-                                              removeGroupInvite(groupSearchResults[index]["Id"]);
+                                              await removeGroupInvite(groupSearchResults[index]["Id"]);
                                               Navigator.of(context).pushReplacementNamed("/Friends");
                                             }
                                           },
@@ -511,12 +619,12 @@ class _FriendsState extends State<Friends> {
                                               child: Text('Reject Friend', style: Theme.of(context).textTheme.bodyMedium),
                                             ),
                                           ],
-                                          onSelected: (value) {
+                                          onSelected: (value) async{
                                             if (value == 'accept') {
-                                              addFriend(friendSearchResults[index]["Id"]);
+                                              await addFriend(friendSearchResults[index]["Id"]);
                                               Navigator.of(context).pushReplacementNamed("/Friends");
                                             } else if (value == 'reject') {
-                                              removeFriendInvite(friendSearchResults[index]["Id"]);
+                                              await removeFriendInvite(friendSearchResults[index]["Id"]);
                                               Navigator.of(context).pushReplacementNamed("/Friends");
                                             }
                                           },

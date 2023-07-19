@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:movein/FriendFunctions.dart';
 import 'package:movein/swipe_card.dart';
 import 'package:movein/GroupFunctions.dart';
 
@@ -19,6 +20,7 @@ class _GroupOptionsState extends State<GroupOptions> {
     List<Map<String,dynamic>> memberDetails = [];
     List<Map<String,dynamic>> applicants = [];
     List<String> voteKicks = [];
+    Map<String,List<int>> kickVals = {};
     String groupPic = "";
 
     final CollectionReference docUsers = FirebaseFirestore.instance.collection("Users");
@@ -31,6 +33,24 @@ class _GroupOptionsState extends State<GroupOptions> {
       if (groupData != null) {
         var applicantIds = groupData["Applicants"];
         var kickIds = groupData["Kicks"];
+
+        var tempKickVals = groupData["KickVals"];
+        for (var key in tempKickVals.keys) {
+          int agree = 0;
+          int disagree = 0;
+          var innerMap = tempKickVals[key];
+
+          innerMap.forEach((innerKey, innerValue) {
+            if (innerValue == 1) {
+              agree += 1;
+            } else {
+              disagree += 1;
+            }
+          });
+
+          kickVals[key] = [agree, disagree];
+        }
+
 
         for (var aId in applicantIds){
           if (!(aId == "")){
@@ -97,8 +117,9 @@ class _GroupOptionsState extends State<GroupOptions> {
       );
     }
 
-    return [memberDetails, applicants, voteKicks, groupPic];
+    return [memberDetails, applicants, voteKicks,kickVals, groupPic];
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +148,8 @@ class _GroupOptionsState extends State<GroupOptions> {
             List<Map<String,dynamic>> memberDetails = data[0] as List<Map<String,dynamic>>;
             List<Map<String,dynamic>> applicants = data[1] as List<Map<String,dynamic>>;
             var kicks = data[2];
-            var groupPic = data[3];
+            var kickVals = data[3];
+            var groupPic = data[4];
 
             return Scaffold(
               appBar: AppBar(
@@ -283,17 +305,80 @@ class _GroupOptionsState extends State<GroupOptions> {
                                             if (isVoteKick)
                                               Padding(
                                                 padding: const EdgeInsets.only(left: 8.0),
-                                                child: Text(
-                                                  "KickVote",
-                                                  style: GoogleFonts.sourceCodePro(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20.0),
+                                                child: Column(
+                                                  children: [
+                                                    Text(
+                                                      "KickVote",
+                                                      style: GoogleFonts.sourceCodePro(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 20.0),
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          "Agree: ${kickVals[memberDetails[index]["Id"]][0]}",
+                                                          style: GoogleFonts.sourceCodePro(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 10.0),
+                                                        ),
+                                                        const SizedBox(width: 3),
+                                                        SizedBox(
+                                                          width: 2,
+                                                          height: 13,
+                                                          child: Container(
+                                                            color: Colors.red,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(width: 3),
+                                                        Text(
+                                                          "Disagree: ${kickVals[memberDetails[index]["Id"]][1]}",
+                                                          style: GoogleFonts.sourceCodePro(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 10.0),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
-                                            IconButton(
-                                                onPressed: () {
-                                                  // open sub-menu
-                                                },
-                                                icon: const Icon(Icons.more_vert)
-                                            )
+                                            PopupMenuButton<String>(
+                                              itemBuilder: (context) => [
+                                                PopupMenuItem<String>(
+                                                  value: 'add',
+                                                  child: Text('Add friend', style: Theme.of(context).textTheme.bodyMedium),
+                                                ),
+                                                if (isVoteKick)
+                                                  const PopupMenuDivider(height: 5),
+                                                if (isVoteKick)
+                                                  PopupMenuItem(
+                                                    value: 'agree',
+                                                      child: Text('Agree vote-kick', style: Theme.of(context).textTheme.bodyMedium),
+                                                  ),
+                                                if (isVoteKick)
+                                                  PopupMenuItem(
+                                                    value: 'disagree',
+                                                      child: Text('Disagree vote-kick', style: Theme.of(context).textTheme.bodyMedium),
+                                                  ),
+                                                if (!isVoteKick)
+                                                PopupMenuItem<String>(
+                                                  value: 'kick',
+                                                  child: Text('Start Vote-kick', style: Theme.of(context).textTheme.bodyMedium),
+                                                ),
+                                              ],
+                                              onSelected: (value) {
+                                                if (value == 'add') {
+                                                  sendFriendInvite(memberDetails[index]["Id"]);
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                      SnackBar(
+                                                          backgroundColor: Theme.of(context).primaryColor,
+                                                          content: const Text('Friend invite sent')
+                                                      )
+                                                  );
+                                                } else if (value == 'kick') {
+                                                  kickUser(memberDetails[index]["Id"], groupId);
+                                                } else if (value == 'agree') {
+                                                  updateKickVote(groupId, true, memberDetails[index]["Id"], members.length);
+                                                } else if (value == 'disagree') {
+                                                  updateKickVote(groupId, false, memberDetails[index]["Id"], members.length);
+                                                }
+                                              },
+                                              icon: const Icon(Icons.more_vert),
+                                              splashRadius: 1,
+                                            ),
                                           ],
                                         ),
                                       ),

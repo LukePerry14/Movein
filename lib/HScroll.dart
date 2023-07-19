@@ -84,12 +84,23 @@ class _GscrollerState extends State<Gscroller> {
               }
 
               else if(index == 1){
-                return Container(
-                  alignment: Alignment.center,
-                  child: Text(
-                    widget.groupName,
-                    style: Theme.of(context).textTheme.headlineLarge,
-                  ),
+                return Column(
+                  children: [
+                    Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        widget.groupName,
+                        style: Theme.of(context).textTheme.headlineLarge,
+                      ),
+                    ),
+                    Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "${profiles.length} Members",
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                    ),
+                  ]
                 );
               } else if (index < profiles.length+2) {
                 return SwipeCard(
