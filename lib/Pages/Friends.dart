@@ -336,25 +336,32 @@ class _FriendsState extends State<Friends> {
                   SizedBox(
                       width: MediaQuery.of(context).size.width * 0.9,
                       child: Row(
-                          children: [
-                            Text("My Groups", style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,),
-                            const SizedBox(width: 15),
-                            isLoading? const Text("")
-                                : Container(
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  "Applied: ${applications.length + joined.length}/$appsMax",
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
+                        children: [
+                          Text("Your Groups", style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,),
+                          const Expanded(child: Text("")),
+                          ElevatedButton(
+                            onPressed: () {
+                              if (joined.length + applications.length == appsMax){
+                                //show alert
+                              }else{
+                                // open bottom modal screen with form
+                              }
+                            },
+                            child: SizedBox(
+                              height: 30,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text('Create Group', style: Theme.of(context).textTheme.bodyMedium),
+                                  const Icon(LineAwesomeIcons.plus, size: 20,),
+                                ],
                               ),
                             ),
-                          ],
+                          ),
+                        ],
                       ),
+
                   ),
                   Padding(
                     padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
@@ -377,6 +384,11 @@ class _FriendsState extends State<Friends> {
                                   Text(
                                     "Joined",
                                     style: Theme.of(context).textTheme.headlineSmall,
+                                  ),
+                                  const SizedBox(width: 15),
+                                  Text(
+                                    "${applications.length + joined.length}/$appsMax",
+                                    style: Theme.of(context).textTheme.bodyLarge,
                                   ),
                                 ]
                             );
