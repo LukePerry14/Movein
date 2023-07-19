@@ -26,11 +26,6 @@ class _GscrollerState extends State<Gscroller> {
   late List<CardProfile> profiles;
 
 
-  @override
-  void initState() {
-    super.initState();
-    loadProfilesFuture = loadProfiles();
-  }
 
   Future<List<CardProfile>> loadProfiles() async {
     List<CardProfile> loadedProfiles = [];
@@ -58,7 +53,7 @@ class _GscrollerState extends State<Gscroller> {
   Widget build(BuildContext context) {
     return Expanded(
       child: FutureBuilder<List<CardProfile>>(
-        future: loadProfilesFuture,
+        future: loadProfiles(),
         builder: (context, snapshot) {
 
           if (snapshot.hasError) {

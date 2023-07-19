@@ -519,8 +519,80 @@ Future<void> updateKickVote(String groupId, bool agree, String kickId, int group
 }
 
 
+class ConfirmGroupDel extends StatelessWidget {
+  final String groupId;
+  final String groupType;
+  const ConfirmGroupDel({
+    Key? key,
+    required this.groupId,
+    required this.groupType,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.0),
+      ),
+      backgroundColor: Theme.of(context).canvasColor,
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.6,
+        height: MediaQuery.of(context).size.height * 0.3,
+        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("If you remove the group you can not undo this action without reapplying", style: Theme.of(context).textTheme.bodyLarge, textAlign: TextAlign.center),
+            const SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text("Cancel", style: Theme.of(context).textTheme.bodyMedium),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton(
+                      onPressed: () {
+                        removeGroupFromUser(groupType, groupId).then((_){
+                          Navigator.of(context).pushReplacementNamed('/Friends');
+                        });
+
+                      },
+                      child: Text("Confirm", style: Theme.of(context).textTheme.bodyMedium)
+                  ),
+                ),
+
+              ],
+            )
+          ],
+        ),
+      ),
+
+    );
+  }
+}
 
 
 
 
 
+Future<void> removeGroupFromUser(String groupType, String groupId) async {
+  try {
+    final DocumentReference userRef = FirebaseFirestore.instance.collection('Users').doc(userId);
+
+    await userRef.update({
+      groupType: FieldValue.arrayRemove([groupId]),
+    });
+  } catch (e) {
+    throw FirebaseException(
+      message: 'Error removing group from user: $e',
+      plugin: 'cloud_firestore',
+    );
+  }
+}

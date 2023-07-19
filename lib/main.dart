@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Themes/lMode.dart';
-import 'package:movein/Pages/Groups.dart';
 import 'package:movein/Pages/Houses.dart';
 import 'package:movein/Pages/Messages.dart';
 import 'package:movein/Pages/Profile.dart';
@@ -39,7 +38,6 @@ class App extends StatelessWidget {
         '/Scroller': (context) => const Scroller(),
         '/ScrollRefresh': (context) => const RanOut(),
         '/Messages': (context) => const Messages(),
-        '/Groups': (context) => const Groups(),
         '/Profile': (context) => const Profile(),
         '/Settings': (context) => const Settings(),
         '/Friends': (context) => const Friends(),

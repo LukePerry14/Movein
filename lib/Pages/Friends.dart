@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/navbar.dart';
 import 'package:movein/FriendFunctions.dart';
 import 'package:movein/swipe_card.dart';
@@ -21,11 +22,18 @@ class _FriendsState extends State<Friends> {
   late List<dynamic> friendSearchResults;
   late List<dynamic> outgoingFriendInvites;
   List<dynamic> outgoingFriendInvitesResults = [];
+  late List<dynamic> joined;
+  late List<dynamic> joinedResults;
+  late List<dynamic> applications;
+  late List<dynamic> applicationsResults;
+  late List<dynamic> shortList;
+  late List<dynamic> shortListResults;
   late bool isLoading;
   late bool isSearchLoading;
   late List<dynamic> fSSearchResults;
   bool loadExtra = false;
   String searchText = "";
+  final appsMax = 3;
 
   int stampToYear(var dateTime) {
     final currentDate = DateTime.now();
@@ -38,8 +46,40 @@ class _FriendsState extends State<Friends> {
     List<Map<String,dynamic>> groupInvites = [];
     List<Map<String,dynamic>> friendInvites = [];
     List<Map<String,dynamic>> outgoingFriendInvites = [];
+    List<dynamic> allGroups = [];
 
     try {
+      for (String type in ["Joined", "Applications", "ShortList"]) {
+        List<Map<String, dynamic>> groups = [];
+        List<String> tGroups = [];
+        final CollectionReference docGroups =
+        FirebaseFirestore.instance.collection("Groups");
+        final CollectionReference docUsers =
+        FirebaseFirestore.instance.collection("Users");
+
+
+        DocumentSnapshot docSnapshot = await docUsers.doc(userId).get();
+        Map<String, dynamic>? data = docSnapshot.data() as Map<String, dynamic>?;
+
+        tGroups = List<String>.from(data?[type] ?? []);
+
+        for (var group in tGroups) {
+          if (group is String && group.isNotEmpty) {
+            DocumentSnapshot groupSnapshot = await docGroups.doc(group).get();
+            Map<String, dynamic>? groupData = groupSnapshot.data() as Map<String, dynamic>?;
+            if (groupData != null){
+              groups.add({
+                "Id": group,
+                "GroupName": groupData["GroupName"],
+                "GroupPicture": groupData["GroupPicture"],
+                "Members": groupData["Members"],
+              });
+            }
+          }
+        }
+
+          allGroups.add(groups);
+      }
       final usersSnapshot = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
       final groupIds = List<String>.from(usersSnapshot.data()?['GroupInvites'] ?? []);
 
@@ -88,8 +128,6 @@ class _FriendsState extends State<Friends> {
             });
           }
         }
-
-
 
       for (String friendId in friendsIds) {
         final friendSnapshot = await FirebaseFirestore.instance
@@ -144,7 +182,7 @@ class _FriendsState extends State<Friends> {
         plugin: 'cloud_firestore',
       );
     }
-    return [friends,friendInvites,groupInvites,outgoingFriendInvites];
+    return [friends,friendInvites,groupInvites,outgoingFriendInvites, allGroups];
   }
 
   Future<List<Friend>> searchUsers(String searchQuery) async {
@@ -218,12 +256,29 @@ class _FriendsState extends State<Friends> {
             '${friend["ForeName"]} ${friend["SurName"]}'.toLowerCase().contains(query.toLowerCase()))
             .toList();
 
-      friendSearchResults = friendInvites
+      outgoingFriendInvitesResults = outgoingFriendInvites
           .where((friend) =>
             friend["Id"].toLowerCase().contains(query.toLowerCase()) ||
             '${friend["ForeName"]} ${friend["SurName"]}'.toLowerCase().contains(query.toLowerCase()))
             .toList();
 
+      joinedResults = joined
+          .where((group) =>
+          group["GroupName"].toLowerCase().contains(query.toLowerCase()) ||
+          group["Id"].toLowerCase().contains(query.toLowerCase()))
+          .toList();
+
+      applicationsResults = applications
+          .where((group) =>
+          group["GroupName"].toLowerCase().contains(query.toLowerCase()) ||
+          group["Id"].toLowerCase().contains(query.toLowerCase()))
+          .toList();
+
+      shortListResults = shortList
+          .where((group) =>
+          group["GroupName"].toLowerCase().contains(query.toLowerCase()) ||
+          group["Id"].toLowerCase().contains(query.toLowerCase()))
+          .toList();
     });
   }
 
@@ -241,6 +296,12 @@ class _FriendsState extends State<Friends> {
         groupSearchResults = data[2];
         outgoingFriendInvites = data[3];
         outgoingFriendInvitesResults = data[3];
+        joined = data[4][0];
+        joinedResults = data[4][0];
+        applications = data[4][1];
+        applicationsResults = data[4][1];
+        shortList = data[4][2];
+        shortListResults = data[4][2];
         isLoading = false;
       });
     });
@@ -272,6 +333,265 @@ class _FriendsState extends State<Friends> {
                       ),
                     ),
                   ),
+                  SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      child: Row(
+                          children: [
+                            Text("My Groups", style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,),
+                            const SizedBox(width: 15),
+                            isLoading? const Text("")
+                                : Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColor,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  "Applied: ${applications.length + joined.length}/$appsMax",
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ),
+                            ),
+                          ],
+                      ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200], // Light grey background color
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: isLoading ? const Center(child: CircularProgressIndicator())
+                          : (joinedResults.isEmpty & applicationsResults.isEmpty & shortListResults.isEmpty) ? Text("No Groups", style: Theme.of(context).textTheme.bodyMedium,)
+                          : ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: joinedResults.length + applicationsResults.length + shortListResults.length + 3,
+                        itemBuilder: (context, index) {
+                          if (index == 0) {
+                            return joinedResults.isEmpty ? const SizedBox(height: 1,)
+                            : Row(
+                                children: [
+                                  const SizedBox(width: 20),
+                                  Text(
+                                    "Joined",
+                                    style: Theme.of(context).textTheme.headlineSmall,
+                                  ),
+                                ]
+                            );
+                          } else if (index <= joinedResults.length) {
+                            int joinedIndex = index - 1;
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, '/Messages', arguments: {
+                                  'members': joinedResults[joinedIndex]["Members"],
+                                  'groupId': joinedResults[joinedIndex]["Id"],
+                                  'groupName': joinedResults[joinedIndex]["GroupName"],
+                                });
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 40,
+                                        height: 40,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(100),
+                                          child: Image.asset(joinedResults[joinedIndex]["GroupPicture"]),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              joinedResults[joinedIndex]["GroupName"],
+                                              style: Theme.of(context).textTheme.headlineSmall,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          Navigator.pushNamed(context, '/Messages', arguments: {
+                                            'members': joinedResults[joinedIndex]["Members"],
+                                            'groupId': joinedResults[joinedIndex]["Id"],
+                                            'groupName': joinedResults[joinedIndex]["GroupName"],
+                                          });
+                                        },
+                                        splashRadius: 1,
+                                        icon: const Icon(Icons.mail),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          } else if (index == joinedResults.length + 1) {
+                            return applicationsResults.isEmpty ? const SizedBox(height: 1,)
+                                : Row(
+                                children: [
+                                  const SizedBox(width: 20),
+                                  Text(
+                                    "Applications",
+                                    style: Theme.of(context).textTheme.headlineSmall,
+                                  ),
+                                ]
+                            );
+                          } else if (index <= joinedResults.length + applicationsResults.length + 1) {
+                            int applicationIndex = index - joinedResults.length - 2;
+                            return GestureDetector(
+                              onTap: () {
+                                showDialog<String>(
+                                  context: context,
+                                  builder: (BuildContext context) => GroupExpand(
+                                    id: applicationsResults[applicationIndex]["Id"],
+                                    groupName: applicationsResults[applicationIndex]["GroupName"],
+                                    groupPicture: applicationsResults[applicationIndex]["GroupPicture"],
+                                    members: applicationsResults[applicationIndex]["Members"].cast<String>().toList(),
+                                  ),
+                                );
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 40,
+                                        height: 40,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(100),
+                                          child: Image.asset(applicationsResults[applicationIndex]["GroupPicture"]),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              applicationsResults[applicationIndex]["GroupName"],
+                                              style: Theme.of(context).textTheme.headlineSmall,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          showDialog<String>(
+                                            context: context,
+                                            builder: (BuildContext context) => ConfirmGroupDel(groupId: applicationsResults[applicationIndex]["Id"], groupType: "Applications")
+                                          );
+                                        },
+                                        splashRadius: 1,
+                                        icon: const Icon(LineAwesomeIcons.trash),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          } else if (index == joinedResults.length + applicationsResults.length + 2) {
+                            return shortListResults.isEmpty ? const SizedBox(height: 1,)
+                                : Row(
+                                children: [
+                                  const SizedBox(width: 20),
+                                  Text(
+                                    "ShortList",
+                                    style: Theme.of(context).textTheme.headlineSmall,
+                                  ),
+                                ]
+                            );
+                          } else {
+                            int shortlistIndex = index - joinedResults.length - applicationsResults.length - 3;
+                            return GestureDetector(
+                              onTap: () {
+                                showDialog<String>(
+                                  context: context,
+                                  builder: (BuildContext context) => GroupExpand(
+                                    id: shortListResults[shortlistIndex]["Id"],
+                                    groupName: shortListResults[shortlistIndex]["GroupName"],
+                                    groupPicture: shortListResults[shortlistIndex]["GroupPicture"],
+                                    members: shortListResults[shortlistIndex]["Members"].cast<String>().toList(),
+                                  ),
+                                );
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 40,
+                                        height: 40,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(100),
+                                          child: Image.asset(shortListResults[shortlistIndex]["GroupPicture"]),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              shortListResults[shortlistIndex]["GroupName"],
+                                              style: Theme.of(context).textTheme.headlineSmall,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          showDialog<String>(
+                                              context: context,
+                                              builder: (BuildContext context) => ConfirmGroupDel(groupId: shortListResults[shortlistIndex]["Id"], groupType: "ShortList")
+                                          );
+                                        },
+                                        splashRadius: 1,
+                                        icon: const Icon(LineAwesomeIcons.trash),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+
+                    ),
+                  ),
+                  ////////////////////////////////////////////////////////////////////
                   SizedBox(
                       width: MediaQuery.of(context).size.width * 0.9,
                       child: Text("Your Friends", style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)

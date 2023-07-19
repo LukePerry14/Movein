@@ -22,7 +22,7 @@ class CustomNavbar extends StatelessWidget {
           ),
           IconButton(
             onPressed: () {
-              onItemSelected('/Groups');
+              onItemSelected('/Friends');
             },
             icon: const Icon(Icons.group),
             color: Colors.white,
@@ -33,13 +33,6 @@ class CustomNavbar extends StatelessWidget {
             },
             icon: const Icon(Icons.person),
             color: Colors.white,
-          ),
-          IconButton(
-              onPressed: () {
-                onItemSelected('/Friends');
-              },
-              icon: const Icon(Icons.mail),
-              color: Colors.white,
           ),
           IconButton(
             onPressed: () {
