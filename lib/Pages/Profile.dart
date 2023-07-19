@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:movein/navbar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
@@ -22,7 +21,7 @@ class Profile extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: <Widget>[
                         Padding(
-                          padding: EdgeInsets.all(40.0),
+                          padding: const EdgeInsets.all(40.0),
                           child: backgroundButton()
                         ),
                         Stack(
@@ -35,7 +34,7 @@ class Profile extends StatelessWidget {
                                 width: 175, height: 175,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(100),
-                                  child: const Image(image: AssetImage("assets/Pictures/ph.png")),
+                                  child: const Image(image: AssetImage("assets/Pictures/dora.png")),
                                 ),
                               ),
                             ),
@@ -47,7 +46,7 @@ class Profile extends StatelessWidget {
                                 height: 30.0,
                                 width: 30.0,
                                 decoration: BoxDecoration(
-                                  color: Color(0xFFEFCE14),
+                                  color: const Color(0xFFEFCE14),
                                   borderRadius: BorderRadius.circular(100),
                                 ),
                                 child: const Icon(LineAwesomeIcons.pen_nib,
@@ -79,10 +78,9 @@ class Profile extends StatelessWidget {
                     const SizedBox(height: 40.0),
 
                     Container(
-                      // color: Theme.of(context).primaryColor.withOpacity(0.7),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                        color: Theme.of(context).primaryColor.withOpacity(0.7)
+                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                        color: Theme.of(context).primaryColor
                       ),
                       child: ListTile(
                         onTap: () {
@@ -97,12 +95,9 @@ class Profile extends StatelessWidget {
                           child: const Icon(
                             LineAwesomeIcons.user, color: Colors.white,),
                         ),
-                        title: Container(
-                          child: Text("Profile information", style: Theme
-                              .of(context)
-                              .textTheme
-                              .bodyMedium),
-                        ),
+                        title: const Text("Profile information", style: TextStyle(
+                          color: Colors.white,
+                        )),
                       ),
                     ), 
 
@@ -110,8 +105,8 @@ class Profile extends StatelessWidget {
 
                     Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                        color: Theme.of(context).primaryColor.withOpacity(0.7)
+                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                        color: Theme.of(context).primaryColor
                       ),
                       child: ListTile(
                         onTap: () {
@@ -127,7 +122,9 @@ class Profile extends StatelessWidget {
                           child: const Icon(
                             LineAwesomeIcons.cog, color: Colors.white),
                         ),
-                        title: Text("Settings", style: Theme.of(context).textTheme.bodyMedium,),
+                        title: const Text("Settings", style: TextStyle(
+                          color: Colors.white
+                        )),
                       ),
                     ),
 
@@ -135,7 +132,7 @@ class Profile extends StatelessWidget {
                   
                     Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        borderRadius: const BorderRadius.all(Radius.circular(20)),
                         color: Theme.of(context).primaryColor
                       ),
                       child: ListTile(
@@ -148,11 +145,13 @@ class Profile extends StatelessWidget {
                           child: const Icon(LineAwesomeIcons.alternate_sign_out,
                             color: Colors.white,),
                         ),
-                        title: Text("Logout",
-                            style:Theme.of(context).textTheme.bodyMedium),
+                        title: const Text("Logout",
+                            style: TextStyle(
+                              color: Colors.white
+                            )
                       ),
                     ),
-                  
+                    )
                   ],
                 ),
               ),
@@ -239,10 +238,10 @@ class ButtonWidgetSettings extends StatelessWidget {
     onPressed: onClicked, 
     child: Row(
       children: <Widget>[
-        Icon(
+        const Icon(
           LineAwesomeIcons.cog,
         ),
-        SizedBox(width: 10,),
+        const SizedBox(width: 10,),
         Text(text)
       ]
     )
@@ -265,8 +264,8 @@ class ButtonWidgetBackground extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
     ),
     onPressed: onClicked, 
-    child: Row(
-      children: const <Widget>[
+    child: const Row(
+      children: <Widget>[
         Padding(
           padding: EdgeInsets.all(5.0),
           child: Icon(LineAwesomeIcons.sun, color: Colors.white, size: 24,),
@@ -291,8 +290,8 @@ class ButtonWidgetShareProfile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
     ),
     onPressed: onClicked, 
-    child: Row(
-      children: const <Widget>[
+    child: const Row(
+      children: <Widget>[
         Padding(
           padding: EdgeInsets.all(5.0),
           child: Icon(LineAwesomeIcons.share_square, color: Colors.white, size: 24,),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/navbar.dart';
-import 'package:settings_ui/settings_ui.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -30,13 +29,21 @@ class _SettingsState extends State<Settings> {
                 },
               ),
               actions: [
-                IconButton(
-                  color: Colors.white,
-                  icon: const Icon(Icons.more_vert), //Icon not showing
-                  onPressed: () {
-                    // Handle settings button press
-                  },
-                ),
+                PopupMenuButton(itemBuilder: (context)=>[
+                  const PopupMenuItem<int>(
+                    value: 0,
+                    child: Text('About'),
+                  ),
+                  const PopupMenuItem<int>(
+                    value: 1,
+                    child: Text('FAQs'),
+                  ),
+                  const PopupMenuItem(
+                    value: 2,
+                    child: Text('TBC'),
+                  )
+                ],onSelected: (item)=>chosenItem(context, item), color: Colors.white,
+                )
               ],
             ),
             body: 
@@ -70,12 +77,12 @@ class _SettingsPageState extends State<SettingsPage> {
           Row(
             children: [
               Icon(
-                Icons.person,
+                Icons.settings,
                 color: Theme.of(context).primaryColor,
                 size: 50,
               ),
               const SizedBox(width: 10),
-              const Text("Account", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 22))
+              const Text("Settings", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 22))
             ],
           ),
           const Divider(height: 20, thickness: 1),
@@ -137,4 +144,15 @@ GestureDetector buildAccountOption(BuildContext context, String title) {
       ),
     ),
   );
+}
+
+chosenItem(BuildContext context, item) {
+  switch(item) {
+    case 0: print('This will link to the about section on the UniMe Website');
+    break;
+    case 1: print('FAQs section of unime website loads');
+    break;
+    case 2: print('no idea yet');
+    break;
+  }
 }

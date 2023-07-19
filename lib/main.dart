@@ -6,6 +6,7 @@ import 'package:movein/Pages/Houses.dart';
 import 'package:movein/Pages/Messages.dart';
 import 'package:movein/Pages/Profile.dart';
 import 'package:movein/Pages/Settings.dart';
+import 'package:movein/Pages/profileInformation.dart';
 import 'package:movein/Pages/GroupOptions.dart';
 import 'package:movein/Pages/Friends.dart';
 import 'package:movein/Pages/ScrollRefresh.dart';
@@ -121,6 +122,7 @@ class App extends StatelessWidget {
         '/Groups': (context) => const Groups(),
         '/Profile': (context) => const Profile(),
         '/Settings': (context) => const Settings(),
+        '/profileInformation': (context) => const profileInformation(),
         '/Friends': (context) => const Friends(),
         '/Houses': (context) => const Houses(),
         '/GroupOptions': (context) => const GroupOptions(),
