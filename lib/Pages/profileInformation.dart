@@ -136,6 +136,8 @@ class _profilePageState extends State<profileInformationPage> {
             ),
             const SizedBox(height: 20),
             const Divider(height: 20, thickness: 1),
+            universityDropdown(),
+
           ],
         ),
       ),
@@ -158,4 +160,17 @@ class _profilePageState extends State<profileInformationPage> {
         })
       });
   }
+}
+
+universityDropdown() {
+  DropdownButton<String>(
+    items:
+      <String>['Durham', 'Birmingham', 'Leeds', 'York'].map((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+      onChanged: (chosenUniversity) {print(chosenUniversity);},
+  );
 }
