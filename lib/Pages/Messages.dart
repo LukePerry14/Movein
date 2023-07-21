@@ -11,11 +11,15 @@ class Messages extends StatefulWidget {
 
 class _MessagesState extends State<Messages> {
   Map data = {};
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    data = ModalRoute.of(context)?.settings.arguments as Map;
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    //retrieves data from previous page to display relevant groupName
-    data = ModalRoute.of(context)?.settings.arguments as Map;
 
     return Builder(
         builder: (context) {
@@ -54,6 +58,7 @@ class _MessagesState extends State<Messages> {
                       'members': data['members'],
                       'groupId': data['groupId'],
                       'groupName': data['groupName'],
+                      'groupPicture' : data['groupPicture'],
                     });
                   },
                 ),

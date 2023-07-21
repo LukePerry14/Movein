@@ -342,9 +342,34 @@ class _FriendsState extends State<Friends> {
                           ElevatedButton(
                             onPressed: () {
                               if (joined.length + applications.length == appsMax){
-                                //show alert
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text('Maximum Number of Groups Reached'),
+                                      content: const Text('You are already in the maximum number of groups. To create your own group, you need to leave one of your existing groups.'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context); // Close the dialog
+                                          },
+                                          child: const Text('OK'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
                               }else{
-                                // open bottom modal screen with form
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Rounded top corners
+                                  ),
+                                  builder: (BuildContext context) {
+                                    return CreateGroupForm(); // Using the extracted widget here
+                                  },
+                                );
                               }
                             },
                             child: SizedBox(
@@ -400,6 +425,7 @@ class _FriendsState extends State<Friends> {
                                   'members': joinedResults[joinedIndex]["Members"],
                                   'groupId': joinedResults[joinedIndex]["Id"],
                                   'groupName': joinedResults[joinedIndex]["GroupName"],
+                                  'groupPicture' : joinedResults[joinedIndex]["GroupPicture"],
                                 });
                               },
                               child: Padding(

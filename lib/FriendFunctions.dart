@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/HScroll.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 const String userId = "iKxLSxcDqlT6vtHe71Bp";
 
@@ -593,6 +596,142 @@ Future<void> removeGroupFromUser(String groupType, String groupId) async {
     throw FirebaseException(
       message: 'Error removing group from user: $e',
       plugin: 'cloud_firestore',
+    );
+  }
+}
+
+class CreateGroupForm extends StatefulWidget {
+  const CreateGroupForm({Key? key}) : super(key: key);
+
+  @override
+  State<CreateGroupForm> createState() => _CreateGroupFormState();
+}
+
+class _CreateGroupFormState extends State<CreateGroupForm> {
+  final _formKey = GlobalKey<FormState>();
+  bool _isButtonEnabled = false;
+  final TextEditingController _groupNameController = TextEditingController(text: "GroupName");
+  File? _selectedImage;
+
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      final String groupName = _groupNameController.text;
+      // Now you can upload the _selectedImage to your backend server.
+
+      // Dummy URL for demonstration purposes
+      const String dummyUrl = 'https://example.com/upload';
+      final Uri uri = Uri.parse(dummyUrl);
+
+      // You can create an HTTP multipart request to send the image.
+      // For this example, we are using a dummy response.
+      final request = http.MultipartRequest('POST', uri)
+        ..fields['group_name'] = groupName
+        ..files.add(await http.MultipartFile.fromPath('image', _selectedImage!.path));
+
+      final response = await request.send();
+      final responseData = await response.stream.bytesToString();
+
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 300,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.35,
+            height: 5,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: const BorderRadius.horizontal(
+                  left: Radius.circular(20), // Sets the radius for the left corner
+                  right: Radius.circular(20), // Sets the radius for the right corner
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 15),
+          SizedBox(width: MediaQuery.of(context).size.width,child: Text("Create Group", style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.start,),),
+          Form(
+            autovalidateMode: AutovalidateMode.always,
+            key: _formKey,
+            onChanged: () {
+              setState(() {
+                _isButtonEnabled = _formKey.currentState?.validate() ?? false;
+              });
+            },
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _groupNameController,
+                  maxLength: 15,
+                  autocorrect: false,
+                  decoration: const InputDecoration(
+                    border: UnderlineInputBorder(),
+                    labelText: 'Change Groupname',
+                  ),
+                  validator: (value) {
+                    if (value!.trim().isEmpty) {
+                      return 'Group name must exist';
+                    }
+                    return null;
+                  },
+                  onTap: () {
+                    // Select the whole text when tapped
+                    _groupNameController.selection = TextSelection(
+                      baseOffset: 0,
+                      extentOffset: _groupNameController.text.length,
+                    );
+                  },
+                ),
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: _selectedImage != null
+                        ? Image.file(_selectedImage!, fit: BoxFit.cover)
+                        : const Icon(Icons.add_a_photo, color: Colors.grey),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: _isButtonEnabled
+                ? () {
+              if (_formKey.currentState?.validate() ?? false) {
+                _submitForm();
+                Navigator.pop(context); // Close the bottom sheet
+              }
+            }
+                : null,
+            child: const Text('Submit'),
+          ),
+        ],
+      ),
     );
   }
 }

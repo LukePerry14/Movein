@@ -43,6 +43,7 @@ dependencies:
   cloud_firestore: ^4.8.1
   intl: ^0.18.1
   modal_bottom_sheet: ^2.1.2
+  image_picker: ^1.0.1
 
 dev_dependencies:
   flutter_test:

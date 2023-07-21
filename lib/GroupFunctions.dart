@@ -45,9 +45,7 @@ Future<void> removeFromGroupAndUser(String groupId) async {
   }
 }
 
-
-class EditGroupName extends StatelessWidget {
-
+class EditGroupName extends StatefulWidget {
   final String name;
   final String groupId;
   const EditGroupName({
@@ -57,9 +55,27 @@ class EditGroupName extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<EditGroupName> createState() => _EditGroupNameState();
+}
+
+class _EditGroupNameState extends State<EditGroupName> {
+  late final TextEditingController _textEditingController;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  bool _isButtonEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController = TextEditingController(text: widget.name);
+  }
+  @override
+  void dispose() {
+    super.dispose();
+    _textEditingController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final TextEditingController textEditingController = TextEditingController(text: name);
-    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -76,14 +92,20 @@ class EditGroupName extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
               child: Form(
+                autovalidateMode: AutovalidateMode.always,
                 key: formKey,
+                onChanged: () {
+                  setState(() {
+                    _isButtonEnabled = formKey.currentState?.validate() ?? false;
+                  });
+                },
                 child: TextFormField(
-                  controller: textEditingController,
+                  controller: _textEditingController,
                   maxLength: 15,
                   autocorrect: false,
                   decoration: const InputDecoration(
                     border: UnderlineInputBorder(),
-                    labelText: 'Change Groupname',
+                    labelText: 'Change Group name',
                   ),
                   validator: (value) {
                     if (value!.trim().isEmpty) {
@@ -91,12 +113,11 @@ class EditGroupName extends StatelessWidget {
                     }
                     return null;
                   },
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   onTap: () {
                     // Select the whole text when tapped
-                    textEditingController.selection = TextSelection(
+                    _textEditingController.selection = TextSelection(
                       baseOffset: 0,
-                      extentOffset: textEditingController.text.length,
+                      extentOffset: _textEditingController.text.length,
                     );
                   },
                 ),
@@ -117,14 +138,14 @@ class EditGroupName extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: _isButtonEnabled ?  () {
                       if (formKey.currentState!.validate()) {
-                        final String newName = textEditingController.text;
-                        updateGroupName(newName, groupId).then((_) {
+                        final String newName = _textEditingController.text;
+                        updateGroupName(newName, widget.groupId).then((_) {
                           Navigator.of(context).pushReplacementNamed('/Groups');
                         });
                       }
-                    },
+                    } : null,
                     child: Text("Confirm", style: Theme.of(context).textTheme.bodyMedium),
                   ),
                 ),
@@ -136,6 +157,7 @@ class EditGroupName extends StatelessWidget {
     );
   }
 }
+
 
 class ConfirmLeave extends StatelessWidget {
   final String groupId;
