@@ -1,7 +1,48 @@
+// ignore: duplicate_ignore
+// ignore_for_file: camel_case_types
+
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/navbar.dart';
-import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+
+// These will be imported in from firebase
+var universityNames = [
+  'Durham',
+  'Birmingham',
+  'Bristol',
+  'Manchester'
+];
+
+// This can remain local as it won't change
+// ignore: non_constant_identifier_names
+var YOS = [
+  'Foundation Year',
+  'Year 1',
+  'Year 2',
+  'Year 3',
+  'Postgraduate'
+];
+
+var gender = [
+
+  'Male',
+  'Female',
+  'Non-binary',
+  'Transgender',
+  'Prefer not to say'
+];
+
+var subject = [
+  'Computer Science',
+  'Maths',
+  'English'
+];
+
+// These values will be imported from firebase and set for the user
+String dropdownValue = universityNames[0];
+String dropdownValue2 = YOS[0];
+String genderValue = gender[0];
+String subjectValue = subject[0];
 
 class profileInformation extends StatefulWidget {
   const profileInformation({Key? key}) : super(key: key);
@@ -78,7 +119,6 @@ class profileInformationPage extends StatefulWidget {
   _profilePageState createState() => _profilePageState();
 }
 
-// ignore: camel_case_types
 class _profilePageState extends State<profileInformationPage> {
   DateTime? _selectedDate;
 
@@ -87,7 +127,6 @@ class _profilePageState extends State<profileInformationPage> {
     return Container(
       padding: const EdgeInsets.all(10),
       child: GestureDetector(
-        // onTap: FocusScope.of(context).focusedChild
         child: ListView(
           children: [
             const SizedBox(height: 30),
@@ -125,7 +164,10 @@ class _profilePageState extends State<profileInformationPage> {
               ),
             ),
             const SizedBox(height: 20),
-            const Text('Date of Birth'),
+            const Padding(
+              padding: EdgeInsets.all(5.0),
+              child: Center(child: Text('Date of Birth', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),)),
+            ),
             const SizedBox(height: 15,),
             ElevatedButton(onPressed: _DateOfBirthPicker, child: const Text('Select your Date of Birth')),
             const SizedBox(height: 15),
@@ -135,9 +177,40 @@ class _profilePageState extends State<profileInformationPage> {
               ),
             ),
             const SizedBox(height: 20),
+            const Padding(
+              padding: EdgeInsets.all(5.0),
+              child: Center(child: Text('Gender', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),)),
+            ),
+            const Center(child: genderDropdown()),
             const Divider(height: 20, thickness: 1),
-            universityDropdown(),
-
+            const Padding(
+              padding: EdgeInsets.all(5.0),
+              child: Center(child: Text('University', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),)),
+            ),
+            const Center(
+              child: universityDropdown()
+            ),
+            const SizedBox(height: 10,),
+            const Padding(
+              padding: EdgeInsets.all(5.0),
+              child: Center(child: Text('Year Of Study', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),),
+            ),
+            const Center(
+              child: yearOfStudyDropdown(),
+            ),
+            const SizedBox(height: 10),
+            const Padding(
+              padding: EdgeInsets.all(5.0),
+              child: Center(child: Text('Subject', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),)),
+            ),
+            const Center(
+              child: subjectDropdown(),
+            ),
+            const SizedBox(height: 30,),
+            ElevatedButton(
+              onPressed: _submit,
+              child: Text('Edit Profile'),
+            )
           ],
         ),
       ),
@@ -162,15 +235,127 @@ class _profilePageState extends State<profileInformationPage> {
   }
 }
 
-universityDropdown() {
-  DropdownButton<String>(
-    items:
-      <String>['Durham', 'Birmingham', 'Leeds', 'York'].map((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
+// UNIVERSITY DROPDOWN
+
+class universityDropdown extends StatefulWidget {
+  const universityDropdown({Key? key}) : super(key: key);
+
+  @override
+  State<universityDropdown> createState() => _universityDropdownMenu();
+}
+
+class _universityDropdownMenu extends State<universityDropdown> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: DropdownButton(
+        value: dropdownValue,
+        icon: const Icon(Icons.keyboard_arrow_down),
+        items: universityNames.map((String items) {
+          return DropdownMenuItem(
+            value: items,
+            child: Text(items),
+          );
+        }).toList(),
+        onChanged: (String? newUniversityName) {
+          setState(() {
+            dropdownValue = newUniversityName!;
+          });
+        },
+      ),
+    );
+  }
+}
+
+// YEAR OF STUDY DROPDOWN
+
+class yearOfStudyDropdown extends StatefulWidget {
+  const yearOfStudyDropdown({Key? key}) : super(key: key);
+  @override
+  State<yearOfStudyDropdown> createState() => _yearOfStudyDropdownMenu();
+}
+
+class _yearOfStudyDropdownMenu extends State<yearOfStudyDropdown> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: DropdownButton(
+        value: dropdownValue2,
+        icon: const Icon(Icons.keyboard_arrow_down),
+        items: YOS.map((String year) {
+          return DropdownMenuItem(
+            value: year,
+            child: Text(year),
+          );
+        }).toList(),
+        onChanged: (String? newYOS) {
+          setState(() {
+            dropdownValue2 = newYOS!;
+          });
+        }
+      ),
+    );
+  }
+}
+
+// GENDER DROPDOWN
+
+class genderDropdown extends StatefulWidget {
+  const genderDropdown({Key? key}) : super(key: key);
+  @override
+  State<genderDropdown> createState() => _genderDropdownMenu();
+}
+
+class _genderDropdownMenu extends State<genderDropdown> {
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton(
+      value: genderValue,
+      icon: const Icon(Icons.keyboard_arrow_down),
+      items: gender.map((String selectedGender) {
+        return DropdownMenuItem(
+          value: selectedGender,
+          child: Text(selectedGender),
         );
       }).toList(),
-      onChanged: (chosenUniversity) {print(chosenUniversity);},
-  );
+      onChanged: (String? newGender) {
+        setState(() {
+          genderValue = newGender!;
+        });
+      },
+    );
+  }
+}
+
+class subjectDropdown extends StatefulWidget {
+  const subjectDropdown({Key? key}) : super(key: key);
+  @override
+  State<subjectDropdown> createState() => _subjectDropdownMenu();
+}
+
+class _subjectDropdownMenu extends State<subjectDropdown> {
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton(
+      value: subjectValue,
+      icon: const Icon(Icons.keyboard_arrow_down),
+      items: subject.map((String selecetdSubject) {
+        return DropdownMenuItem(
+          value: selecetdSubject,
+          child: Text(selecetdSubject),
+        );
+      }).toList(),
+    onChanged: (String? newSubject) {
+      setState(() {
+        subjectValue = newSubject!;
+      });
+    },
+    );
+  }
+}
+
+void _submit() {
+  // firebased editting code goes here
 }
