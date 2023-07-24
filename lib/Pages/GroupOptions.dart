@@ -28,19 +28,15 @@ class _GroupOptionsState extends State<GroupOptions> {
     List<Map<String, dynamic>> applicants = [];
     List<String> voteKicks = [];
     Map<String, List<int>> kickVals = {};
-    String groupPic = "";
+    Map<String, List<int>> appVals = {};
 
 
-    final CollectionReference docUsers = FirebaseFirestore.instance.collection(
-        "Users");
+    final CollectionReference docUsers = FirebaseFirestore.instance.collection("Users");
 
     try {
-      DocumentSnapshot groupSnapshot = await FirebaseFirestore.instance
-          .collection("Groups").doc(groupId).get();
-      Map<String, dynamic>? groupData = groupSnapshot.data() as Map<
-          String,
-          dynamic>?;
-      groupPic = groupData?["GroupPicture"];
+      DocumentSnapshot groupSnapshot = await FirebaseFirestore.instance.collection("Groups").doc(groupId).get();
+
+      Map<String, dynamic>? groupData = groupSnapshot.data() as Map<String, dynamic>?;
 
       if (groupData != null) {
         var applicantIds = groupData["Applicants"];
@@ -61,6 +57,23 @@ class _GroupOptionsState extends State<GroupOptions> {
           });
 
           kickVals[key] = [agree, disagree];
+        }
+
+        var tempAppVals = groupData["AppVals"];
+        for (var key in tempAppVals.keys) {
+          int agree = 0;
+          int disagree = 0;
+          var innerMap = tempAppVals[key];
+
+          innerMap.forEach((innerKey, innerValue) {
+            if (innerValue == 1) {
+              agree += 1;
+            } else {
+              disagree += 1;
+            }
+          });
+
+          appVals[key] = [agree, disagree];
         }
 
 
@@ -133,7 +146,7 @@ class _GroupOptionsState extends State<GroupOptions> {
       );
     }
 
-    return [memberDetails, applicants, voteKicks, kickVals, groupPic];
+    return [memberDetails, applicants, voteKicks, kickVals, appVals];
   }
 
 
@@ -177,7 +190,8 @@ class _GroupOptionsState extends State<GroupOptions> {
           data[1] as List<Map<String, dynamic>>;
           var kicks = data[2];
           var kickVals = data[3];
-          var groupPic = data[4];
+          var appVals = data[4];
+
 
           return Scaffold(
             appBar: AppBar(
@@ -608,16 +622,70 @@ class _GroupOptionsState extends State<GroupOptions> {
                                           ],
                                         ),
                                         Expanded(child: Container()),
-                                        IconButton(
-                                          onPressed: () {
-                                            // open sub-menu
+                                        Row(
+                                          children: [
+                                            Text(
+                                              "Agree: ${appVals[applicants[index]["Id"]][0]}",
+                                              style: Theme.of(context).textTheme.bodyMedium,
+                                            ),
+                                            const SizedBox(width: 3),
+                                            SizedBox(
+                                              width: 2,
+                                              height: 18,
+                                              child: Container(
+                                                color: Colors.black87
+                                              ),
+                                            ),
+                                            const SizedBox(width: 3),
+                                            Text(
+                                              "Disagree: ${appVals[applicants[index]["Id"]][1]}",
+                                              style: Theme.of(context).textTheme.bodyMedium,
+                                            ),
+                                          ],
+                                        ),
+                                        PopupMenuButton<String>(
+                                          itemBuilder: (context) =>
+                                          [
+                                            PopupMenuItem(
+                                              value: 'accept',
+                                              child: Text(
+                                                'Vote accept',
+                                                style: Theme
+                                                    .of(context)
+                                                    .textTheme
+                                                    .bodyMedium,
+                                              ),
+                                            ),
+                                            PopupMenuItem(
+                                              value: 'decline',
+                                              child: Text(
+                                                'Vote decline',
+                                                style: Theme
+                                                    .of(context)
+                                                    .textTheme
+                                                    .bodyMedium,
+                                              ),
+                                            ),
+                                          ],
+                                          onSelected: (value) {
+                                            if (value == 'accept') {
+                                              updateApplicationVote(groupId, true,
+                                                  applicants[index]["Id"],
+                                                  members.length);
+                                            } else if (value == 'decline') {
+                                              updateApplicationVote(groupId, false,
+                                                  applicants[index]["Id"],
+                                                  members.length);
+                                            }
                                           },
                                           icon: const Icon(Icons.more_vert),
+                                          splashRadius: 1,
                                         ),
                                       ],
                                     ),
                                   ),
                                 ),
+
                               );
                             },
                           ),
@@ -631,6 +699,21 @@ class _GroupOptionsState extends State<GroupOptions> {
                     padding: const EdgeInsets.fromLTRB(10, 0.0, 10.0, 0.0),
                     child: Column(
                       children: [
+                        ListTile(
+                          onTap: () async {
+                            await showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) => GroupExpand(id: groupId, groupName: groupName, groupPicture: groupPicture, members: members)
+                            );
+                          },
+                          title: Text(
+                            "Preview Group",
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .bodyMedium,
+                          ),
+                        ),
                         ListTile(
                           onTap: () async {
                             await showDialog<String>(

@@ -64,7 +64,7 @@ class _FriendsState extends State<Friends> {
         tGroups = List<String>.from(data?[type] ?? []);
 
         for (var group in tGroups) {
-          if (group is String && group.isNotEmpty) {
+          if (group.isNotEmpty) {
             DocumentSnapshot groupSnapshot = await docGroups.doc(group).get();
             Map<String, dynamic>? groupData = groupSnapshot.data() as Map<String, dynamic>?;
             if (groupData != null){
@@ -367,7 +367,7 @@ class _FriendsState extends State<Friends> {
                                     borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Rounded top corners
                                   ),
                                   builder: (BuildContext context) {
-                                    return CreateGroupForm(); // Using the extracted widget here
+                                    return const CreateGroupForm(); // Using the extracted widget here
                                   },
                                 );
                               }

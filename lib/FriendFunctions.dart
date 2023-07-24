@@ -230,6 +230,20 @@ Future<void> inviteFriendToGroup(String friendId, String groupId) async {
     if (!members.contains(friendId)) {
       await userRef.update({'GroupInvites': FieldValue.arrayUnion([groupId])});
     }
+
+    // Update Kicks field in the group's document
+    await groupRef.update({
+      'Applicants': FieldValue.arrayUnion([friendId]),
+    });
+    //final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
+    final Map<String, dynamic>? appVals = groupSnapshot.data()?['AppVals'];
+
+    if (appVals != null) {
+      // Update the KickVals field with the new key-value pair
+      appVals[friendId] = {userId: 1};
+      await groupRef.update({'AppVals': appVals});
+    }
+
   } catch (e) {
     throw FirebaseException(message: 'Error Inviting friend: $e', plugin: 'cloud_firestore');
   }
@@ -437,8 +451,7 @@ Future<void> kickUser(String kickId, String groupId) async {
   }
 }
 
-Future<void> isKickVotesThresholdReached(
-    String groupId, String kickId, int groupSize) async {
+Future<void> isKickVotesThresholdReached(String groupId, String kickId, int groupSize) async {
   try {
     final DocumentReference groupRef =
     FirebaseFirestore.instance.collection('Groups').doc(groupId);
@@ -495,10 +508,7 @@ Future<void> isKickVotesThresholdReached(
 Future<void> updateKickVote(String groupId, bool agree, String kickId, int groupSize) async {
   try {
     final DocumentReference groupRef = FirebaseFirestore.instance.collection('Groups').doc(groupId);
-
-
     final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
-
     final kickVals = groupSnapshot.data()?['KickVals'];
 
 
@@ -521,6 +531,78 @@ Future<void> updateKickVote(String groupId, bool agree, String kickId, int group
   }
 }
 
+Future<void> isAppVotesThresholdReached(String groupId, String appId, int groupSize) async {
+  try {
+    final DocumentReference groupRef = FirebaseFirestore.instance.collection('Groups').doc(groupId);
+
+    final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
+
+    final Map<String, dynamic>? appVals = groupSnapshot.data()?['AppVals'];
+
+    if (appVals != null && appVals.containsKey(appId)) {
+      final Map<String, dynamic>? appVotes = appVals[appId] as Map<String, dynamic>?;
+
+      if (appVotes != null) {
+        int posSum = 0;
+        int negSum = 0;
+        appVotes.forEach((key, value) {
+          if (value is int) {
+            if (value > 0) {
+              posSum += value;
+            } else {
+              negSum += value;
+            }
+          }
+        });
+
+        if ((posSum > groupSize / 2) | (negSum.abs() >= groupSize / 2)) {
+          if (posSum > groupSize / 2) {
+            await groupRef.update({
+              'Applicants': FieldValue.arrayRemove([appId]),
+              'Members': FieldValue.arrayUnion([appId]),
+              'BlackList': FieldValue.arrayUnion([appId])
+            });
+          }
+
+          appVals.remove(appId);
+          await groupRef.update({'AppVals': appVals});
+        }
+      }
+    }
+  } catch (e) {
+    // Error occurred
+    throw FirebaseException(
+      message: 'Error checking application votes threshold: $e',
+      plugin: 'cloud_firestore',
+    );
+  }
+}
+
+Future<void> updateApplicationVote(String groupId, bool agree, String appId, int groupSize) async {
+  try {
+    final DocumentReference groupRef = FirebaseFirestore.instance.collection('Groups').doc(groupId);
+    final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
+    final appVals = groupSnapshot.data()?['AppVals'];
+
+
+    if (appVals != null && appVals.containsKey(appId)) {
+      final Map<String, dynamic>? appVotes = appVals[appId] as Map<String, dynamic>?;
+
+      if (appVotes != null) {
+        int vote = agree ? 1 : -1;
+        appVotes[userId] = vote;
+
+        await groupRef.update({'AppVals.$appId': appVotes});
+      }
+    }
+    await isAppVotesThresholdReached(groupId,appId,groupSize);
+  } catch (e) {
+    throw FirebaseException(
+      message: 'Error updating kick vote: $e',
+      plugin: 'cloud_firestore',
+    );
+  }
+}
 
 class ConfirmGroupDel extends StatelessWidget {
   final String groupId;
