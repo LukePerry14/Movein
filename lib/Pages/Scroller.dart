@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:movein/navbar.dart';
 import 'package:movein/HScroll.dart';
+import 'package:movein/ad_helper.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 class Scroller extends StatefulWidget {
@@ -15,6 +18,11 @@ class _ScrollerState extends State<Scroller> {
   bool refresh = true;
   int index = 0;
   final String userId = "iKxLSxcDqlT6vtHe71Bp"; //change to stored userId when cache implemented
+  late NativeAd _ad;
+  bool _isAdLoaded = false;
+  bool adTime = true;
+
+
 
   Future<List<Map<String, dynamic>>> getGroups() async {
     List<Map<String, dynamic>> groups = [];
@@ -110,7 +118,40 @@ class _ScrollerState extends State<Scroller> {
     addToBlacklist(groupId);
   }
 
+  void loadNativeAd(){
+    if (!kIsWeb){
+      _ad = NativeAd(
+        adUnitId: 'ca-app-pub-3940256099942544/2247696110',//AdHelper.nativeAdUnitId,
+        request: const AdRequest(),
+        listener: NativeAdListener(
+            onAdLoaded: (ad){
+              setState () {
+                _isAdLoaded = true;
+              }
+            },
+            onAdFailedToLoad: (ad, error) {
+              ad.dispose();
+              print("Error to load ad ${error.message}, ${error.code}");
+            }
+        ),
+      );
 
+      _ad.load();
+    }
+  }
+
+  @override
+  void initState() {
+    loadNativeAd();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _ad.dispose();
+    super.dispose();
+  }
+  
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Map<String, dynamic>>>(
@@ -137,7 +178,8 @@ class _ScrollerState extends State<Scroller> {
                 Navigator.of(context).pushReplacementNamed('/ScrollRefresh');
               }
               final navigator = Navigator.of(context);
-
+              bool loadAd = ((index > 0) & (index % 3 == 0) & adTime);
+              adTime = !loadAd;
               return Material(
                 color: Colors.transparent,
                 child: SafeArea(
@@ -145,20 +187,27 @@ class _ScrollerState extends State<Scroller> {
                     floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
                     body: Container(
                       alignment: Alignment.center,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Gscroller(
-                            groupName: groupData[index]['GroupName'],
-                            groupPicture: groupData[index]['GroupPicture'],
-                            members: groupData[index]['Members'],
-                            showFriend: true,
-                          ),
-                        ],
+                      child: loadAd
+                          ? const Text('Add in CustomAd Widget here') //CustomAd(ad: _ad) // Replace CustomAd with the appropriate widget you want to show as the ad
+                          : Gscroller(
+                        groupName: groupData[index]['GroupName'],
+                        groupPicture: groupData[index]['GroupPicture'],
+                        members: groupData[index]['Members'],
+                        showFriend: true,
                       ),
                     ),
-                    floatingActionButton: Row(
+                    floatingActionButton: loadAd
+                        ? FloatingActionButton(
+                            heroTag: "AdNext",
+                            backgroundColor: Theme.of(context).primaryColor.withOpacity(0.5),
+                            onPressed: () {
+                              setState(() {
+                                adTime = false;
+                              });
+                            },
+                            child: const Icon(LineAwesomeIcons.angle_right, color: Colors.white),
+                          )
+                        : Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         FloatingActionButton(
@@ -251,6 +300,41 @@ class _ScrollerState extends State<Scroller> {
           );
         }
       },
+    );
+  }
+}
+class CustomAd extends StatelessWidget {
+  final NativeAd ad;
+  const CustomAd({
+    Key? key,
+    required this.ad,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final double width = constraints.maxWidth;
+          final double height = width; // Calculate the height based on the width
+
+          return Container(
+              margin: const EdgeInsets.fromLTRB(16.0, 5.0, 16.0, 5.0),
+              height: height,
+              decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(20.0),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color.fromARGB(255, 67, 67, 67),
+                    spreadRadius: 0,
+                    blurRadius: 6,
+                    offset: Offset(0, 4),
+                  )
+                ],
+              ),
+              child: AdWidget(ad: ad),
+          );
+        }
     );
   }
 }

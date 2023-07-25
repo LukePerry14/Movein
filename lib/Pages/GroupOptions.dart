@@ -153,10 +153,7 @@ class _GroupOptionsState extends State<GroupOptions> {
   @override
   Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
-    data = ModalRoute
-        .of(context)
-        ?.settings
-        .arguments as Map;
+    data = ModalRoute.of(context)?.settings.arguments as Map;
     members = data['members'];
     groupId = data['groupId'];
     groupName = data['groupName'];

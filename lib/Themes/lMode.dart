@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LAppTheme{
-  static TextStyle bHeader = GoogleFonts.sourceCodePro(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 26);
-  static TextStyle header = GoogleFonts.sourceCodePro(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 23);
-  static TextStyle sHeader = GoogleFonts.sourceCodePro(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 20.0);
-  static TextStyle body = GoogleFonts.roboto(color: Colors.black87, fontSize: 16.5);
-  static TextStyle sBody = GoogleFonts.roboto(color: Colors.black87, fontSize: 12.0);
-  static TextStyle lBody = GoogleFonts.roboto(color: Colors.black87, fontSize: 16.5, fontWeight: FontWeight.bold);
+  static TextStyle bHeader = GoogleFonts.lexend(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 26);
+  static TextStyle header = GoogleFonts.lexend(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 23);
+  static TextStyle sHeader = GoogleFonts.lexend(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 20.0);
+  static TextStyle body = GoogleFonts.redHatDisplay(color: Colors.black87, fontSize: 16.5);
+  static TextStyle sBody = GoogleFonts.redHatDisplay(color: Colors.black87, fontSize: 12.0);
+  static TextStyle lBody = GoogleFonts.redHatDisplay(color: Colors.black87, fontSize: 16.5, fontWeight: FontWeight.bold);
 
   static TextStyle d_bHeader = GoogleFonts.sourceCodePro(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 26);
   static TextStyle d_header = GoogleFonts.sourceCodePro(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 23);

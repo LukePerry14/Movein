@@ -44,6 +44,7 @@ dependencies:
   intl: ^0.18.1
   modal_bottom_sheet: ^2.1.2
   image_picker: ^1.0.1
+  google_mobile_ads: ^3.0.0
 
 dev_dependencies:
   flutter_test:

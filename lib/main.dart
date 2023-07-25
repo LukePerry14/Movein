@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Themes/lMode.dart';
 import 'package:movein/Pages/Houses.dart';
@@ -14,6 +15,7 @@ import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // await Settings.init(cacheProvider: CustomCacheProvider());
   // Run the app
