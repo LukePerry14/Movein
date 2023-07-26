@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LAppTheme{
-  static TextStyle bHeader = GoogleFonts.lexend(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 26);
-  static TextStyle header = GoogleFonts.lexend(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 23);
-  static TextStyle sHeader = GoogleFonts.lexend(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 20.0);
+  static TextStyle bHeader = GoogleFonts.lexend(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 26);
+  static TextStyle header = GoogleFonts.lexend(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 23);
+  static TextStyle sHeader = GoogleFonts.lexend(color: Colors.black87, fontWeight: FontWeight.normal, fontSize: 20.0);
   static TextStyle body = GoogleFonts.redHatDisplay(color: Colors.black87, fontSize: 16.5);
   static TextStyle sBody = GoogleFonts.redHatDisplay(color: Colors.black87, fontSize: 12.0);
   static TextStyle lBody = GoogleFonts.redHatDisplay(color: Colors.black87, fontSize: 16.5, fontWeight: FontWeight.bold);
 
-  static TextStyle d_bHeader = GoogleFonts.sourceCodePro(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 26);
-  static TextStyle d_header = GoogleFonts.sourceCodePro(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 23);
-  static TextStyle d_sHeader = GoogleFonts.sourceCodePro(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.0);
-  static TextStyle d_body = GoogleFonts.roboto(color: Colors.white70, fontSize: 16.5);
-  static TextStyle d_sBody = GoogleFonts.roboto(color: Colors.white70, fontSize: 12.0);
-  static TextStyle d_lBody = GoogleFonts.roboto(color: Colors.white70, fontSize: 16.5, fontWeight: FontWeight.bold);
+  static TextStyle d_bHeader = GoogleFonts.lexend(color: Colors.white, fontWeight: FontWeight.normal, fontSize: 26);
+  static TextStyle d_header = GoogleFonts.lexend(color: Colors.white, fontWeight: FontWeight.normal, fontSize: 23);
+  static TextStyle d_sHeader = GoogleFonts.lexend(color: Colors.white, fontWeight: FontWeight.normal, fontSize: 20.0);
+  static TextStyle d_body = GoogleFonts.redHatDisplay(color: Colors.white70, fontSize: 16.5);
+  static TextStyle d_sBody = GoogleFonts.redHatDisplay(color: Colors.white70, fontSize: 12.0);
+  static TextStyle d_lBody = GoogleFonts.redHatDisplay(color: Colors.white70, fontSize: 16.5, fontWeight: FontWeight.bold);
 
   static ThemeData lightTheme = ThemeData(
       brightness: Brightness.light,

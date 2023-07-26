@@ -214,8 +214,8 @@ class _GroupOptionsState extends State<GroupOptions> {
                       GestureDetector(
                         onTap: () {},
                         child: SizedBox(
-                          width: 100,
-                          height: 100,
+                          width: 150,
+                          height: 150,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(100),
                             child: Image(image: AssetImage(groupPicture)),
@@ -252,14 +252,12 @@ class _GroupOptionsState extends State<GroupOptions> {
                       style: Theme
                           .of(context)
                           .textTheme
-                          .headlineSmall,
+                          .headlineMedium,
                     ),
                   ),
                   const SizedBox(height: 30.0),
                   Container(
-                    color: Theme
-                        .of(context)
-                        .primaryColor,
+                    color: Theme.of(context).primaryColor,
                     height: 1.0,
                   ),
                   const SizedBox(height: 20.0),
@@ -284,9 +282,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                         padding: const EdgeInsets.all(10.0),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Theme
-                                .of(context)
-                                .primaryColor,
+                            color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: ListView.builder(
@@ -535,9 +531,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                         padding: const EdgeInsets.all(10.0),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Theme
-                                .of(context)
-                                .primaryColor,
+                            color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: hasApps
@@ -697,6 +691,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                     child: Column(
                       children: [
                         ListTile(
+                          splashColor: Theme.of(context).primaryColor,
                           onTap: () async {
                             await showDialog<String>(
                               context: context,
@@ -712,23 +707,21 @@ class _GroupOptionsState extends State<GroupOptions> {
                           ),
                         ),
                         ListTile(
+                          splashColor: Theme.of(context).primaryColor,
                           onTap: () async {
                             await showDialog<String>(
                               context: context,
                               builder: (BuildContext context) =>
-                                  EditGroupName(
-                                      name: groupName, groupId: groupId),
+                                  EditGroupName(name: groupName, groupId: groupId),
                             );
                           },
                           title: Text(
                             "Edit Group Name",
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .bodyMedium,
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         ),
                         ListTile(
+                          splashColor: Theme.of(context).primaryColor,
                           onTap: () async {
                             await showDialog<String>(
                               context: context,

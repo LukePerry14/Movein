@@ -197,13 +197,13 @@ class CustomDialog extends StatelessWidget {
     List<Widget> preferenceWidgets = preferences.entries.map((entry) {
       if (entry.key == "Lights Out") {
         return Text(
-          '${entry.key}: $formattedTime',
-          style: Theme.of(context).textTheme.headlineSmall,
+          " - It's normally ${entry.key} at $formattedTime for me",
+          style: Theme.of(context).textTheme.bodyMedium,
         );
       } else {
         return Text(
-          '${entry.key}: ${entry.value}',
-          style: Theme.of(context).textTheme.headlineSmall,
+          ' - ${entry.key} is of ${entry.value}/5 importance for me',
+          style: Theme.of(context).textTheme.bodyMedium,
         );
       }
     }).toList();
@@ -289,9 +289,9 @@ class CustomDialog extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Attends: $uni", style: Theme.of(context).textTheme.headlineSmall),
-                                  const SizedBox(height:5),
-                                  Text("Studying: $subject", style: Theme.of(context).textTheme.headlineSmall),
+                                  Text("Attends $uni", style: Theme.of(context).textTheme.headlineSmall),
+                                  const SizedBox(height:3),
+                                  Text("Studying $subject", style: Theme.of(context).textTheme.bodyMedium),
                                 ],
                               ),
                             ),
@@ -351,8 +351,19 @@ class CustomDialog extends StatelessWidget {
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: preferenceWidgets,
-                              ),
+                                children: [
+                                  Text("Preferences", style: Theme.of(context).textTheme.headlineSmall,),
+                                  const SizedBox(height: 5), // Add a small gap between title and widgets
+                                  ...preferenceWidgets.map((widget) => Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      widget,
+                                      const SizedBox(height: 5), // Add a small gap between preference widgets
+                                    ],
+                                  )),
+                                ],
+                              )
+
                             ),
                           );
                         }

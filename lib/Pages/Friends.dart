@@ -336,9 +336,10 @@ class _FriendsState extends State<Friends> {
                   SizedBox(
                       width: MediaQuery.of(context).size.width * 0.9,
                       child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text("Your Groups", style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,),
-                          const Expanded(child: Text("")),
+                          Text("Your Groups", style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.left,),
+                          Expanded(child: Container()),
                           ElevatedButton(
                             onPressed: () {
                               if (joined.length + applications.length == appsMax){
@@ -396,7 +397,7 @@ class _FriendsState extends State<Friends> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: isLoading ? const Center(child: CircularProgressIndicator())
-                          : (joinedResults.isEmpty & applicationsResults.isEmpty & shortListResults.isEmpty) ? Text("No Groups", style: Theme.of(context).textTheme.bodyMedium,)
+                          : (joinedResults.isEmpty & applicationsResults.isEmpty & shortListResults.isEmpty) ? Padding(padding: const EdgeInsets.all(10), child: Text("No Groups", style: Theme.of(context).textTheme.bodyMedium,))
                           : ListView.builder(
                         shrinkWrap: true,
                         itemCount: joinedResults.length + applicationsResults.length + shortListResults.length + 3,
@@ -632,7 +633,7 @@ class _FriendsState extends State<Friends> {
                   ////////////////////////////////////////////////////////////////////
                   SizedBox(
                       width: MediaQuery.of(context).size.width * 0.9,
-                      child: Text("Your Friends", style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)
+                      child: Text("Your Friends", style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.left,)
                   ),
                   Padding(
                     padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
@@ -644,7 +645,7 @@ class _FriendsState extends State<Friends> {
                       child: Column(
                         children: [
                           isLoading ? const Center(child: CircularProgressIndicator())
-                              : searchResults.isEmpty ? Text("No Friends", style: Theme.of(context).textTheme.bodyMedium,)
+                              : searchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10),child: Text("No Friends", style: Theme.of(context).textTheme.bodyMedium,),)
                               : ListView.builder(
                             shrinkWrap: true,
                             itemCount: searchResults.length,
@@ -828,7 +829,7 @@ class _FriendsState extends State<Friends> {
                       child: Column(
                         children: [
                           isLoading ? const Center(child: CircularProgressIndicator())
-                              : groupSearchResults.isEmpty ? Text("No Group Invites", style: Theme.of(context).textTheme.bodyMedium,)
+                              : groupSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10),child: Text("No Group Invites", style: Theme.of(context).textTheme.bodyMedium,),)
                               : ListView.builder(
                             shrinkWrap: true,
                             itemCount: groupSearchResults.length,
@@ -921,7 +922,7 @@ class _FriendsState extends State<Friends> {
                       child: Column(
                         children: [
                           isLoading ? const Center(child: CircularProgressIndicator())
-                              : friendSearchResults.isEmpty ? Text("No Friend Invites", style: Theme.of(context).textTheme.bodyMedium,)
+                              : friendSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10), child: Text("No Friend Invites", style: Theme.of(context).textTheme.bodyMedium,))
                               : ListView.builder(
                             shrinkWrap: true,
                             itemCount: friendSearchResults.length,
