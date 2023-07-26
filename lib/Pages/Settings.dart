@@ -87,10 +87,10 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const Divider(height: 20, thickness: 1),
           const SizedBox(height: 10),
-          buildAccountOption(context, 'Change Password'),
-          buildAccountOption(context, 'Change Email'),
-          buildAccountOption(context, 'Language'),
-          buildAccountOption(context, 'Ads'),
+          buildChangePassword(context, 'Change Password'),
+          buildChangeEmail(context, 'Change Email'),
+          buildChangeLanguage(context, 'Language'),
+          buildReviewAds(context, 'Ads'),
           buildAccountOption(context, 'Privacy and Security'),
           buildAccountOption(context, 'Terms and Conditions'),
           buildAccountOption(context, 'Billing'),
@@ -146,6 +146,255 @@ GestureDetector buildAccountOption(BuildContext context, String title) {
   );
 }
 
+// For Change password button
+GestureDetector buildChangePassword(BuildContext context, String title) {
+  return GestureDetector(
+    onTap: () {
+      showDialog(context: context, builder: (BuildContext context) {
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).primaryColor,
+            centerTitle: true,
+            elevation: 0,
+            leading: IconButton(
+                icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.white),
+                color: Colors.grey[500],
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+          ),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                children: [
+                  const Text('Change Password', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                  const SizedBox(height: 20),
+                  const TextField(
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Password'
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  const TextField(
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Confirm Password'
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {print('The password has changed');},
+                    child: const Text('Change Password'),
+                  )
+                ],
+              ),
+            ),
+          )
+        );
+      });
+    },
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[600]
+            ),
+          ),
+          const Icon(Icons.arrow_forward_ios, color: Colors.grey)
+        ],
+      ),
+    ),
+  );
+}
+
+GestureDetector buildChangeEmail(BuildContext context, String title) {
+  return GestureDetector(
+    onTap: () {
+      showDialog(context: context, builder: (BuildContext context) {
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).primaryColor,
+            centerTitle: true,
+            elevation: 0,
+            leading: IconButton(
+                icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.white),
+                color: Colors.grey[500],
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+          ),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                children: [
+                  const Text('Change Email', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                  const SizedBox(height: 20),
+                  const TextField(
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Email'
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {print('The email has changed');},
+                    child: const Text('Change Email'),
+                  )
+                ],
+              ),
+            ),
+          )
+        );
+      });
+    },
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[600]
+            ),
+          ),
+          const Icon(Icons.arrow_forward_ios, color: Colors.grey)
+        ],
+      ),
+    ),
+  );
+}
+
+GestureDetector buildChangeLanguage(BuildContext context, String title) {
+  return GestureDetector(
+    onTap: () {
+      showDialog(context: context, builder: (BuildContext context) {
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).primaryColor,
+            centerTitle: true,
+            elevation: 0,
+            leading: IconButton(
+                icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.white),
+                color: Colors.grey[500],
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+          ),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                children: [
+                  const Text('Language', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                  const SizedBox(height: 20),
+                  const RadioLanguage(),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {print('The language has changed');},
+                    child: const Text('Change Language'),
+                  )
+                ],
+              ),
+            ),
+          )
+        );
+      });
+    },
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[600]
+            ),
+          ),
+          const Icon(Icons.arrow_forward_ios, color: Colors.grey)
+        ],
+      ),
+    ),
+  );
+}
+
+GestureDetector buildReviewAds(BuildContext context, String title) {
+  return GestureDetector(
+    onTap: () {
+      showDialog(context: context, builder: (BuildContext context) {
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).primaryColor,
+            centerTitle: true,
+            elevation: 0,
+            leading: IconButton(
+                icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.white),
+                color: Colors.grey[500],
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+          ),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                children: [
+                  const Text('Advertisements', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                  const SizedBox(height: 20),
+                  const Text('Information about how ads work here'),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: ElevatedButton(onPressed: () => {print('Takes them to unime website to update adveritsement')}, child: const Text('Upgrade Account', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),)),
+                  )
+                ],
+              ),
+            ),
+          )
+        );
+      });
+    },
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[600]
+            ),
+          ),
+          const Icon(Icons.arrow_forward_ios, color: Colors.grey)
+        ],
+      ),
+    ),
+  );
+}
+
 chosenItem(BuildContext context, item) {
   switch(item) {
     case 0: print('This will link to the about section on the UniMe Website');
@@ -154,5 +403,44 @@ chosenItem(BuildContext context, item) {
     break;
     case 2: print('no idea yet');
     break;
+  }
+}
+
+class RadioLanguage extends StatefulWidget {
+  const RadioLanguage({super.key});
+
+  @override
+  State<RadioLanguage> createState() => _RadioLanguageState();
+}
+
+enum SingingCharacter { English, French, Italian }
+
+class _RadioLanguageState extends State<RadioLanguage> {
+  SingingCharacter? _character = SingingCharacter.English;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        ListTile(
+          title: const Text('English'),
+          leading: Radio<SingingCharacter>(groupValue: _character, value: SingingCharacter.English, onChanged: (SingingCharacter? value) {setState(() {
+            _character = value;
+          });},),
+        ),
+        ListTile(
+          title: const Text('French'),
+          leading: Radio<SingingCharacter>(groupValue: _character, value: SingingCharacter.French, onChanged: (SingingCharacter? value) {setState(() {
+            _character = value;
+          });},),
+        ),
+        ListTile(
+          title: const Text('Italian'),
+          leading: Radio<SingingCharacter>(groupValue: _character, value: SingingCharacter.Italian, onChanged: (SingingCharacter? value) {setState(() {
+            _character = value;
+          });},),
+        )
+      ],
+    );
   }
 }

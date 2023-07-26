@@ -332,5 +332,6 @@ class ButtonWidgetLogOut extends StatelessWidget {
 
 Widget upgradeAccountButton() => ButtonWidget(text: 'Upgrade Account', onClicked: () {});
 
-Widget backgroundButton() => ButtonWidgetBackground(onClicked: () {});
+Widget backgroundButton() => ButtonWidgetBackground(onClicked: () {
+});
 Widget shareProfileButton() => ButtonWidgetShareProfile(onClicked: () {});
