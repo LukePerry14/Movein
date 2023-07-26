@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:movein/navbar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Profile extends StatelessWidget {
   const Profile({Key? key}) : super(key: key);
@@ -28,7 +30,7 @@ class Profile extends StatelessWidget {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                print("testing");
+                                ProfileImage();
                               },
                               child: SizedBox(
                                 width: 175, height: 175,
@@ -167,6 +169,25 @@ class Profile extends StatelessWidget {
     );
   }
 }
+
+class ProfileImage extends StatefulWidget {
+  const ProfileImage({Key? key})
+  @override
+  State<ProfileImage> createState() => _profileImagePicker();
+}
+
+class _profileImagePicker extends State<ProfileImage> {
+  @override
+  File? _image;
+  final _picker = ImagePicker();
+  Future<void> _openImagePicker() async {
+    final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      
+    }
+  }
+}
+
 
 class ButtonWidget extends StatelessWidget {
   final String text;
