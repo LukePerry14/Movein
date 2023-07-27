@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Themes/lMode.dart';
 import 'package:movein/Pages/Groups.dart';
@@ -13,12 +14,37 @@ import 'package:movein/Pages/ScrollRefresh.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+var darkTheme = LAppTheme.darkTheme;
+var lightTheme = LAppTheme.lightTheme;
+enum ThemeType { Light, Dark }
+
+class ThemeModel extends ChangeNotifier {
+  ThemeData currentTheme = lightTheme;
+  ThemeType _themeType = ThemeType.Dark;
+
+  toggleTheme() {
+    if (_themeType == ThemeType.Dark) {
+      currentTheme = lightTheme;
+      _themeType = ThemeType.Light;
+    }
+    else if (_themeType == ThemeType.Light) {
+      currentTheme = darkTheme;
+      _themeType = ThemeType.Dark;
+    }
+    return notifyListeners();
+  }
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // await Settings.init(cacheProvider: CustomCacheProvider());
-  // Run the app
-  runApp(const App());
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);  // Run the app
+  // runApp(const App());
+  runApp(
+    ChangeNotifierProvider<ThemeModel>(
+      create: (BuildContext context) => ThemeModel(),
+      child: const App(),
+    )
+  );
 }
 
 class App extends StatelessWidget {
@@ -28,9 +54,10 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: LAppTheme.lightTheme,
-      darkTheme: LAppTheme.darkTheme,
-      themeMode: ThemeMode.light,
+      theme: Provider.of<ThemeModel>(context).currentTheme,
+      // theme: LAppTheme.lightTheme,
+      // darkTheme: LAppTheme.darkTheme,
+      // themeMode: ThemeMode.light,
 
       initialRoute: '/Scroller',
 

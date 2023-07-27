@@ -1,5 +1,7 @@
-import 'dart:io';
+// ignore_for_file: camel_case_types
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:movein/main.dart';
 import 'package:movein/navbar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -38,9 +40,9 @@ class _ProfilePage extends State<Profile> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(40.0),
-                          child: backgroundButton()
+                        const Padding(
+                          padding: EdgeInsets.all(40.0),
+                          child: changeBackground()
                         ),
                         Stack(
                           children: [
@@ -267,30 +269,28 @@ class ButtonWidgetSettings extends StatelessWidget {
   );
 }
 
-class ButtonWidgetBackground extends StatelessWidget {
-  final VoidCallback onClicked;
-
-  const ButtonWidgetBackground({
-    Key? key,
-    required this.onClicked
-  }) : super(key : key);
+class changeBackground extends StatefulWidget {
+  const changeBackground({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => ElevatedButton(
-    style: ElevatedButton.styleFrom(
-      shape: const CircleBorder(),
-      foregroundColor: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-    ),
-    onPressed: onClicked, 
-    child: const Row(
+  State<changeBackground> createState() => _changeBackgroundButton();
+}
+
+class _changeBackgroundButton extends State<changeBackground> {
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: Provider.of<ThemeModel>(context, listen: true).toggleTheme(),
+      child: const Row(
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.all(5.0),
+          padding: EdgeInsets.all(0.0),
           child: Icon(LineAwesomeIcons.sun, color: Colors.white, size: 24,),
         ),
       ],
-    )); 
+    ),
+    );
+  }
 }
 
 class ButtonWidgetShareProfile extends StatelessWidget {
@@ -350,7 +350,4 @@ class ButtonWidgetLogOut extends StatelessWidget {
 }
 
 Widget upgradeAccountButton() => ButtonWidget(text: 'Upgrade Account', onClicked: () {});
-
-Widget backgroundButton() => ButtonWidgetBackground(onClicked: () {
-});
 Widget shareProfileButton() => ButtonWidgetShareProfile(onClicked: () {});
