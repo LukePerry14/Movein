@@ -4,8 +4,24 @@ import 'package:movein/navbar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
+
+  @override
+  State<Profile> createState() => _ProfilePage();
+}
+
+class _ProfilePage extends State<Profile> {
+  XFile? _image;
+  final _picker = ImagePicker();
+
+  Future<void> _openImagePicker() async {
+    final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = pickedImage;
+      // azure upload will go here
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +46,7 @@ class Profile extends StatelessWidget {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                ProfileImage();
+                                _openImagePicker();
                               },
                               child: SizedBox(
                                 width: 175, height: 175,
@@ -168,26 +184,8 @@ class Profile extends StatelessWidget {
         }
     );
   }
+  
 }
-
-class ProfileImage extends StatefulWidget {
-  const ProfileImage({Key? key})
-  @override
-  State<ProfileImage> createState() => _profileImagePicker();
-}
-
-class _profileImagePicker extends State<ProfileImage> {
-  @override
-  File? _image;
-  final _picker = ImagePicker();
-  Future<void> _openImagePicker() async {
-    final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
-      
-    }
-  }
-}
-
 
 class ButtonWidget extends StatelessWidget {
   final String text;
