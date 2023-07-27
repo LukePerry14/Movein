@@ -141,9 +141,7 @@ class _EditGroupNameState extends State<EditGroupName> {
                     onPressed: _isButtonEnabled ?  () {
                       if (formKey.currentState!.validate()) {
                         final String newName = _textEditingController.text;
-                        updateGroupName(newName, widget.groupId).then((_) {
-                          Navigator.of(context).pushReplacementNamed('/Groups');
-                        });
+                        updateGroupName(newName, widget.groupId).then((value) => Navigator.of(context).pop());
                       }
                     } : null,
                     child: Text("Confirm", style: Theme.of(context).textTheme.bodyMedium),

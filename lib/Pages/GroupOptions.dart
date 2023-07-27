@@ -18,17 +18,17 @@ class GroupOptions extends StatefulWidget {
 
 class _GroupOptionsState extends State<GroupOptions> {
   var data = {};
-  late var members;
   late String groupId;
-  late String groupName;
-  late String groupPicture;
+  late Future<List<dynamic>> _myFuture;
 
-  Future<List<dynamic>> getUsers(idList, groupId) async {
+  Future<List<dynamic>> getUsers(groupId) async {
     List<Map<String, dynamic>> memberDetails = [];
     List<Map<String, dynamic>> applicants = [];
     List<String> voteKicks = [];
     Map<String, List<int>> kickVals = {};
     Map<String, List<int>> appVals = {};
+    var groupName = "";
+    var groupPicture = "";
 
 
     final CollectionReference docUsers = FirebaseFirestore.instance.collection("Users");
@@ -39,8 +39,8 @@ class _GroupOptionsState extends State<GroupOptions> {
       Map<String, dynamic>? groupData = groupSnapshot.data() as Map<String, dynamic>?;
 
       if (groupData != null) {
-        var applicantIds = groupData["Applicants"];
-        var kickIds = groupData["Kicks"];
+        groupName = groupData['GroupName'];
+        groupPicture = groupData['GroupPicture'];
 
         var tempKickVals = groupData["KickVals"];
         for (var key in tempKickVals.keys) {
@@ -59,6 +59,7 @@ class _GroupOptionsState extends State<GroupOptions> {
           kickVals[key] = [agree, disagree];
         }
 
+
         var tempAppVals = groupData["AppVals"];
         for (var key in tempAppVals.keys) {
           int agree = 0;
@@ -76,7 +77,7 @@ class _GroupOptionsState extends State<GroupOptions> {
           appVals[key] = [agree, disagree];
         }
 
-
+        var applicantIds = groupData["Applicants"];
         for (var aId in applicantIds) {
           if (!(aId == "")) {
             DocumentSnapshot docSnapshot = await docUsers.doc(aId).get();
@@ -103,7 +104,9 @@ class _GroupOptionsState extends State<GroupOptions> {
           }
         }
 
-        for (String id in idList) {
+        var members = groupData['Members'];
+        var kickIds = groupData["Kicks"];
+        for (String id in members) {
           try {
             DocumentSnapshot docSnapshot = await docUsers.doc(id).get();
             Map<String, dynamic>? data = docSnapshot.data() as Map<
@@ -146,25 +149,28 @@ class _GroupOptionsState extends State<GroupOptions> {
       );
     }
 
-    return [memberDetails, applicants, voteKicks, kickVals, appVals];
+    return [memberDetails, applicants, voteKicks, kickVals, appVals, groupName, groupPicture];
   }
 
-
+  void _refreshData() {
+    setState(() {
+      _myFuture = getUsers(groupId); // Recreate the Future to trigger the FutureBuilder.
+    });
+  }
+  
   @override
   Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
     data = ModalRoute.of(context)?.settings.arguments as Map;
-    members = data['members'];
     groupId = data['groupId'];
-    groupName = data['groupName'];
-    groupPicture = data['groupPicture'];
+    _myFuture = getUsers(groupId);
   }
 
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<dynamic>>(
-      future: getUsers(members, groupId),
+      future: _myFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // While waiting for the data to load, you can show a loading indicator
@@ -181,13 +187,13 @@ class _GroupOptionsState extends State<GroupOptions> {
           return Text('Error: ${snapshot.error}');
         } else {
           List data = snapshot.data!;
-          List<Map<String, dynamic>> memberDetails =
-          data[0] as List<Map<String, dynamic>>;
-          List<Map<String, dynamic>> applicants =
-          data[1] as List<Map<String, dynamic>>;
+          List<Map<String, dynamic>> memberDetails = data[0] as List<Map<String, dynamic>>;
+          List<Map<String, dynamic>> applicants = data[1] as List<Map<String, dynamic>>;
           var kicks = data[2];
           var kickVals = data[3];
           var appVals = data[4];
+          var groupName = data[5];
+          var groupPicture = data[6];
 
 
           return Scaffold(
@@ -212,7 +218,9 @@ class _GroupOptionsState extends State<GroupOptions> {
                     // Group picture
                     children: [
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          _refreshData();
+                        },
                         child: SizedBox(
                           width: 150,
                           height: 150,
@@ -243,9 +251,9 @@ class _GroupOptionsState extends State<GroupOptions> {
                     onTap: () async {
                       await showDialog<String>(
                         context: context,
-                        builder: (BuildContext context) =>
-                            EditGroupName(name: groupName, groupId: groupId),
+                        builder: (BuildContext context) => EditGroupName(name: groupName, groupId: groupId),
                       );
+                      _refreshData();
                     },
                     child: Text(
                       groupName,
@@ -329,9 +337,8 @@ class _GroupOptionsState extends State<GroupOptions> {
                                           child: ClipRRect(
                                             borderRadius: BorderRadius.circular(
                                                 100),
-                                            child: const Image(
-                                                image: AssetImage(
-                                                    "assets/Pictures/ph.png")),
+                                            child: Image(
+                                                image: AssetImage(memberDetails[index]["Images"][0])),
                                           ),
                                         ),
                                         const SizedBox(width: 8),
@@ -347,10 +354,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 20.0,
                                               )
-                                                  : Theme
-                                                  .of(context)
-                                                  .textTheme
-                                                  .headlineSmall,
+                                                  : Theme.of(context).textTheme.headlineSmall,
                                             ),
                                             Text(
                                               "${memberDetails[index]["Id"]}",
@@ -360,10 +364,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 12.0,
                                               )
-                                                  : Theme
-                                                  .of(context)
-                                                  .textTheme
-                                                  .bodySmall,
+                                                  : Theme.of(context).textTheme.bodySmall,
                                             ),
                                           ],
                                         ),
@@ -387,11 +388,9 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                   children: [
                                                     Text(
                                                       "Agree: ${kickVals[memberDetails[index]["Id"]][0]}",
-                                                      style: GoogleFonts
-                                                          .sourceCodePro(
+                                                      style: GoogleFonts.sourceCodePro(
                                                         color: Colors.red,
-                                                        fontWeight: FontWeight
-                                                            .bold,
+                                                        fontWeight: FontWeight.bold,
                                                         fontSize: 10.0,
                                                       ),
                                                     ),
@@ -406,11 +405,9 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                     const SizedBox(width: 3),
                                                     Text(
                                                       "Disagree: ${kickVals[memberDetails[index]["Id"]][1]}",
-                                                      style: GoogleFonts
-                                                          .sourceCodePro(
+                                                      style: GoogleFonts.sourceCodePro(
                                                         color: Colors.red,
-                                                        fontWeight: FontWeight
-                                                            .bold,
+                                                        fontWeight: FontWeight.bold,
                                                         fontSize: 10.0,
                                                       ),
                                                     ),
@@ -426,10 +423,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                               value: 'add',
                                               child: Text(
                                                 'Add friend',
-                                                style: Theme
-                                                    .of(context)
-                                                    .textTheme
-                                                    .bodyMedium,
+                                                style: Theme.of(context).textTheme.bodyMedium,
                                               ),
                                             ),
                                             if (isVoteKick)
@@ -439,10 +433,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 value: 'agree',
                                                 child: Text(
                                                   'Agree vote-kick',
-                                                  style: Theme
-                                                      .of(context)
-                                                      .textTheme
-                                                      .bodyMedium,
+                                                  style: Theme.of(context).textTheme.bodyMedium,
                                                 ),
                                               ),
                                             if (isVoteKick)
@@ -450,10 +441,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 value: 'disagree',
                                                 child: Text(
                                                   'Disagree vote-kick',
-                                                  style: Theme
-                                                      .of(context)
-                                                      .textTheme
-                                                      .bodyMedium,
+                                                  style: Theme.of(context).textTheme.bodyMedium,
                                                 ),
                                               ),
                                             if (!isVoteKick)
@@ -461,39 +449,28 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 value: 'kick',
                                                 child: Text(
                                                   'Start Vote-kick',
-                                                  style: Theme
-                                                      .of(context)
-                                                      .textTheme
-                                                      .bodyMedium,
+                                                  style: Theme.of(context).textTheme.bodyMedium,
                                                 ),
                                               ),
                                           ],
-                                          onSelected: (value) {
+                                          onSelected: (value) async {
                                             if (value == 'add') {
-                                              sendFriendInvite(
-                                                  memberDetails[index]["Id"]);
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
+                                              sendFriendInvite(memberDetails[index]["Id"]);
+                                              ScaffoldMessenger.of(context).showSnackBar(
                                                 SnackBar(
-                                                  backgroundColor: Theme
-                                                      .of(context)
-                                                      .primaryColor,
-                                                  content: const Text(
-                                                      'Friend invite sent'),
+                                                  backgroundColor: Theme.of(context).primaryColor,
+                                                  content: const Text('Friend invite sent'),
                                                 ),
                                               );
                                             } else if (value == 'kick') {
-                                              kickUser(
-                                                  memberDetails[index]["Id"],
-                                                  groupId);
+                                              await kickUser(memberDetails[index]["Id"], groupId);
+                                              _refreshData();
                                             } else if (value == 'agree') {
-                                              updateKickVote(groupId, true,
-                                                  memberDetails[index]["Id"],
-                                                  members.length);
+                                              await updateKickVote(groupId, true, memberDetails[index]["Id"], memberDetails.length);
+                                              _refreshData();
                                             } else if (value == 'disagree') {
-                                              updateKickVote(groupId, false,
-                                                  memberDetails[index]["Id"],
-                                                  members.length);
+                                              await updateKickVote(groupId, false, memberDetails[index]["Id"], memberDetails.length);
+                                              _refreshData();
                                             }
                                           },
                                           icon: const Icon(Icons.more_vert),
@@ -516,10 +493,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                       const SizedBox(width: 13),
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: Text("Applications", style: Theme
-                            .of(context)
-                            .textTheme
-                            .headlineSmall),
+                        child: Text("Applications", style: Theme.of(context).textTheme.headlineSmall),
                       ),
                     ],
                   ),
@@ -539,10 +513,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                             width: double.maxFinite,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text("Empty", style: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .bodyLarge),
+                              child: Text("Empty", style: Theme.of(context).textTheme.bodyLarge),
                             ),
                           )
                               : ListView.builder(
@@ -587,28 +558,20 @@ class _GroupOptionsState extends State<GroupOptions> {
                                           child: ClipRRect(
                                             borderRadius: BorderRadius.circular(
                                                 100),
-                                            child: Image(image: AssetImage(
-                                                applicants[index]["Images"][0])),
+                                            child: Image(image: AssetImage(applicants[index]["Images"][0])),
                                           ),
                                         ),
                                         const SizedBox(width: 8),
                                         Column(
-                                          crossAxisAlignment: CrossAxisAlignment
-                                              .start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               "${applicants[index]["ForeName"]} ${applicants[index]["SurName"]}",
-                                              style: Theme
-                                                  .of(context)
-                                                  .textTheme
-                                                  .headlineSmall,
+                                              style: Theme.of(context).textTheme.headlineSmall,
                                             ),
                                             Text(
                                               applicants[index]["Id"],
-                                              style: Theme
-                                                  .of(context)
-                                                  .textTheme
-                                                  .bodySmall,
+                                              style: Theme.of(context).textTheme.bodySmall,
                                             ),
                                           ],
                                         ),
@@ -624,7 +587,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                               width: 2,
                                               height: 18,
                                               child: Container(
-                                                color: Colors.black87
+                                                  color: Colors.black87
                                               ),
                                             ),
                                             const SizedBox(width: 3),
@@ -641,32 +604,24 @@ class _GroupOptionsState extends State<GroupOptions> {
                                               value: 'accept',
                                               child: Text(
                                                 'Vote accept',
-                                                style: Theme
-                                                    .of(context)
-                                                    .textTheme
-                                                    .bodyMedium,
+                                                style: Theme.of(context).textTheme.bodyMedium,
                                               ),
                                             ),
                                             PopupMenuItem(
                                               value: 'decline',
                                               child: Text(
                                                 'Vote decline',
-                                                style: Theme
-                                                    .of(context)
-                                                    .textTheme
-                                                    .bodyMedium,
+                                                style: Theme.of(context).textTheme.bodyMedium,
                                               ),
                                             ),
                                           ],
-                                          onSelected: (value) {
+                                          onSelected: (value) async {
                                             if (value == 'accept') {
-                                              updateApplicationVote(groupId, true,
-                                                  applicants[index]["Id"],
-                                                  members.length);
+                                              await updateApplicationVote(groupId, true, applicants[index]["Id"], memberDetails.length);
+                                              _refreshData();
                                             } else if (value == 'decline') {
-                                              updateApplicationVote(groupId, false,
-                                                  applicants[index]["Id"],
-                                                  members.length);
+                                              await updateApplicationVote(groupId, false, applicants[index]["Id"], memberDetails.length);
+                                              _refreshData();
                                             }
                                           },
                                           icon: const Icon(Icons.more_vert),
@@ -694,8 +649,8 @@ class _GroupOptionsState extends State<GroupOptions> {
                           splashColor: Theme.of(context).primaryColor,
                           onTap: () async {
                             await showDialog<String>(
-                              context: context,
-                              builder: (BuildContext context) => GroupExpand(id: groupId, groupName: groupName, groupPicture: groupPicture, members: members)
+                                context: context,
+                                builder: (BuildContext context) => GroupExpand(id: groupId, groupName: groupName, groupPicture: groupPicture, members: memberDetails.map((item) => item["Id"] as String).toList())
                             );
                           },
                           title: Text(
@@ -711,9 +666,9 @@ class _GroupOptionsState extends State<GroupOptions> {
                           onTap: () async {
                             await showDialog<String>(
                               context: context,
-                              builder: (BuildContext context) =>
-                                  EditGroupName(name: groupName, groupId: groupId),
+                              builder: (BuildContext context) => EditGroupName(name: groupName, groupId: groupId),
                             );
+                            _refreshData();
                           },
                           title: Text(
                             "Edit Group Name",
@@ -725,8 +680,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                           onTap: () async {
                             await showDialog<String>(
                               context: context,
-                              builder: (BuildContext context) =>
-                                  ConfirmLeave(groupId: groupId),
+                              builder: (BuildContext context) => ConfirmLeave(groupId: groupId),
                             );
                           },
                           title: Text(

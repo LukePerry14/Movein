@@ -106,8 +106,7 @@ class _ScrollerState extends State<Scroller> {
       throw FirebaseException(message: 'Error adding to group field "Applicants": $e', plugin: 'cloud_firestore');
     });
 
-    final DocumentReference userDocRef =
-    FirebaseFirestore.instance.collection('Users').doc(userId);
+    final DocumentReference userDocRef = FirebaseFirestore.instance.collection('Users').doc(userId);
 
     userDocRef.update({
       'Applications': FieldValue.arrayUnion([groupId])

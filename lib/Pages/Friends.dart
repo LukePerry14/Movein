@@ -4,6 +4,7 @@ import 'package:movein/navbar.dart';
 import 'package:movein/FriendFunctions.dart';
 import 'package:movein/swipe_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Friends extends StatefulWidget {
   const Friends({Key? key}) : super(key: key);
@@ -219,20 +220,6 @@ class _FriendsState extends State<Friends> {
     return retlist;
   }
 
-  void searchMore() async {
-    setState(() {
-      loadExtra = true;
-      isSearchLoading = true;
-    });
-
-    List<Friend> results = await searchUsers(searchText);
-
-    setState(() {
-      fSSearchResults = results;
-      isSearchLoading = false;
-    });
-  }
-
 
   void filterSearchResults(String query) {
     setState(() {
@@ -307,6 +294,7 @@ class _FriendsState extends State<Friends> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Builder(
@@ -330,6 +318,14 @@ class _FriendsState extends State<Friends> {
                           searchText = value;
                           filterSearchResults(value);
                         },
+                        trailing: [
+                          IconButton(
+                            onPressed: () {
+
+                            },
+                            icon: const Icon(LineAwesomeIcons.user_plus),
+                          ),
+                        ]
                       ),
                     ),
                   ),
@@ -630,7 +626,6 @@ class _FriendsState extends State<Friends> {
 
                     ),
                   ),
-                  ////////////////////////////////////////////////////////////////////
                   SizedBox(
                       width: MediaQuery.of(context).size.width * 0.9,
                       child: Text("Your Friends", style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.left,)
