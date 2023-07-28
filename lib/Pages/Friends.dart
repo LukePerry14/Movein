@@ -321,7 +321,10 @@ class _FriendsState extends State<Friends> {
                         trailing: [
                           IconButton(
                             onPressed: () {
-
+                              showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) => const SendFriendInvite(),
+                              );
                             },
                             icon: const Icon(LineAwesomeIcons.user_plus),
                           ),

@@ -173,9 +173,6 @@ class _ScrollerState extends State<Scroller> {
 
           return Builder(
             builder: (context) {
-              if (groupData.isEmpty){
-                Navigator.of(context).pushReplacementNamed('/ScrollRefresh');
-              }
               final navigator = Navigator.of(context);
               bool loadAd = ((index > 0) & (index % 3 == 0) & adTime);
               adTime = !loadAd;
@@ -186,7 +183,8 @@ class _ScrollerState extends State<Scroller> {
                     floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
                     body: Container(
                       alignment: Alignment.center,
-                      child: loadAd
+                      child: (groupData.isEmpty)? const NoGroups()
+                          : loadAd
                           ? const Text('Add in CustomAd Widget here') //CustomAd(ad: _ad) // Replace CustomAd with the appropriate widget you want to show as the ad
                           : Gscroller(
                         groupName: groupData[index]['GroupName'],
@@ -195,96 +193,106 @@ class _ScrollerState extends State<Scroller> {
                         showFriend: true,
                       ),
                     ),
-                    floatingActionButton: loadAd
-                        ? FloatingActionButton(
-                            heroTag: "AdNext",
+                    floatingActionButton: Visibility(
+                      visible: groupData.isNotEmpty,
+                      child: loadAd
+                          ? FloatingActionButton(
+                        heroTag: "AdNext",
+                        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.5),
+                        onPressed: () {
+                          setState(() {
+                            adTime = false;
+                          });
+                        },
+                        child: const Icon(LineAwesomeIcons.angle_right, color: Colors.white),
+                      )
+                          : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          FloatingActionButton(
+                            heroTag: "Block",
                             backgroundColor: Theme.of(context).primaryColor.withOpacity(0.5),
                             onPressed: () {
-                              setState(() {
-                                adTime = false;
+                              addToBlacklist(groupData[index]['Id'])
+                                  .then((_) {
+                                if (index < groupData.length - 1) {
+                                  setState(() {
+                                    index++;
+                                  });
+                                } else {
+                                  navigator.pushReplacementNamed('/ScrollRefresh');
+                                }
+                              }).catchError((e) {
+                                throw FirebaseException(
+                                  message: 'Error calling addToBlacklist: $e',
+                                  plugin: 'cloud_firestore',
+                                );
                               });
                             },
+                            child: const Icon(LineAwesomeIcons.times, color: Colors.white),
+                          ),
+                          FloatingActionButton(
+                            heroTag: "Next",
+                            backgroundColor: Theme.of(context).primaryColor.withOpacity(0.5),
+                            onPressed: () {
+                              if (index < groupData.length - 1) {
+                                setState(() {
+                                  index++;
+                                });
+                              } else {
+                                navigator.pushReplacementNamed('/ScrollRefresh');
+                              }
+                            },
                             child: const Icon(LineAwesomeIcons.angle_right, color: Colors.white),
-                          )
-                        : Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        FloatingActionButton(
-                          heroTag: "Block",
-                          backgroundColor: Theme.of(context).primaryColor.withOpacity(0.5),
-                          onPressed: () {
-                            addToBlacklist(groupData[index]['Id'])
-                                .then((_) {
-                              if (index < groupData.length - 1){
-                                setState(() {
-                                  index++;
-                                });
-                              } else{
-                                navigator.pushReplacementNamed('/ScrollRefresh');
-                              }
-                            })
-                                .catchError((e) {
-                              throw FirebaseException(message: 'Error calling addToBlacklist: $e', plugin: 'cloud_firestore');
-                            });
-                          },
-                          child: const Icon(LineAwesomeIcons.times, color: Colors.white),
-                        ),
-                        FloatingActionButton(
-                          heroTag: "Next",
-                          backgroundColor: Theme.of(context).primaryColor.withOpacity(0.5),
-                          onPressed: () {
-                            if (index < groupData.length - 1) {
-                              setState(() {
-                                index++;
+                          ),
+                          FloatingActionButton(
+                            heroTag: "Shortlist",
+                            backgroundColor: Theme.of(context).primaryColor.withOpacity(0.5),
+                            onPressed: () {
+                              addToShortList(groupData[index]['Id'])
+                                  .then((_) {
+                                if (index < groupData.length - 1) {
+                                  setState(() {
+                                    index++;
+                                  });
+                                } else {
+                                  navigator.pushReplacementNamed('/ScrollRefresh');
+                                }
+                              }).catchError((e) {
+                                throw FirebaseException(
+                                  message: 'Error calling addToShortlist: $e',
+                                  plugin: 'cloud_firestore',
+                                );
                               });
-                            } else {
-                              navigator.pushReplacementNamed('/ScrollRefresh');
-                            }
-                          },
-                          child: const Icon(LineAwesomeIcons.angle_right, color: Colors.white),
-                        ),
-                        FloatingActionButton(
-                          heroTag: "Shortlist",
-                          backgroundColor: Theme.of(context).primaryColor.withOpacity(0.5),
-                          onPressed: () {
-                            addToShortList(groupData[index]['Id'])
-                                .then((_) {
-                              if (index < groupData.length - 1){
-                                setState(() {
-                                  index++;
-                                });
-                              }else{
-                                navigator.pushReplacementNamed('/ScrollRefresh');
-                              }
-                            })
-                                .catchError((e) {
-                              throw FirebaseException(message: 'Error calling addToShortlist: $e', plugin: 'cloud_firestore');
-                            });
-                          },
-                          child: const Icon(LineAwesomeIcons.archive, color: Colors.white),
-                        ),
-                        FloatingActionButton(
-                          heroTag: "Apply",
-                          backgroundColor: Theme.of(context).primaryColor.withOpacity(0.5),
-                          onPressed: () {
-                            addToApplicants(groupData[index]['Id'])
-                                .then((_) {
-                              if (index < groupData.length - 1){
-                                setState(() {
-                                  index++;
-                                });
-                              }else{
-                                navigator.pushReplacementNamed('/ScrollRefresh');
-                              }
-                            })
-                                .catchError((e) {
-                              throw FirebaseException(message: 'Error calling addToApplicants: $e', plugin: 'cloud_firestore');
-                            });
-                          },
-                          child: const Icon(LineAwesomeIcons.check, color: Colors.white),
-                        ),
-                      ],
+                            },
+                            child: const Icon(LineAwesomeIcons.archive, color: Colors.white),
+                          ),
+                          FloatingActionButton(
+                            heroTag: "Apply",
+                            backgroundColor: Theme.of(context).primaryColor.withOpacity(0.5),
+                            onPressed: () {
+                              addToApplicants(groupData[index]['Id'])
+                                  .then((_) {
+                                if (index < groupData.length - 1) {
+                                  setState(() {
+                                    index++;
+                                  });
+                                } else {
+                                  navigator.pushReplacementNamed('/ScrollRefresh');
+                                }
+                              }).catchError((e) {
+                                throw FirebaseException(
+                                  message: 'Error calling addToApplicants: $e',
+                                  plugin: 'cloud_firestore',
+                                );
+                              });
+                            },
+                            child: const Icon(LineAwesomeIcons.check, color: Colors.white),
+                          ),
+                        ],
+                      ),
                     ),
+
 
 
                     bottomNavigationBar: CustomNavbar(
@@ -334,6 +342,71 @@ class CustomAd extends StatelessWidget {
               child: AdWidget(ad: ad),
           );
         }
+    );
+  }
+}
+
+class NoGroups extends StatelessWidget {
+  const NoGroups({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.3,
+            height: MediaQuery.of(context).size.width * 0.3,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Icon(
+                LineAwesomeIcons.exclamation_circle,
+                color: Theme.of(context).primaryColor,
+                fill: 1,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.7,
+
+            child: Text("You've seen to have run out of groups for now, Consider making your own or refresh to try and have another look",
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center
+            ),
+          ),
+          const SizedBox(height: 25),
+
+          Container(
+            width: MediaQuery.of(context).size.width * 0.5,
+            height: 50,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Colors.blue,
+            ),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pushReplacementNamed('/Scroller');
+              },
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                backgroundColor: Theme.of(context).primaryColor,
+              ),
+              child: const Text(
+                "Refresh",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

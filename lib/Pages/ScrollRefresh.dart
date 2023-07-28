@@ -49,7 +49,7 @@ class RanOut extends StatelessWidget {
                   ),
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/Scroller');
+                      Navigator.of(context).pushReplacementNamed('/Scroller');
                     },
                     style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(

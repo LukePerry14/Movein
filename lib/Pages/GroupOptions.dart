@@ -680,7 +680,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                           onTap: () async {
                             await showDialog<String>(
                               context: context,
-                              builder: (BuildContext context) => ConfirmLeave(groupId: groupId),
+                              builder: (BuildContext context) => ConfirmLeave(groupId: groupId, memCount: memberDetails.length,),
                             );
                           },
                           title: Text(

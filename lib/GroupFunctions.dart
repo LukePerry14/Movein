@@ -20,15 +20,19 @@ Future<void> updateGroupName(String newName, String groupId) async {
   }
 }
 
-Future<void> removeFromGroupAndUser(String groupId) async {
+Future<void> removeFromGroupAndUser(String groupId, int memCount) async {
   try {
-    // Access the "Groups" collection and remove the userId from the "Members" array
     final groupsCollectionRef = FirebaseFirestore.instance.collection('Groups');
     final groupDocRef = groupsCollectionRef.doc(groupId);
-    await groupDocRef.update({
-      'Members': FieldValue.arrayRemove([userId]),
-    });
 
+    if (memCount == 1){
+      await groupDocRef.delete();
+    } else{
+      await groupDocRef.update({
+        'Members': FieldValue.arrayRemove([userId]),
+      });
+
+    }
 
     final usersCollectionRef = FirebaseFirestore.instance.collection('Users');
     final userDocRef = usersCollectionRef.doc(userId);
@@ -159,9 +163,11 @@ class _EditGroupNameState extends State<EditGroupName> {
 
 class ConfirmLeave extends StatelessWidget {
   final String groupId;
+  final int memCount;
   const ConfirmLeave({
     Key? key,
     required this.groupId,
+    required this.memCount,
   }) : super(key: key);
 
   @override
@@ -202,8 +208,8 @@ class ConfirmLeave extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                       onPressed: () {
-                        removeFromGroupAndUser(groupId).then((_) {
-                          Navigator.of(context).pushReplacementNamed('/Groups');
+                        removeFromGroupAndUser(groupId, memCount).then((_) {
+                          Navigator.of(context).pushReplacementNamed('/Friends');
                         });
                       },
                       child: Text("Confirm", style: Theme.of(context).textTheme.bodyMedium)

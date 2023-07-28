@@ -398,29 +398,33 @@ Future<void> removeOutFriendInvite(String inviteId) async {
 }
 
 Future<void> sendFriendInvite(String invitee) async {
-
   try {
     final CollectionReference usersCollection = FirebaseFirestore.instance.collection('Users');
 
-    DocumentSnapshot userSnapshot = await usersCollection.doc(userId).get();
-    List<dynamic> friendList = userSnapshot.get('Friends');
-    if (!friendList.contains(invitee)) {
-      await usersCollection.doc(invitee).update({
-        'FriendInvites': FieldValue.arrayUnion([userId])
-      });
+    // Get the user document of the invitee
+    DocumentSnapshot inviteeSnapshot = await usersCollection.doc(invitee).get();
 
-      // Update OutgoingFriendInvites field in the user's document
-      await usersCollection.doc(userId).update({
-        'OutgoingFriendInvites': FieldValue.arrayUnion([invitee])
-      });
+    // Check if the invitee document exists
+    if (inviteeSnapshot.exists) {
+      DocumentSnapshot userSnapshot = await usersCollection.doc(userId).get();
+      List<dynamic> friendList = userSnapshot.get('Friends');
+      if (!friendList.contains(invitee)) {
+        await usersCollection.doc(invitee).update({
+          'FriendInvites': FieldValue.arrayUnion([userId])
+        });
+
+        // Update OutgoingFriendInvites field in the user's document
+        await usersCollection.doc(userId).update({
+          'OutgoingFriendInvites': FieldValue.arrayUnion([invitee])
+        });
+      }
     }
-
-    // Success!
   } catch (e) {
     // Error occurred
     throw FirebaseException(message: 'Error sending friend invite: $e', plugin: 'cloud_firestore');
   }
 }
+
 
 Future<void> kickUser(String kickId, String groupId) async {
   try {
@@ -694,6 +698,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
   bool _isButtonEnabled = false;
   final TextEditingController _groupNameController = TextEditingController(text: "GroupName");
   File? _selectedImage;
+  final String userId = "iKxLSxcDqlT6vtHe71Bp";
 
 
   Future<void> _pickImage() async {
@@ -710,21 +715,53 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       final String groupName = _groupNameController.text;
-      // Now you can upload the _selectedImage to your backend server.
 
-      // Dummy URL for demonstration purposes
-      const String dummyUrl = 'https://example.com/upload';
-      final Uri uri = Uri.parse(dummyUrl);
+      // const String dummyUrl = 'https://example.com/upload';
+      // final Uri uri = Uri.parse(dummyUrl);
+      //
+      // final request = http.MultipartRequest('POST', uri)
+      //   ..files.add(await http.MultipartFile.fromPath('image', _selectedImage!.path));
+      //
+      // final response = await request.send();
+      // final groupPicture = await response.stream.bytesToString();
 
-      // You can create an HTTP multipart request to send the image.
-      // For this example, we are using a dummy response.
-      final request = http.MultipartRequest('POST', uri)
-        ..fields['group_name'] = groupName
-        ..files.add(await http.MultipartFile.fromPath('image', _selectedImage!.path));
+      final CollectionReference groupsCollection = FirebaseFirestore.instance.collection('Groups');
+      final DocumentReference userDocument = FirebaseFirestore.instance.collection('Users').doc(userId);
+      final DocumentSnapshot userSnapshot = await userDocument.get();
+      final Map<String,dynamic> prefs = userSnapshot.get('Preferences');
+      List<String> allowedUnis = [userSnapshot.get('UniAttended')];
+      Map<String, dynamic> appVals = {};
+      List<String> applicants = [];
+      var avgBedTime = prefs['Lights Out'];
+      int avgCleanliness = prefs['Cleanliness'];
+      int avgNightLife = prefs['NightLife'];
+      int avgNoisiness = prefs['Noisiness'];
+      List<String> blackList = [userId];
+      List<String> invitees = [];
+      Map<String, dynamic> kickVals = {};
+      List<String> kicks = [];
+      List<String> members = [userId];
 
-      final response = await request.send();
-      final responseData = await response.stream.bytesToString();
-
+      final newGroupDocument = await groupsCollection.add({
+        'AllowedUnis': allowedUnis,
+        'AppVals': appVals,
+        'Applicants': applicants,
+        'AvgBedTime': avgBedTime,
+        'AvgCleanliness': avgCleanliness,
+        'AvgNightLife': avgNightLife,
+        'AvgNoisiness': avgNoisiness,
+        'BlackList': blackList,
+        'GroupName': groupName,
+        'GroupPicture': "assets/Pictures/ph.png",
+        'Invitees': invitees,
+        'KickVals': kickVals,
+        'Kicks': kicks,
+        'Members': members,
+      });
+      print("gelloe");
+      await userDocument.update({
+        'Joined': FieldValue.arrayUnion([newGroupDocument.id]),
+      });
     }
   }
 
@@ -803,16 +840,121 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: _isButtonEnabled
-                ? () {
+                ? () async {
               if (_formKey.currentState?.validate() ?? false) {
-                _submitForm();
-                Navigator.pop(context); // Close the bottom sheet
+                await _submitForm().then((value) => Navigator.of(context).pushReplacementNamed('/Friends'));
               }
             }
                 : null,
             child: const Text('Submit'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class SendFriendInvite extends StatefulWidget {
+  const SendFriendInvite({Key? key,}) : super(key: key);
+
+  @override
+  State<SendFriendInvite> createState() => _SendFriendInviteState();
+}
+
+class _SendFriendInviteState extends State<SendFriendInvite> {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  bool _isButtonEnabled = false;
+  late final TextEditingController _textEditingController;
+
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController = TextEditingController();
+  }
+  @override
+  void dispose() {
+    super.dispose();
+    _textEditingController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.0),
+      ),
+      backgroundColor: Theme.of(context).canvasColor,
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.6,
+        height: MediaQuery.of(context).size.height * 0.3,
+        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Add friend by ID", style: Theme.of(context).textTheme.bodyLarge, textAlign: TextAlign.center),
+            Text("You can find this in the profile section", style: Theme.of(context).textTheme.bodySmall, textAlign: TextAlign.center),
+
+            Form(
+              autovalidateMode: AutovalidateMode.always,
+              key: formKey,
+              onChanged: () {
+                setState(() {
+                  _isButtonEnabled = formKey.currentState?.validate() ?? false;
+                });
+              },
+              child: TextFormField(
+                controller: _textEditingController,
+                maxLength: 20,
+                autocorrect: false,
+                decoration: const InputDecoration(
+                  border: UnderlineInputBorder(),
+                  labelText: 'Enter Friend Id',
+                ),
+                validator: (value) {
+                  if (value?.length != 20) {
+                  return 'Friend Id must have exactly 20 characters';
+                  }
+                  return null;
+                },
+                onTap: () {
+                  // Select the whole text when tapped
+                  _textEditingController.selection = TextSelection(
+                    baseOffset: 0,
+                    extentOffset: _textEditingController.text.length,
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text("Cancel", style: Theme.of(context).textTheme.bodyMedium),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _isButtonEnabled ?  () {
+                      if (formKey.currentState!.validate()) {
+                        final String inviteeId = _textEditingController.text;
+                        sendFriendInvite(inviteeId).then((value) => Navigator.of(context).pushReplacementNamed('/Friends'));
+                      }
+                    } : null,
+                    child: Text("Confirm", style: Theme.of(context).textTheme.bodyMedium),
+                  ),
+                ),
+
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
