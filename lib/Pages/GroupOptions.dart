@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,13 +28,17 @@ class _GroupOptionsState extends State<GroupOptions> {
     var groupName = "";
     var groupPicture = "";
 
-
-    final CollectionReference docUsers = FirebaseFirestore.instance.collection("Users");
+    final CollectionReference docUsers =
+        FirebaseFirestore.instance.collection("Users");
 
     try {
-      DocumentSnapshot groupSnapshot = await FirebaseFirestore.instance.collection("Groups").doc(groupId).get();
+      DocumentSnapshot groupSnapshot = await FirebaseFirestore.instance
+          .collection("Groups")
+          .doc(groupId)
+          .get();
 
-      Map<String, dynamic>? groupData = groupSnapshot.data() as Map<String, dynamic>?;
+      Map<String, dynamic>? groupData =
+          groupSnapshot.data() as Map<String, dynamic>?;
 
       if (groupData != null) {
         groupName = groupData['GroupName'];
@@ -59,7 +61,6 @@ class _GroupOptionsState extends State<GroupOptions> {
           kickVals[key] = [agree, disagree];
         }
 
-
         var tempAppVals = groupData["AppVals"];
         for (var key in tempAppVals.keys) {
           int agree = 0;
@@ -81,9 +82,8 @@ class _GroupOptionsState extends State<GroupOptions> {
         for (var aId in applicantIds) {
           if (!(aId == "")) {
             DocumentSnapshot docSnapshot = await docUsers.doc(aId).get();
-            Map<String, dynamic>? data = docSnapshot.data() as Map<
-                String,
-                dynamic>?;
+            Map<String, dynamic>? data =
+                docSnapshot.data() as Map<String, dynamic>?;
 
             final dateTime = data?['DOB'].toDate();
             final currentDate = DateTime.now();
@@ -109,9 +109,8 @@ class _GroupOptionsState extends State<GroupOptions> {
         for (String id in members) {
           try {
             DocumentSnapshot docSnapshot = await docUsers.doc(id).get();
-            Map<String, dynamic>? data = docSnapshot.data() as Map<
-                String,
-                dynamic>?;
+            Map<String, dynamic>? data =
+                docSnapshot.data() as Map<String, dynamic>?;
 
             final dateTime = data?['DOB'].toDate();
             final currentDate = DateTime.now();
@@ -149,15 +148,24 @@ class _GroupOptionsState extends State<GroupOptions> {
       );
     }
 
-    return [memberDetails, applicants, voteKicks, kickVals, appVals, groupName, groupPicture];
+    return [
+      memberDetails,
+      applicants,
+      voteKicks,
+      kickVals,
+      appVals,
+      groupName,
+      groupPicture
+    ];
   }
 
   void _refreshData() {
     setState(() {
-      _myFuture = getUsers(groupId); // Recreate the Future to trigger the FutureBuilder.
+      _myFuture = getUsers(
+          groupId); // Recreate the Future to trigger the FutureBuilder.
     });
   }
-  
+
   @override
   Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
@@ -165,7 +173,6 @@ class _GroupOptionsState extends State<GroupOptions> {
     groupId = data['groupId'];
     _myFuture = getUsers(groupId);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -187,22 +194,21 @@ class _GroupOptionsState extends State<GroupOptions> {
           return Text('Error: ${snapshot.error}');
         } else {
           List data = snapshot.data!;
-          List<Map<String, dynamic>> memberDetails = data[0] as List<Map<String, dynamic>>;
-          List<Map<String, dynamic>> applicants = data[1] as List<Map<String, dynamic>>;
+          List<Map<String, dynamic>> memberDetails =
+              data[0] as List<Map<String, dynamic>>;
+          List<Map<String, dynamic>> applicants =
+              data[1] as List<Map<String, dynamic>>;
           var kicks = data[2];
           var kickVals = data[3];
           var appVals = data[4];
           var groupName = data[5];
           var groupPicture = data[6];
 
-
           return Scaffold(
             appBar: AppBar(
               elevation: 0.0,
               centerTitle: true,
-              backgroundColor: Theme
-                  .of(context)
-                  .canvasColor,
+              backgroundColor: Theme.of(context).canvasColor,
               leading: IconButton(
                 icon: const Icon(LineAwesomeIcons.angle_left),
                 color: Colors.grey[500],
@@ -251,16 +257,14 @@ class _GroupOptionsState extends State<GroupOptions> {
                     onTap: () async {
                       await showDialog<String>(
                         context: context,
-                        builder: (BuildContext context) => EditGroupName(name: groupName, groupId: groupId),
+                        builder: (BuildContext context) =>
+                            EditGroupName(name: groupName, groupId: groupId),
                       );
                       _refreshData();
                     },
                     child: Text(
                       groupName,
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .headlineMedium,
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
                   ),
                   const SizedBox(height: 30.0),
@@ -274,11 +278,8 @@ class _GroupOptionsState extends State<GroupOptions> {
                       const SizedBox(width: 13),
                       Align(
                         alignment: Alignment.centerLeft,
-                        child:
-                        Text("Members", style: Theme
-                            .of(context)
-                            .textTheme
-                            .headlineSmall),
+                        child: Text("Members",
+                            style: Theme.of(context).textTheme.headlineSmall),
                       ),
                     ],
                   ),
@@ -298,24 +299,27 @@ class _GroupOptionsState extends State<GroupOptions> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: memberDetails.length,
                             itemBuilder: (context, index) {
-                              bool isVoteKick = kicks.contains(
-                                  memberDetails[index]['Id']);
+                              bool isVoteKick =
+                                  kicks.contains(memberDetails[index]['Id']);
                               return GestureDetector(
                                 onTap: () {
                                   showDialog<String>(
                                     context: context,
                                     builder: (BuildContext context) =>
                                         CustomDialog(
-                                          id: memberDetails[index]['Id'],
-                                          foreName: memberDetails[index]['ForeName'],
-                                          age: memberDetails[index]['Age'],
-                                          uni: memberDetails[index]['Uni'],
-                                          preferences: memberDetails[index]['Preferences'],
-                                          images: memberDetails[index]['Images'],
-                                          bio: memberDetails[index]['Bio'],
-                                          subject: memberDetails[index]['Subject'],
-                                          yearOfStudy: memberDetails[index]['YearOfStudy'],
-                                        ),
+                                      id: memberDetails[index]['Id'],
+                                      foreName: memberDetails[index]
+                                          ['ForeName'],
+                                      age: memberDetails[index]['Age'],
+                                      uni: memberDetails[index]['Uni'],
+                                      preferences: memberDetails[index]
+                                          ['Preferences'],
+                                      images: memberDetails[index]['Images'],
+                                      bio: memberDetails[index]['Bio'],
+                                      subject: memberDetails[index]['Subject'],
+                                      yearOfStudy: memberDetails[index]
+                                          ['YearOfStudy'],
+                                    ),
                                   );
                                 },
                                 child: Padding(
@@ -335,36 +339,44 @@ class _GroupOptionsState extends State<GroupOptions> {
                                           width: 50,
                                           height: 50,
                                           child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                                100),
+                                            borderRadius:
+                                                BorderRadius.circular(100),
                                             child: Image(
-                                                image: AssetImage(memberDetails[index]["Images"][0])),
+                                                image: AssetImage(
+                                                    memberDetails[index]
+                                                        ["Images"][0])),
                                           ),
                                         ),
                                         const SizedBox(width: 8),
                                         Column(
-                                          crossAxisAlignment: CrossAxisAlignment
-                                              .start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               "${memberDetails[index]["ForeName"]} ${memberDetails[index]["SurName"]}",
                                               style: isVoteKick
                                                   ? GoogleFonts.sourceCodePro(
-                                                color: Colors.red,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 20.0,
-                                              )
-                                                  : Theme.of(context).textTheme.headlineSmall,
+                                                      color: Colors.red,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 20.0,
+                                                    )
+                                                  : Theme.of(context)
+                                                      .textTheme
+                                                      .headlineSmall,
                                             ),
                                             Text(
                                               "${memberDetails[index]["Id"]}",
                                               style: isVoteKick
                                                   ? GoogleFonts.sourceCodePro(
-                                                color: Colors.red,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 12.0,
-                                              )
-                                                  : Theme.of(context).textTheme.bodySmall,
+                                                      color: Colors.red,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 12.0,
+                                                    )
+                                                  : Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall,
                                             ),
                                           ],
                                         ),
@@ -377,8 +389,8 @@ class _GroupOptionsState extends State<GroupOptions> {
                                               children: [
                                                 Text(
                                                   "KickVote",
-                                                  style: GoogleFonts
-                                                      .sourceCodePro(
+                                                  style:
+                                                      GoogleFonts.sourceCodePro(
                                                     color: Colors.red,
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 20.0,
@@ -388,9 +400,11 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                   children: [
                                                     Text(
                                                       "Agree: ${kickVals[memberDetails[index]["Id"]][0]}",
-                                                      style: GoogleFonts.sourceCodePro(
+                                                      style: GoogleFonts
+                                                          .sourceCodePro(
                                                         color: Colors.red,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontSize: 10.0,
                                                       ),
                                                     ),
@@ -405,9 +419,11 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                     const SizedBox(width: 3),
                                                     Text(
                                                       "Disagree: ${kickVals[memberDetails[index]["Id"]][1]}",
-                                                      style: GoogleFonts.sourceCodePro(
+                                                      style: GoogleFonts
+                                                          .sourceCodePro(
                                                         color: Colors.red,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontSize: 10.0,
                                                       ),
                                                     ),
@@ -417,13 +433,14 @@ class _GroupOptionsState extends State<GroupOptions> {
                                             ),
                                           ),
                                         PopupMenuButton<String>(
-                                          itemBuilder: (context) =>
-                                          [
+                                          itemBuilder: (context) => [
                                             PopupMenuItem<String>(
                                               value: 'add',
                                               child: Text(
                                                 'Add friend',
-                                                style: Theme.of(context).textTheme.bodyMedium,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium,
                                               ),
                                             ),
                                             if (isVoteKick)
@@ -433,7 +450,9 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 value: 'agree',
                                                 child: Text(
                                                   'Agree vote-kick',
-                                                  style: Theme.of(context).textTheme.bodyMedium,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium,
                                                 ),
                                               ),
                                             if (isVoteKick)
@@ -441,7 +460,9 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 value: 'disagree',
                                                 child: Text(
                                                   'Disagree vote-kick',
-                                                  style: Theme.of(context).textTheme.bodyMedium,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium,
                                                 ),
                                               ),
                                             if (!isVoteKick)
@@ -449,27 +470,44 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 value: 'kick',
                                                 child: Text(
                                                   'Start Vote-kick',
-                                                  style: Theme.of(context).textTheme.bodyMedium,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium,
                                                 ),
                                               ),
                                           ],
                                           onSelected: (value) async {
                                             if (value == 'add') {
-                                              sendFriendInvite(memberDetails[index]["Id"]);
-                                              ScaffoldMessenger.of(context).showSnackBar(
+                                              sendFriendInvite(
+                                                  memberDetails[index]["Id"]);
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
                                                 SnackBar(
-                                                  backgroundColor: Theme.of(context).primaryColor,
-                                                  content: const Text('Friend invite sent'),
+                                                  backgroundColor:
+                                                      Theme.of(context)
+                                                          .primaryColor,
+                                                  content: const Text(
+                                                      'Friend invite sent'),
                                                 ),
                                               );
                                             } else if (value == 'kick') {
-                                              await kickUser(memberDetails[index]["Id"], groupId);
+                                              await kickUser(
+                                                  memberDetails[index]["Id"],
+                                                  groupId);
                                               _refreshData();
                                             } else if (value == 'agree') {
-                                              await updateKickVote(groupId, true, memberDetails[index]["Id"], memberDetails.length);
+                                              await updateKickVote(
+                                                  groupId,
+                                                  true,
+                                                  memberDetails[index]["Id"],
+                                                  memberDetails.length);
                                               _refreshData();
                                             } else if (value == 'disagree') {
-                                              await updateKickVote(groupId, false, memberDetails[index]["Id"], memberDetails.length);
+                                              await updateKickVote(
+                                                  groupId,
+                                                  false,
+                                                  memberDetails[index]["Id"],
+                                                  memberDetails.length);
                                               _refreshData();
                                             }
                                           },
@@ -493,7 +531,8 @@ class _GroupOptionsState extends State<GroupOptions> {
                       const SizedBox(width: 13),
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: Text("Applications", style: Theme.of(context).textTheme.headlineSmall),
+                        child: Text("Applications",
+                            style: Theme.of(context).textTheme.headlineSmall),
                       ),
                     ],
                   ),
@@ -510,131 +549,163 @@ class _GroupOptionsState extends State<GroupOptions> {
                           ),
                           child: hasApps
                               ? SizedBox(
-                            width: double.maxFinite,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text("Empty", style: Theme.of(context).textTheme.bodyLarge),
-                            ),
-                          )
+                                  width: double.maxFinite,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text("Empty",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge),
+                                  ),
+                                )
                               : ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: applicants.length,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  showDialog<String>(
-                                    context: context,
-                                    builder: (BuildContext context) =>
-                                        CustomDialog(
-                                          id: applicants[index]['Id'],
-                                          foreName: applicants[index]['ForeName'],
-                                          age: applicants[index]['Age'],
-                                          uni: applicants[index]['Uni'],
-                                          preferences: applicants[index]['Preferences'],
-                                          images: applicants[index]['Images'],
-                                          bio: applicants[index]['Bio'],
-                                          subject: applicants[index]['Subject'],
-                                          yearOfStudy: applicants[index]['YearOfStudy'],
-                                        ),
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    padding: const EdgeInsets.only(bottom: 12),
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          color: Colors.grey[300]!,
-                                        ),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        SizedBox(
-                                          width: 50,
-                                          height: 50,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                                100),
-                                            child: Image(image: AssetImage(applicants[index]["Images"][0])),
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: applicants.length,
+                                  itemBuilder: (context, index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        showDialog<String>(
+                                          context: context,
+                                          builder: (BuildContext context) =>
+                                              CustomDialog(
+                                            id: applicants[index]['Id'],
+                                            foreName: applicants[index]
+                                                ['ForeName'],
+                                            age: applicants[index]['Age'],
+                                            uni: applicants[index]['Uni'],
+                                            preferences: applicants[index]
+                                                ['Preferences'],
+                                            images: applicants[index]['Images'],
+                                            bio: applicants[index]['Bio'],
+                                            subject: applicants[index]
+                                                ['Subject'],
+                                            yearOfStudy: applicants[index]
+                                                ['YearOfStudy'],
+                                          ),
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          padding:
+                                              const EdgeInsets.only(bottom: 12),
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              bottom: BorderSide(
+                                                color: Colors.grey[300]!,
+                                              ),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 50,
+                                                height: 50,
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          100),
+                                                  child: Image(
+                                                      image: AssetImage(
+                                                          applicants[index]
+                                                              ["Images"][0])),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "${applicants[index]["ForeName"]} ${applicants[index]["SurName"]}",
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headlineSmall,
+                                                  ),
+                                                  Text(
+                                                    applicants[index]["Id"],
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodySmall,
+                                                  ),
+                                                ],
+                                              ),
+                                              Expanded(child: Container()),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    "Agree: ${appVals[applicants[index]["Id"]][0]}",
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium,
+                                                  ),
+                                                  const SizedBox(width: 3),
+                                                  SizedBox(
+                                                    width: 2,
+                                                    height: 18,
+                                                    child: Container(
+                                                        color: Colors.black87),
+                                                  ),
+                                                  const SizedBox(width: 3),
+                                                  Text(
+                                                    "Disagree: ${appVals[applicants[index]["Id"]][1]}",
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium,
+                                                  ),
+                                                ],
+                                              ),
+                                              PopupMenuButton<String>(
+                                                itemBuilder: (context) => [
+                                                  PopupMenuItem(
+                                                    value: 'accept',
+                                                    child: Text(
+                                                      'Vote accept',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyMedium,
+                                                    ),
+                                                  ),
+                                                  PopupMenuItem(
+                                                    value: 'decline',
+                                                    child: Text(
+                                                      'Vote decline',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyMedium,
+                                                    ),
+                                                  ),
+                                                ],
+                                                onSelected: (value) async {
+                                                  if (value == 'accept') {
+                                                    await updateApplicationVote(
+                                                        groupId,
+                                                        true,
+                                                        applicants[index]["Id"],
+                                                        memberDetails.length);
+                                                    _refreshData();
+                                                  } else if (value ==
+                                                      'decline') {
+                                                    await updateApplicationVote(
+                                                        groupId,
+                                                        false,
+                                                        applicants[index]["Id"],
+                                                        memberDetails.length);
+                                                    _refreshData();
+                                                  }
+                                                },
+                                                icon:
+                                                    const Icon(Icons.more_vert),
+                                                splashRadius: 1,
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        const SizedBox(width: 8),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "${applicants[index]["ForeName"]} ${applicants[index]["SurName"]}",
-                                              style: Theme.of(context).textTheme.headlineSmall,
-                                            ),
-                                            Text(
-                                              applicants[index]["Id"],
-                                              style: Theme.of(context).textTheme.bodySmall,
-                                            ),
-                                          ],
-                                        ),
-                                        Expanded(child: Container()),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              "Agree: ${appVals[applicants[index]["Id"]][0]}",
-                                              style: Theme.of(context).textTheme.bodyMedium,
-                                            ),
-                                            const SizedBox(width: 3),
-                                            SizedBox(
-                                              width: 2,
-                                              height: 18,
-                                              child: Container(
-                                                  color: Colors.black87
-                                              ),
-                                            ),
-                                            const SizedBox(width: 3),
-                                            Text(
-                                              "Disagree: ${appVals[applicants[index]["Id"]][1]}",
-                                              style: Theme.of(context).textTheme.bodyMedium,
-                                            ),
-                                          ],
-                                        ),
-                                        PopupMenuButton<String>(
-                                          itemBuilder: (context) =>
-                                          [
-                                            PopupMenuItem(
-                                              value: 'accept',
-                                              child: Text(
-                                                'Vote accept',
-                                                style: Theme.of(context).textTheme.bodyMedium,
-                                              ),
-                                            ),
-                                            PopupMenuItem(
-                                              value: 'decline',
-                                              child: Text(
-                                                'Vote decline',
-                                                style: Theme.of(context).textTheme.bodyMedium,
-                                              ),
-                                            ),
-                                          ],
-                                          onSelected: (value) async {
-                                            if (value == 'accept') {
-                                              await updateApplicationVote(groupId, true, applicants[index]["Id"], memberDetails.length);
-                                              _refreshData();
-                                            } else if (value == 'decline') {
-                                              await updateApplicationVote(groupId, false, applicants[index]["Id"], memberDetails.length);
-                                              _refreshData();
-                                            }
-                                          },
-                                          icon: const Icon(Icons.more_vert),
-                                          splashRadius: 1,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                      ),
+                                    );
+                                  },
                                 ),
-
-                              );
-                            },
-                          ),
                         ),
                       );
                     },
@@ -650,15 +721,17 @@ class _GroupOptionsState extends State<GroupOptions> {
                           onTap: () async {
                             await showDialog<String>(
                                 context: context,
-                                builder: (BuildContext context) => GroupExpand(id: groupId, groupName: groupName, groupPicture: groupPicture, members: memberDetails.map((item) => item["Id"] as String).toList())
-                            );
+                                builder: (BuildContext context) => GroupExpand(
+                                    id: groupId,
+                                    groupName: groupName,
+                                    groupPicture: groupPicture,
+                                    members: memberDetails
+                                        .map((item) => item["Id"] as String)
+                                        .toList()));
                           },
                           title: Text(
                             "Preview Group",
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .bodyMedium,
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         ),
                         ListTile(
@@ -666,7 +739,8 @@ class _GroupOptionsState extends State<GroupOptions> {
                           onTap: () async {
                             await showDialog<String>(
                               context: context,
-                              builder: (BuildContext context) => EditGroupName(name: groupName, groupId: groupId),
+                              builder: (BuildContext context) => EditGroupName(
+                                  name: groupName, groupId: groupId),
                             );
                             _refreshData();
                           },
@@ -680,7 +754,10 @@ class _GroupOptionsState extends State<GroupOptions> {
                           onTap: () async {
                             await showDialog<String>(
                               context: context,
-                              builder: (BuildContext context) => ConfirmLeave(groupId: groupId, memCount: memberDetails.length,),
+                              builder: (BuildContext context) => ConfirmLeave(
+                                groupId: groupId,
+                                memCount: memberDetails.length,
+                              ),
                             );
                           },
                           title: Text(
