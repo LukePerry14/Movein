@@ -4,7 +4,7 @@ import 'package:movein/navbar.dart';
 import 'package:movein/FriendFunctions.dart';
 import 'package:movein/swipe_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+//import 'package:shared_preferences/shared_preferences.dart';
 
 class Friends extends StatefulWidget {
   const Friends({Key? key}) : super(key: key);
@@ -42,6 +42,7 @@ class _FriendsState extends State<Friends> {
     final yearsAgo = difference.inDays ~/ 365;
     return yearsAgo;
   }
+
   Future<List<List<dynamic>>> fetchFriendsData() async {
     List<Map<String,dynamic>> friends = [];
     List<Map<String,dynamic>> groupInvites = [];
@@ -74,6 +75,10 @@ class _FriendsState extends State<Friends> {
                 "GroupName": groupData["GroupName"],
                 "GroupPicture": groupData["GroupPicture"],
                 "Members": groupData["Members"],
+                "avgCleanliness" : groupData["AvgCleanliness"],
+                "AvgNoisiness" : groupData["AvgNoisiness"],
+                "AvgNightLife" : groupData["AvgNightLife"],
+                "AvgBedTime" : groupData["AvgBedTime"],
               });
             }
           }
@@ -499,6 +504,10 @@ class _FriendsState extends State<Friends> {
                                     groupName: applicationsResults[applicationIndex]["GroupName"],
                                     groupPicture: applicationsResults[applicationIndex]["GroupPicture"],
                                     members: applicationsResults[applicationIndex]["Members"].cast<String>().toList(),
+                                    avgCleanliness: applicationsResults[applicationIndex]["avgCleanliness"],
+                                    avgNoisiness: applicationsResults[applicationIndex]["avgNoisiness"],
+                                    avgNightLife: applicationsResults[applicationIndex]["avgNightLife"],
+                                    avgBedTime: applicationsResults[applicationIndex]["avgBedTime"],
                                   ),
                                 );
                               },
@@ -572,6 +581,10 @@ class _FriendsState extends State<Friends> {
                                     groupName: shortListResults[shortlistIndex]["GroupName"],
                                     groupPicture: shortListResults[shortlistIndex]["GroupPicture"],
                                     members: shortListResults[shortlistIndex]["Members"].cast<String>().toList(),
+                                    avgCleanliness: shortListResults[shortlistIndex]["avgCleanliness"],
+                                    avgNoisiness: shortListResults[shortlistIndex]["avgNoisiness"],
+                                    avgNightLife: shortListResults[shortlistIndex]["avgNightLife"],
+                                    avgBedTime: shortListResults[shortlistIndex]["avgBedTime"],
                                   ),
                                 );
                               },
@@ -836,7 +849,16 @@ class _FriendsState extends State<Friends> {
                                 onTap: () {
                                   showDialog<String>(
                                       context: context,
-                                      builder: (BuildContext context) => GroupExpand(id: groupSearchResults[index]["Id"], groupName: groupSearchResults[index]["GroupName"], groupPicture: groupSearchResults[index]["GroupPicture"], members: groupSearchResults[index]["Members"].cast<String>().toList())
+                                      builder: (BuildContext context) => GroupExpand(
+                                          id: groupSearchResults[index]["Id"],
+                                          groupName: groupSearchResults[index]["GroupName"],
+                                          groupPicture: groupSearchResults[index]["GroupPicture"],
+                                          members: groupSearchResults[index]["Members"].cast<String>().toList(),
+                                          avgCleanliness: groupSearchResults[index]["avgCleanliness"],
+                                          avgNoisiness: groupSearchResults[index]["avgNoisiness"],
+                                          avgNightLife: groupSearchResults[index]["avgNightLife"],
+                                          avgBedTime: groupSearchResults[index]["avgBedTime"],
+                                      )
                                   );
                                 },
                                 child: Padding(
@@ -885,7 +907,7 @@ class _FriendsState extends State<Friends> {
                                           ],
                                           onSelected: (value) async{
                                             if (value == 'accept') {
-                                              await joinGroup(groupSearchResults[index]["Id"]);
+                                              await joinGroup(groupSearchResults[index]["Id"], userId);
                                               Navigator.of(context).pushReplacementNamed("/Friends");
                                             } else if (value == 'reject') {
                                               await removeGroupInvite(groupSearchResults[index]["Id"]);

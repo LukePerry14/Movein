@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:movein/swipe_card.dart';
 import 'package:movein/profile-data.dart';
 
@@ -7,6 +8,10 @@ class Gscroller extends StatefulWidget {
   final String groupName;
   final dynamic members;
   final String groupPicture;
+  final double avgNoisiness;
+  final double avgCleanliness;
+  final double avgNightLife;
+  final Timestamp avgBedTime;
   final bool showFriend;
 
   const Gscroller({
@@ -14,6 +19,11 @@ class Gscroller extends StatefulWidget {
     required this.groupName,
     required this.members,
     required this.groupPicture,
+    required this.avgNoisiness,
+    required this.avgCleanliness,
+    required this.avgNightLife,
+    required this.avgBedTime,
+
     this.showFriend = false,
   }) : super(key: key);
 
@@ -61,7 +71,11 @@ class _GscrollerState extends State<Gscroller> {
           }
 
           profiles = snapshot.data ?? []; // Assign the fetched data to the profiles list
-
+          DateTime? dateTime;
+          String formattedTime = '';
+          dateTime = widget.avgBedTime.toDate();
+          DateFormat timeFormat = DateFormat.jm();
+          formattedTime = timeFormat.format(dateTime);
           return ListView.builder(
             itemCount: profiles.length + 3,
             itemBuilder: (context, index) {
@@ -79,23 +93,59 @@ class _GscrollerState extends State<Gscroller> {
               }
 
               else if(index == 1){
-                return Column(
-                  children: [
-                    Container(
-                      alignment: Alignment.center,
-                      child: Text(
+                return ExpansionTile(
+                  title: Row(
+                    children: [
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.5 - 68,),
+                      Text(
                         widget.groupName,
                         style: Theme.of(context).textTheme.headlineLarge,
                       ),
-                    ),
+                    ]
+                  ),
+                  children: [
+                    const SizedBox(height: 20), // Add space between the title and the children
                     Container(
                       alignment: Alignment.center,
                       child: Text(
                         "${profiles.length} Members",
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                    ),
+                    const SizedBox(height: 10), // Add space between the children
+                    Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Average BedTime: $formattedTime",
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
-                  ]
+                    const SizedBox(height: 10), // Add space between the children
+                    Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Cleanliness is of ${widget.avgCleanliness}/5 importance",
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                    ),
+                    const SizedBox(height: 10), // Add space between the children
+                    Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Noisiness is of ${widget.avgNoisiness}/5 importance",
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                    ),
+                    const SizedBox(height: 10), // Add space between the children
+                    Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "NightLife is of ${widget.avgNightLife}/5 importance",
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                    ),
+                    const SizedBox(height: 20), // Add space between the last child and the bottom of the tile
+                  ],
                 );
               } else if (index < profiles.length+2) {
                 return SwipeCard(

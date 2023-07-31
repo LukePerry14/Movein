@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:movein/navbar.dart';
 import 'package:movein/HScroll.dart';
@@ -17,8 +18,7 @@ class Scroller extends StatefulWidget {
 class _ScrollerState extends State<Scroller> {
   bool refresh = true;
   int index = 0;
-  final String userId =
-      "iKxLSxcDqlT6vtHe71Bp"; //change to stored userId when cache implemented
+  final String userId = "iKxLSxcDqlT6vtHe71Bp";
   late NativeAd _ad;
   bool _isAdLoaded = false;
   bool adTime = true;
@@ -45,6 +45,10 @@ class _ScrollerState extends State<Scroller> {
             'GroupPicture': data['GroupPicture'].toString(),
             'Members': List<String>.from(
                 data['Members'].map((member) => member.toString())),
+            'AvgCleanliness' : data['AvgCleanliness'],
+            'AvgNoisiness' : data['AvgNoisiness'],
+            'AvgNightLife' : data['AvgNightLife'],
+            'AvgBedTime' : data['AvgBedTime'],
           };
           groups.add(groupData);
         }
@@ -211,6 +215,10 @@ class _ScrollerState extends State<Scroller> {
                                   groupPicture: groupData[index]
                                       ['GroupPicture'],
                                   members: groupData[index]['Members'],
+                                  avgBedTime: groupData[index]['AvgBedTime'],
+                                  avgNoisiness: groupData[index]['AvgNoisiness'],
+                                  avgCleanliness: groupData[index]['AvgCleanliness'],
+                                  avgNightLife: groupData[index]['AvgNightLife'],
                                   showFriend: true,
                                 ),
                     ),
@@ -257,8 +265,13 @@ class _ScrollerState extends State<Scroller> {
                                       );
                                     });
                                   },
-                                  child: const Icon(LineAwesomeIcons.times,
-                                      color: Colors.white),
+                                  child: Column(
+                                    children: [
+                                      const SizedBox(height: 9),
+                                      const Icon(LineAwesomeIcons.times, color: Colors.white),
+                                      Text("Block", style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                    ]
+                                  ),
                                 ),
                                 FloatingActionButton(
                                   heroTag: "Next",
@@ -275,9 +288,13 @@ class _ScrollerState extends State<Scroller> {
                                           '/ScrollRefresh');
                                     }
                                   },
-                                  child: const Icon(
-                                      LineAwesomeIcons.angle_right,
-                                      color: Colors.white),
+                                  child: Column(
+                                      children: [
+                                        const SizedBox(height: 9),
+                                        const Icon(LineAwesomeIcons.angle_right, color: Colors.white),
+                                        Text("Next", style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                      ]
+                                  ),
                                 ),
                                 FloatingActionButton(
                                   heroTag: "Shortlist",
@@ -303,8 +320,13 @@ class _ScrollerState extends State<Scroller> {
                                       );
                                     });
                                   },
-                                  child: const Icon(LineAwesomeIcons.archive,
-                                      color: Colors.white),
+                                  child: Column(
+                                      children: [
+                                        const SizedBox(height: 9),
+                                        const Icon(LineAwesomeIcons.archive, color: Colors.white),
+                                        Text("Shortlist", style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                      ]
+                                  ),
                                 ),
                                 FloatingActionButton(
                                   heroTag: "Apply",
@@ -330,8 +352,13 @@ class _ScrollerState extends State<Scroller> {
                                       );
                                     });
                                   },
-                                  child: const Icon(LineAwesomeIcons.check,
-                                      color: Colors.white),
+                                  child: Column(
+                                      children: [
+                                        const SizedBox(height: 9),
+                                        const Icon(LineAwesomeIcons.check, color: Colors.white),
+                                        Text("Apply", style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                      ]
+                                  ),
                                 ),
                               ],
                             ),

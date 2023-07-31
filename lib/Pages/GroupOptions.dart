@@ -25,8 +25,12 @@ class _GroupOptionsState extends State<GroupOptions> {
     List<String> voteKicks = [];
     Map<String, List<int>> kickVals = {};
     Map<String, List<int>> appVals = {};
-    var groupName = "";
-    var groupPicture = "";
+    String groupName;
+    String groupPicture;
+    double avgCleanliness;
+    double avgNoisiness ;
+    double avgNightLife;
+    Timestamp avgBedTime;
 
     final CollectionReference docUsers =
         FirebaseFirestore.instance.collection("Users");
@@ -40,11 +44,14 @@ class _GroupOptionsState extends State<GroupOptions> {
       Map<String, dynamic>? groupData =
           groupSnapshot.data() as Map<String, dynamic>?;
 
-      if (groupData != null) {
-        groupName = groupData['GroupName'];
-        groupPicture = groupData['GroupPicture'];
+        groupName = groupData?['GroupName'];
+        groupPicture = groupData?['GroupPicture'];
+        avgCleanliness = groupData?['AvgCleanliness'];
+        avgNoisiness = groupData?['AvgNoisiness'];
+        avgNightLife = groupData?['AvgNightLife'];
+        avgBedTime = groupData?['AvgBedTime'];
 
-        var tempKickVals = groupData["KickVals"];
+        var tempKickVals = groupData?["KickVals"];
         for (var key in tempKickVals.keys) {
           int agree = 0;
           int disagree = 0;
@@ -61,7 +68,7 @@ class _GroupOptionsState extends State<GroupOptions> {
           kickVals[key] = [agree, disagree];
         }
 
-        var tempAppVals = groupData["AppVals"];
+        var tempAppVals = groupData?["AppVals"];
         for (var key in tempAppVals.keys) {
           int agree = 0;
           int disagree = 0;
@@ -78,7 +85,7 @@ class _GroupOptionsState extends State<GroupOptions> {
           appVals[key] = [agree, disagree];
         }
 
-        var applicantIds = groupData["Applicants"];
+        var applicantIds = groupData?["Applicants"];
         for (var aId in applicantIds) {
           if (!(aId == "")) {
             DocumentSnapshot docSnapshot = await docUsers.doc(aId).get();
@@ -104,8 +111,8 @@ class _GroupOptionsState extends State<GroupOptions> {
           }
         }
 
-        var members = groupData['Members'];
-        var kickIds = groupData["Kicks"];
+        var members = groupData?['Members'];
+        var kickIds = groupData?["Kicks"];
         for (String id in members) {
           try {
             DocumentSnapshot docSnapshot = await docUsers.doc(id).get();
@@ -140,7 +147,6 @@ class _GroupOptionsState extends State<GroupOptions> {
             );
           }
         }
-      }
     } catch (e) {
       throw FirebaseException(
         message: 'Error fetching group data in GroupOptions: $e',
@@ -155,14 +161,17 @@ class _GroupOptionsState extends State<GroupOptions> {
       kickVals,
       appVals,
       groupName,
-      groupPicture
+      groupPicture,
+      avgCleanliness,
+      avgNoisiness,
+      avgNightLife,
+      avgBedTime,
     ];
   }
 
   void _refreshData() {
     setState(() {
-      _myFuture = getUsers(
-          groupId); // Recreate the Future to trigger the FutureBuilder.
+      _myFuture = getUsers(groupId); // Recreate the Future to trigger the FutureBuilder.
     });
   }
 
@@ -203,6 +212,10 @@ class _GroupOptionsState extends State<GroupOptions> {
           var appVals = data[4];
           var groupName = data[5];
           var groupPicture = data[6];
+          var avgCleanliness = data[7];
+          var avgNoisiness = data[8];
+          var avgNightLife = data[9];
+          var avgBedTime = data[10];
 
           return Scaffold(
             appBar: AppBar(
@@ -491,7 +504,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 ),
                                               );
                                             } else if (value == 'kick') {
-                                              await kickUser(
+                                              await startKickVote(
                                                   memberDetails[index]["Id"],
                                                   groupId);
                                               _refreshData();
@@ -725,9 +738,13 @@ class _GroupOptionsState extends State<GroupOptions> {
                                     id: groupId,
                                     groupName: groupName,
                                     groupPicture: groupPicture,
-                                    members: memberDetails
-                                        .map((item) => item["Id"] as String)
-                                        .toList()));
+                                    members: memberDetails.map((item) => item["Id"] as String).toList(),
+                                    avgCleanliness: avgCleanliness,
+                                    avgNoisiness: avgNoisiness,
+                                    avgNightLife: avgNightLife,
+                                    avgBedTime: avgBedTime,
+                                )
+                            );
                           },
                           title: Text(
                             "Preview Group",
