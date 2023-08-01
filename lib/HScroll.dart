@@ -34,6 +34,7 @@ class Gscroller extends StatefulWidget {
 class _GscrollerState extends State<Gscroller> {
   late Future<List<CardProfile>> loadProfilesFuture;
   late List<CardProfile> profiles;
+  bool _isExpanded = false;
 
 
 
@@ -80,28 +81,42 @@ class _GscrollerState extends State<Gscroller> {
             itemCount: profiles.length + 3,
             itemBuilder: (context, index) {
               if (index == 0){
-                return CircleAvatar(
-                  radius: 75, // Adjust the size as needed
-                  backgroundColor: Colors.transparent, // Set the background color to transparent
-                  child: ClipOval(
-                    child: Image(
-                      image: AssetImage(widget.groupPicture),
-                      fit: BoxFit.cover, // Adjust the fit as needed
+                return Column(
+                  children: [
+                    const SizedBox(height: 5),
+                    Text(
+                      widget.groupName,
+                      style: Theme.of(context).textTheme.headlineLarge,
                     ),
-                  ),
+                    const SizedBox(height:5),
+                    CircleAvatar(
+                      radius: 75, // Adjust the size as needed
+                      backgroundColor: Colors.transparent, // Set the background color to transparent
+                      child: ClipOval(
+                        child: Image(
+                          image: AssetImage(widget.groupPicture),
+                          fit: BoxFit.cover, // Adjust the fit as needed
+                        ),
+                      ),
+                    ),
+                  ]
                 );
               }
 
               else if(index == 1){
                 return ExpansionTile(
+                  trailing: null,
+                  backgroundColor: _isExpanded ? Colors.grey : Colors.grey.withOpacity(0.27), // Set background color to grey when expanded
+                  onExpansionChanged: (expanded) {
+                    setState(() {
+                      _isExpanded = expanded;
+                    });
+                  },
                   title: Row(
-                    children: [
-                      SizedBox(width: MediaQuery.of(context).size.width * 0.5 - 68,),
-                      Text(
-                        widget.groupName,
-                        style: Theme.of(context).textTheme.headlineLarge,
-                      ),
-                    ]
+                      children: [
+                        const SizedBox(width: 20),
+                        Text("...", style: Theme.of(context).textTheme.headlineLarge,)
+                      ]
                   ),
                   children: [
                     const SizedBox(height: 20), // Add space between the title and the children
@@ -116,7 +131,7 @@ class _GscrollerState extends State<Gscroller> {
                     Container(
                       alignment: Alignment.center,
                       child: Text(
-                        "Average BedTime: $formattedTime",
+                        "Most asleep around $formattedTime",
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
@@ -124,7 +139,7 @@ class _GscrollerState extends State<Gscroller> {
                     Container(
                       alignment: Alignment.center,
                       child: Text(
-                        "Cleanliness is of ${widget.avgCleanliness}/5 importance",
+                        "Average house cleanliness: ${widget.avgCleanliness}/5",
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
@@ -132,7 +147,7 @@ class _GscrollerState extends State<Gscroller> {
                     Container(
                       alignment: Alignment.center,
                       child: Text(
-                        "Noisiness is of ${widget.avgNoisiness}/5 importance",
+                        "Average house noisiness: ${widget.avgNoisiness}/5",
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
@@ -140,7 +155,7 @@ class _GscrollerState extends State<Gscroller> {
                     Container(
                       alignment: Alignment.center,
                       child: Text(
-                        "NightLife is of ${widget.avgNightLife}/5 importance",
+                        "Average house nightlife rating: ${widget.avgNightLife}/5",
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
