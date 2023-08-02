@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/navbar.dart';
-import 'package:movein/FriendFunctions.dart';
-import 'package:movein/swipe_card.dart';
+import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
+import 'package:movein/Scroller%20Code/swipe_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 //import 'package:shared_preferences/shared_preferences.dart';
 

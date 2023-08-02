@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:movein/swipe_card.dart';
-import 'package:movein/profile-data.dart';
+import 'package:movein/Scroller%20Code/swipe_card.dart';
+import 'package:movein/Scroller%20Code/profile-data.dart';
 
 class Gscroller extends StatefulWidget {
   final String groupName;

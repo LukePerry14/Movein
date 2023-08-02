@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:movein/FriendFunctions.dart';
-import 'package:movein/swipe_card.dart';
-import 'package:movein/GroupFunctions.dart';
+import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
+import 'package:movein/Scroller%20Code/swipe_card.dart';
+import 'package:movein/Friend%20And%20Groups%20Code/GroupFunctions.dart';
 
 class GroupOptions extends StatefulWidget {
   const GroupOptions({Key? key}) : super(key: key);

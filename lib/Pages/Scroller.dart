@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:movein/navbar.dart';
-import 'package:movein/HScroll.dart';
-import 'package:movein/ad_helper.dart';
+import 'package:movein/Scroller%20Code/HScroll.dart';
+import 'package:movein/Ad%20code/ad_helper.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 class Scroller extends StatefulWidget {

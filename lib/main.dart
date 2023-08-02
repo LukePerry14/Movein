@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:movein/Pages/OnBoarding.dart';
 import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Themes/lMode.dart';
 import 'package:movein/Pages/Houses.dart';
@@ -13,7 +14,7 @@ import 'package:movein/Pages/ScrollRefresh.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import './auth.dart';
+import 'Auth code/auth.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -129,6 +130,7 @@ class App extends StatelessWidget {
         '/Friends': (context) => const Friends(),
         '/Houses': (context) => const Houses(),
         '/GroupOptions': (context) => const GroupOptions(),
+        '/OnBoarding' : (context) => const OnBoardingPage(),
       },
     );
   }
@@ -188,7 +190,7 @@ class _AuthScreenState extends State<AuthScreen> {
         final lastName = _lastNameController.value.text;
 
         Auth().registerWithUserDetails(email, password, firstName, lastName);
-        Navigator.pushNamed(context, '/Scroller'); // THIS SHOULD BE CONDITIONAL
+        Navigator.pushNamed(context, '/OnBoarding'); // THIS SHOULD BE CONDITIONAL
       }
     }
     return;
