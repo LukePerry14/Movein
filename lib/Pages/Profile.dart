@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:movein/navbar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Profile extends StatelessWidget {
   const Profile({Key? key}) : super(key: key);
+
+  void _copyToClipboard(BuildContext context) {
+    Clipboard.setData(const ClipboardData(text: 'iKxLSxcDqlT6vtHe71Bp'));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Copied to clipboard'),
+        backgroundColor: Theme.of(context).primaryColor,
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +41,17 @@ class Profile extends StatelessWidget {
                           onTap: () {
                             print("testing");
                           },
-                          child: SizedBox(
-                            width: 175,
-                            height: 175,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(100),
-                              child: const Image(
-                                  image:
-                                      AssetImage("assets/Pictures/dora.png")),
+                          child: Container(
+                            width: 150, // Set a fixed width for the container
+                            height: 150, // Set a fixed height for the container
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                            ),
+                            child: const ClipOval(
+                              child: Image(
+                                image: AssetImage("assets/Pictures/dora.png"),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ),
@@ -68,10 +83,29 @@ class Profile extends StatelessWidget {
                 const Text("Name",
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
-                const SizedBox(height: 15.0),
-                const Text('Email',
-                    style:
-                        TextStyle(fontStyle: FontStyle.italic, fontSize: 15)),
+                const SizedBox(height: 8.0),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () => _copyToClipboard(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        child: const Text(
+                          'iKxLSxcDqlT6vtHe71Bp',
+                          style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => _copyToClipboard(context),
+                      child: const Icon(Icons.copy),
+                    ),
+                  ]
+                ),
                 const SizedBox(height: 30.0),
                 upgradeAccountButton(),
                 const SizedBox(height: 40.0),

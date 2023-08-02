@@ -59,43 +59,52 @@ class _profileInformation extends State<profileInformation> {
           final navigator = Navigator.of(context);
 
           return Scaffold(
-            appBar: AppBar( //maybe replace with a sliverappbar to improve polish
-              backgroundColor: Theme.of(context).primaryColor,
-              centerTitle: true,
-              elevation: 0,
-              leading: IconButton(
-                icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.white),
-                color: Colors.grey[500],
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              actions: [
-                PopupMenuButton(itemBuilder: (context)=>[
-                  const PopupMenuItem<int>(
-                    value: 0,
-                    child: Text('About'),
+            body: CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  backgroundColor: Theme.of(context).canvasColor,
+                  centerTitle: true,
+                  elevation: 0,
+                  floating: true, // Make the SliverAppBar automatically hide when scrolling down
+                  leading: IconButton(
+                    icon: Icon(LineAwesomeIcons.angle_left, color: Theme.of(context).primaryColor),
+                    color: Colors.grey[500],
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                   ),
-                  const PopupMenuItem<int>(
-                    value: 1,
-                    child: Text('FAQs'),
-                  ),
-                  const PopupMenuItem(
-                    value: 2,
-                    child: Text('TBC'),
-                  )
-                ],onSelected: (item)=>chosenItem(context, item), color: Colors.white,
-                )
+                  actions: [
+                    PopupMenuButton(
+                      icon: Icon(LineAwesomeIcons.vertical_ellipsis, color: Theme.of(context).primaryColor,),
+                      color: Colors.grey[200],
+                      itemBuilder: (context) => [
+                        const PopupMenuItem<int>(
+                          value: 0,
+                          child: Text('About'),
+                        ),
+                        const PopupMenuItem<int>(
+                          value: 1,
+                          child: Text('FAQs'),
+                        ),
+                        const PopupMenuItem(
+                          value: 2,
+                          child: Text('TBC'),
+                        )
+                      ],
+                      onSelected: (item) => chosenItem(context, item),
+                    )
+                  ],
+                ),
+                SliverToBoxAdapter(
+                  child: profileInformationPage()
+                ),
               ],
             ),
-            body: profileInformationPage(),
-            // add body here
             bottomNavigationBar: CustomNavbar(
               onItemSelected: (route) {
-                navigator.pushReplacementNamed(route);
-              },
+                navigator.pushNamed(route);
+                },
             ),
-
           );
         }
     );
@@ -128,20 +137,20 @@ class _profilePageState extends State<profileInformationPage> {
       padding: const EdgeInsets.all(10),
       child: GestureDetector(
         child: ListView(
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
           children: [
-            const SizedBox(height: 30),
             Row(
               children: [
                 Icon(
-                  Icons.person,
-                  color: Theme.of(context).primaryColor,
-                  size: 50
+                    Icons.person,
+                    color: Theme.of(context).primaryColor,
+                    size: 50
                 ),
                 const SizedBox(width: 10),
                 const Text("Profile Information", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 22),)
               ],
             ),
-            const Divider(height: 20, thickness: 1),
             const SizedBox(height: 10),
             const TextField(
               decoration: InputDecoration(
@@ -207,9 +216,9 @@ class _profilePageState extends State<profileInformationPage> {
               child: subjectDropdown(),
             ),
             const SizedBox(height: 30,),
-            ElevatedButton(
+            const ElevatedButton(
               onPressed: _submit,
-              child: Text('Edit Profile'),
+              child: Text('Confirm changes'),
             )
           ],
         ),
