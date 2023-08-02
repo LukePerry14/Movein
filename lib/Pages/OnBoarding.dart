@@ -31,7 +31,7 @@ class OnBoardingPage extends StatelessWidget {
             ),
             PageViewModel(
                 title: "Interacting with the group",
-                body: "for each group you can: \n - Remove them from your feed \n - Skip to the next group \n - Add them to a shortlist to check out later \n - Apply directly to the group (to a max of 3)",
+                body: "for each group you can: \n 1. Remove them from your feed \n 2. Skip to the next group \n 3. Add them to a shortlist to check out later \n 4. Apply directly to the group (to a max of 3)",
                 image: buildImage("assets/Pictures/ph.png"),
                 decoration: PageDecoration(
                   pageColor: Theme.of(context).canvasColor,
