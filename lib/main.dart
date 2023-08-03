@@ -22,42 +22,34 @@ Future<void> main() async {
   runApp(const App());
 }
 
-StreamController<bool> isLightTheme = StreamController<bool>();
-
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
 
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<bool>(
-      initialData: true,
-      stream: isLightTheme.stream,
-      builder: (context, snapshot) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          // theme: Provider.of<ThemeModel>(context).currentTheme,
-          theme: snapshot.data ? ThemeData.light() : ThemeData.dark(),
-          darkTheme: LAppTheme.darkTheme,
-    
-          initialRoute: '/Scroller',
-    
-          routes: {
-            '/Scroller': (context) => const Scroller(),
-            '/ScrollRefresh': (context) => const RanOut(),
-            '/Messages': (context) => const Messages(),
-            '/Groups': (context) => const Groups(),
-            '/Profile': (context) => const Profile(),
-            '/Settings': (context) => const Settings(),
-            '/profileInformation': (context) => const profileInformation(),
-            '/Friends': (context) => const Friends(),
-            '/Houses': (context) => const Houses(),
-            '/GroupOptions': (context) => const GroupOptions(),
-          },
-        );
-      }
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: LAppTheme.lightTheme,
+      darkTheme: LAppTheme.darkTheme,
+
+      initialRoute: '/Scroller',
+
+      routes: {
+        '/Scroller': (context) => const Scroller(),
+        '/ScrollRefresh': (context) => const RanOut(),
+        '/Messages': (context) => const Messages(),
+        '/Groups': (context) => const Groups(),
+        '/Profile': (context) => const Profile(),
+        '/Settings': (context) => const Settings(),
+        '/profileInformation': (context) => const profileInformation(),
+        '/Friends': (context) => const Friends(),
+        '/Houses': (context) => const Houses(),
+        '/GroupOptions': (context) => const GroupOptions(),
+      },
     );
-  }
+    }
 }
+
 
 
