@@ -1,3 +1,8 @@
+// ignore_for_file: camel_case_types
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,7 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../main.dart';
 
-class Profile extends StatelessWidget {
+class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
 
   void _copyToClipboard(BuildContext context) {
@@ -19,6 +24,22 @@ class Profile extends StatelessWidget {
         duration: const Duration(seconds: 1),
       ),
     );
+  }
+
+  @override
+  State<Profile> createState() => _ProfilePage();
+}
+
+class _ProfilePage extends State<Profile> {
+  XFile? _image;
+  final _picker = ImagePicker();
+
+  Future<void> _openImagePicker() async {
+    final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = pickedImage;
+      // azure upload will go here
+    });
   }
 
   @override
@@ -179,6 +200,7 @@ class Profile extends StatelessWidget {
       );
     });
   }
+  
 }
 
 class ButtonWidget extends StatelessWidget {
@@ -256,8 +278,8 @@ class ButtonWidgetSettings extends StatelessWidget {
       ]));
 }
 
-class ButtonWidgetBackground extends StatelessWidget {
-  final VoidCallback onClicked;
+// class changeBackground extends StatefulWidget {
+//   const changeBackground({Key? key}) : super(key: key);
 
   const ButtonWidgetBackground({Key? key, required this.onClicked})
       : super(key: key);
