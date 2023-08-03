@@ -105,33 +105,40 @@ Future<void> main() async {
 // }
 
 class App extends StatelessWidget {
+  static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+  
   const App({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // return Placeholder();
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: LAppTheme.lightTheme,
-      darkTheme: LAppTheme.darkTheme,
-      themeMode: ThemeMode.light,
-      // initialRoute: '/Auth',
-      initialRoute:
-          FirebaseAuth.instance.currentUser == null ? '/Auth' : '/Scroller',
-      routes: {
-        '/Auth': (context) => const AuthScreen(),
-        '/Scroller': (context) => const Scroller(),
-        '/ScrollRefresh': (context) => const RanOut(),
-        '/Messages': (context) => const Messages(),
-        '/Profile': (context) => const Profile(),
-        '/Settings': (context) => const Settings(),
-        '/profileInformation': (context) => const profileInformation(),
-        '/Friends': (context) => const Friends(),
-        '/Houses': (context) => const Houses(),
-        '/GroupOptions': (context) => const GroupOptions(),
-        '/OnBoarding' : (context) => const OnBoardingPage(),
-      },
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier,
+
+      builder: (context, currentMode, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: LAppTheme.lightTheme,
+          darkTheme: LAppTheme.darkTheme,
+          themeMode: currentMode,
+          // initialRoute: '/Auth',
+          initialRoute:
+              FirebaseAuth.instance.currentUser == null ? '/Auth' : '/Scroller',
+          routes: {
+            '/Auth': (context) => const AuthScreen(),
+            '/Scroller': (context) => const Scroller(),
+            '/ScrollRefresh': (context) => const RanOut(),
+            '/Messages': (context) => const Messages(),
+            '/Profile': (context) => const Profile(),
+            '/Settings': (context) => const Settings(),
+            '/profileInformation': (context) => const profileInformation(),
+            '/Friends': (context) => const Friends(),
+            '/Houses': (context) => const Houses(),
+            '/GroupOptions': (context) => const GroupOptions(),
+            '/OnBoarding' : (context) => const OnBoardingPage(),
+          },
+        );
+      }
     );
   }
 }

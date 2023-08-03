@@ -258,6 +258,10 @@ class _GroupOptionsState extends State<GroupOptions> {
                           decoration: BoxDecoration(
                             color: Colors.white60,
                             borderRadius: BorderRadius.circular(100),
+                            border: Border.all(
+                              color: Colors.grey.withOpacity(0.5),
+                              width: 1, // Adjust the border width as needed
+                            ),
                           ),
                           child: const Icon(LineAwesomeIcons.pen_nib,
                               color: Colors.grey),
