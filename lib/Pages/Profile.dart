@@ -42,7 +42,7 @@ class _ProfilePage extends State<Profile> {
                       children: <Widget>[
                         const Padding(
                           padding: EdgeInsets.all(40.0),
-                          child: changeBackground()
+                          // child: changeBackground()
                         ),
                         Stack(
                           children: [
@@ -269,29 +269,30 @@ class ButtonWidgetSettings extends StatelessWidget {
   );
 }
 
-class changeBackground extends StatefulWidget {
-  const changeBackground({Key? key}) : super(key: key);
+// class changeBackground extends StatefulWidget {
+//   const changeBackground({Key? key}) : super(key: key);
 
-  @override
-  State<changeBackground> createState() => _changeBackgroundButton();
-}
+//   @override
+//   State<changeBackground> createState() => _changeBackgroundButton();
+// }
 
-class _changeBackgroundButton extends State<changeBackground> {
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: Provider.of<ThemeModel>(context, listen: true).toggleTheme(),
-      child: const Row(
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsets.all(0.0),
-          child: Icon(LineAwesomeIcons.sun, color: Colors.white, size: 24,),
-        ),
-      ],
-    ),
-    );
-  }
-}
+// class _changeBackgroundButton extends State<changeBackground> {
+//   @override
+//   Widget build(BuildContext context) {
+    
+//     return ElevatedButton(
+//       onPressed: ,
+//       child: const Row(
+//       children: <Widget>[
+//         Padding(
+//           padding: EdgeInsets.all(0.0),
+//           child: Icon(LineAwesomeIcons.sun, color: Colors.white, size: 24,),
+//         ),
+//       ],
+//     ),
+//     );
+//   }
+// }
 
 class ButtonWidgetShareProfile extends StatelessWidget {
   final VoidCallback onClicked;
