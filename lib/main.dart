@@ -17,13 +17,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'Auth code/auth.dart';
+import 'package:azblob/azblob.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // await Settings.init(cacheProvider: CustomCacheProvider());
-  // Run the app
+
+  var ABlob = AzureStorage.parse(connectionString)
+
   runApp(const App());
 }
 
