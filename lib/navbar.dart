@@ -34,13 +34,13 @@ class CustomNavbar extends StatelessWidget {
             icon: const Icon(Icons.person),
             color: Colors.white,
           ),
-          IconButton(
-            onPressed: () {
-              onItemSelected('/Houses');
-            },
-            icon: const Icon(Icons.home),
-            color: Colors.white,
-          ),
+          // IconButton(
+          //   onPressed: () {
+          //     onItemSelected('/Houses');
+          //   },
+          //   icon: const Icon(Icons.home),
+          //   color: Colors.white,
+          // ),
         ],
       ),
     );

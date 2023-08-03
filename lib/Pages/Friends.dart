@@ -345,6 +345,9 @@ class _FriendsState extends State<Friends> {
                           Text("Your Groups", style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.left,),
                           Expanded(child: Container()),
                           ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
+                            ),
                             onPressed: () {
                               if (joined.length + applications.length == appsMax){
                                 showDialog(
@@ -384,7 +387,7 @@ class _FriendsState extends State<Friends> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text('Create Group', style: Theme.of(context).textTheme.bodyMedium),
-                                  const Icon(LineAwesomeIcons.plus, size: 20,),
+                                  Icon(LineAwesomeIcons.plus, size: 20, color: Theme.of(context).textTheme.bodyMedium?.color,),
                                 ],
                               ),
                             ),

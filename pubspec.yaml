@@ -48,7 +48,7 @@ dependencies:
   shared_preferences: ^2.2.0
   firebase_auth: ^4.7.2
   introduction_screen: ^3.1.11
-  easy_dynamic_theme: ^2.3.1
+  in_app_purchase: ^3.1.7
 
 flutter_native_splash:
   android: true
