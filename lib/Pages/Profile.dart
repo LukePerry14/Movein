@@ -2,8 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:movein/navbar.dart';
@@ -15,6 +14,22 @@ import '../main.dart';
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
 
+  // void _copyToClipboard(BuildContext context) {
+  //   Clipboard.setData(const ClipboardData(text: 'iKxLSxcDqlT6vtHe71Bp'));
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text('Copied to clipboard', style: Theme.of(context).textTheme.bodySmall,),
+  //       backgroundColor: Theme.of(context).primaryColor,
+  //       duration: const Duration(seconds: 1),
+  //     ),
+  //   );
+  // }
+
+  @override
+  State<Profile> createState() => _ProfilePage();
+}
+
+class _ProfilePage extends State<Profile> {
   void _copyToClipboard(BuildContext context) {
     Clipboard.setData(const ClipboardData(text: 'iKxLSxcDqlT6vtHe71Bp'));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -26,11 +41,6 @@ class Profile extends StatefulWidget {
     );
   }
 
-  @override
-  State<Profile> createState() => _ProfilePage();
-}
-
-class _ProfilePage extends State<Profile> {
   XFile? _image;
   final _picker = ImagePicker();
 
@@ -278,41 +288,41 @@ class ButtonWidgetSettings extends StatelessWidget {
       ]));
 }
 
-// class changeBackground extends StatefulWidget {
-//   const changeBackground({Key? key}) : super(key: key);
+class ButtonWidgetBackground extends StatelessWidget {
+  final VoidCallback onClicked;
 
   const ButtonWidgetBackground({Key? key, required this.onClicked})
       : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    bool isDark = App.themeNotifier.value == ThemeMode.dark;
-    return ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          shape: const CircleBorder(),
-          foregroundColor: Colors.white,
-          backgroundColor: Theme
+@override
+Widget build(BuildContext context) {
+  bool isDark = App.themeNotifier.value == ThemeMode.dark;
+  return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        shape: const CircleBorder(),
+        foregroundColor: Colors.white,
+        backgroundColor: Theme
+            .of(context)
+            .canvasColor,
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+        side: BorderSide(color: Theme
+            .of(context)
+            .primaryColor, width: 1),
+      ),
+      onPressed: () {
+        App.themeNotifier.value = isDark? ThemeMode.light : ThemeMode.dark;
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(5.0),
+        child: Icon(
+          isDark ? LineAwesomeIcons.sun : LineAwesomeIcons.moon,
+          color: Theme
               .of(context)
-              .canvasColor,
-          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-          side: BorderSide(color: Theme
-              .of(context)
-              .primaryColor, width: 1),
+              .primaryColor,
+          size: 24,
         ),
-        onPressed: () {
-          App.themeNotifier.value = isDark? ThemeMode.light : ThemeMode.dark;
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: Icon(
-            isDark ? LineAwesomeIcons.sun : LineAwesomeIcons.moon,
-            color: Theme
-                .of(context)
-                .primaryColor,
-            size: 24,
-          ),
-        ));
-  }
+      ));
+}
 }
 
 class ButtonWidgetShareProfile extends StatelessWidget {
@@ -373,3 +383,4 @@ Widget upgradeAccountButton() =>
 
 Widget backgroundButton() => ButtonWidgetBackground(onClicked: () {});
 Widget shareProfileButton() => ButtonWidgetShareProfile(onClicked: () {});
+
