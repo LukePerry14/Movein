@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
 
 class Settings extends StatefulWidget {
@@ -287,39 +289,49 @@ GestureDetector buildChangeEmail(BuildContext context, String title) {
 GestureDetector buildChangeLanguage(BuildContext context, String title) {
   return GestureDetector(
     onTap: () {
-      showDialog(context: context, builder: (BuildContext context) {
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Theme.of(context).primaryColor,
-            centerTitle: true,
-            elevation: 0,
-            leading: IconButton(
-                icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.white),
-                color: Colors.grey[500],
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-          ),
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: [
-                  const Text('Language', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-                  const SizedBox(height: 20),
-                  const RadioLanguage(),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {print('The language has changed');},
-                    child: const Text('Change Language'),
-                  )
-                ],
-              ),
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            contentPadding: const EdgeInsets.all(0),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height:5),
+                Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: Icon(LineAwesomeIcons.angle_left, color: Theme.of(context).primaryColor),
+                        color: Colors.grey[500],
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                        child: Text('Language', style: Theme.of(context).textTheme.headlineSmall)
+                    ),
+                  ],
+                ),
+                const Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      RadioLanguage(),
+                      SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          )
-        );
-      });
+          );
+        },
+      );
+
     },
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
@@ -416,10 +428,44 @@ class RadioLanguage extends StatefulWidget {
   State<RadioLanguage> createState() => _RadioLanguageState();
 }
 
-enum SingingCharacter { English, French, Italian }
+enum SingingCharacter { english, french, hindi, mandarin, spanish, }
 
 class _RadioLanguageState extends State<RadioLanguage> {
-  SingingCharacter? _character = SingingCharacter.English;
+  String? current;
+  SingingCharacter? _character;
+  @override
+  void initState() {
+    super.initState();
+    current = UserPreferences.getLocale();
+    _character = _getSingingCharacterFromLocale(current);
+  }
+
+  void _updateLocaleAndRebuild(String languageCode) async {
+    await UserPreferences.setLocale(languageCode);
+    Get.updateLocale(Locale(languageCode));
+    setState(() {
+      current = languageCode;
+      _character = _getSingingCharacterFromLocale(current);
+    });
+  }
+
+  SingingCharacter? _getSingingCharacterFromLocale(String? languageCode) {
+    if (languageCode == null) return null;
+    switch (languageCode) {
+      case 'en':
+        return SingingCharacter.english;
+      case 'fr':
+        return SingingCharacter.french;
+      case 'es':
+        return SingingCharacter.spanish;
+      case 'zh':
+        return SingingCharacter.mandarin;
+      case 'hi':
+        return SingingCharacter.hindi;
+      default:
+        return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -427,21 +473,68 @@ class _RadioLanguageState extends State<RadioLanguage> {
       children: <Widget>[
         ListTile(
           title: const Text('English'),
-          leading: Radio<SingingCharacter>(groupValue: _character, value: SingingCharacter.English, onChanged: (SingingCharacter? value) {setState(() {
-            _character = value;
-          });},),
+          leading: Radio<SingingCharacter>(
+            groupValue: _character,
+            value: SingingCharacter.english,
+            onChanged: (SingingCharacter? value) {
+              setState(() {
+                _character = value;
+                _updateLocaleAndRebuild("en");
+              });
+            },
+          ),
         ),
         ListTile(
-          title: const Text('French'),
-          leading: Radio<SingingCharacter>(groupValue: _character, value: SingingCharacter.French, onChanged: (SingingCharacter? value) {setState(() {
-            _character = value;
-          });},),
+          title: const Text('Français'),
+          leading: Radio<SingingCharacter>(
+            groupValue: _character,
+            value: SingingCharacter.french,
+            onChanged: (SingingCharacter? value) {
+              setState(() {
+                _character = value;
+                _updateLocaleAndRebuild("fr");
+              });
+            },
+          ),
         ),
         ListTile(
-          title: const Text('Italian'),
-          leading: Radio<SingingCharacter>(groupValue: _character, value: SingingCharacter.Italian, onChanged: (SingingCharacter? value) {setState(() {
-            _character = value;
-          });},),
+          title: const Text('Español'),
+          leading: Radio<SingingCharacter>(
+            groupValue: _character,
+            value: SingingCharacter.spanish,
+            onChanged: (SingingCharacter? value) {
+              setState(() {
+                _character = value;
+                _updateLocaleAndRebuild("es");
+              });
+            },
+          ),
+        ),
+        ListTile(
+          title: const Text('普通话'),
+          leading: Radio<SingingCharacter>(
+            groupValue: _character,
+            value: SingingCharacter.mandarin,
+            onChanged: (SingingCharacter? value) {
+              setState(() {
+                _character = value;
+                _updateLocaleAndRebuild("zh");
+              });
+            },
+          ),
+        ),
+        ListTile(
+          title: const Text('हिंदी'),
+          leading: Radio<SingingCharacter>(
+            groupValue: _character,
+            value: SingingCharacter.hindi,
+            onChanged: (SingingCharacter? value) {
+              setState(() {
+                _character = value;
+                _updateLocaleAndRebuild("hi");
+              });
+            },
+          ),
         )
       ],
     );

@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -309,7 +310,8 @@ Widget build(BuildContext context) {
             .of(context)
             .primaryColor, width: 1),
       ),
-      onPressed: () {
+      onPressed: () async {
+        await UserPreferences.setBrightness(!isDark);
         App.themeNotifier.value = isDark? ThemeMode.light : ThemeMode.dark;
       },
       child: Padding(

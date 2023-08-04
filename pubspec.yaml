@@ -49,6 +49,7 @@ dependencies:
   firebase_auth: ^4.7.2
   introduction_screen: ^3.1.11
   in_app_purchase: ^3.1.7
+  get: ^4.6.5
 
 flutter_native_splash:
   android: true

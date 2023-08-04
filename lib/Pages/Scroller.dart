@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:movein/navbar.dart';
@@ -208,8 +209,7 @@ class _ScrollerState extends State<Scroller> {
                       child: (groupData.isEmpty)
                           ? const NoGroups()
                           : loadAd
-                              ? const Text(
-                                  'Add in CustomAd Widget here') //CustomAd(ad: _ad) // Replace CustomAd with the appropriate widget you want to show as the ad
+                              ? const Text('Add in CustomAd Widget here') //CustomAd(ad: _ad) // Replace CustomAd with the appropriate widget you want to show as the ad
                               : Gscroller(
                                   groupName: groupData[index]['GroupName'],
                                   groupPicture: groupData[index]
@@ -235,8 +235,10 @@ class _ScrollerState extends State<Scroller> {
                                   adTime = false;
                                 });
                               },
-                              child: const Icon(LineAwesomeIcons.angle_right,
-                                  color: Colors.white),
+                              child: const Icon(
+                                  LineAwesomeIcons.angle_right,
+                                  color: Colors.white
+                              ),
                             )
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -254,8 +256,7 @@ class _ScrollerState extends State<Scroller> {
                                           index++;
                                         });
                                       } else {
-                                        navigator.pushReplacementNamed(
-                                            '/ScrollRefresh');
+                                        navigator.pushReplacementNamed('/ScrollRefresh');
                                       }
                                     }).catchError((e) {
                                       throw FirebaseException(
@@ -269,7 +270,7 @@ class _ScrollerState extends State<Scroller> {
                                     children: [
                                       const SizedBox(height: 9),
                                       const Icon(LineAwesomeIcons.times, color: Colors.white),
-                                      Text("Block", style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                      Text("block".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
                                     ]
                                   ),
                                 ),
@@ -284,15 +285,14 @@ class _ScrollerState extends State<Scroller> {
                                         index++;
                                       });
                                     } else {
-                                      navigator.pushReplacementNamed(
-                                          '/ScrollRefresh');
+                                      navigator.pushReplacementNamed('/ScrollRefresh');
                                     }
                                   },
                                   child: Column(
                                       children: [
                                         const SizedBox(height: 9),
                                         const Icon(LineAwesomeIcons.angle_right, color: Colors.white),
-                                        Text("Next", style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                        Text("next".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
                                       ]
                                   ),
                                 ),
@@ -324,7 +324,7 @@ class _ScrollerState extends State<Scroller> {
                                       children: [
                                         const SizedBox(height: 9),
                                         const Icon(LineAwesomeIcons.archive, color: Colors.white),
-                                        Text("Shortlist", style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                        Text("sList".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
                                       ]
                                   ),
                                 ),
@@ -356,7 +356,7 @@ class _ScrollerState extends State<Scroller> {
                                       children: [
                                         const SizedBox(height: 9),
                                         const Icon(LineAwesomeIcons.check, color: Colors.white),
-                                        Text("Apply", style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                        Text("apply".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
                                       ]
                                   ),
                                 ),
