@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:movein/HScroll.dart';
+import 'package:movein/Scroller%20Code/HScroll.dart';
 import 'dart:io';
-import 'package:http/http.dart' as http;
+//import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-
 const String userId = "iKxLSxcDqlT6vtHe71Bp";
 
 Future<List<Map<String, dynamic>>> getUserJoinedGroups() async {
@@ -50,7 +49,6 @@ Future<List<Map<String, dynamic>>> getUserJoinedGroups() async {
     );
   }
 }
-
 
 class GroupInvite extends StatelessWidget {
   final String inviteeId;
@@ -140,7 +138,6 @@ class GroupInvite extends StatelessWidget {
     );
   }
 }
-
 
 class ConfirmDel extends StatelessWidget {
   final String friendId;
@@ -249,12 +246,15 @@ Future<void> inviteFriendToGroup(String friendId, String groupId) async {
   }
 }
 
-
 class GroupExpand extends StatelessWidget {
   final String id;
   final String groupName;
   final String groupPicture;
   final dynamic members;
+  final double avgCleanliness;
+  final double avgNoisiness;
+  final double avgNightLife;
+  final Timestamp avgBedTime;
 
   const GroupExpand({
     Key? key,
@@ -262,6 +262,10 @@ class GroupExpand extends StatelessWidget {
     required this.groupName,
     required this.groupPicture,
     required this.members,
+    required this.avgCleanliness,
+    required this.avgNoisiness,
+    required this.avgNightLife,
+    required this.avgBedTime,
 
   }) : super(key: key);
 
@@ -281,7 +285,7 @@ class GroupExpand extends StatelessWidget {
             SizedBox(
               width: double.maxFinite,
               height: MediaQuery.of(context).size.height,
-              child: Gscroller(groupName: groupName, groupPicture: groupPicture, members: members)
+              child: Gscroller(groupName: groupName, groupPicture: groupPicture, members: members, avgCleanliness: avgCleanliness, avgNoisiness: avgNoisiness, avgNightLife: avgNightLife, avgBedTime: avgBedTime,)
             ),
             Positioned(
               top: 0,
@@ -302,24 +306,75 @@ class GroupExpand extends StatelessWidget {
   }
 }
 
-Future<void> joinGroup(String groupId) async {
-  final CollectionReference usersCollection = FirebaseFirestore.instance.collection('Users');
-  final DocumentReference userDoc = usersCollection.doc(userId);
+Future<void> joinGroup(String groupId, String userId) async {
+  try {
+    final CollectionReference usersCollection = FirebaseFirestore.instance.collection('Users');
+    final DocumentReference userDoc = usersCollection.doc(userId);
 
-  // Update user's "Applications" and remove from "GroupInvites"
-  await userDoc.update({
-    'Applications': FieldValue.arrayUnion([groupId]),
-    'GroupInvites': FieldValue.arrayRemove([groupId]),
-  });
+    // Update user's "Applications" and remove from "GroupInvites"
+    await userDoc.update({
+      'Applications': FieldValue.arrayUnion([groupId]),
+      'GroupInvites': FieldValue.arrayRemove([groupId]),
+      'Joined' : FieldValue.arrayUnion([groupId]),
+    });
 
-  final CollectionReference groupsCollection = FirebaseFirestore.instance.collection('Groups');
-  final DocumentReference groupDoc = groupsCollection.doc(groupId);
+    final CollectionReference groupsCollection = FirebaseFirestore.instance.collection('Groups');
+    final DocumentReference groupDoc = groupsCollection.doc(groupId);
 
-  // Update group's "Applicants"
-  await groupDoc.update({
-    'Applicants': FieldValue.arrayUnion([userId]),
-  });
+    // Get the group document to access the average fields
+    final DocumentSnapshot groupSnapshot = await groupDoc.get();
+
+    // Get the group size from the 'Members' array field
+    final List<dynamic> members = groupSnapshot.get('Members');
+    int groupSize = members.length;
+
+    // Calculate the new average values
+    double avgCleanliness = groupSnapshot.get('AvgCleanliness');
+    double avgNightLife = groupSnapshot.get('AvgNightLife');
+    double avgNoisiness = groupSnapshot.get('AvgNoisiness');
+    DateTime avgBedTime = groupSnapshot.get('AvgBedTime').toDate();
+
+    // Get the user document of the current user
+    final DocumentSnapshot userSnapshot = await userDoc.get();
+
+    // Get the 'Preferences' map field from the user document
+    final Map<String, dynamic> prefs = userSnapshot.get('Preferences');
+
+    // Get the corresponding fields from the user document
+    double userCleanliness = prefs['Cleanliness'];
+    double userNightLife = prefs['NightLife'];
+    double userNoisiness = prefs['Noisiness'];
+    DateTime userBedTime = prefs['BedTime'].toDate();
+
+    // Calculate the new average values after adding the user to the group
+    avgCleanliness = (avgCleanliness * groupSize + userCleanliness) / (groupSize + 1);
+    avgNightLife = (avgNightLife * groupSize + userNightLife) / (groupSize + 1);
+    avgNoisiness = (avgNoisiness * groupSize + userNoisiness) / (groupSize + 1);
+
+    // Calculate the new average bed time after adding the user to the group
+    int totalBedTimeInMilliseconds = avgBedTime.millisecondsSinceEpoch * groupSize;
+    totalBedTimeInMilliseconds += userBedTime.millisecondsSinceEpoch;
+    avgBedTime = DateTime.fromMillisecondsSinceEpoch(totalBedTimeInMilliseconds ~/ (groupSize + 1));
+
+    // Convert the average bedtime back to a Timestamp format
+    final Timestamp avgBedTimeTimestamp = Timestamp.fromDate(avgBedTime);
+
+    // Update the group document with the new average values and add the user to the 'Members' array
+    await groupDoc.update({
+      'AvgCleanliness': avgCleanliness,
+      'AvgNightLife': avgNightLife,
+      'AvgNoisiness': avgNoisiness,
+      'AvgBedTime': avgBedTimeTimestamp,
+      'Members': FieldValue.arrayUnion([userId]),
+    });
+  } catch (e) {
+    throw FirebaseException(
+      message: 'Error joining group: $e',
+      plugin: 'cloud_firestore',
+    );
+  }
 }
+
 
 Future<void> removeGroupInvite(String groupId) async {
   final CollectionReference usersCollection = FirebaseFirestore.instance.collection('Users');
@@ -425,189 +480,6 @@ Future<void> sendFriendInvite(String invitee) async {
   }
 }
 
-
-Future<void> kickUser(String kickId, String groupId) async {
-  try {
-    final CollectionReference groupsCollection =
-    FirebaseFirestore.instance.collection('Groups');
-
-    // Access the group's document
-    final DocumentReference groupDocRef = groupsCollection.doc(groupId);
-
-    // Update Kicks field in the group's document
-    await groupDocRef.update({
-      'Kicks': FieldValue.arrayUnion([kickId]),
-    });
-    final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
-    final Map<String, dynamic>? kickVals = groupSnapshot.data()?['KickVals'];
-
-    if (kickVals != null) {
-      // Update the KickVals field with the new key-value pair
-      kickVals[kickId] = {userId: 1};
-      await groupDocRef.update({'KickVals': kickVals});
-    }
-
-  } catch (e) {
-    throw FirebaseException(
-      message: 'Error kicking user: $e',
-      plugin: 'cloud_firestore',
-    );
-  }
-}
-
-Future<void> isKickVotesThresholdReached(String groupId, String kickId, int groupSize) async {
-  try {
-    final DocumentReference groupRef =
-    FirebaseFirestore.instance.collection('Groups').doc(groupId);
-
-    final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
-
-
-    final Map<String, dynamic>? kickVals = groupSnapshot.data()?['KickVals'];
-
-    if (kickVals != null && kickVals.containsKey(kickId)) {
-      final Map<String, dynamic>? kickVotes =
-      kickVals[kickId] as Map<String, dynamic>?;
-
-      if (kickVotes != null) {
-        int posSum = 0;
-        int negSum = 0;
-        kickVotes.forEach((key, value) {
-          if (value is int) {
-            if (value > 0) {
-              posSum += value;
-            } else {
-              negSum += value;
-            }
-          }
-        });
-
-        if ((posSum > groupSize / 2) | (negSum.abs() >= groupSize / 2)) {
-          if (posSum > groupSize / 2) {
-            await groupRef.update({
-              'Members': FieldValue.arrayRemove([kickId])
-            });
-          }
-          // Remove kickId from 'Kicks' array field
-          await groupRef.update({
-            'Kicks': FieldValue.arrayRemove([kickId])
-          });
-
-          // Remove key-value pair with key kickId from 'KickVals' map field
-          kickVals.remove(kickId);
-          await groupRef.update({'KickVals': kickVals});
-          // Remove kickId from 'Kicks' array field
-        }
-      }
-    }
-  } catch (e) {
-    // Error occurred
-    throw FirebaseException(
-      message: 'Error checking kick votes threshold: $e',
-      plugin: 'cloud_firestore',
-    );
-  }
-}
-
-Future<void> updateKickVote(String groupId, bool agree, String kickId, int groupSize) async {
-  try {
-    final DocumentReference groupRef = FirebaseFirestore.instance.collection('Groups').doc(groupId);
-    final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
-    final kickVals = groupSnapshot.data()?['KickVals'];
-
-
-    if (kickVals != null && kickVals.containsKey(kickId)) {
-      final Map<String, dynamic>? kickVotes = kickVals[kickId] as Map<String, dynamic>?;
-
-      if (kickVotes != null) {
-          int vote = agree ? 1 : -1;
-          kickVotes[userId] = vote;
-
-        await groupRef.update({'KickVals.$kickId': kickVotes});
-      }
-    }
-    await isKickVotesThresholdReached(groupId,kickId,groupSize);
-  } catch (e) {
-    throw FirebaseException(
-      message: 'Error updating kick vote: $e',
-      plugin: 'cloud_firestore',
-    );
-  }
-}
-
-Future<void> isAppVotesThresholdReached(String groupId, String appId, int groupSize) async {
-  try {
-    final DocumentReference groupRef = FirebaseFirestore.instance.collection('Groups').doc(groupId);
-
-    final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
-
-    final Map<String, dynamic>? appVals = groupSnapshot.data()?['AppVals'];
-
-    if (appVals != null && appVals.containsKey(appId)) {
-      final Map<String, dynamic>? appVotes = appVals[appId] as Map<String, dynamic>?;
-
-      if (appVotes != null) {
-        int posSum = 0;
-        int negSum = 0;
-        appVotes.forEach((key, value) {
-          if (value is int) {
-            if (value > 0) {
-              posSum += value;
-            } else {
-              negSum += value;
-            }
-          }
-        });
-
-        if ((posSum > groupSize / 2) | (negSum.abs() >= groupSize / 2)) {
-          if (posSum > groupSize / 2) {
-            await groupRef.update({
-              'Applicants': FieldValue.arrayRemove([appId]),
-              'Members': FieldValue.arrayUnion([appId]),
-              'BlackList': FieldValue.arrayUnion([appId])
-            });
-          }
-
-          appVals.remove(appId);
-          await groupRef.update({'AppVals': appVals});
-        }
-      }
-    }
-  } catch (e) {
-    // Error occurred
-    throw FirebaseException(
-      message: 'Error checking application votes threshold: $e',
-      plugin: 'cloud_firestore',
-    );
-  }
-}
-
-Future<void> updateApplicationVote(String groupId, bool agree, String appId, int groupSize) async {
-  try {
-    final DocumentReference groupRef = FirebaseFirestore.instance.collection('Groups').doc(groupId);
-    final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
-    final appVals = groupSnapshot.data()?['AppVals'];
-
-
-    if (appVals != null && appVals.containsKey(appId)) {
-      final Map<String, dynamic>? appVotes = appVals[appId] as Map<String, dynamic>?;
-
-      if (appVotes != null) {
-        int vote = agree ? 1 : -1;
-        appVotes[userId] = vote;
-
-        await groupRef.update({'AppVals.$appId': appVotes});
-      }
-    }
-    await isAppVotesThresholdReached(groupId,appId,groupSize);
-  } catch (e) {
-    throw FirebaseException(
-      message: 'Error updating kick vote: $e',
-      plugin: 'cloud_firestore',
-    );
-  }
-}
-
 class ConfirmGroupDel extends StatelessWidget {
   final String groupId;
   final String groupType;
@@ -666,10 +538,6 @@ class ConfirmGroupDel extends StatelessWidget {
     );
   }
 }
-
-
-
-
 
 Future<void> removeGroupFromUser(String groupType, String groupId) async {
   try {
@@ -758,7 +626,6 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
         'Kicks': kicks,
         'Members': members,
       });
-      print("gelloe");
       await userDocument.update({
         'Joined': FieldValue.arrayUnion([newGroupDocument.id]),
       });

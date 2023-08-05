@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:movein/FriendFunctions.dart';
+import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
 
 class SwipeCard extends StatelessWidget {
   final String id;
@@ -398,7 +398,7 @@ class CustomDialog extends StatelessWidget {
                         ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                                 backgroundColor: Theme.of(context).primaryColor,
-                                content: const Text('Friend invite sent')
+                                content: Text('Friend invite sent', style: Theme.of(context).textTheme.bodySmall)
                             )
                         );
                       },

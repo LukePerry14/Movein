@@ -1,10 +1,57 @@
+// ignore_for_file: camel_case_types
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class Profile extends StatelessWidget {
+import '../main.dart';
+
+class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
+
+  // void _copyToClipboard(BuildContext context) {
+  //   Clipboard.setData(const ClipboardData(text: 'iKxLSxcDqlT6vtHe71Bp'));
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text('Copied to clipboard', style: Theme.of(context).textTheme.bodySmall,),
+  //       backgroundColor: Theme.of(context).primaryColor,
+  //       duration: const Duration(seconds: 1),
+  //     ),
+  //   );
+  // }
+
+  @override
+  State<Profile> createState() => _ProfilePage();
+}
+
+class _ProfilePage extends State<Profile> {
+  void _copyToClipboard(BuildContext context) {
+    Clipboard.setData(const ClipboardData(text: 'iKxLSxcDqlT6vtHe71Bp'));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Copied to clipboard', style: Theme.of(context).textTheme.bodySmall,),
+        backgroundColor: Theme.of(context).primaryColor,
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
+  XFile? _image;
+  final _picker = ImagePicker();
+
+  Future<void> _openImagePicker() async {
+    final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = pickedImage;
+      // azure upload will go here
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,33 +76,38 @@ class Profile extends StatelessWidget {
                           onTap: () {
                             print("testing");
                           },
-                          child: SizedBox(
-                            width: 175,
-                            height: 175,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(100),
-                              child: const Image(
-                                  image:
-                                      AssetImage("assets/Pictures/dora.png")),
+                          child: Container(
+                            width: 150, // Set a fixed width for the container
+                            height: 150, // Set a fixed height for the container
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                            ),
+                            child: const ClipOval(
+                              child: Image(
+                                image: AssetImage("assets/Pictures/dora.png"),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ),
                         Positioned(
-                          bottom: 5,
-                          right: 20,
+                          bottom: 0,
+                          right: 0,
                           child: Container(
                             height: 30.0,
                             width: 30.0,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFEFCE14),
+                              color: Colors.white60,
                               borderRadius: BorderRadius.circular(100),
+                              border: Border.all(
+                                color: Colors.grey.withOpacity(0.5),
+                                width: 1, // Adjust the border width as needed
+                              ),
                             ),
-                            child: const Icon(
-                              LineAwesomeIcons.pen_nib,
-                              color: Colors.white,
-                            ),
+                            child: const Icon(LineAwesomeIcons.pen_nib,
+                                color: Colors.grey),
                           ),
-                        )
+                        ),
                       ],
                     ),
                     Padding(
@@ -68,87 +120,85 @@ class Profile extends StatelessWidget {
                 const Text("Name",
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
-                const SizedBox(height: 15.0),
-                const Text('Email',
-                    style:
-                        TextStyle(fontStyle: FontStyle.italic, fontSize: 15)),
-                const SizedBox(height: 30.0),
-                upgradeAccountButton(),
-                const SizedBox(height: 40.0),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: Theme.of(context).primaryColor),
-                  child: ListTile(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/profileInformation');
-                    },
-                    leading: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: const Icon(
-                        LineAwesomeIcons.user,
-                        color: Colors.white,
+                const SizedBox(height: 8.0),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () => _copyToClipboard(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        child: const Text(
+                          'iKxLSxcDqlT6vtHe71Bp',
+                          style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                            fontSize: 15,
+                          ),
+                        ),
                       ),
                     ),
-                    title: const Text("Profile information",
-                        style: TextStyle(
-                          color: Colors.white,
-                        )),
+                    GestureDetector(
+                      onTap: () => _copyToClipboard(context),
+                      child: const Icon(Icons.copy),
+                    ),
+                  ]
+                ),
+                const SizedBox(height: 50.0),
+                upgradeAccountButton(),
+                const SizedBox(height: 35.0),
+                Divider(height: 1, color: Colors.grey.withOpacity(0.3),),
+                const SizedBox(height: 35.0),
+                ListTile(
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Theme.of(context).primaryColor, width: 1),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: Icon(LineAwesomeIcons.user, color: Theme.of(context).primaryColor),
                   ),
+                  title: Text("Edit Profile", style: Theme.of(context).textTheme.headlineSmall,),
+                  trailing: const Icon(LineAwesomeIcons.angle_right),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/profileInformation');
+                  },
                 ),
                 const SizedBox(height: 30.0),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: Theme.of(context).primaryColor),
-                  child: ListTile(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/Settings');
-                    },
-                    leading: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        color: Colors.grey[200]?.withOpacity(0.1),
-                      ),
-                      child:
-                          const Icon(LineAwesomeIcons.cog, color: Colors.white),
+                ListTile(
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Theme.of(context).primaryColor, width: 1),
+                      borderRadius: BorderRadius.circular(100),
                     ),
-                    title: const Text("Settings",
-                        style: TextStyle(color: Colors.white)),
+                    child: Icon(LineAwesomeIcons.cog, color: Theme.of(context).primaryColor),
                   ),
+                  title: Text("Settings", style: Theme.of(context).textTheme.headlineSmall,),
+                  trailing: const Icon(LineAwesomeIcons.angle_right),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/Settings');
+                  }
                 ),
                 const SizedBox(height: 30),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      color: Theme.of(context).primaryColor),
-                  child: ListTile(
-                    onTap: () => {
-                      FirebaseAuth.instance.signOut(),
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, '/Auth', (route) => false)
-                    },
-                    leading: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: const Icon(
-                        LineAwesomeIcons.alternate_sign_out,
-                        color: Colors.white,
-                      ),
+                ListTile(
+                  leading: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.red, width: 1),
+                      borderRadius: BorderRadius.circular(100),
                     ),
-                    title: const Text("Logout",
-                        style: TextStyle(color: Colors.white)),
+                    child: const Icon(LineAwesomeIcons.alternate_sign_out, color: Colors.red),
                   ),
-                )
+                  title: Text("Log Out", style: GoogleFonts.lexend(color: Colors.red, fontWeight: FontWeight.normal, fontSize: 20.0)),
+                  onTap: () => {
+                    FirebaseAuth.instance.signOut(),
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/Auth', (route) => false)
+                  },
+                ),
               ],
             ),
           ),
@@ -161,6 +211,7 @@ class Profile extends StatelessWidget {
       );
     });
   }
+  
 }
 
 class ButtonWidget extends StatelessWidget {
@@ -178,9 +229,11 @@ class ButtonWidget extends StatelessWidget {
       style: ElevatedButton.styleFrom(
           shape: const StadiumBorder(),
           padding: const EdgeInsets.symmetric(horizontal: 62, vertical: 22),
-          foregroundColor: Colors.white),
+          foregroundColor: Colors.white,
+          backgroundColor: Theme.of(context).primaryColor,
+      ),
       onPressed: onClicked,
-      child: Text(text));
+      child: Text(text, style: Theme.of(context).textTheme.bodySmall,));
 }
 
 class ButtonWidgetProfileInformation extends StatelessWidget {
@@ -242,26 +295,36 @@ class ButtonWidgetBackground extends StatelessWidget {
   const ButtonWidgetBackground({Key? key, required this.onClicked})
       : super(key: key);
 
-  @override
-  Widget build(BuildContext context) => ElevatedButton(
+@override
+Widget build(BuildContext context) {
+  bool isDark = App.themeNotifier.value == ThemeMode.dark;
+  return ElevatedButton(
       style: ElevatedButton.styleFrom(
         shape: const CircleBorder(),
         foregroundColor: Colors.white,
+        backgroundColor: Theme
+            .of(context)
+            .canvasColor,
         padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+        side: BorderSide(color: Theme
+            .of(context)
+            .primaryColor, width: 1),
       ),
-      onPressed: onClicked,
-      child: const Row(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(5.0),
-            child: Icon(
-              LineAwesomeIcons.sun,
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
-        ],
+      onPressed: () async {
+        await UserPreferences.setBrightness(!isDark);
+        App.themeNotifier.value = isDark? ThemeMode.light : ThemeMode.dark;
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(5.0),
+        child: Icon(
+          isDark ? LineAwesomeIcons.sun : LineAwesomeIcons.moon,
+          color: Theme
+              .of(context)
+              .primaryColor,
+          size: 24,
+        ),
       ));
+}
 }
 
 class ButtonWidgetShareProfile extends StatelessWidget {
@@ -275,20 +338,18 @@ class ButtonWidgetShareProfile extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         shape: const CircleBorder(),
         foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).canvasColor,
         padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+        side: BorderSide(color: Theme.of(context).primaryColor, width: 1),
       ),
       onPressed: onClicked,
-      child: const Row(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(5.0),
-            child: Icon(
-              LineAwesomeIcons.share_square,
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(5.0),
+        child: Icon(
+          LineAwesomeIcons.share_square,
+          color: Theme.of(context).primaryColor,
+          size: 24,
+        ),
       ));
 }
 
@@ -324,3 +385,4 @@ Widget upgradeAccountButton() =>
 
 Widget backgroundButton() => ButtonWidgetBackground(onClicked: () {});
 Widget shareProfileButton() => ButtonWidgetShareProfile(onClicked: () {});
+

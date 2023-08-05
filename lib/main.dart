@@ -1,5 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+// import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:movein/Pages/OnBoarding.dart';
 import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Themes/lMode.dart';
 import 'package:movein/Pages/Houses.dart';
@@ -11,6 +15,8 @@ import 'package:movein/Pages/GroupOptions.dart';
 import 'package:movein/Pages/Friends.dart';
 import 'package:movein/Pages/ScrollRefresh.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:movein/Translations.dart';
+import 'package:movein/UserPreferences.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import './auth.dart';
@@ -20,6 +26,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await UserPreferences.init();
   // await Settings.init(cacheProvider: CustomCacheProvider());
   // Run the app
   runApp(const App());

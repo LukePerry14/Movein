@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:movein/navbar.dart';
-import 'package:movein/HScroll.dart';
-import 'package:movein/ad_helper.dart';
+import 'package:movein/Scroller%20Code/HScroll.dart';
+import 'package:movein/Ad%20code/ad_helper.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
 class Scroller extends StatefulWidget {
@@ -17,8 +19,7 @@ class Scroller extends StatefulWidget {
 class _ScrollerState extends State<Scroller> {
   bool refresh = true;
   int index = 0;
-  final String userId =
-      "iKxLSxcDqlT6vtHe71Bp"; //change to stored userId when cache implemented
+  final String userId = "iKxLSxcDqlT6vtHe71Bp";
   late NativeAd _ad;
   bool _isAdLoaded = false;
   bool adTime = true;
@@ -45,6 +46,10 @@ class _ScrollerState extends State<Scroller> {
             'GroupPicture': data['GroupPicture'].toString(),
             'Members': List<String>.from(
                 data['Members'].map((member) => member.toString())),
+            'AvgCleanliness' : data['AvgCleanliness'],
+            'AvgNoisiness' : data['AvgNoisiness'],
+            'AvgNightLife' : data['AvgNightLife'],
+            'AvgBedTime' : data['AvgBedTime'],
           };
           groups.add(groupData);
         }
@@ -204,13 +209,16 @@ class _ScrollerState extends State<Scroller> {
                       child: (groupData.isEmpty)
                           ? const NoGroups()
                           : loadAd
-                              ? const Text(
-                                  'Add in CustomAd Widget here') //CustomAd(ad: _ad) // Replace CustomAd with the appropriate widget you want to show as the ad
+                              ? const Text('Add in CustomAd Widget here') //CustomAd(ad: _ad) // Replace CustomAd with the appropriate widget you want to show as the ad
                               : Gscroller(
                                   groupName: groupData[index]['GroupName'],
                                   groupPicture: groupData[index]
                                       ['GroupPicture'],
                                   members: groupData[index]['Members'],
+                                  avgBedTime: groupData[index]['AvgBedTime'],
+                                  avgNoisiness: groupData[index]['AvgNoisiness'],
+                                  avgCleanliness: groupData[index]['AvgCleanliness'],
+                                  avgNightLife: groupData[index]['AvgNightLife'],
                                   showFriend: true,
                                 ),
                     ),
@@ -227,8 +235,10 @@ class _ScrollerState extends State<Scroller> {
                                   adTime = false;
                                 });
                               },
-                              child: const Icon(LineAwesomeIcons.angle_right,
-                                  color: Colors.white),
+                              child: const Icon(
+                                  LineAwesomeIcons.angle_right,
+                                  color: Colors.white
+                              ),
                             )
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -246,8 +256,7 @@ class _ScrollerState extends State<Scroller> {
                                           index++;
                                         });
                                       } else {
-                                        navigator.pushReplacementNamed(
-                                            '/ScrollRefresh');
+                                        navigator.pushReplacementNamed('/ScrollRefresh');
                                       }
                                     }).catchError((e) {
                                       throw FirebaseException(
@@ -257,8 +266,13 @@ class _ScrollerState extends State<Scroller> {
                                       );
                                     });
                                   },
-                                  child: const Icon(LineAwesomeIcons.times,
-                                      color: Colors.white),
+                                  child: Column(
+                                    children: [
+                                      const SizedBox(height: 9),
+                                      const Icon(LineAwesomeIcons.times, color: Colors.white),
+                                      Text("block".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                    ]
+                                  ),
                                 ),
                                 FloatingActionButton(
                                   heroTag: "Next",
@@ -271,13 +285,16 @@ class _ScrollerState extends State<Scroller> {
                                         index++;
                                       });
                                     } else {
-                                      navigator.pushReplacementNamed(
-                                          '/ScrollRefresh');
+                                      navigator.pushReplacementNamed('/ScrollRefresh');
                                     }
                                   },
-                                  child: const Icon(
-                                      LineAwesomeIcons.angle_right,
-                                      color: Colors.white),
+                                  child: Column(
+                                      children: [
+                                        const SizedBox(height: 9),
+                                        const Icon(LineAwesomeIcons.angle_right, color: Colors.white),
+                                        Text("next".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                      ]
+                                  ),
                                 ),
                                 FloatingActionButton(
                                   heroTag: "Shortlist",
@@ -303,8 +320,13 @@ class _ScrollerState extends State<Scroller> {
                                       );
                                     });
                                   },
-                                  child: const Icon(LineAwesomeIcons.archive,
-                                      color: Colors.white),
+                                  child: Column(
+                                      children: [
+                                        const SizedBox(height: 9),
+                                        const Icon(LineAwesomeIcons.archive, color: Colors.white),
+                                        Text("sList".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                      ]
+                                  ),
                                 ),
                                 FloatingActionButton(
                                   heroTag: "Apply",
@@ -330,8 +352,13 @@ class _ScrollerState extends State<Scroller> {
                                       );
                                     });
                                   },
-                                  child: const Icon(LineAwesomeIcons.check,
-                                      color: Colors.white),
+                                  child: Column(
+                                      children: [
+                                        const SizedBox(height: 9),
+                                        const Icon(LineAwesomeIcons.check, color: Colors.white),
+                                        Text("apply".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                      ]
+                                  ),
                                 ),
                               ],
                             ),
