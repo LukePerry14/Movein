@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:movein/Scroller%20Code/swipe_card.dart';
 import 'package:movein/Scroller%20Code/profile-data.dart';
@@ -123,7 +124,7 @@ class _GscrollerState extends State<Gscroller> {
                     Container(
                       alignment: Alignment.center,
                       child: Text(
-                        "${profiles.length} Members",
+                        "${profiles.length}" + "mems".tr,
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ),

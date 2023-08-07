@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:get/get.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:movein/Pages/OnBoarding.dart';
 import 'package:movein/Pages/Scroller.dart';
@@ -17,9 +17,9 @@ import 'package:movein/Pages/ScrollRefresh.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:movein/Translations.dart';
 import 'package:movein/UserPreferences.dart';
+import 'Auth code/auth.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import './auth.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 Future<void> main() async {
@@ -33,34 +33,53 @@ Future<void> main() async {
 }
 
 class App extends StatelessWidget {
+  static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
   const App({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // return Placeholder();
+    _loadSavedTheme();
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: LAppTheme.lightTheme,
-      darkTheme: LAppTheme.darkTheme,
-      themeMode: ThemeMode.light,
-      // initialRoute: '/Auth',
-      initialRoute:
-          FirebaseAuth.instance.currentUser == null ? '/Login' : '/Scroller',
-      routes: {
-        '/Login': (context) => const LoginScreen(),
-        '/Signup': (context) => const SignupScreen(),
-        '/Scroller': (context) => const Scroller(),
-        '/ScrollRefresh': (context) => const RanOut(),
-        '/Messages': (context) => const Messages(),
-        '/Profile': (context) => const Profile(),
-        '/Settings': (context) => const Settings(),
-        '/profileInformation': (context) => const profileInformation(),
-        '/Friends': (context) => const Friends(),
-        '/Houses': (context) => const Houses(),
-        '/GroupOptions': (context) => const GroupOptions(),
-      },
+    return ValueListenableBuilder<ThemeMode>(
+        valueListenable: App.themeNotifier,
+        builder: (context, currentMode, child) {
+        return GetMaterialApp(
+          debugShowCheckedModeBanner: false,
+          translations: AppTranslations(),
+          locale: Get.deviceLocale,
+          theme: LAppTheme.lightTheme,
+          darkTheme: LAppTheme.darkTheme,
+          themeMode: currentMode,
+          initialRoute:
+              FirebaseAuth.instance.currentUser == null ? '/Login' : '/Scroller',
+          routes: {
+            '/Login': (context) => const LoginScreen(),
+            '/Signup': (context) => const SignupScreen(),
+            '/Scroller': (context) => const Scroller(),
+            '/ScrollRefresh': (context) => const RanOut(),
+            '/Messages': (context) => const Messages(),
+            '/Profile': (context) => const Profile(),
+            '/Settings': (context) => const Settings(),
+            '/profileInformation': (context) => const profileInformation(),
+            '/Friends': (context) => const Friends(),
+            '/Houses': (context) => const Houses(),
+            '/GroupOptions': (context) => const GroupOptions(),
+            '/OnBoarding' : (context) => const OnBoardingPage(),
+          },
+        );
+      }
     );
+  }
+  void _loadSavedTheme() {
+    String? locale = UserPreferences.getLocale();
+    if (locale != null) {
+      Get.updateLocale(Locale(locale));
+    }
+
+    bool? isDarkMode = UserPreferences.getBrightness();
+    if (isDarkMode != null) {
+      themeNotifier.value = isDarkMode ? ThemeMode.dark : ThemeMode.light;
+    }
   }
 }
 

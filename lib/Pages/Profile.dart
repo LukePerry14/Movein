@@ -297,34 +297,33 @@ class ButtonWidgetBackground extends StatelessWidget {
 
 @override
 Widget build(BuildContext context) {
-  bool isDark = App.themeNotifier.value == ThemeMode.dark;
+  bool isDark = (App.themeNotifier.value == ThemeMode.dark);
   return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        shape: const CircleBorder(),
-        foregroundColor: Colors.white,
-        backgroundColor: Theme
-            .of(context)
-            .canvasColor,
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-        side: BorderSide(color: Theme
-            .of(context)
-            .primaryColor, width: 1),
+    style: ElevatedButton.styleFrom(
+      shape: const CircleBorder(),
+      foregroundColor: Colors.white,
+      backgroundColor: Theme.of(context).canvasColor,
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+      side: BorderSide(color: Theme.of(context).primaryColor, width: 1),
+    ),
+    onPressed: () async {
+      await UserPreferences.setBrightness(!isDark);
+      App.themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
+
+      // Update the isDark variable after the theme mode has been updated.
+      isDark = !isDark;
+    },
+    child: Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: Icon(
+        isDark ? LineAwesomeIcons.sun : LineAwesomeIcons.moon,
+        color: Theme.of(context).primaryColor,
+        size: 24,
       ),
-      onPressed: () async {
-        await UserPreferences.setBrightness(!isDark);
-        App.themeNotifier.value = isDark? ThemeMode.light : ThemeMode.dark;
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(5.0),
-        child: Icon(
-          isDark ? LineAwesomeIcons.sun : LineAwesomeIcons.moon,
-          color: Theme
-              .of(context)
-              .primaryColor,
-          size: 24,
-        ),
-      ));
+    ),
+  );
 }
+
 }
 
 class ButtonWidgetShareProfile extends StatelessWidget {

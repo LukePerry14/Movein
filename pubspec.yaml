@@ -48,13 +48,15 @@ dependencies:
   shared_preferences: ^2.2.0
   firebase_auth: ^4.7.2
   flutter_form_builder: ^9.1.0
+  get: ^4.6.5
+  introduction_screen: ^3.1.11
 
 flutter_native_splash:
   android: true
   ios: true
   web: true
-  color: '#EFCE14'
-  image: 'assets/Pictures/bud-dha.png'
+  color: '#F8AC41'
+  image: 'assets/Pictures/logo.png'
 
 dev_dependencies:
   flutter_test:

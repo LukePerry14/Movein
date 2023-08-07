@@ -18,19 +18,17 @@ class LAppTheme{
 
   static ThemeData lightTheme = ThemeData(
       brightness: Brightness.light,
-      primarySwatch: const MaterialColor(0xFFEFCE14, <int, Color>{
-        50: Color(0xFFFDF9E3),
-        100: Color(0xFFFAF0B9),
-        200: Color(0xFFF7E78A),
-        300: Color(0xFFF4DD5B),
-        400: Color(0xFFF1D537),
-        500: Color(0xFFEFCE14),
-        600: Color(0xFFEDC912),
-        700: Color(0xFFEBC20E),
-        800: Color(0xFFE8BC0B),
-        900: Color(0xFFE4B006),
-      }
-      ),
+    primarySwatch: const MaterialColor(4294487362,{50: Color( 0xffF8AC41 )
+      , 100: Color( 0xfffdeace )
+      , 200: Color( 0xfffbd49d )
+      , 300: Color( 0xfffabf6b )
+      , 400: Color( 0xfff8aa3a )
+      , 500: Color( 0xfff69409 )
+      , 600: Color( 0xffc57707 )
+      , 700: Color( 0xff945905 )
+      , 800: Color( 0xff623b04 )
+      , 900: Color( 0xff311e02 )
+    }),
     textTheme: TextTheme(
       headlineLarge: bHeader,
       headlineMedium: header,
