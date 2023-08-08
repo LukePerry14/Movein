@@ -1,8 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/Pages/OnBoarding.dart';
 import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Themes/lMode.dart';
@@ -21,6 +25,7 @@ import 'Auth code/auth.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:email_validator/email_validator.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -98,86 +103,108 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: FormBuilder(
-          key: _formKey,
-          child: Column(
-            children: [
-              FormBuilderTextField(
-                name: 'email',
-                decoration: const InputDecoration(labelText: 'Email'),
-                // enabled: false,
-
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  }
-                  return null;
-                },
-
-                // validator: FormBuilderValidators.compose([
-                // FormBuilderValidators.required(),
-                // FormBuilderValidators.email(),
-                // ]),
+      body: CustomScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            leading: null,
+            expandedHeight: MediaQuery.of(context).size.height / 3,
+            collapsedHeight: MediaQuery.of(context).size.height / 3,
+            forceElevated: true,
+            elevation: 50,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Image.asset(
+                'assets/Pictures/logo.png', // Replace with your image path
+                fit: BoxFit.fitHeight,
               ),
-              const SizedBox(height: 10),
-              FormBuilderTextField(
-                name: 'password',
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 10),
-              Text(error_message),
-              const SizedBox(height: 5),
-              MaterialButton(
-                color: Theme.of(context).colorScheme.primary,
-                onPressed: () async {
-                  // Validate and save the form values
-
-                  if (_formKey.currentState?.saveAndValidate() == false) {
-                    return;
-                  }
-
-                  String response = await Auth().signInWithEmailAndPassword(
-                      _formKey.currentState?.fields['email']?.value,
-                      _formKey.currentState?.fields['password']?.value);
-
-                  if (response == 'success') {
-                    Navigator.pushNamed(context, '/Scroller');
-                    return;
-                  } else {
-                    setState(() {
-                      var errors = {
-                        'invalid-email': 'Enter a valid email',
-                        'wrong-password': 'Incorrect password'
-                      };
-                      error_message = errors[response] ?? response;
-                    });
-                  }
-                  return;
-                },
-                child: const Text('Login'),
-              ),
-              const SizedBox(height: 10),
-              TextButton(
-                onPressed: () async {
-                  Navigator.pushNamed(context, '/Signup');
-                },
-                child: const Text('Want to sign up instead?'),
-              )
-            ],
+            ),
           ),
-        ),
+          SliverFillRemaining(
+            child: Padding(
+              padding: const EdgeInsets.all(50.0),
+              child: FormBuilder(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 50),
+                    FormBuilderTextField(
+                      name: 'email',
+                      decoration: const InputDecoration(labelText: 'Email'),
+                      // enabled: false,
+
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        return null;
+                      },
+
+                      // validator: FormBuilderValidators.compose([
+                      // FormBuilderValidators.required(),
+                      // FormBuilderValidators.email(),
+                      // ]),
+                    ),
+                    const SizedBox(height: 10),
+                    FormBuilderTextField(
+                      name: 'password',
+                      decoration: const InputDecoration(labelText: 'Password'),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    Text(error_message),
+                    const SizedBox(height: 5),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20), // Adjust the radius as needed
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24), // Adjust padding as needed
+                      ),
+                      onPressed: () async {
+                        if (_formKey.currentState?.saveAndValidate() == false) {
+                          return;
+                        }
+
+                        String response = await Auth().signInWithEmailAndPassword(
+                            _formKey.currentState?.fields['email']?.value,
+                            _formKey.currentState?.fields['password']?.value);
+
+                        if (response == 'success') {
+                          Navigator.pushNamed(context, '/Scroller');
+                          return;
+                        } else {
+                          setState(() {
+                            var errors = {
+                              'invalid-email': 'Enter a valid email',
+                              'wrong-password': 'Incorrect password'
+                            };
+                            error_message = errors[response] ?? response;
+                          });
+                        }
+                        return;
+                      },
+                      child: Text('Login', style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 16.5)),
+                    ),
+                    const SizedBox(height: 10),
+                    TextButton(
+                      onPressed: () async {
+                        Navigator.pushNamed(context, '/Signup');
+                      },
+                      child: Text('Want to sign up instead?', style: GoogleFonts.redHatDisplay(color: Theme.of(context).primaryColor, fontSize: 16.5)),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -194,196 +221,448 @@ class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
 
   String error_message = "";
+  bool userInfoValid = false;
+  bool profileInfoValid = false;
+  bool preferenceInfoValid = false;
+  late List<dynamic> universitiesData;
+  late List<dynamic> domains;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchJSON();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Signup'),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: FormBuilder(
-            key: _formKey,
-            child: Column(
-              children: [
-                FormBuilderTextField(
-                  name: 'email',
-                  decoration: const InputDecoration(labelText: 'Email'),
-                  // enabled: false,
+          return Builder(
+            builder: (context) {
+              return Scaffold(
+                body: CustomScrollView(
+                  slivers: [
+                    SliverAppBar(
+                      backgroundColor: Theme
+                          .of(context)
+                          .canvasColor,
+                      centerTitle: true,
+                      elevation: 0,
+                      floating: true,
+                      // Make the SliverAppBar automatically hide when scrolling down
+                      leading: IconButton(
+                        icon: Icon(LineAwesomeIcons.angle_left, color: Theme
+                            .of(context)
+                            .primaryColor),
+                        color: Colors.grey[500],
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: FormBuilder(
+                          autovalidateMode: AutovalidateMode.always,
+                          key: _formKey,
+                          child: Column(
+                            children: [
+                              ListTile(
+                                enableFeedback: false,
+                                enabled: true,
+                                leading: Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: Theme
+                                          .of(context)
+                                          .primaryColor, width: 1),
+                                      borderRadius: BorderRadius.circular(100),
+                                    ),
+                                    child: Center(child: Text(
+                                        "1", textAlign: TextAlign.center,
+                                        style: GoogleFonts.lexend(color: Theme
+                                            .of(context)
+                                            .primaryColor,
+                                            fontWeight: FontWeight.normal,
+                                            fontSize: 23)))
+                                ),
+                                title: Text("User Info", style: Theme
+                                    .of(context)
+                                    .textTheme
+                                    .headlineSmall),
+                              ),
+                              const SizedBox(height: 10),
+                              Column(
+                                children: [
+                                  FormBuilderTextField(
+                                    name: 'forename',
+                                    decoration: const InputDecoration(
+                                        labelText: 'First Name'),
+                                    // enabled: false,
 
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                FormBuilderTextField(
-                  name: 'password',
-                  decoration: const InputDecoration(labelText: 'Password'),
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                FormBuilderTextField(
-                  name: 'bio',
-                  decoration: const InputDecoration(labelText: 'Bio'),
-                  // enabled: false,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter your first name';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 10),
+                                  FormBuilderTextField(
+                                    name: 'surname',
+                                    decoration: const InputDecoration(
+                                        labelText: 'Last Name'),
+                                    // enabled: false,
 
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a bio';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                FormBuilderDateTimePicker(
-                  inputType: InputType.date,
-                  name: "dob",
-                  decoration: const InputDecoration(labelText: 'Date of Birth'),
-                ),
-                const SizedBox(height: 10),
-                FormBuilderTextField(
-                  name: 'forename',
-                  decoration: const InputDecoration(labelText: 'First Name'),
-                  // enabled: false,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter your Surname';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 15),
+                                  FormBuilderTextField(
+                                    name: 'email',
+                                    decoration: const InputDecoration(labelText: 'University Email'),
 
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your first name';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                FormBuilderTextField(
-                  name: 'surname',
-                  decoration: const InputDecoration(labelText: 'Last Name'),
-                  // enabled: false,
+                                    validator: (email) {
+                                      if (email == null || email.isEmpty) {
+                                        return 'Please enter your email';
+                                      }
+                                      if (!EmailValidator.validate(email)) {
+                                        return 'Please enter a valid email address';
+                                      }
+                                      if (!domains.any((domain) => email.contains(domain))) {
+                                        return 'Email domain is not valid';
+                                      }
+                                      return null;
+                                    },
 
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 30),
-                FormBuilderSlider(
-                  name: 'cleanliness',
-                  initialValue: 2,
-                  min: 0,
-                  max: 5,
-                  divisions: 5,
-                  decoration: const InputDecoration(labelText: 'Cleanliness'),
-                ),
-                FormBuilderSlider(
-                  name: 'noisiness',
-                  initialValue: 2,
-                  min: 0,
-                  max: 5,
-                  divisions: 5,
-                  decoration: const InputDecoration(labelText: 'Noisiness'),
-                ),
-                FormBuilderSlider(
-                  name: 'nightlife',
-                  initialValue: 2,
-                  min: 0,
-                  max: 5,
-                  divisions: 5,
-                  decoration: const InputDecoration(labelText: 'Nightlife'),
-                ),
-                FormBuilderDateTimePicker(
-                  name: 'bedtime',
-                  inputType: InputType.time,
-                  decoration: const InputDecoration(labelText: 'Bedtime'),
-                ),
-                FormBuilderTextField(
-                  name: 'subject',
-                  decoration:
-                      const InputDecoration(labelText: 'Subject Studied'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    return null;
-                  },
-                ),
-                FormBuilderTextField(
-                  name: 'University',
-                  decoration:
-                      const InputDecoration(labelText: 'University Attended'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    }
-                    return null;
-                  },
-                ),
-                FormBuilderSlider(
-                  name: 'yearofstudy',
-                  initialValue: 1,
-                  min: 1,
-                  max: 7,
-                  divisions: 6,
-                  decoration: const InputDecoration(labelText: 'Year of Study'),
-                ),
-                Text(error_message),
-                const SizedBox(height: 5),
-                MaterialButton(
-                  color: Theme.of(context).colorScheme.primary,
-                  onPressed: () async {
-                    // Validate and save the form values
+                                  ),
+                                  const SizedBox(height: 10),
+                                  FormBuilderTextField(
+                                    name: 'password',
+                                    decoration: const InputDecoration(
+                                        labelText: 'Password'),
+                                    obscureText: true,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter your password';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  const SizedBox(height: 10),
+                                  FormBuilderTextField(
+                                    name: 'password_conf',
+                                    decoration: const InputDecoration(
+                                        labelText: 'Confirm Password'),
+                                    obscureText: true,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please confirm your password';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ],
+                              ),
 
-                    if (_formKey.currentState?.saveAndValidate() == false) {
-                      return;
-                    }
+                              const SizedBox(height: 25),
 
-                    // debugPrint(_formKey.currentState?.value.toString());
+                              ListTile(
+                                enableFeedback: false,
+                                enabled: true,
+                                leading: Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: userInfoValid ? Theme
+                                              .of(context)
+                                              .primaryColor : Colors.grey,
+                                          width: 1),
+                                      borderRadius: BorderRadius.circular(100),
+                                    ),
+                                    child: Center(child: Text(
+                                        "2", textAlign: TextAlign.center,
+                                        style: GoogleFonts.lexend(
+                                            color: userInfoValid ? Theme
+                                                .of(context)
+                                                .primaryColor : Colors.grey,
+                                            fontWeight: FontWeight.normal,
+                                            fontSize: 23)))
+                                ),
+                                title: Text("Profile Info",
+                                    style: GoogleFonts.lexend(color: userInfoValid
+                                        ? Colors.black87
+                                        : Colors.grey,
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 20.0)),
+                              ),
+                              const SizedBox(height: 10),
+                              if(userInfoValid)
+                                Column(
+                                  children: [
+                                    FormBuilderTextField(
+                                      name: 'bio',
+                                      decoration: const InputDecoration(
+                                          labelText: 'Bio'),
+                                      // enabled: false,
 
-                    String response = await Auth().registerWithUserDetails(
-                        _formKey.currentState?.fields['email']?.value,
-                        _formKey.currentState?.fields['password']?.value,
-                        _formKey.currentState?.value ?? {});
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter a bio';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    const SizedBox(height: 10),
+                                    FormBuilderDateTimePicker(
+                                      inputType: InputType.date,
+                                      name: "dob",
+                                      decoration: const InputDecoration(
+                                          labelText: 'Date of Birth'),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    FormBuilderTextField(
+                                      name: 'subject',
+                                      decoration:
+                                      const InputDecoration(
+                                          labelText: 'Subject Studied'),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter your email';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    const SizedBox(height: 10),
+                                    FormBuilderDropdown(
+                                      name: "university",
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please select a university';
+                                        }
+                                        return null;
+                                      },
+                                      items: universitiesData.map((university) {
+                                        final String name = university['name'];
+                                        return DropdownMenuItem(
+                                          value: name,
+                                          child: Text(name),
+                                        );
+                                      }).toList(),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    FormBuilderSlider(
+                                      name: 'yearOfStudy',
+                                      initialValue: 1,
+                                      min: 1,
+                                      max: 7,
+                                      divisions: 6,
+                                      decoration: const InputDecoration(
+                                          labelText: 'Year of Study'),
+                                    ),
+                                  ],
+                                ),
 
-                    // if (response == 'success') {
-                    //   Navigator.pushNamed(context, '/Scroller');
-                    //   return;
-                    // } else {
-                    //   setState(() {
-                    //     var errors = {
-                    //       'invalid-email': 'Enter a valid email',
-                    //       'wrong-password': 'Incorrect password'
-                    //     };
-                    //     error_message = errors[response] ?? response;
-                    //   });
-                    // }
-                    // return;
-                  },
-                  child: const Text('Signup'),
+                              const SizedBox(height: 25),
+
+                              ListTile(
+                                enableFeedback: false,
+                                enabled: true,
+                                leading: Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: (userInfoValid & profileInfoValid)
+                                              ? Theme
+                                              .of(context)
+                                              .primaryColor
+                                              : Colors.grey, width: 1),
+                                      borderRadius: BorderRadius.circular(100),
+                                    ),
+                                    child: Center(child: Text(
+                                        "3", textAlign: TextAlign.center,
+                                        style: GoogleFonts.lexend(
+                                            color: (userInfoValid & profileInfoValid)
+                                                ? Theme
+                                                .of(context)
+                                                .primaryColor
+                                                : Colors.grey,
+                                            fontWeight: FontWeight.normal,
+                                            fontSize: 23)))
+                                ),
+                                title: Text("Preferences",
+                                    style: GoogleFonts.lexend(
+                                        color: (userInfoValid & profileInfoValid)
+                                            ? Colors.black87
+                                            : Colors.grey,
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 20.0)),
+                              ),
+                              const SizedBox(height: 10),
+                              if(userInfoValid & profileInfoValid)
+                                Column(
+                                  children: [
+                                    FormBuilderSlider(
+                                      name: 'cleanliness',
+                                      initialValue: 2,
+                                      min: 0,
+                                      max: 5,
+                                      divisions: 5,
+                                      decoration: const InputDecoration(
+                                          labelText: 'How much does Cleanliness matter to you?'),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    FormBuilderSlider(
+                                      name: 'noisiness',
+                                      initialValue: 2,
+                                      min: 0,
+                                      max: 5,
+                                      divisions: 5,
+                                      decoration: const InputDecoration(
+                                          labelText: 'How much does Noisiness to you?'),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    FormBuilderSlider(
+                                      name: 'nightlife',
+                                      initialValue: 2,
+                                      min: 0,
+                                      max: 5,
+                                      divisions: 5,
+                                      decoration: const InputDecoration(
+                                          labelText: 'How much does Nightlife to you?'),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    FormBuilderDateTimePicker(
+                                      name: 'bedtime',
+                                      inputType: InputType.time,
+                                      decoration: const InputDecoration(
+                                          labelText: 'When are you normally in bed?'),
+                                    ),
+                                  ],
+                                ),
+
+
+                              Text(error_message),
+                              const SizedBox(height: 5),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: (profileInfoValid & userInfoValid & preferenceInfoValid)? Theme.of(context).colorScheme.primary : Colors.grey,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20), // Adjust the radius as needed
+                                  ),
+                                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24), // Adjust padding as needed
+                                ),
+                                onPressed: () async {
+                                  // Validate and save the form values
+
+                                  if (_formKey.currentState?.saveAndValidate() == false) {
+                                    return;
+                                  }
+
+                                  // debugPrint(_formKey.currentState?.value.toString());
+
+                                  String response = await Auth()
+                                      .registerWithUserDetails(
+                                      _formKey.currentState?.fields['email']?.value,
+                                      _formKey.currentState?.fields['password']
+                                          ?.value,
+                                      _formKey.currentState?.value ?? {});
+
+                                  // if (response == 'success') {
+                                  //   Navigator.pushNamed(context, '/Scroller');
+                                  //   return;
+                                  // } else {
+                                  //   setState(() {
+                                  //     var errors = {
+                                  //       'invalid-email': 'Enter a valid email',
+                                  //       'wrong-password': 'Incorrect password'
+                                  //     };
+                                  //     error_message = errors[response] ?? response;
+                                  //   });
+                                  // }
+                                  // return;
+                                },
+                                child: Text('Signup', style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 16.5)),
+                              ),
+                              const SizedBox(height: 10),
+                              TextButton(
+                                onPressed: () async {
+                                  Navigator.pushNamed(context, '/Login');
+                                },
+                                child: const Text('Want to log in instead?'),
+                              )
+                            ],
+                          ),
+                          onChanged: () {
+                            // Check if user info section fields are complete
+                            final userInfoComplete =
+                            (_formKey.currentState?.fields['forename']?.isValid ??
+                                false) &
+                            (_formKey.currentState?.fields['surname']?.isValid ??
+                                false) &
+                            (_formKey.currentState?.fields['email']?.isValid ??
+                                false) &
+                            (_formKey.currentState?.fields['password']?.isValid ??
+                                false) &
+                            (_formKey.currentState?.fields['password_conf']
+                                ?.isValid ?? false);
+
+                            // Check if profile info section fields are complete
+                            final profileInfoComplete =
+                            (_formKey.currentState?.fields['bio']?.isValid ??
+                                false) &
+                            (_formKey.currentState?.fields['dob']?.isValid ??
+                                false) &
+                            (_formKey.currentState?.fields['subject']?.isValid ??
+                                false) &
+                            (_formKey.currentState?.fields['university']?.isValid ??
+                                false) &
+                            (_formKey.currentState?.fields['yearOfStudy']
+                                ?.isValid ?? false);
+
+                            final preferenceInfoComplete =
+                            (_formKey.currentState?.fields['cleanliness']?.isValid ??
+                                false) &
+                            (_formKey.currentState?.fields['noisiness']?.isValid ??
+                                false) &
+                            (_formKey.currentState?.fields['nightlife']?.isValid ??
+                                false) &
+                            (_formKey.currentState?.fields['bedtime']
+                                ?.isValid ?? false);
+
+                            print(userInfoComplete);
+                            print(profileInfoComplete);
+                            print(preferenceInfoComplete);
+                            setState(() {
+                              userInfoValid = userInfoComplete;
+                              profileInfoValid = profileInfoComplete;
+                              preferenceInfoValid = preferenceInfoComplete;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 10),
-                TextButton(
-                  onPressed: () async {
-                    Navigator.pushNamed(context, '/Login');
-                  },
-                  child: const Text('Want to log in instead?'),
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+              );
+            }
+          );
+  }
+  Future<void> fetchJSON() async{
+    final String jsonContent = await rootBundle.loadString('assets/JSON/world_universities_and_domains.json');
+    universitiesData = json.decode(jsonContent);
+    domains = universitiesData
+        .map<List<dynamic>>((university) => university['domains'])
+        .expand((list) => list)
+        .toList();// Fetch the data when the widget is created
+    print("hello");
+    setState(() {});
   }
 }
 

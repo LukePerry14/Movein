@@ -124,7 +124,7 @@ class _GscrollerState extends State<Gscroller> {
                     Container(
                       alignment: Alignment.center,
                       child: Text(
-                        "${profiles.length}" + "mems".tr,
+                        "${profiles.length} " + "mems".tr,
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                     ),

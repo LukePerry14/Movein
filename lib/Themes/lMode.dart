@@ -17,18 +17,22 @@ class LAppTheme{
   static TextStyle d_lBody = GoogleFonts.redHatDisplay(color: Colors.white70, fontSize: 16.5, fontWeight: FontWeight.bold);
 
   static ThemeData lightTheme = ThemeData(
-      brightness: Brightness.light,
-    primarySwatch: const MaterialColor(4294487362,{50: Color( 0xffF8AC41 )
-      , 100: Color( 0xfffdeace )
-      , 200: Color( 0xfffbd49d )
-      , 300: Color( 0xfffabf6b )
-      , 400: Color( 0xfff8aa3a )
-      , 500: Color( 0xfff69409 )
-      , 600: Color( 0xffc57707 )
-      , 700: Color( 0xff945905 )
-      , 800: Color( 0xff623b04 )
-      , 900: Color( 0xff311e02 )
+    brightness: Brightness.light,
+    primarySwatch: const MaterialColor(0xFFF8AC41, {
+      50: Color(0xFFFFF5E0),
+      100: Color(0xFFFFE0B2),
+      200: Color(0xFFFFCC80),
+      300: Color(0xFFFFB74D),
+      400: Color(0xFFFFA726),
+      500: Color(0xFFF8AC41), // Your desired color
+      600: Color(0xFFF39C12),
+      700: Color(0xFFF29F05),
+      800: Color(0xFFE86C02),
+      900: Color(0xFFD84315),
     }),
+
+    canvasColor: Colors.white,
+
     textTheme: TextTheme(
       headlineLarge: bHeader,
       headlineMedium: header,
@@ -37,8 +41,12 @@ class LAppTheme{
       bodyMedium: body,
       bodySmall: sBody,
     ),
-
   );
+
+
+
+
+
 
   static ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
