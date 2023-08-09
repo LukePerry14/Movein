@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
@@ -26,6 +25,8 @@ import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -98,7 +99,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
 
-  String error_message = "";
+  String errorMessage = "";
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
             expandedHeight: MediaQuery.of(context).size.height / 3,
             collapsedHeight: MediaQuery.of(context).size.height / 3,
             forceElevated: true,
-            elevation: 50,
+            elevation: 40,
             flexibleSpace: FlexibleSpaceBar(
               background: Image.asset(
                 'assets/Pictures/logo.png', // Replace with your image path
@@ -157,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                     ),
                     const SizedBox(height: 10),
-                    Text(error_message),
+                    Text(errorMessage),
                     const SizedBox(height: 5),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -185,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               'invalid-email': 'Enter a valid email',
                               'wrong-password': 'Incorrect password'
                             };
-                            error_message = errors[response] ?? response;
+                            errorMessage = errors[response] ?? response;
                           });
                         }
                         return;
@@ -219,8 +220,18 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
+  late Timer _timer;
+  TextEditingController _passwordController = TextEditingController();
+  TextEditingController _passwordConfController = TextEditingController();
 
-  String error_message = "";
+  bool _passwordObscured = true;
+  bool _passwordConfObscured = true;
+  final _universityController = TextEditingController();
+  final _universityFocusNode = FocusNode();
+  bool _universityValid = true;
+
+
+  String errorMessage = "";
   bool userInfoValid = false;
   bool profileInfoValid = false;
   bool preferenceInfoValid = false;
@@ -231,6 +242,16 @@ class _SignupScreenState extends State<SignupScreen> {
   void initState() {
     super.initState();
     fetchJSON();
+
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (Timer timer) {
+      _validateForm(); // Call your validation function here
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel(); // Cancel the timer when the widget is disposed
+    super.dispose();
   }
 
   @override
@@ -292,81 +313,120 @@ class _SignupScreenState extends State<SignupScreen> {
                                     .headlineSmall),
                               ),
                               const SizedBox(height: 10),
-                              Column(
-                                children: [
-                                  FormBuilderTextField(
-                                    name: 'forename',
-                                    decoration: const InputDecoration(
-                                        labelText: 'First Name'),
-                                    // enabled: false,
+                              Padding(
+                                padding: const EdgeInsets.all(15),
+                                child: Column(
+                                  children: [
+                                    FormBuilderTextField(
+                                      name: 'forename',
+                                      decoration: const InputDecoration(
+                                          labelText: 'First Name'),
+                                      // enabled: false,
 
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter your first name';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 10),
-                                  FormBuilderTextField(
-                                    name: 'surname',
-                                    decoration: const InputDecoration(
-                                        labelText: 'Last Name'),
-                                    // enabled: false,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter your first name';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    const SizedBox(height: 10),
+                                    FormBuilderTextField(
+                                      name: 'surname',
+                                      decoration: const InputDecoration(
+                                          labelText: 'Last Name'),
+                                      // enabled: false,
 
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter your Surname';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 15),
-                                  FormBuilderTextField(
-                                    name: 'email',
-                                    decoration: const InputDecoration(labelText: 'University Email'),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter your Surname';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    const SizedBox(height: 15),
+                                    FormBuilderTextField(
+                                      name: 'email',
+                                      decoration: const InputDecoration(labelText: 'University Email'),
+                                      validator: (email) {
+                                        if (email == null || email.isEmpty) {
+                                          return 'Please enter your email';
+                                        }
+                                        if (!EmailValidator.validate(email)) {
+                                          return 'Please enter a valid email address';
+                                        }
+                                        if (!domains.any((domain) => email.contains(domain))) {
+                                          return 'Email domain is not valid';
+                                        }
+                                        return null;
+                                      },
 
-                                    validator: (email) {
-                                      if (email == null || email.isEmpty) {
-                                        return 'Please enter your email';
-                                      }
-                                      if (!EmailValidator.validate(email)) {
-                                        return 'Please enter a valid email address';
-                                      }
-                                      if (!domains.any((domain) => email.contains(domain))) {
-                                        return 'Email domain is not valid';
-                                      }
-                                      return null;
-                                    },
-
-                                  ),
-                                  const SizedBox(height: 10),
-                                  FormBuilderTextField(
-                                    name: 'password',
-                                    decoration: const InputDecoration(
-                                        labelText: 'Password'),
-                                    obscureText: true,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please enter your password';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 10),
-                                  FormBuilderTextField(
-                                    name: 'password_conf',
-                                    decoration: const InputDecoration(
-                                        labelText: 'Confirm Password'),
-                                    obscureText: true,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Please confirm your password';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      children:[
+                                        Expanded(
+                                          child: FormBuilderTextField(
+                                            name: 'password',
+                                            decoration: const InputDecoration(
+                                                labelText: 'Password'),
+                                            obscureText: _passwordObscured, // Use the variable to control the obscuring
+                                            controller: _passwordController,
+                                            validator: (value) {
+                                              if (value == null || value.isEmpty) {
+                                                return 'Please enter your password';
+                                              }
+                                              if (value.length < 8) {
+                                                return 'Password must be at least 8 characters long';
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                        ),
+                                        IconButton(
+                                          splashRadius: 20,
+                                            onPressed: () {
+                                              setState(() {
+                                                _passwordObscured = !_passwordObscured;
+                                              });
+                                            },
+                                            icon: Icon(_passwordObscured ? Icons.visibility : Icons.visibility_off),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      children:[
+                                        Expanded(
+                                          child: FormBuilderTextField(
+                                            name: 'password_conf',
+                                            decoration: const InputDecoration(
+                                                labelText: 'Confirm password'),
+                                            obscureText: _passwordConfObscured, // Use the variable to control the obscuring
+                                            controller: _passwordConfController,
+                                            validator: (value) {
+                                              if (value == null || value.isEmpty) {
+                                                return 'Please Confirm your password';
+                                              } else if (_passwordConfController.text != _passwordController.text){
+                                                return "Passwords don't match";
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                        ),
+                                        IconButton(
+                                          splashRadius: 20,
+                                          onPressed: () {
+                                            setState(() {
+                                              _passwordConfObscured = !_passwordConfObscured;
+                                            });
+                                          },
+                                          icon: Icon(_passwordConfObscured ? Icons.visibility : Icons.visibility_off),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
 
                               const SizedBox(height: 25),
@@ -403,69 +463,113 @@ class _SignupScreenState extends State<SignupScreen> {
                               ),
                               const SizedBox(height: 10),
                               if(userInfoValid)
-                                Column(
-                                  children: [
-                                    FormBuilderTextField(
-                                      name: 'bio',
-                                      decoration: const InputDecoration(
-                                          labelText: 'Bio'),
-                                      // enabled: false,
+                                Padding(
+                                  padding: const EdgeInsets.all(15),
+                                  child: Column(
+                                    children: [
+                                      FormBuilderTextField(
+                                        name: 'bio',
+                                        maxLength: 200,
+                                        decoration: const InputDecoration(
+                                            labelText: 'Bio'
+                                        ),
 
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter a bio';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                    const SizedBox(height: 10),
-                                    FormBuilderDateTimePicker(
-                                      inputType: InputType.date,
-                                      name: "dob",
-                                      decoration: const InputDecoration(
-                                          labelText: 'Date of Birth'),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    FormBuilderTextField(
-                                      name: 'subject',
-                                      decoration:
-                                      const InputDecoration(
-                                          labelText: 'Subject Studied'),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter your email';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                    const SizedBox(height: 10),
-                                    FormBuilderDropdown(
-                                      name: "university",
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please select a university';
-                                        }
-                                        return null;
-                                      },
-                                      items: universitiesData.map((university) {
-                                        final String name = university['name'];
-                                        return DropdownMenuItem(
-                                          value: name,
-                                          child: Text(name),
-                                        );
-                                      }).toList(),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    FormBuilderSlider(
-                                      name: 'yearOfStudy',
-                                      initialValue: 1,
-                                      min: 1,
-                                      max: 7,
-                                      divisions: 6,
-                                      decoration: const InputDecoration(
-                                          labelText: 'Year of Study'),
-                                    ),
-                                  ],
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please enter a bio';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      const SizedBox(height: 10),
+                                      FormBuilderDateTimePicker(
+                                        inputType: InputType.date,
+                                        name: "dob",
+                                        decoration: const InputDecoration(
+                                            labelText: 'Date of Birth'),
+
+                                        validator: (value) {
+                                          if (value == null) {
+                                            return 'Please select a date';
+                                          }
+
+                                          final currentDate = DateTime.now();
+                                          final selectedDate = value;
+                                          final minimumAgeDate = DateTime(currentDate.year - 17, currentDate.month, currentDate.day);
+
+                                          if (selectedDate.isAfter(minimumAgeDate)) {
+                                            return 'You must be at least 17 years old';
+                                          }
+
+                                          return null;
+                                        },
+                                      ),
+                                      const SizedBox(height: 10),
+                                      FormBuilderTextField(
+                                        name: 'subject',
+                                        decoration:
+                                        const InputDecoration(
+                                            labelText: 'Subject Studied'),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please enter your Subject';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      const SizedBox(height: 10),
+                                      TypeAheadFormField(
+                                        textFieldConfiguration: TextFieldConfiguration(
+                                          decoration: const InputDecoration(
+                                            labelText: 'University',
+                                          ),
+                                          controller: _universityController,
+                                          focusNode: _universityFocusNode,
+                                        ),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please select a university';
+                                          }
+                                          final universitiesSuggestions = universitiesData
+                                              .map((university) => university['name'])
+                                              .toList();
+
+                                          if (!universitiesSuggestions.contains(value)) {
+                                            return 'Please select a valid university from the suggestions';
+                                          }
+                                          return null;
+                                        },
+                                        suggestionsCallback: (pattern) {
+                                          // Return filtered universities based on the pattern
+                                          return universitiesData
+                                              .where((university) =>
+                                              university['name'].toLowerCase().contains(pattern.toLowerCase()))
+                                              .map((university) => university['name'])
+                                              .toList();
+                                        },
+                                        itemBuilder: (context, suggestion) {
+                                          return ListTile(
+                                            title: Text(suggestion),
+                                          );
+                                        },
+                                        onSuggestionSelected: (value) {
+                                          _universityController.text = value;
+                                          _universityFocusNode.unfocus();
+                                          _validateUniversity(value);
+                                        },
+                                      ),
+                                      const SizedBox(height: 10),
+                                      FormBuilderSlider(
+                                        name: 'yearOfStudy',
+                                        initialValue: 1,
+                                        min: 1,
+                                        max: 7,
+                                        divisions: 6,
+                                        decoration: const InputDecoration(
+                                            labelText: 'Year of Study'),
+                                      ),
+                                    ],
+                                  ),
                                 ),
 
                               const SizedBox(height: 25),
@@ -506,49 +610,59 @@ class _SignupScreenState extends State<SignupScreen> {
                               ),
                               const SizedBox(height: 10),
                               if(userInfoValid & profileInfoValid)
-                                Column(
-                                  children: [
-                                    FormBuilderSlider(
-                                      name: 'cleanliness',
-                                      initialValue: 2,
-                                      min: 0,
-                                      max: 5,
-                                      divisions: 5,
-                                      decoration: const InputDecoration(
-                                          labelText: 'How much does Cleanliness matter to you?'),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    FormBuilderSlider(
-                                      name: 'noisiness',
-                                      initialValue: 2,
-                                      min: 0,
-                                      max: 5,
-                                      divisions: 5,
-                                      decoration: const InputDecoration(
-                                          labelText: 'How much does Noisiness to you?'),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    FormBuilderSlider(
-                                      name: 'nightlife',
-                                      initialValue: 2,
-                                      min: 0,
-                                      max: 5,
-                                      divisions: 5,
-                                      decoration: const InputDecoration(
-                                          labelText: 'How much does Nightlife to you?'),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    FormBuilderDateTimePicker(
-                                      name: 'bedtime',
-                                      inputType: InputType.time,
-                                      decoration: const InputDecoration(
-                                          labelText: 'When are you normally in bed?'),
-                                    ),
-                                  ],
+                                Padding(
+                                  padding: const EdgeInsets.all(15),
+                                  child: Column(
+                                    children: [
+                                      FormBuilderSlider(
+                                        name: 'cleanliness',
+                                        initialValue: 2,
+                                        min: 0,
+                                        max: 5,
+                                        divisions: 5,
+                                        decoration: const InputDecoration(
+                                            labelText: 'How much does Cleanliness matter to you?'),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      FormBuilderSlider(
+                                        name: 'noisiness',
+                                        initialValue: 2,
+                                        min: 0,
+                                        max: 5,
+                                        divisions: 5,
+                                        decoration: const InputDecoration(
+                                            labelText: 'How much does Noisiness matter to you?'),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      FormBuilderSlider(
+                                        name: 'nightlife',
+                                        initialValue: 2,
+                                        min: 0,
+                                        max: 5,
+                                        divisions: 5,
+                                        decoration: const InputDecoration(
+                                            labelText: 'How much does Nightlife matter to you?'),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      FormBuilderDateTimePicker(
+                                        name: 'bedtime',
+                                        initialValue: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 23, 0), // 11:00 PM
+                                        inputType: InputType.time,
+                                        decoration: const InputDecoration(
+                                            labelText: 'When are you normally in bed?'),
+                                        validator: (value) {
+                                          if (value == null) {
+                                            return "Please select a time you're asleep by";
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                 ),
 
 
-                              Text(error_message),
+                              Text(errorMessage),
                               const SizedBox(height: 5),
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
@@ -599,52 +713,6 @@ class _SignupScreenState extends State<SignupScreen> {
                               )
                             ],
                           ),
-                          onChanged: () {
-                            // Check if user info section fields are complete
-                            final userInfoComplete =
-                            (_formKey.currentState?.fields['forename']?.isValid ??
-                                false) &
-                            (_formKey.currentState?.fields['surname']?.isValid ??
-                                false) &
-                            (_formKey.currentState?.fields['email']?.isValid ??
-                                false) &
-                            (_formKey.currentState?.fields['password']?.isValid ??
-                                false) &
-                            (_formKey.currentState?.fields['password_conf']
-                                ?.isValid ?? false);
-
-                            // Check if profile info section fields are complete
-                            final profileInfoComplete =
-                            (_formKey.currentState?.fields['bio']?.isValid ??
-                                false) &
-                            (_formKey.currentState?.fields['dob']?.isValid ??
-                                false) &
-                            (_formKey.currentState?.fields['subject']?.isValid ??
-                                false) &
-                            (_formKey.currentState?.fields['university']?.isValid ??
-                                false) &
-                            (_formKey.currentState?.fields['yearOfStudy']
-                                ?.isValid ?? false);
-
-                            final preferenceInfoComplete =
-                            (_formKey.currentState?.fields['cleanliness']?.isValid ??
-                                false) &
-                            (_formKey.currentState?.fields['noisiness']?.isValid ??
-                                false) &
-                            (_formKey.currentState?.fields['nightlife']?.isValid ??
-                                false) &
-                            (_formKey.currentState?.fields['bedtime']
-                                ?.isValid ?? false);
-
-                            print(userInfoComplete);
-                            print(profileInfoComplete);
-                            print(preferenceInfoComplete);
-                            setState(() {
-                              userInfoValid = userInfoComplete;
-                              profileInfoValid = profileInfoComplete;
-                              preferenceInfoValid = preferenceInfoComplete;
-                            });
-                          },
                         ),
                       ),
                     ),
@@ -661,8 +729,64 @@ class _SignupScreenState extends State<SignupScreen> {
         .map<List<dynamic>>((university) => university['domains'])
         .expand((list) => list)
         .toList();// Fetch the data when the widget is created
-    print("hello");
     setState(() {});
+  }
+
+  void _validateForm(){
+    _validateUniversity(_universityController.text);
+    final userInfoComplete =
+    (_formKey.currentState?.fields['forename']?.isValid ??
+        false) &
+    (_formKey.currentState?.fields['surname']?.isValid ??
+        false) &
+    (_formKey.currentState?.fields['email']?.isValid ??
+        false) &
+    (_formKey.currentState?.fields['password']?.isValid ??
+        false) &
+    (_formKey.currentState?.fields['password_conf']
+        ?.isValid ?? false);
+
+    // Check if profile info section fields are complete
+    final profileInfoComplete =
+    (_formKey.currentState?.fields['bio']?.isValid ??
+        false) &
+    (_formKey.currentState?.fields['dob']?.isValid ??
+        false) &
+    (_formKey.currentState?.fields['subject']?.isValid ??
+        false) &
+    (_universityValid) &
+    (_formKey.currentState?.fields['yearOfStudy']
+        ?.isValid ?? false);
+
+    final preferenceInfoComplete =
+    (_formKey.currentState?.fields['cleanliness']?.isValid ??
+        false) &
+    (_formKey.currentState?.fields['noisiness']?.isValid ??
+        false) &
+    (_formKey.currentState?.fields['nightlife']?.isValid ??
+        false) &
+    (_formKey.currentState?.fields['bedtime']?.isValid ??
+        false);
+
+    setState(() {
+      userInfoValid = userInfoComplete;
+      profileInfoValid = profileInfoComplete;
+      preferenceInfoValid = preferenceInfoComplete;
+    });
+  }
+
+  void _validateUniversity(selectedUniversity) {
+    bool temp = true;
+    final universitiesSuggestions = universitiesData
+        .map((university) => university['name'])
+        .toList();
+
+    if (!universitiesSuggestions.contains(selectedUniversity)) {
+      temp = false;
+    }
+    setState(() {
+      _universityValid = temp;
+    });
   }
 }
 
