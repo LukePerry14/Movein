@@ -8,6 +8,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:movein/navbar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:azblob/azblob.dart';
+import 'package:mime/mime.dart';
 
 import '../main.dart';
 
@@ -45,11 +47,23 @@ class _ProfilePage extends State<Profile> {
   final _picker = ImagePicker();
 
   Future<void> _openImagePicker() async {
+    try {
     final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      _image = pickedImage;
-      // azure upload will go here
-    });
+    var ABlob = AzureStorage.parse('DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=aSkkUFABL48/iFzN7oMllHcWVEii3+VYQKjahb511l7UwYI3bqALqc/mygXRfknzlSrQq1aK8WKl+AStZUkDiQ==;EndpointSuffix=core.windows.net');
+    Uint8List? content = await pickedImage?.readAsBytes();
+    String? imagePath = pickedImage?.path;
+    String container='image';
+    String? contentType = lookupMimeType(imagePath!);
+    await ABlob.putBlob('/$container/$imagePath', bodyBytes: content, contentType: contentType, type: BlobType.BlockBlob);
+    } on AzureStorageException catch(ex) {
+      print('oh no');
+      print(ex.message);
+    } catch(err) {
+      print(err);
+    }
+    // setState(() {
+    //   print('hi');
+    // });
   }
 
   @override
@@ -73,7 +87,7 @@ class _ProfilePage extends State<Profile> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            print("testing");
+                            _openImagePicker();
                           },
                           child: Container(
                             width: 150, // Set a fixed width for the container

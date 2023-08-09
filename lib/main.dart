@@ -24,7 +24,7 @@ Future<void> main() async {
   MobileAds.instance.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  var ABlob = AzureStorage.parse(connectionString)
+  // var ABlob = AzureStorage.parse('https://movein.blob.core.windows.net/moveinimages');
 
   runApp(const App());
 }
