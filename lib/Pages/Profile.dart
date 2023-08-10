@@ -1,7 +1,9 @@
 // ignore_for_file: camel_case_types
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +12,7 @@ import 'package:movein/navbar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../Auth code/auth.dart';
 import '../main.dart';
 
 class Profile extends StatefulWidget {
@@ -31,22 +34,50 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfilePage extends State<Profile> {
+  var name;
+
   void _copyToClipboard(BuildContext context) {
     Clipboard.setData(const ClipboardData(text: 'iKxLSxcDqlT6vtHe71Bp'));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Copied to clipboard', style: Theme.of(context).textTheme.bodySmall,),
+        content: Text(
+          'copied'.tr,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
         backgroundColor: Theme.of(context).primaryColor,
         duration: const Duration(seconds: 1),
       ),
     );
   }
 
+  Future<String> getName() async {
+    try {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(Auth().currentUser())
+          .get();
+
+      if (!userDoc.exists) {
+        return "User document not found";
+      }
+
+      String foreName = userDoc.get("ForeName");
+      String surname = userDoc.get("SurName");
+
+      String fullName = "$foreName $surname";
+
+      return fullName;
+    } catch (e) {
+      return "Error: $e";
+    }
+  }
+
   XFile? _image;
   final _picker = ImagePicker();
 
   Future<void> _openImagePicker() async {
-    final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedImage =
+        await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
       _image = pickedImage;
       // azure upload will go here
@@ -55,163 +86,179 @@ class _ProfilePage extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    return Builder(builder: (context) {
-      final navigator = Navigator.of(context);
-      return Scaffold(
-        body: SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Padding(
-                        padding: const EdgeInsets.all(40.0),
-                        child: backgroundButton()),
-                    Stack(
+    return FutureBuilder<String>(
+        future: getName(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: FractionallySizedBox(
+                heightFactor: 0.3,
+                child: AspectRatio(
+                  aspectRatio: 1.0,
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            );
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            name = snapshot.data;
+            return Builder(builder: (context) {
+              final navigator = Navigator.of(context);
+              return Scaffold(
+                body: SingleChildScrollView(
+                  child: Container(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            print("testing");
-                          },
-                          child: Container(
-                            width: 150, // Set a fixed width for the container
-                            height: 150, // Set a fixed height for the container
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            Padding(
+                                padding: const EdgeInsets.all(40.0),
+                                child: backgroundButton()),
+                            Stack(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    print("testing");
+                                  },
+                                  child: Container(
+                                    width: 150,
+                                    // Set a fixed width for the container
+                                    height: 150,
+                                    // Set a fixed height for the container
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const ClipOval(
+                                      child: Image(
+                                        image: AssetImage(
+                                            "assets/Pictures/dora.png"),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            child: const ClipOval(
-                              child: Image(
-                                image: AssetImage("assets/Pictures/dora.png"),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
+                            Padding(
+                              padding: const EdgeInsets.all(40.0),
+                              child: shareProfileButton(),
+                            )
+                          ],
                         ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: Container(
-                            height: 30.0,
-                            width: 30.0,
-                            decoration: BoxDecoration(
-                              color: Colors.white60,
-                              borderRadius: BorderRadius.circular(100),
-                              border: Border.all(
-                                color: Colors.grey.withOpacity(0.5),
-                                width: 1, // Adjust the border width as needed
+                        const SizedBox(height: 20.0),
+                        Text(name,
+                            style: Theme.of(context).textTheme.headlineMedium),
+                        const SizedBox(height: 8.0),
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          GestureDetector(
+                            onTap: () => _copyToClipboard(context),
+                            child: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                Auth().currentUser(),
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ),
-                            child: const Icon(LineAwesomeIcons.pen_nib,
-                                color: Colors.grey),
                           ),
+                          GestureDetector(
+                            onTap: () => _copyToClipboard(context),
+                            child: const Icon(Icons.copy),
+                          ),
+                        ]),
+                        const SizedBox(height: 50.0),
+                        upgradeAccountButton(),
+                        const SizedBox(height: 35.0),
+                        Divider(
+                          height: 1,
+                          color: Colors.grey.withOpacity(0.3),
+                        ),
+                        const SizedBox(height: 35.0),
+                        ListTile(
+                          leading: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: Theme.of(context).primaryColor,
+                                  width: 1),
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            child: Icon(LineAwesomeIcons.user,
+                                color: Theme.of(context).primaryColor),
+                          ),
+                          title: Text(
+                            "edit_profile".tr,
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                          trailing: const Icon(LineAwesomeIcons.angle_right),
+                          onTap: () {
+                            Navigator.pushNamed(context, '/profileInformation');
+                          },
+                        ),
+                        const SizedBox(height: 30.0),
+                        ListTile(
+                            leading: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: Theme.of(context).primaryColor,
+                                    width: 1),
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: Icon(LineAwesomeIcons.cog,
+                                  color: Theme.of(context).primaryColor),
+                            ),
+                            title: Text(
+                              "settings".tr,
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                            trailing: const Icon(LineAwesomeIcons.angle_right),
+                            onTap: () {
+                              Navigator.pushNamed(context, '/Settings');
+                            }),
+                        const SizedBox(height: 30),
+                        ListTile(
+                          leading: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.red, width: 1),
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            child: const Icon(
+                                LineAwesomeIcons.alternate_sign_out,
+                                color: Colors.red),
+                          ),
+                          title: Text("log_out".tr,
+                              style: GoogleFonts.lexend(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 20.0)),
+                          onTap: () => {
+                            FirebaseAuth.instance.signOut(),
+                            Navigator.pushNamedAndRemoveUntil(
+                                context, '/Login', (route) => false)
+                          },
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(40.0),
-                      child: shareProfileButton(),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 20.0),
-                const Text("Name",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
-                const SizedBox(height: 8.0),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    GestureDetector(
-                      onTap: () => _copyToClipboard(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(8.0),
-                        child: const Text(
-                          'iKxLSxcDqlT6vtHe71Bp',
-                          style: TextStyle(
-                            fontStyle: FontStyle.italic,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => _copyToClipboard(context),
-                      child: const Icon(Icons.copy),
-                    ),
-                  ]
-                ),
-                const SizedBox(height: 50.0),
-                upgradeAccountButton(),
-                const SizedBox(height: 35.0),
-                Divider(height: 1, color: Colors.grey.withOpacity(0.3),),
-                const SizedBox(height: 35.0),
-                ListTile(
-                  leading: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Theme.of(context).primaryColor, width: 1),
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: Icon(LineAwesomeIcons.user, color: Theme.of(context).primaryColor),
                   ),
-                  title: Text("Edit Profile", style: Theme.of(context).textTheme.headlineSmall,),
-                  trailing: const Icon(LineAwesomeIcons.angle_right),
-                  onTap: () {
-                    Navigator.pushNamed(context, '/profileInformation');
+                ),
+                bottomNavigationBar: CustomNavbar(
+                  onItemSelected: (route) {
+                    navigator.pushNamed(route);
                   },
                 ),
-                const SizedBox(height: 30.0),
-                ListTile(
-                  leading: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Theme.of(context).primaryColor, width: 1),
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: Icon(LineAwesomeIcons.cog, color: Theme.of(context).primaryColor),
-                  ),
-                  title: Text("Settings", style: Theme.of(context).textTheme.headlineSmall,),
-                  trailing: const Icon(LineAwesomeIcons.angle_right),
-                  onTap: () {
-                    Navigator.pushNamed(context, '/Settings');
-                  }
-                ),
-                const SizedBox(height: 30),
-                ListTile(
-                  leading: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.red, width: 1),
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: const Icon(LineAwesomeIcons.alternate_sign_out, color: Colors.red),
-                  ),
-                  title: Text("Log Out", style: GoogleFonts.lexend(color: Colors.red, fontWeight: FontWeight.normal, fontSize: 20.0)),
-                  onTap: () => {
-                    FirebaseAuth.instance.signOut(),
-                    Navigator.pushNamedAndRemoveUntil(
-                        context, '/Auth', (route) => false)
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-        bottomNavigationBar: CustomNavbar(
-          onItemSelected: (route) {
-            navigator.pushNamed(route);
-          },
-        ),
-      );
-    });
+              );
+            });
+          }
+        });
   }
-  
 }
 
 class ButtonWidget extends StatelessWidget {
@@ -380,7 +427,7 @@ class ButtonWidgetLogOut extends StatelessWidget {
 }
 
 Widget upgradeAccountButton() =>
-    ButtonWidget(text: 'Upgrade Account', onClicked: () {});
+    ButtonWidget(text: 'upgrade'.tr, onClicked: () {});
 
 Widget backgroundButton() => ButtonWidgetBackground(onClicked: () {});
 Widget shareProfileButton() => ButtonWidgetShareProfile(onClicked: () {});

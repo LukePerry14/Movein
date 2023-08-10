@@ -31,7 +31,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  var UP = await UserPreferences.init();
+  await UserPreferences.init();
   // await Settings.init(cacheProvider: CustomCacheProvider());
   // Run the app
   runApp(const App());
@@ -39,7 +39,7 @@ Future<void> main() async {
 
 class App extends StatelessWidget {
   static final ValueNotifier<ThemeMode> themeNotifier =
-      ValueNotifier(ThemeMode.light);
+  ValueNotifier(ThemeMode.light);
   const App({Key? key}) : super(key: key);
 
   @override
@@ -67,7 +67,7 @@ class App extends StatelessWidget {
               '/Messages': (context) => const Messages(),
               '/Profile': (context) => const Profile(),
               '/Settings': (context) => const Settings(),
-              '/profileInformation': (context) => const profileInformation(),
+              '/profileInformation': (context) => const ProfileInformation(),
               '/Friends': (context) => const Friends(),
               '/Houses': (context) => const Houses(),
               '/GroupOptions': (context) => const GroupOptions(),
@@ -79,9 +79,9 @@ class App extends StatelessWidget {
 
   void _loadSavedTheme() {
     String? locale = UserPreferences.getLocale();
-    if (locale != null) {
-      Get.updateLocale(Locale(locale));
-    }
+
+    Get.updateLocale(Locale(locale));
+
 
     bool? isDarkMode = UserPreferences.getBrightness();
     if (isDarkMode != null) {
@@ -179,9 +179,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         String response = await Auth()
                             .signInWithEmailAndPassword(
-                                _formKey.currentState?.fields['email']?.value,
-                                _formKey
-                                    .currentState?.fields['password']?.value);
+                            _formKey.currentState?.fields['email']?.value,
+                            _formKey
+                                .currentState?.fields['password']?.value);
 
                         if (response == 'success') {
                           Navigator.pushNamed(context, '/Scroller');
@@ -232,8 +232,9 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
   late Timer _timer;
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _passwordConfController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passwordConfController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   bool _passwordObscured = true;
   bool _passwordConfObscured = true;
@@ -321,7 +322,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         child: Column(
                           children: [
                             FormBuilderTextField(
-                              name: 'forename',
+                              name: 'ForeName',
                               decoration: const InputDecoration(
                                   labelText: 'First Name'),
                               // enabled: false,
@@ -335,9 +336,9 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                             const SizedBox(height: 10),
                             FormBuilderTextField(
-                              name: 'surname',
+                              name: 'SurName',
                               decoration:
-                                  const InputDecoration(labelText: 'Last Name'),
+                              const InputDecoration(labelText: 'Last Name'),
                               // enabled: false,
 
                               validator: (value) {
@@ -350,6 +351,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             const SizedBox(height: 15),
                             FormBuilderTextField(
                               name: 'email',
+                              controller: _emailController,
                               decoration: const InputDecoration(
                                   labelText: 'University Email'),
                               validator: (email) {
@@ -375,7 +377,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                     decoration: const InputDecoration(
                                         labelText: 'Password'),
                                     obscureText:
-                                        _passwordObscured, // Use the variable to control the obscuring
+                                    _passwordObscured, // Use the variable to control the obscuring
                                     controller: _passwordController,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -410,7 +412,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                     decoration: const InputDecoration(
                                         labelText: 'Confirm password'),
                                     obscureText:
-                                        _passwordConfObscured, // Use the variable to control the obscuring
+                                    _passwordConfObscured, // Use the variable to control the obscuring
                                     controller: _passwordConfController,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
@@ -428,7 +430,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   onPressed: () {
                                     setState(() {
                                       _passwordConfObscured =
-                                          !_passwordConfObscured;
+                                      !_passwordConfObscured;
                                     });
                                   },
                                   icon: Icon(_passwordConfObscured
@@ -479,10 +481,10 @@ class _SignupScreenState extends State<SignupScreen> {
                           child: Column(
                             children: [
                               FormBuilderTextField(
-                                name: 'bio',
+                                name: 'Bio',
                                 maxLength: 200,
                                 decoration:
-                                    const InputDecoration(labelText: 'Bio'),
+                                const InputDecoration(labelText: 'Bio'),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Please enter a bio';
@@ -493,7 +495,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               const SizedBox(height: 10),
                               FormBuilderDateTimePicker(
                                 inputType: InputType.date,
-                                name: "dob",
+                                name: "DOB",
                                 decoration: const InputDecoration(
                                     labelText: 'Date of Birth'),
                                 validator: (value) {
@@ -517,7 +519,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               ),
                               const SizedBox(height: 10),
                               FormBuilderTextField(
-                                name: 'subject',
+                                name: 'Subject',
                                 decoration: const InputDecoration(
                                     labelText: 'Subject Studied'),
                                 validator: (value) {
@@ -541,14 +543,25 @@ class _SignupScreenState extends State<SignupScreen> {
                                     return 'Please select a university';
                                   }
                                   final universitiesSuggestions =
-                                      universitiesData
-                                          .map((university) =>
-                                              university['name'])
-                                          .toList();
+                                  universitiesData
+                                      .map((university) =>
+                                  university['name'])
+                                      .toList();
 
                                   if (!universitiesSuggestions
                                       .contains(value)) {
                                     return 'Please select a valid university from the suggestions';
+                                  }
+                                  String emailDomain = _emailController.text.split('@')[1];
+
+                                  // Check if the email domain is valid for the selected university
+                                  Map<String, dynamic>? selectedUniversity = universitiesData
+                                      .firstWhere((university) => university['name'] == value, orElse: () => null);
+                                  if (selectedUniversity != null) {
+                                    List<String>? validDomains = selectedUniversity['domains']?.cast<String>();
+                                    if (validDomains != null && !validDomains.contains(emailDomain)) {
+                                      return 'The selected university does not match the email domain';
+                                    }
                                   }
                                   return null;
                                 },
@@ -556,8 +569,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                   // Return filtered universities based on the pattern
                                   return universitiesData
                                       .where((university) => university['name']
-                                          .toLowerCase()
-                                          .contains(pattern.toLowerCase()))
+                                      .toLowerCase()
+                                      .contains(pattern.toLowerCase()))
                                       .map((university) => university['name'])
                                       .toList();
                                 },
@@ -574,7 +587,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               ),
                               const SizedBox(height: 10),
                               FormBuilderSlider(
-                                name: 'yearOfStudy',
+                                name: 'YearOfStudy',
                                 initialValue: 1,
                                 min: 1,
                                 max: 7,
@@ -605,9 +618,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.lexend(
                                         color:
-                                            (userInfoValid & profileInfoValid)
-                                                ? Theme.of(context).primaryColor
-                                                : Colors.grey,
+                                        (userInfoValid & profileInfoValid)
+                                            ? Theme.of(context).primaryColor
+                                            : Colors.grey,
                                         fontWeight: FontWeight.normal,
                                         fontSize: 23)))),
                         title: Text("Preferences",
@@ -625,40 +638,40 @@ class _SignupScreenState extends State<SignupScreen> {
                           child: Column(
                             children: [
                               FormBuilderSlider(
-                                name: 'cleanliness',
+                                name: 'Cleanliness',
                                 initialValue: 2,
                                 min: 0,
                                 max: 5,
                                 divisions: 5,
                                 decoration: const InputDecoration(
                                     labelText:
-                                        'How much does Cleanliness matter to you?'),
+                                    'How much does Cleanliness matter to you?'),
                               ),
                               const SizedBox(height: 10),
                               FormBuilderSlider(
-                                name: 'noisiness',
+                                name: 'Noisiness',
                                 initialValue: 2,
                                 min: 0,
                                 max: 5,
                                 divisions: 5,
                                 decoration: const InputDecoration(
                                     labelText:
-                                        'How much does Noisiness matter to you?'),
+                                    'How much does Noisiness matter to you?'),
                               ),
                               const SizedBox(height: 10),
                               FormBuilderSlider(
-                                name: 'nightlife',
+                                name: 'NightLife',
                                 initialValue: 2,
                                 min: 0,
                                 max: 5,
                                 divisions: 5,
                                 decoration: const InputDecoration(
                                     labelText:
-                                        'How much does Nightlife matter to you?'),
+                                    'How much does Nightlife matter to you?'),
                               ),
                               const SizedBox(height: 10),
                               FormBuilderDateTimePicker(
-                                name: 'bedtime',
+                                name: 'Lights Out',
                                 initialValue: DateTime(
                                     DateTime.now().year,
                                     DateTime.now().month,
@@ -683,8 +696,8 @@ class _SignupScreenState extends State<SignupScreen> {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: (profileInfoValid &
-                                  userInfoValid &
-                                  preferenceInfoValid)
+                          userInfoValid &
+                          preferenceInfoValid)
                               ? Theme.of(context).colorScheme.primary
                               : Colors.grey,
                           shape: RoundedRectangleBorder(
@@ -696,20 +709,19 @@ class _SignupScreenState extends State<SignupScreen> {
                               horizontal: 24), // Adjust padding as needed
                         ),
                         onPressed: () async {
-                          // Validate and save the form values
-
                           if (_formKey.currentState?.saveAndValidate() ==
                               false) {
                             return;
                           }
-
                           // debugPrint(_formKey.currentState?.value.toString());
-
+                          Map<String,dynamic> data = Map<String,dynamic>.from(_formKey.currentState?.value ?? {});
+                          data['UniAttended'] = _universityController.text;
+                          Map<String,dynamic> reConfigedData = reConfigData(data);
                           String response =
-                              await Auth().registerWithUserDetails(
+                          await Auth().registerWithUserDetails(
                             _formKey.currentState?.fields['email']?.value,
                             _formKey.currentState?.fields['password']?.value,
-                            _formKey.currentState?.value ?? {},
+                            reConfigedData,
                           );
 
                           if (response == 'success') {
@@ -762,25 +774,25 @@ class _SignupScreenState extends State<SignupScreen> {
   void _validateForm() {
     _validateUniversity(_universityController.text);
     final userInfoComplete =
-        (_formKey.currentState?.fields['forename']?.isValid ?? false) &
-            (_formKey.currentState?.fields['surname']?.isValid ?? false) &
-            (_formKey.currentState?.fields['email']?.isValid ?? false) &
-            (_formKey.currentState?.fields['password']?.isValid ?? false) &
-            (_formKey.currentState?.fields['password_conf']?.isValid ?? false);
+    (_formKey.currentState?.fields['ForeName']?.isValid ?? false) &
+    (_formKey.currentState?.fields['SurName']?.isValid ?? false) &
+    (_formKey.currentState?.fields['email']?.isValid ?? false) &
+    (_formKey.currentState?.fields['password']?.isValid ?? false) &
+    (_formKey.currentState?.fields['password_conf']?.isValid ?? false);
 
     // Check if profile info section fields are complete
     final profileInfoComplete =
-        (_formKey.currentState?.fields['bio']?.isValid ?? false) &
-            (_formKey.currentState?.fields['dob']?.isValid ?? false) &
-            (_formKey.currentState?.fields['subject']?.isValid ?? false) &
-            (_universityValid) &
-            (_formKey.currentState?.fields['yearOfStudy']?.isValid ?? false);
+    (_formKey.currentState?.fields['Bio']?.isValid ?? false) &
+    (_formKey.currentState?.fields['DOB']?.isValid ?? false) &
+    (_formKey.currentState?.fields['Subject']?.isValid ?? false) &
+    (_universityValid) &
+    (_formKey.currentState?.fields['YearOfStudy']?.isValid ?? false);
 
     final preferenceInfoComplete =
-        (_formKey.currentState?.fields['cleanliness']?.isValid ?? false) &
-            (_formKey.currentState?.fields['noisiness']?.isValid ?? false) &
-            (_formKey.currentState?.fields['nightlife']?.isValid ?? false) &
-            (_formKey.currentState?.fields['bedtime']?.isValid ?? false);
+    (_formKey.currentState?.fields['Cleanliness']?.isValid ?? false) &
+    (_formKey.currentState?.fields['Noisiness']?.isValid ?? false) &
+    (_formKey.currentState?.fields['NightLife']?.isValid ?? false) &
+    (_formKey.currentState?.fields['Lights Out']?.isValid ?? false);
 
     setState(() {
       userInfoValid = userInfoComplete;
@@ -792,7 +804,7 @@ class _SignupScreenState extends State<SignupScreen> {
   void _validateUniversity(selectedUniversity) {
     bool temp = true;
     final universitiesSuggestions =
-        universitiesData.map((university) => university['name']).toList();
+    universitiesData.map((university) => university['name']).toList();
 
     if (!universitiesSuggestions.contains(selectedUniversity)) {
       temp = false;
@@ -800,6 +812,28 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() {
       _universityValid = temp;
     });
+  }
+
+  Map<String, dynamic> reConfigData(Map<String, dynamic> data) {
+    data.remove('password');
+    data.remove('password_conf');
+    data.remove('email');
+    data['Preferences'] = {'Noisiness': data['Noisiness'], 'Cleanliness': data['Cleanliness'], 'NightLife': data['NightLife'], 'Lights Out': data['Lights Out']};
+    data.remove('Noisiness');
+    data.remove('Cleanliness');
+    data.remove('NightLife');
+    data.remove('Lights Out');
+    data['Applications'] = [];
+    data['BlockedGroups'] = [];
+    data['FriendInvites'] = [];
+    data['Friends'] = [];
+    data['GroupInvites'] = [];
+    data['Groups'] = [];
+    data['Joined'] = [];
+    data['OutgoingFriendInvites'] = [];
+    data['ShortList'] = [];
+    data['Images'] = ["assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png"];
+    return data;
   }
 }
 

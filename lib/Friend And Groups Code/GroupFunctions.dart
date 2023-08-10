@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-const String userId = "iKxLSxcDqlT6vtHe71Bp";
 
 Future<void> updateGroupName(String newName, String groupId) async {
   try {
@@ -206,10 +205,12 @@ class _EditGroupNameState extends State<EditGroupName> {
 class ConfirmLeave extends StatelessWidget {
   final String groupId;
   final int memCount;
+  final String userId;
   const ConfirmLeave({
     Key? key,
     required this.groupId,
     required this.memCount,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -267,7 +268,7 @@ class ConfirmLeave extends StatelessWidget {
   }
 }
 
-Future<void> startKickVote(String kickId, String groupId) async {
+Future<void> startKickVote(String kickId, String groupId, userId) async {
   try {
     final CollectionReference groupsCollection =
     FirebaseFirestore.instance.collection('Groups');
@@ -348,7 +349,7 @@ Future<void> isKickVotesThresholdReached(String groupId, String kickId, int grou
   }
 }
 
-Future<void> updateKickVote(String groupId, bool agree, String kickId, int groupSize) async {
+Future<void> updateKickVote(String groupId, bool agree, String kickId, int groupSize, userId) async {
   try {
     final DocumentReference groupRef = FirebaseFirestore.instance.collection('Groups').doc(groupId);
     final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
@@ -421,7 +422,7 @@ Future<void> isAppVotesThresholdReached(String groupId, String appId, int groupS
   }
 }
 
-Future<void> updateApplicationVote(String groupId, bool agree, String appId, int groupSize) async {
+Future<void> updateApplicationVote(String groupId, bool agree, String appId, int groupSize, userId) async {
   try {
     final DocumentReference groupRef = FirebaseFirestore.instance.collection('Groups').doc(groupId);
     final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();

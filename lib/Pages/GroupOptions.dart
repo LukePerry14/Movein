@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
 import 'package:movein/Scroller%20Code/swipe_card.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/GroupFunctions.dart';
+
+import '../Auth code/auth.dart';
+import '../UserPreferences.dart';
 
 class GroupOptions extends StatefulWidget {
   const GroupOptions({Key? key}) : super(key: key);
@@ -295,7 +299,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                       const SizedBox(width: 13),
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: Text("Members",
+                        child: Text("mems".tr,
                             style: Theme.of(context).textTheme.headlineSmall),
                       ),
                     ],
@@ -405,7 +409,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                             child: Column(
                                               children: [
                                                 Text(
-                                                  "KickVote",
+                                                  "start_vote_kick".tr,
                                                   style:
                                                       GoogleFonts.sourceCodePro(
                                                     color: Colors.red,
@@ -416,7 +420,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 Row(
                                                   children: [
                                                     Text(
-                                                      "Agree: ${kickVals[memberDetails[index]["Id"]][0]}",
+                                                      "${"Agree".tr}: ${kickVals[memberDetails[index]["Id"]][0]}",
                                                       style: GoogleFonts
                                                           .sourceCodePro(
                                                         color: Colors.red,
@@ -435,7 +439,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                     ),
                                                     const SizedBox(width: 3),
                                                     Text(
-                                                      "Disagree: ${kickVals[memberDetails[index]["Id"]][1]}",
+                                                      "${'Disagree'.tr}: ${kickVals[memberDetails[index]["Id"]][1]}",
                                                       style: GoogleFonts
                                                           .sourceCodePro(
                                                         color: Colors.red,
@@ -454,7 +458,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                             PopupMenuItem<String>(
                                               value: 'add',
                                               child: Text(
-                                                'Add friend',
+                                                'add_friend'.tr,
                                                 style: Theme.of(context)
                                                     .textTheme
                                                     .bodyMedium,
@@ -466,7 +470,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                               PopupMenuItem(
                                                 value: 'agree',
                                                 child: Text(
-                                                  'Agree vote-kick',
+                                                  'agree'.tr,
                                                   style: Theme.of(context)
                                                       .textTheme
                                                       .bodyMedium,
@@ -476,7 +480,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                               PopupMenuItem(
                                                 value: 'disagree',
                                                 child: Text(
-                                                  'Disagree vote-kick',
+                                                  'disagree'.tr,
                                                   style: Theme.of(context)
                                                       .textTheme
                                                       .bodyMedium,
@@ -486,7 +490,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                               PopupMenuItem<String>(
                                                 value: 'kick',
                                                 child: Text(
-                                                  'Start Vote-kick',
+                                                  'start_vote_kick'.tr,
                                                   style: Theme.of(context)
                                                       .textTheme
                                                       .bodyMedium,
@@ -496,35 +500,40 @@ class _GroupOptionsState extends State<GroupOptions> {
                                           onSelected: (value) async {
                                             if (value == 'add') {
                                               sendFriendInvite(
-                                                  memberDetails[index]["Id"]);
+                                                  memberDetails[index]["Id"], Auth().currentUser(),);
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 SnackBar(
                                                   backgroundColor:
                                                       Theme.of(context)
                                                           .primaryColor,
-                                                  content: const Text(
-                                                      'Friend invite sent'),
+                                                  content: Text(
+                                                      'invite_sent'.tr, style: Theme.of(context).textTheme.bodySmall,),
                                                 ),
                                               );
                                             } else if (value == 'kick') {
                                               await startKickVote(
                                                   memberDetails[index]["Id"],
-                                                  groupId);
+                                                  groupId,
+                                                Auth().currentUser(),);
                                               _refreshData();
                                             } else if (value == 'agree') {
                                               await updateKickVote(
                                                   groupId,
                                                   true,
                                                   memberDetails[index]["Id"],
-                                                  memberDetails.length);
+                                                  memberDetails.length,
+                                                Auth().currentUser(),
+                                              );
                                               _refreshData();
                                             } else if (value == 'disagree') {
                                               await updateKickVote(
                                                   groupId,
                                                   false,
                                                   memberDetails[index]["Id"],
-                                                  memberDetails.length);
+                                                  memberDetails.length,
+                                                Auth().currentUser(),
+                                              );
                                               _refreshData();
                                             }
                                           },
@@ -548,7 +557,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                       const SizedBox(width: 13),
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: Text("Applications",
+                        child: Text("applications".tr,
                             style: Theme.of(context).textTheme.headlineSmall),
                       ),
                     ],
@@ -652,7 +661,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                               Row(
                                                 children: [
                                                   Text(
-                                                    "Agree: ${appVals[applicants[index]["Id"]][0]}",
+                                                    "${"agree".tr}: ${appVals[applicants[index]["Id"]][0]}",
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .bodyMedium,
@@ -666,7 +675,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                   ),
                                                   const SizedBox(width: 3),
                                                   Text(
-                                                    "Disagree: ${appVals[applicants[index]["Id"]][1]}",
+                                                    "${"disagree".tr}: ${appVals[applicants[index]["Id"]][1]}",
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .bodyMedium,
@@ -678,7 +687,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                   PopupMenuItem(
                                                     value: 'accept',
                                                     child: Text(
-                                                      'Vote accept',
+                                                      'vote-accept'.tr,
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .bodyMedium,
@@ -687,7 +696,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                   PopupMenuItem(
                                                     value: 'decline',
                                                     child: Text(
-                                                      'Vote decline',
+                                                      'vote-decline'.tr,
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .bodyMedium,
@@ -700,7 +709,9 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                         groupId,
                                                         true,
                                                         applicants[index]["Id"],
-                                                        memberDetails.length);
+                                                        memberDetails.length,
+                                                      Auth().currentUser(),
+                                                    );
                                                     _refreshData();
                                                   } else if (value ==
                                                       'decline') {
@@ -708,7 +719,9 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                         groupId,
                                                         false,
                                                         applicants[index]["Id"],
-                                                        memberDetails.length);
+                                                        memberDetails.length,
+                                                      Auth().currentUser(),
+                                                    );
                                                     _refreshData();
                                                   }
                                                 },
@@ -751,7 +764,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                             );
                           },
                           title: Text(
-                            "Preview Group",
+                            "preview".tr,
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         ),
@@ -766,7 +779,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                             _refreshData();
                           },
                           title: Text(
-                            "Edit Group Name",
+                            "edit_groupname",
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         ),
@@ -778,11 +791,12 @@ class _GroupOptionsState extends State<GroupOptions> {
                               builder: (BuildContext context) => ConfirmLeave(
                                 groupId: groupId,
                                 memCount: memberDetails.length,
+                                userId: Auth().currentUser(),
                               ),
                             );
                           },
                           title: Text(
-                            "Leave Group",
+                            "leave_group".tr,
                             style: GoogleFonts.roboto(
                                 color: Colors.red, fontSize: 16.5),
                           ),

@@ -20,12 +20,10 @@ class Auth {
       String email, String password, Map<String, dynamic> details) async {
     try {
       // This will create a new user in our firebase
-      print({email, password});
       var user = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      print(user.user?.uid);
 
       FirebaseFirestore.instance
           .collection("Users")

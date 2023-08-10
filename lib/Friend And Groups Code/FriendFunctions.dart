@@ -5,9 +5,9 @@ import 'package:movein/Scroller%20Code/HScroll.dart';
 import 'dart:io';
 //import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-const String userId = "iKxLSxcDqlT6vtHe71Bp";
 
-Future<List<Map<String, dynamic>>> getUserJoinedGroups() async {
+
+Future<List<Map<String, dynamic>>> getUserJoinedGroups(userId) async {
   try {
     final usersCollectionRef = FirebaseFirestore.instance.collection('Users');
     final userDocRef = usersCollectionRef.doc(userId);
@@ -52,16 +52,18 @@ Future<List<Map<String, dynamic>>> getUserJoinedGroups() async {
 
 class GroupInvite extends StatelessWidget {
   final String inviteeId;
+  final String userId;
   const GroupInvite({
     Key? key,
     required this.inviteeId,
+    required this.userId,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
 
     return FutureBuilder(
-      future: getUserJoinedGroups(),
+      future: getUserJoinedGroups(userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // While waiting for the data to load, you can show a loading indicator
@@ -119,7 +121,7 @@ class GroupInvite extends StatelessWidget {
                                     data[index]?["Members"]!.join(', '),
                                     style: Theme.of(context).textTheme.bodySmall),
                                 onTap: () {
-                                  inviteFriendToGroup(inviteeId, data[index]?["Id"]);
+                                  inviteFriendToGroup(inviteeId, data[index]?["Id"], userId);
                                   Navigator.of(context).pop();
                                 },
                               );
@@ -216,7 +218,7 @@ Future<void> removeFriend(String friendId) async{
   }
 }
 
-Future<void> inviteFriendToGroup(String friendId, String groupId) async {
+Future<void> inviteFriendToGroup(String friendId, String groupId, userId) async {
   try {
     final DocumentReference groupRef = FirebaseFirestore.instance.collection('Groups').doc(groupId);
     final DocumentReference userRef = FirebaseFirestore.instance.collection('Users').doc(friendId);
@@ -376,7 +378,7 @@ Future<void> joinGroup(String groupId, String userId) async {
 }
 
 
-Future<void> removeGroupInvite(String groupId) async {
+Future<void> removeGroupInvite(String groupId, userId) async {
   final CollectionReference usersCollection = FirebaseFirestore.instance.collection('Users');
   final DocumentReference userDoc = usersCollection.doc(userId);
 
@@ -386,7 +388,7 @@ Future<void> removeGroupInvite(String groupId) async {
   });
 }
 
-Future<void> addFriend(String inviteId) async {
+Future<void> addFriend(String inviteId, userId) async {
   // Access the "Users" collection
   final CollectionReference usersCollection =
   FirebaseFirestore.instance.collection('Users');
@@ -401,10 +403,10 @@ Future<void> addFriend(String inviteId) async {
       .doc(userId)
       .update({'Friends': FieldValue.arrayUnion([inviteId])});
 
-  removeFriendInvite(inviteId);
+  removeFriendInvite(inviteId, userId);
 }
 
-Future<void> removeFriendInvite(String inviteId) async {
+Future<void> removeFriendInvite(String inviteId, userId) async {
   final CollectionReference usersCollection =
   FirebaseFirestore.instance.collection('Users');
 
@@ -428,7 +430,7 @@ Future<void> removeFriendInvite(String inviteId) async {
   }
 }
 
-Future<void> removeOutFriendInvite(String inviteId) async {
+Future<void> removeOutFriendInvite(String inviteId, userId) async {
   final CollectionReference usersCollection =
   FirebaseFirestore.instance.collection('Users');
 
@@ -452,7 +454,7 @@ Future<void> removeOutFriendInvite(String inviteId) async {
   }
 }
 
-Future<void> sendFriendInvite(String invitee) async {
+Future<void> sendFriendInvite(String invitee, userId) async {
   try {
     final CollectionReference usersCollection = FirebaseFirestore.instance.collection('Users');
 
@@ -483,10 +485,12 @@ Future<void> sendFriendInvite(String invitee) async {
 class ConfirmGroupDel extends StatelessWidget {
   final String groupId;
   final String groupType;
+  final String userId;
   const ConfirmGroupDel({
     Key? key,
     required this.groupId,
     required this.groupType,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -520,7 +524,7 @@ class ConfirmGroupDel extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                       onPressed: () {
-                        removeGroupFromUser(groupType, groupId).then((_){
+                        removeGroupFromUser(groupType, groupId, userId).then((_){
                           Navigator.of(context).pushReplacementNamed('/Friends');
                         });
 
@@ -539,7 +543,7 @@ class ConfirmGroupDel extends StatelessWidget {
   }
 }
 
-Future<void> removeGroupFromUser(String groupType, String groupId) async {
+Future<void> removeGroupFromUser(String groupType, String groupId, userId) async {
   try {
     final DocumentReference userRef = FirebaseFirestore.instance.collection('Users').doc(userId);
 
@@ -722,7 +726,11 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
 }
 
 class SendFriendInvite extends StatefulWidget {
-  const SendFriendInvite({Key? key,}) : super(key: key);
+  final String userId;
+  const SendFriendInvite({
+    Key? key,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   State<SendFriendInvite> createState() => _SendFriendInviteState();
@@ -811,7 +819,7 @@ class _SendFriendInviteState extends State<SendFriendInvite> {
                     onPressed: _isButtonEnabled ?  () {
                       if (formKey.currentState!.validate()) {
                         final String inviteeId = _textEditingController.text;
-                        sendFriendInvite(inviteeId).then((value) => Navigator.of(context).pushReplacementNamed('/Friends'));
+                        sendFriendInvite(inviteeId, widget.userId).then((value) => Navigator.of(context).pushReplacementNamed('/Friends'));
                       }
                     } : null,
                     child: Text("Confirm", style: Theme.of(context).textTheme.bodyMedium),

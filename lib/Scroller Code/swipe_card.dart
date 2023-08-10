@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
+import '../Auth code/auth.dart';
 
 class SwipeCard extends StatelessWidget {
   final String id;
@@ -289,9 +291,9 @@ class CustomDialog extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Attends $uni", style: Theme.of(context).textTheme.headlineSmall),
+                                  Text("${"attends".tr} $uni", style: Theme.of(context).textTheme.headlineSmall),
                                   const SizedBox(height:3),
-                                  Text("Studying $subject", style: Theme.of(context).textTheme.bodyMedium),
+                                  Text("${"studying".tr} $subject", style: Theme.of(context).textTheme.bodyMedium),
                                 ],
                               ),
                             ),
@@ -321,7 +323,7 @@ class CustomDialog extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Bio:", style: Theme.of(context).textTheme.headlineSmall),
+                                  Text("${"bio".tr}:", style: Theme.of(context).textTheme.headlineSmall),
                                   Text(bio, style: Theme.of(context).textTheme.bodyMedium),
                                 ],
                               ),
@@ -352,7 +354,7 @@ class CustomDialog extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("Preferences", style: Theme.of(context).textTheme.headlineSmall,),
+                                  Text("${"preferences".tr}:", style: Theme.of(context).textTheme.headlineSmall,),
                                   const SizedBox(height: 5), // Add a small gap between title and widgets
                                   ...preferenceWidgets.map((widget) => Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,11 +396,11 @@ class CustomDialog extends StatelessWidget {
                       splashRadius: 20,
                       icon: const Icon(LineAwesomeIcons.user_plus),
                       onPressed: () {
-                        sendFriendInvite(id);
+                        sendFriendInvite(id, Auth().currentUser(),);
                         ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                                 backgroundColor: Theme.of(context).primaryColor,
-                                content: Text('Friend invite sent', style: Theme.of(context).textTheme.bodySmall)
+                                content: Text('invite_sent'.tr, style: Theme.of(context).textTheme.bodySmall)
                             )
                         );
                       },
@@ -411,10 +413,5 @@ class CustomDialog extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void showSnackbar(BuildContext context) {
-    final snackBar = SnackBar(content: Text('Friend invite sent'));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

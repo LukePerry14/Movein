@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/navbar.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
 import 'package:movein/Scroller%20Code/swipe_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'package:shared_preferences/shared_preferences.dart';
+import '../Auth code/auth.dart';
+
 
 class Friends extends StatefulWidget {
   const Friends({Key? key}) : super(key: key);
@@ -14,7 +16,6 @@ class Friends extends StatefulWidget {
 }
 
 class _FriendsState extends State<Friends> {
-  final String userId = 'iKxLSxcDqlT6vtHe71Bp';
   late List<dynamic> friends;
   late List<dynamic> searchResults;
   late List<dynamic> groupInvites;
@@ -60,7 +61,7 @@ class _FriendsState extends State<Friends> {
         FirebaseFirestore.instance.collection("Users");
 
 
-        DocumentSnapshot docSnapshot = await docUsers.doc(userId).get();
+        DocumentSnapshot docSnapshot = await docUsers.doc(Auth().currentUser()).get();
         Map<String, dynamic>? data = docSnapshot.data() as Map<String, dynamic>?;
 
         tGroups = List<String>.from(data?[type] ?? []);
@@ -86,7 +87,7 @@ class _FriendsState extends State<Friends> {
 
           allGroups.add(groups);
       }
-      final usersSnapshot = await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+      final usersSnapshot = await FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser()).get();
       final groupIds = List<String>.from(usersSnapshot.data()?['GroupInvites'] ?? []);
 
       if (!groupIds.contains("")){
@@ -318,7 +319,7 @@ class _FriendsState extends State<Friends> {
                       height: 40,
                       width: double.maxFinite,
                       child: SearchBar(
-                        hintText: "Search",
+                        hintText: "search".tr,
                         onChanged: (value) {
                           searchText = value;
                           filterSearchResults(value);
@@ -328,7 +329,7 @@ class _FriendsState extends State<Friends> {
                             onPressed: () {
                               showDialog<String>(
                                 context: context,
-                                builder: (BuildContext context) => const SendFriendInvite(),
+                                builder: (BuildContext context) => SendFriendInvite(userId: Auth().currentUser(),),
                               );
                             },
                             icon: const Icon(LineAwesomeIcons.user_plus),
@@ -342,7 +343,7 @@ class _FriendsState extends State<Friends> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text("Your Groups", style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.left,),
+                          Text("your_groups".tr, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.left,),
                           Expanded(child: Container()),
                           ElevatedButton(
                             style: ButtonStyle(
@@ -354,14 +355,14 @@ class _FriendsState extends State<Friends> {
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
-                                      title: const Text('Maximum Number of Groups Reached'),
-                                      content: const Text('You are already in the maximum number of groups. To create your own group, you need to leave one of your existing groups.'),
+                                      title: Text('max_groups_title'.tr, style: Theme.of(context).textTheme.bodyMedium,),
+                                      content: Text('max_groups_desc'.tr, style: Theme.of(context).textTheme.bodySmall),
                                       actions: [
                                         TextButton(
                                           onPressed: () {
                                             Navigator.pop(context); // Close the dialog
                                           },
-                                          child: const Text('OK'),
+                                          child: Text('ok'.tr, style: Theme.of(context).textTheme.bodyMedium,),
                                         ),
                                       ],
                                     );
@@ -386,7 +387,7 @@ class _FriendsState extends State<Friends> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text('Create Group', style: Theme.of(context).textTheme.bodyMedium),
+                                  Text('create_group'.tr, style: Theme.of(context).textTheme.bodyMedium),
                                   Icon(LineAwesomeIcons.plus, size: 20, color: Theme.of(context).textTheme.bodyMedium?.color,),
                                 ],
                               ),
@@ -404,7 +405,7 @@ class _FriendsState extends State<Friends> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: isLoading ? const Center(child: CircularProgressIndicator())
-                          : (joinedResults.isEmpty & applicationsResults.isEmpty & shortListResults.isEmpty) ? Padding(padding: const EdgeInsets.all(10), child: Text("No Groups", style: Theme.of(context).textTheme.bodyMedium,))
+                          : (joinedResults.isEmpty & applicationsResults.isEmpty & shortListResults.isEmpty) ? Padding(padding: const EdgeInsets.all(10), child: Text("no_groups".tr, style: Theme.of(context).textTheme.bodyMedium,))
                           : ListView.builder(
                         shrinkWrap: true,
                         itemCount: joinedResults.length + applicationsResults.length + shortListResults.length + 3,
@@ -415,7 +416,7 @@ class _FriendsState extends State<Friends> {
                                 children: [
                                   const SizedBox(width: 20),
                                   Text(
-                                    "Joined",
+                                    "joined".tr,
                                     style: Theme.of(context).textTheme.headlineSmall,
                                   ),
                                   const SizedBox(width: 15),
@@ -491,7 +492,7 @@ class _FriendsState extends State<Friends> {
                                 children: [
                                   const SizedBox(width: 20),
                                   Text(
-                                    "Applications",
+                                    "applications".tr,
                                     style: Theme.of(context).textTheme.headlineSmall,
                                   ),
                                 ]
@@ -551,7 +552,7 @@ class _FriendsState extends State<Friends> {
                                         onPressed: () {
                                           showDialog<String>(
                                             context: context,
-                                            builder: (BuildContext context) => ConfirmGroupDel(groupId: applicationsResults[applicationIndex]["Id"], groupType: "Applications")
+                                            builder: (BuildContext context) => ConfirmGroupDel(groupId: applicationsResults[applicationIndex]["Id"], groupType: "Applications", userId: Auth().currentUser(),)
                                           );
                                         },
                                         splashRadius: 1,
@@ -568,7 +569,7 @@ class _FriendsState extends State<Friends> {
                                 children: [
                                   const SizedBox(width: 20),
                                   Text(
-                                    "ShortList",
+                                    "sList".tr,
                                     style: Theme.of(context).textTheme.headlineSmall,
                                   ),
                                 ]
@@ -628,7 +629,7 @@ class _FriendsState extends State<Friends> {
                                         onPressed: () {
                                           showDialog<String>(
                                               context: context,
-                                              builder: (BuildContext context) => ConfirmGroupDel(groupId: shortListResults[shortlistIndex]["Id"], groupType: "ShortList")
+                                              builder: (BuildContext context) => ConfirmGroupDel(groupId: shortListResults[shortlistIndex]["Id"], groupType: "ShortList", userId: Auth().currentUser(),)
                                           );
                                         },
                                         splashRadius: 1,
@@ -647,7 +648,7 @@ class _FriendsState extends State<Friends> {
                   ),
                   SizedBox(
                       width: MediaQuery.of(context).size.width * 0.9,
-                      child: Text("Your Friends", style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.left,)
+                      child: Text("Your_friends".tr, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.left,)
                   ),
                   Padding(
                     padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
@@ -723,7 +724,7 @@ class _FriendsState extends State<Friends> {
                                             if (value == 'invite') {
                                               showDialog<String>(
                                                   context: context,
-                                                  builder: (BuildContext context) => GroupInvite(inviteeId: searchResults[index]["Id"])
+                                                  builder: (BuildContext context) => GroupInvite(inviteeId: searchResults[index]["Id"], userId: Auth().currentUser(),)
                                               );
 
                                             } else if (value == 'remove') {
@@ -747,7 +748,7 @@ class _FriendsState extends State<Friends> {
                           if (outgoingFriendInvitesResults.isNotEmpty)
                             SizedBox(
                                 width: MediaQuery.of(context).size.width * 0.9,
-                                child: Text("OutGoing Friend Invites", style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)
+                                child: Text('outGoing_friend_invite'.tr, style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)
                             ),
                           if (outgoingFriendInvitesResults.isNotEmpty)
                             ListView.builder(
@@ -802,12 +803,12 @@ class _FriendsState extends State<Friends> {
                                           itemBuilder: (context) => [
                                             PopupMenuItem<String>(
                                               value: 'remove',
-                                              child: Text('Cancel invite', style: Theme.of(context).textTheme.bodyMedium),
+                                              child: Text('cancel_invite', style: Theme.of(context).textTheme.bodyMedium),
                                             ),
                                           ],
                                           onSelected: (value) async {
                                             if (value == 'remove') {
-                                              await removeOutFriendInvite(outgoingFriendInvitesResults[index]['Id']);
+                                              await removeOutFriendInvite(outgoingFriendInvitesResults[index]['Id'], Auth().currentUser(),);
                                               Navigator.of(context).pushReplacementNamed("/Friends");
                                             }
                                           },
@@ -826,12 +827,12 @@ class _FriendsState extends State<Friends> {
                   ),
 
                   const SizedBox(height: 20),
-                  Text("Invites", style: Theme.of(context).textTheme.headlineMedium),
+                  Text("invites".tr, style: Theme.of(context).textTheme.headlineMedium),
                   const Divider(),
                   const SizedBox(height: 15),
                   SizedBox(
                       width: MediaQuery.of(context).size.width * 0.9,
-                      child: Text("Group Invites", style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)
+                      child: Text("group_invites".tr, style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)
                   ),
                   Padding(
                     padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
@@ -843,7 +844,7 @@ class _FriendsState extends State<Friends> {
                       child: Column(
                         children: [
                           isLoading ? const Center(child: CircularProgressIndicator())
-                              : groupSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10),child: Text("No Group Invites", style: Theme.of(context).textTheme.bodyMedium,),)
+                              : groupSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10),child: Text("no_group_invites".tr, style: Theme.of(context).textTheme.bodyMedium,),)
                               : ListView.builder(
                             shrinkWrap: true,
                             itemCount: groupSearchResults.length,
@@ -901,19 +902,19 @@ class _FriendsState extends State<Friends> {
                                           itemBuilder: (context) => [
                                             PopupMenuItem<String>(
                                               value: 'accept',
-                                              child: Text('Apply to group', style: Theme.of(context).textTheme.bodyMedium),
+                                              child: Text('apply_to_group'.tr, style: Theme.of(context).textTheme.bodyMedium),
                                             ),
                                             PopupMenuItem<String>(
                                               value: 'reject',
-                                              child: Text('Reject group', style: Theme.of(context).textTheme.bodyMedium),
+                                              child: Text('reject_group'.tr, style: Theme.of(context).textTheme.bodyMedium),
                                             ),
                                           ],
                                           onSelected: (value) async{
                                             if (value == 'accept') {
-                                              await joinGroup(groupSearchResults[index]["Id"], userId);
+                                              await joinGroup(groupSearchResults[index]["Id"], Auth().currentUser());
                                               Navigator.of(context).pushReplacementNamed("/Friends");
                                             } else if (value == 'reject') {
-                                              await removeGroupInvite(groupSearchResults[index]["Id"]);
+                                              await removeGroupInvite(groupSearchResults[index]["Id"], Auth().currentUser(),);
                                               Navigator.of(context).pushReplacementNamed("/Friends");
                                             }
                                           },
@@ -933,7 +934,7 @@ class _FriendsState extends State<Friends> {
                   const SizedBox(height: 15),
                   SizedBox(
                       width: MediaQuery.of(context).size.width * 0.9,
-                      child: Text("Friend Invites", style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)
+                      child: Text("friend_invites".tr, style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)
                   ),
                   Padding(
                     padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
@@ -945,7 +946,7 @@ class _FriendsState extends State<Friends> {
                       child: Column(
                         children: [
                           isLoading ? const Center(child: CircularProgressIndicator())
-                              : friendSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10), child: Text("No Friend Invites", style: Theme.of(context).textTheme.bodyMedium,))
+                              : friendSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10), child: Text("np_friend_invites".tr, style: Theme.of(context).textTheme.bodyMedium,))
                               : ListView.builder(
                             shrinkWrap: true,
                             itemCount: friendSearchResults.length,
@@ -994,19 +995,19 @@ class _FriendsState extends State<Friends> {
                                           itemBuilder: (context) => [
                                             PopupMenuItem<String>(
                                               value: 'accept',
-                                              child: Text('Accept Friend', style: Theme.of(context).textTheme.bodyMedium),
+                                              child: Text('accept_friend'.tr, style: Theme.of(context).textTheme.bodyMedium),
                                             ),
                                             PopupMenuItem<String>(
                                               value: 'reject',
-                                              child: Text('Reject Friend', style: Theme.of(context).textTheme.bodyMedium),
+                                              child: Text('reject_friend', style: Theme.of(context).textTheme.bodyMedium),
                                             ),
                                           ],
                                           onSelected: (value) async{
                                             if (value == 'accept') {
-                                              await addFriend(friendSearchResults[index]["Id"]);
+                                              await addFriend(friendSearchResults[index]["Id"], Auth().currentUser(),);
                                               Navigator.of(context).pushReplacementNamed("/Friends");
                                             } else if (value == 'reject') {
-                                              await removeFriendInvite(friendSearchResults[index]["Id"]);
+                                              await removeFriendInvite(friendSearchResults[index]["Id"], Auth().currentUser(),);
                                               Navigator.of(context).pushReplacementNamed("/Friends");
                                             }
                                           },

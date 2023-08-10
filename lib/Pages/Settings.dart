@@ -88,17 +88,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 size: 50,
               ),
               const SizedBox(width: 10),
-              const Text("Settings", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 22))
+              Text("settings".tr, style: Theme.of(context).textTheme.headlineLarge)
             ],
           ),
           const Divider(height: 20, thickness: 1),
           const SizedBox(height: 10),
           buildChangePassword(context, 'Change Password'),
-          buildChangeEmail(context, 'Change Email'),
-          buildChangeLanguage(context, 'Language'),
-          buildReviewAds(context, 'Premium'),
-          buildAccountOption(context, 'Privacy and Security'),
-          buildAccountOption(context, 'Terms and Conditions'),
+          //buildChangeEmail(context, 'Change Email'),
+          buildChangeLanguage(context, 'language'.tr),
+          buildReviewAds(context, 'premium'.tr),
+          buildAccountOption(context, 'privacy'.tr),
+          buildAccountOption(context, 't&c'.tr),
         ],
       ),
     );
@@ -174,13 +174,13 @@ GestureDetector buildChangePassword(BuildContext context, String title) {
               padding: const EdgeInsets.all(15.0),
               child: Column(
                 children: [
-                  const Text('Change Password', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                  Text('change-password'.tr, style: Theme.of(context).textTheme.headlineMedium),
                   const SizedBox(height: 20),
-                  const TextField(
+                  TextField(
                     obscureText: true,
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Password'
+                      border: const OutlineInputBorder(),
+                      labelText: 'password'.tr
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -312,12 +312,12 @@ GestureDetector buildChangeLanguage(BuildContext context, String title) {
                     ),
                     Align(
                       alignment: Alignment.bottomCenter,
-                        child: Text('Language', style: Theme.of(context).textTheme.headlineSmall)
+                        child: Text('language'.tr, style: Theme.of(context).textTheme.headlineSmall)
                     ),
                   ],
                 ),
                 const Padding(
-                  padding: const EdgeInsets.all(15.0),
+                  padding: EdgeInsets.all(15.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [

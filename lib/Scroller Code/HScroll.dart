@@ -132,7 +132,7 @@ class _GscrollerState extends State<Gscroller> {
                     Container(
                       alignment: Alignment.center,
                       child: Text(
-                        "Most asleep around $formattedTime",
+                        "${"asleep".tr} $formattedTime",
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
@@ -140,7 +140,7 @@ class _GscrollerState extends State<Gscroller> {
                     Container(
                       alignment: Alignment.center,
                       child: Text(
-                        "Average house cleanliness: ${widget.avgCleanliness}/5",
+                        "${"clean".tr}: ${widget.avgCleanliness}/5",
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
@@ -148,7 +148,7 @@ class _GscrollerState extends State<Gscroller> {
                     Container(
                       alignment: Alignment.center,
                       child: Text(
-                        "Average house noisiness: ${widget.avgNoisiness}/5",
+                        "${"noise".tr}: ${widget.avgNoisiness}/5",
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),
@@ -156,7 +156,7 @@ class _GscrollerState extends State<Gscroller> {
                     Container(
                       alignment: Alignment.center,
                       child: Text(
-                        "Average house nightlife rating: ${widget.avgNightLife}/5",
+                        "${"nightlife".tr}: ${widget.avgNightLife}/5",
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),

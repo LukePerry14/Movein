@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,6 +7,8 @@ import 'package:movein/navbar.dart';
 import 'package:movein/Scroller%20Code/HScroll.dart';
 import 'package:movein/Ad%20code/ad_helper.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+
+import '../Auth code/auth.dart';
 
 class Scroller extends StatefulWidget {
   const Scroller({Key? key}) : super(key: key);
@@ -19,7 +20,6 @@ class Scroller extends StatefulWidget {
 class _ScrollerState extends State<Scroller> {
   bool refresh = true;
   int index = 0;
-  final String userId = "iKxLSxcDqlT6vtHe71Bp";
   late NativeAd _ad;
   bool _isAdLoaded = false;
   bool adTime = true;
@@ -37,7 +37,7 @@ class _ScrollerState extends State<Scroller> {
         Map<String, dynamic>? data =
             docSnapshot.data() as Map<String, dynamic>?;
 
-        if (docSnapshot.exists && !data?["BlackList"].contains(userId)) {
+        if (docSnapshot.exists && !data?["BlackList"].contains(Auth().currentUser())) {
           //change this line to use the stored userId
 
           Map<String, dynamic> groupData = {
@@ -75,14 +75,14 @@ class _ScrollerState extends State<Scroller> {
       if (groupSnapshot.exists) {
         // Perform array union on BlackList field within the group document
         await groupCollection.doc(groupId).update({
-          'BlackList': FieldValue.arrayUnion([userId])
+          'BlackList': FieldValue.arrayUnion([Auth().currentUser()])
         });
 
         // Access the user document
-        DocumentSnapshot userSnapshot = await userCollection.doc(userId).get();
+        DocumentSnapshot userSnapshot = await userCollection.doc(Auth().currentUser()).get();
         if (userSnapshot.exists) {
           // Perform array union on BlockedGroups field within the user document
-          await userCollection.doc(userId).update({
+          await userCollection.doc(Auth().currentUser()).update({
             'BlockedGroups': FieldValue.arrayUnion([groupId])
           });
         } else {
@@ -103,7 +103,7 @@ class _ScrollerState extends State<Scroller> {
     final CollectionReference usersCollection =
         FirebaseFirestore.instance.collection('Users');
 
-    usersCollection.doc(userId).update({
+    usersCollection.doc(Auth().currentUser()).update({
       'ShortList': FieldValue.arrayUnion([groupId])
     }).catchError((e) {
       throw FirebaseException(
@@ -119,7 +119,7 @@ class _ScrollerState extends State<Scroller> {
     final DocumentReference groupDocRef = groupsCollection.doc(groupId);
 
     groupDocRef.update({
-      'Applicants': FieldValue.arrayUnion([userId])
+      'Applicants': FieldValue.arrayUnion([Auth().currentUser()])
     }).catchError((e) {
       throw FirebaseException(
           message: 'Error adding to group field "Applicants": $e',
@@ -127,7 +127,7 @@ class _ScrollerState extends State<Scroller> {
     });
 
     final DocumentReference userDocRef =
-        FirebaseFirestore.instance.collection('Users').doc(userId);
+        FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser());
 
     userDocRef.update({
       'Applications': FieldValue.arrayUnion([groupId])
@@ -141,24 +141,23 @@ class _ScrollerState extends State<Scroller> {
   }
 
   void loadNativeAd() {
-    return;
-    if (!kIsWeb) {
-      _ad = NativeAd(
-        adUnitId:
-            'ca-app-pub-3940256099942544/2247696110', //AdHelper.nativeAdUnitId,
-        request: const AdRequest(),
-        listener: NativeAdListener(onAdLoaded: (ad) {
-          setState() {
-            _isAdLoaded = true;
-          }
-        }, onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-          print("Error to load ad ${error.message}, ${error.code}");
-        }),
-      );
-
-      _ad.load();
-    }
+    // if (!kIsWeb) {
+    //   _ad = NativeAd(
+    //     adUnitId:
+    //         'ca-app-pub-3940256099942544/2247696110', //AdHelper.nativeAdUnitId,
+    //     request: const AdRequest(),
+    //     listener: NativeAdListener(onAdLoaded: (ad) {
+    //       setState() {
+    //         _isAdLoaded = true;
+    //       }
+    //     }, onAdFailedToLoad: (ad, error) {
+    //       ad.dispose();
+    //       print("Error to load ad ${error.message}, ${error.code}");
+    //     }),
+    //   );
+    //
+    //   _ad.load();
+    // }
   }
 
   @override
