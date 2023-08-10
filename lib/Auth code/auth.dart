@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Auth {
@@ -11,27 +10,34 @@ class Auth {
     return methods.isNotEmpty;
   }
 
+  String currentUser() {
+    final User? user = _auth.currentUser;
+    final uid = user?.uid.toString();
+    return uid ?? "";
+  }
+
   Future<String> registerWithUserDetails(
       String email, String password, Map<String, dynamic> details) async {
     try {
       // This will create a new user in our firebase
-      // print({email, password});
-      // await _auth.createUserWithEmailAndPassword(
-      //   email: email,
-      //   password: password,
-      // );
+      print({email, password});
+      var user = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      print(user.user?.uid);
 
-      print(details);
+      FirebaseFirestore.instance
+          .collection("Users")
+          .doc(user.user?.uid)
+          .set(details);
 
-      FirebaseFirestore.instance.collection("Users").add(details).then(
-          (DocumentReference doc) =>
-              print('DocumentSnapshot added with ID: ${doc.id}'));
+      return 'success';
     } on FirebaseAuthException catch (e) {
       return e.code;
     } catch (e) {
       return 'Unknown error.';
     }
-    return 'Signing in...';
   }
 
   Future<String> signInWithEmailAndPassword(
@@ -42,6 +48,7 @@ class Auth {
         email: email,
         password: password,
       );
+
       return "success";
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {

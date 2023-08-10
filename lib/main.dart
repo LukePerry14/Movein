@@ -27,19 +27,19 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await UserPreferences.init();
+  var UP = await UserPreferences.init();
   // await Settings.init(cacheProvider: CustomCacheProvider());
   // Run the app
   runApp(const App());
 }
 
 class App extends StatelessWidget {
-  static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+  static final ValueNotifier<ThemeMode> themeNotifier =
+      ValueNotifier(ThemeMode.light);
   const App({Key? key}) : super(key: key);
 
   @override
@@ -49,33 +49,34 @@ class App extends StatelessWidget {
     return ValueListenableBuilder<ThemeMode>(
         valueListenable: App.themeNotifier,
         builder: (context, currentMode, child) {
-        return GetMaterialApp(
-          debugShowCheckedModeBanner: false,
-          translations: AppTranslations(),
-          locale: Get.deviceLocale,
-          theme: LAppTheme.lightTheme,
-          darkTheme: LAppTheme.darkTheme,
-          themeMode: currentMode,
-          initialRoute:
-              FirebaseAuth.instance.currentUser == null ? '/Login' : '/Scroller',
-          routes: {
-            '/Login': (context) => const LoginScreen(),
-            '/Signup': (context) => const SignupScreen(),
-            '/Scroller': (context) => const Scroller(),
-            '/ScrollRefresh': (context) => const RanOut(),
-            '/Messages': (context) => const Messages(),
-            '/Profile': (context) => const Profile(),
-            '/Settings': (context) => const Settings(),
-            '/profileInformation': (context) => const profileInformation(),
-            '/Friends': (context) => const Friends(),
-            '/Houses': (context) => const Houses(),
-            '/GroupOptions': (context) => const GroupOptions(),
-            '/OnBoarding' : (context) => const OnBoardingPage(),
-          },
-        );
-      }
-    );
+          return GetMaterialApp(
+            debugShowCheckedModeBanner: false,
+            translations: AppTranslations(),
+            locale: Get.deviceLocale,
+            theme: LAppTheme.lightTheme,
+            darkTheme: LAppTheme.darkTheme,
+            themeMode: currentMode,
+            initialRoute: FirebaseAuth.instance.currentUser == null
+                ? '/Login'
+                : '/Scroller',
+            routes: {
+              '/Login': (context) => const LoginScreen(),
+              '/Signup': (context) => const SignupScreen(),
+              '/Scroller': (context) => const Scroller(),
+              '/ScrollRefresh': (context) => const RanOut(),
+              '/Messages': (context) => const Messages(),
+              '/Profile': (context) => const Profile(),
+              '/Settings': (context) => const Settings(),
+              '/profileInformation': (context) => const profileInformation(),
+              '/Friends': (context) => const Friends(),
+              '/Houses': (context) => const Houses(),
+              '/GroupOptions': (context) => const GroupOptions(),
+              '/OnBoarding': (context) => const OnBoardingPage(),
+            },
+          );
+        });
   }
+
   void _loadSavedTheme() {
     String? locale = UserPreferences.getLocale();
     if (locale != null) {
@@ -164,18 +165,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primary,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20), // Adjust the radius as needed
+                          borderRadius: BorderRadius.circular(
+                              20), // Adjust the radius as needed
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24), // Adjust padding as needed
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 24), // Adjust padding as needed
                       ),
                       onPressed: () async {
                         if (_formKey.currentState?.saveAndValidate() == false) {
                           return;
                         }
 
-                        String response = await Auth().signInWithEmailAndPassword(
-                            _formKey.currentState?.fields['email']?.value,
-                            _formKey.currentState?.fields['password']?.value);
+                        String response = await Auth()
+                            .signInWithEmailAndPassword(
+                                _formKey.currentState?.fields['email']?.value,
+                                _formKey
+                                    .currentState?.fields['password']?.value);
 
                         if (response == 'success') {
                           Navigator.pushNamed(context, '/Scroller');
@@ -191,14 +197,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
                         return;
                       },
-                      child: Text('Login', style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 16.5)),
+                      child: Text('Login',
+                          style: GoogleFonts.redHatDisplay(
+                              color: Colors.white, fontSize: 16.5)),
                     ),
                     const SizedBox(height: 10),
                     TextButton(
                       onPressed: () async {
                         Navigator.pushNamed(context, '/Signup');
                       },
-                      child: Text('Want to sign up instead?', style: GoogleFonts.redHatDisplay(color: Theme.of(context).primaryColor, fontSize: 16.5)),
+                      child: Text('Want to sign up instead?',
+                          style: GoogleFonts.redHatDisplay(
+                              color: Theme.of(context).primaryColor,
+                              fontSize: 16.5)),
                     )
                   ],
                 ),
@@ -230,7 +241,6 @@ class _SignupScreenState extends State<SignupScreen> {
   final _universityFocusNode = FocusNode();
   bool _universityValid = true;
 
-
   String errorMessage = "";
   bool userInfoValid = false;
   bool profileInfoValid = false;
@@ -256,517 +266,521 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-          return Builder(
-            builder: (context) {
-              return Scaffold(
-                body: CustomScrollView(
-                  slivers: [
-                    SliverAppBar(
-                      backgroundColor: Theme
-                          .of(context)
-                          .canvasColor,
-                      centerTitle: true,
-                      elevation: 0,
-                      floating: true,
-                      // Make the SliverAppBar automatically hide when scrolling down
-                      leading: IconButton(
-                        icon: Icon(LineAwesomeIcons.angle_left, color: Theme
-                            .of(context)
-                            .primaryColor),
-                        color: Colors.grey[500],
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: FormBuilder(
-                          autovalidateMode: AutovalidateMode.always,
-                          key: _formKey,
-                          child: Column(
-                            children: [
-                              ListTile(
-                                enableFeedback: false,
-                                enabled: true,
-                                leading: Container(
-                                    width: 50,
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Theme
-                                          .of(context)
-                                          .primaryColor, width: 1),
-                                      borderRadius: BorderRadius.circular(100),
-                                    ),
-                                    child: Center(child: Text(
-                                        "1", textAlign: TextAlign.center,
-                                        style: GoogleFonts.lexend(color: Theme
-                                            .of(context)
-                                            .primaryColor,
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 23)))
-                                ),
-                                title: Text("User Info", style: Theme
-                                    .of(context)
-                                    .textTheme
-                                    .headlineSmall),
-                              ),
-                              const SizedBox(height: 10),
-                              Padding(
-                                padding: const EdgeInsets.all(15),
-                                child: Column(
-                                  children: [
-                                    FormBuilderTextField(
-                                      name: 'forename',
-                                      decoration: const InputDecoration(
-                                          labelText: 'First Name'),
-                                      // enabled: false,
-
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter your first name';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                    const SizedBox(height: 10),
-                                    FormBuilderTextField(
-                                      name: 'surname',
-                                      decoration: const InputDecoration(
-                                          labelText: 'Last Name'),
-                                      // enabled: false,
-
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter your Surname';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                    const SizedBox(height: 15),
-                                    FormBuilderTextField(
-                                      name: 'email',
-                                      decoration: const InputDecoration(labelText: 'University Email'),
-                                      validator: (email) {
-                                        if (email == null || email.isEmpty) {
-                                          return 'Please enter your email';
-                                        }
-                                        if (!EmailValidator.validate(email)) {
-                                          return 'Please enter a valid email address';
-                                        }
-                                        if (!domains.any((domain) => email.contains(domain))) {
-                                          return 'Email domain is not valid';
-                                        }
-                                        return null;
-                                      },
-
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Row(
-                                      children:[
-                                        Expanded(
-                                          child: FormBuilderTextField(
-                                            name: 'password',
-                                            decoration: const InputDecoration(
-                                                labelText: 'Password'),
-                                            obscureText: _passwordObscured, // Use the variable to control the obscuring
-                                            controller: _passwordController,
-                                            validator: (value) {
-                                              if (value == null || value.isEmpty) {
-                                                return 'Please enter your password';
-                                              }
-                                              if (value.length < 8) {
-                                                return 'Password must be at least 8 characters long';
-                                              }
-                                              return null;
-                                            },
-                                          ),
-                                        ),
-                                        IconButton(
-                                          splashRadius: 20,
-                                            onPressed: () {
-                                              setState(() {
-                                                _passwordObscured = !_passwordObscured;
-                                              });
-                                            },
-                                            icon: Icon(_passwordObscured ? Icons.visibility : Icons.visibility_off),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Row(
-                                      children:[
-                                        Expanded(
-                                          child: FormBuilderTextField(
-                                            name: 'password_conf',
-                                            decoration: const InputDecoration(
-                                                labelText: 'Confirm password'),
-                                            obscureText: _passwordConfObscured, // Use the variable to control the obscuring
-                                            controller: _passwordConfController,
-                                            validator: (value) {
-                                              if (value == null || value.isEmpty) {
-                                                return 'Please Confirm your password';
-                                              } else if (_passwordConfController.text != _passwordController.text){
-                                                return "Passwords don't match";
-                                              }
-                                              return null;
-                                            },
-                                          ),
-                                        ),
-                                        IconButton(
-                                          splashRadius: 20,
-                                          onPressed: () {
-                                            setState(() {
-                                              _passwordConfObscured = !_passwordConfObscured;
-                                            });
-                                          },
-                                          icon: Icon(_passwordConfObscured ? Icons.visibility : Icons.visibility_off),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              const SizedBox(height: 25),
-
-                              ListTile(
-                                enableFeedback: false,
-                                enabled: true,
-                                leading: Container(
-                                    width: 50,
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: userInfoValid ? Theme
-                                              .of(context)
-                                              .primaryColor : Colors.grey,
-                                          width: 1),
-                                      borderRadius: BorderRadius.circular(100),
-                                    ),
-                                    child: Center(child: Text(
-                                        "2", textAlign: TextAlign.center,
-                                        style: GoogleFonts.lexend(
-                                            color: userInfoValid ? Theme
-                                                .of(context)
-                                                .primaryColor : Colors.grey,
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 23)))
-                                ),
-                                title: Text("Profile Info",
-                                    style: GoogleFonts.lexend(color: userInfoValid
-                                        ? Colors.black87
-                                        : Colors.grey,
+    return Builder(builder: (context) {
+      return Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              backgroundColor: Theme.of(context).canvasColor,
+              centerTitle: true,
+              elevation: 0,
+              floating: true,
+              // Make the SliverAppBar automatically hide when scrolling down
+              leading: IconButton(
+                icon: Icon(LineAwesomeIcons.angle_left,
+                    color: Theme.of(context).primaryColor),
+                color: Colors.grey[500],
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: FormBuilder(
+                  autovalidateMode: AutovalidateMode.always,
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        enableFeedback: false,
+                        enabled: true,
+                        leading: Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: Theme.of(context).primaryColor,
+                                  width: 1),
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            child: Center(
+                                child: Text("1",
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.lexend(
+                                        color: Theme.of(context).primaryColor,
                                         fontWeight: FontWeight.normal,
-                                        fontSize: 20.0)),
-                              ),
-                              const SizedBox(height: 10),
-                              if(userInfoValid)
-                                Padding(
-                                  padding: const EdgeInsets.all(15),
-                                  child: Column(
-                                    children: [
-                                      FormBuilderTextField(
-                                        name: 'bio',
-                                        maxLength: 200,
-                                        decoration: const InputDecoration(
-                                            labelText: 'Bio'
-                                        ),
+                                        fontSize: 23)))),
+                        title: Text("User Info",
+                            style: Theme.of(context).textTheme.headlineSmall),
+                      ),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.all(15),
+                        child: Column(
+                          children: [
+                            FormBuilderTextField(
+                              name: 'forename',
+                              decoration: const InputDecoration(
+                                  labelText: 'First Name'),
+                              // enabled: false,
 
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Please enter a bio';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                      const SizedBox(height: 10),
-                                      FormBuilderDateTimePicker(
-                                        inputType: InputType.date,
-                                        name: "dob",
-                                        decoration: const InputDecoration(
-                                            labelText: 'Date of Birth'),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your first name';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 10),
+                            FormBuilderTextField(
+                              name: 'surname',
+                              decoration:
+                                  const InputDecoration(labelText: 'Last Name'),
+                              // enabled: false,
 
-                                        validator: (value) {
-                                          if (value == null) {
-                                            return 'Please select a date';
-                                          }
-
-                                          final currentDate = DateTime.now();
-                                          final selectedDate = value;
-                                          final minimumAgeDate = DateTime(currentDate.year - 17, currentDate.month, currentDate.day);
-
-                                          if (selectedDate.isAfter(minimumAgeDate)) {
-                                            return 'You must be at least 17 years old';
-                                          }
-
-                                          return null;
-                                        },
-                                      ),
-                                      const SizedBox(height: 10),
-                                      FormBuilderTextField(
-                                        name: 'subject',
-                                        decoration:
-                                        const InputDecoration(
-                                            labelText: 'Subject Studied'),
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Please enter your Subject';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                      const SizedBox(height: 10),
-                                      TypeAheadFormField(
-                                        textFieldConfiguration: TextFieldConfiguration(
-                                          decoration: const InputDecoration(
-                                            labelText: 'University',
-                                          ),
-                                          controller: _universityController,
-                                          focusNode: _universityFocusNode,
-                                        ),
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Please select a university';
-                                          }
-                                          final universitiesSuggestions = universitiesData
-                                              .map((university) => university['name'])
-                                              .toList();
-
-                                          if (!universitiesSuggestions.contains(value)) {
-                                            return 'Please select a valid university from the suggestions';
-                                          }
-                                          return null;
-                                        },
-                                        suggestionsCallback: (pattern) {
-                                          // Return filtered universities based on the pattern
-                                          return universitiesData
-                                              .where((university) =>
-                                              university['name'].toLowerCase().contains(pattern.toLowerCase()))
-                                              .map((university) => university['name'])
-                                              .toList();
-                                        },
-                                        itemBuilder: (context, suggestion) {
-                                          return ListTile(
-                                            title: Text(suggestion),
-                                          );
-                                        },
-                                        onSuggestionSelected: (value) {
-                                          _universityController.text = value;
-                                          _universityFocusNode.unfocus();
-                                          _validateUniversity(value);
-                                        },
-                                      ),
-                                      const SizedBox(height: 10),
-                                      FormBuilderSlider(
-                                        name: 'yearOfStudy',
-                                        initialValue: 1,
-                                        min: 1,
-                                        max: 7,
-                                        divisions: 6,
-                                        decoration: const InputDecoration(
-                                            labelText: 'Year of Study'),
-                                      ),
-                                    ],
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter your Surname';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 15),
+                            FormBuilderTextField(
+                              name: 'email',
+                              decoration: const InputDecoration(
+                                  labelText: 'University Email'),
+                              validator: (email) {
+                                if (email == null || email.isEmpty) {
+                                  return 'Please enter your email';
+                                }
+                                if (!EmailValidator.validate(email)) {
+                                  return 'Please enter a valid email address';
+                                }
+                                if (!domains
+                                    .any((domain) => email.contains(domain))) {
+                                  return 'Email domain is not valid';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: FormBuilderTextField(
+                                    name: 'password',
+                                    decoration: const InputDecoration(
+                                        labelText: 'Password'),
+                                    obscureText:
+                                        _passwordObscured, // Use the variable to control the obscuring
+                                    controller: _passwordController,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter your password';
+                                      }
+                                      if (value.length < 8) {
+                                        return 'Password must be at least 8 characters long';
+                                      }
+                                      return null;
+                                    },
                                   ),
                                 ),
-
-                              const SizedBox(height: 25),
-
-                              ListTile(
-                                enableFeedback: false,
-                                enabled: true,
-                                leading: Container(
-                                    width: 50,
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: (userInfoValid & profileInfoValid)
-                                              ? Theme
-                                              .of(context)
-                                              .primaryColor
-                                              : Colors.grey, width: 1),
-                                      borderRadius: BorderRadius.circular(100),
-                                    ),
-                                    child: Center(child: Text(
-                                        "3", textAlign: TextAlign.center,
-                                        style: GoogleFonts.lexend(
-                                            color: (userInfoValid & profileInfoValid)
-                                                ? Theme
-                                                .of(context)
-                                                .primaryColor
-                                                : Colors.grey,
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 23)))
+                                IconButton(
+                                  splashRadius: 20,
+                                  onPressed: () {
+                                    setState(() {
+                                      _passwordObscured = !_passwordObscured;
+                                    });
+                                  },
+                                  icon: Icon(_passwordObscured
+                                      ? Icons.visibility
+                                      : Icons.visibility_off),
                                 ),
-                                title: Text("Preferences",
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: FormBuilderTextField(
+                                    name: 'password_conf',
+                                    decoration: const InputDecoration(
+                                        labelText: 'Confirm password'),
+                                    obscureText:
+                                        _passwordConfObscured, // Use the variable to control the obscuring
+                                    controller: _passwordConfController,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please Confirm your password';
+                                      } else if (_passwordConfController.text !=
+                                          _passwordController.text) {
+                                        return "Passwords don't match";
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                                IconButton(
+                                  splashRadius: 20,
+                                  onPressed: () {
+                                    setState(() {
+                                      _passwordConfObscured =
+                                          !_passwordConfObscured;
+                                    });
+                                  },
+                                  icon: Icon(_passwordConfObscured
+                                      ? Icons.visibility
+                                      : Icons.visibility_off),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 25),
+                      ListTile(
+                        enableFeedback: false,
+                        enabled: true,
+                        leading: Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: userInfoValid
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.grey,
+                                  width: 1),
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            child: Center(
+                                child: Text("2",
+                                    textAlign: TextAlign.center,
                                     style: GoogleFonts.lexend(
-                                        color: (userInfoValid & profileInfoValid)
-                                            ? Colors.black87
+                                        color: userInfoValid
+                                            ? Theme.of(context).primaryColor
                                             : Colors.grey,
                                         fontWeight: FontWeight.normal,
-                                        fontSize: 20.0)),
+                                        fontSize: 23)))),
+                        title: Text("Profile Info",
+                            style: GoogleFonts.lexend(
+                                color: userInfoValid
+                                    ? Colors.black87
+                                    : Colors.grey,
+                                fontWeight: FontWeight.normal,
+                                fontSize: 20.0)),
+                      ),
+                      const SizedBox(height: 10),
+                      if (userInfoValid)
+                        Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: Column(
+                            children: [
+                              FormBuilderTextField(
+                                name: 'bio',
+                                maxLength: 200,
+                                decoration:
+                                    const InputDecoration(labelText: 'Bio'),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter a bio';
+                                  }
+                                  return null;
+                                },
                               ),
                               const SizedBox(height: 10),
-                              if(userInfoValid & profileInfoValid)
-                                Padding(
-                                  padding: const EdgeInsets.all(15),
-                                  child: Column(
-                                    children: [
-                                      FormBuilderSlider(
-                                        name: 'cleanliness',
-                                        initialValue: 2,
-                                        min: 0,
-                                        max: 5,
-                                        divisions: 5,
-                                        decoration: const InputDecoration(
-                                            labelText: 'How much does Cleanliness matter to you?'),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      FormBuilderSlider(
-                                        name: 'noisiness',
-                                        initialValue: 2,
-                                        min: 0,
-                                        max: 5,
-                                        divisions: 5,
-                                        decoration: const InputDecoration(
-                                            labelText: 'How much does Noisiness matter to you?'),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      FormBuilderSlider(
-                                        name: 'nightlife',
-                                        initialValue: 2,
-                                        min: 0,
-                                        max: 5,
-                                        divisions: 5,
-                                        decoration: const InputDecoration(
-                                            labelText: 'How much does Nightlife matter to you?'),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      FormBuilderDateTimePicker(
-                                        name: 'bedtime',
-                                        initialValue: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 23, 0), // 11:00 PM
-                                        inputType: InputType.time,
-                                        decoration: const InputDecoration(
-                                            labelText: 'When are you normally in bed?'),
-                                        validator: (value) {
-                                          if (value == null) {
-                                            return "Please select a time you're asleep by";
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-
-                              Text(errorMessage),
-                              const SizedBox(height: 5),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: (profileInfoValid & userInfoValid & preferenceInfoValid)? Theme.of(context).colorScheme.primary : Colors.grey,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20), // Adjust the radius as needed
-                                  ),
-                                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24), // Adjust padding as needed
-                                ),
-                                onPressed: () async {
-                                  // Validate and save the form values
-
-                                  if (_formKey.currentState?.saveAndValidate() == false) {
-                                    return;
+                              FormBuilderDateTimePicker(
+                                inputType: InputType.date,
+                                name: "dob",
+                                decoration: const InputDecoration(
+                                    labelText: 'Date of Birth'),
+                                validator: (value) {
+                                  if (value == null) {
+                                    return 'Please select a date';
                                   }
 
-                                  // debugPrint(_formKey.currentState?.value.toString());
+                                  final currentDate = DateTime.now();
+                                  final selectedDate = value;
+                                  final minimumAgeDate = DateTime(
+                                      currentDate.year - 17,
+                                      currentDate.month,
+                                      currentDate.day);
 
-                                  String response = await Auth()
-                                      .registerWithUserDetails(
-                                      _formKey.currentState?.fields['email']?.value,
-                                      _formKey.currentState?.fields['password']
-                                          ?.value,
-                                      _formKey.currentState?.value ?? {});
+                                  if (selectedDate.isAfter(minimumAgeDate)) {
+                                    return 'You must be at least 17 years old';
+                                  }
 
-                                  // if (response == 'success') {
-                                  //   Navigator.pushNamed(context, '/Scroller');
-                                  //   return;
-                                  // } else {
-                                  //   setState(() {
-                                  //     var errors = {
-                                  //       'invalid-email': 'Enter a valid email',
-                                  //       'wrong-password': 'Incorrect password'
-                                  //     };
-                                  //     error_message = errors[response] ?? response;
-                                  //   });
-                                  // }
-                                  // return;
+                                  return null;
                                 },
-                                child: Text('Signup', style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 16.5)),
                               ),
                               const SizedBox(height: 10),
-                              TextButton(
-                                onPressed: () async {
-                                  Navigator.pushNamed(context, '/Login');
+                              FormBuilderTextField(
+                                name: 'subject',
+                                decoration: const InputDecoration(
+                                    labelText: 'Subject Studied'),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter your Subject';
+                                  }
+                                  return null;
                                 },
-                                child: const Text('Want to log in instead?'),
-                              )
+                              ),
+                              const SizedBox(height: 10),
+                              TypeAheadFormField(
+                                textFieldConfiguration: TextFieldConfiguration(
+                                  decoration: const InputDecoration(
+                                    labelText: 'University',
+                                  ),
+                                  controller: _universityController,
+                                  focusNode: _universityFocusNode,
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please select a university';
+                                  }
+                                  final universitiesSuggestions =
+                                      universitiesData
+                                          .map((university) =>
+                                              university['name'])
+                                          .toList();
+
+                                  if (!universitiesSuggestions
+                                      .contains(value)) {
+                                    return 'Please select a valid university from the suggestions';
+                                  }
+                                  return null;
+                                },
+                                suggestionsCallback: (pattern) {
+                                  // Return filtered universities based on the pattern
+                                  return universitiesData
+                                      .where((university) => university['name']
+                                          .toLowerCase()
+                                          .contains(pattern.toLowerCase()))
+                                      .map((university) => university['name'])
+                                      .toList();
+                                },
+                                itemBuilder: (context, suggestion) {
+                                  return ListTile(
+                                    title: Text(suggestion),
+                                  );
+                                },
+                                onSuggestionSelected: (value) {
+                                  _universityController.text = value;
+                                  _universityFocusNode.unfocus();
+                                  _validateUniversity(value);
+                                },
+                              ),
+                              const SizedBox(height: 10),
+                              FormBuilderSlider(
+                                name: 'yearOfStudy',
+                                initialValue: 1,
+                                min: 1,
+                                max: 7,
+                                divisions: 6,
+                                decoration: const InputDecoration(
+                                    labelText: 'Year of Study'),
+                              ),
                             ],
                           ),
                         ),
+                      const SizedBox(height: 25),
+                      ListTile(
+                        enableFeedback: false,
+                        enabled: true,
+                        leading: Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: (userInfoValid & profileInfoValid)
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.grey,
+                                  width: 1),
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            child: Center(
+                                child: Text("3",
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.lexend(
+                                        color:
+                                            (userInfoValid & profileInfoValid)
+                                                ? Theme.of(context).primaryColor
+                                                : Colors.grey,
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 23)))),
+                        title: Text("Preferences",
+                            style: GoogleFonts.lexend(
+                                color: (userInfoValid & profileInfoValid)
+                                    ? Colors.black87
+                                    : Colors.grey,
+                                fontWeight: FontWeight.normal,
+                                fontSize: 20.0)),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 10),
+                      if (userInfoValid & profileInfoValid)
+                        Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: Column(
+                            children: [
+                              FormBuilderSlider(
+                                name: 'cleanliness',
+                                initialValue: 2,
+                                min: 0,
+                                max: 5,
+                                divisions: 5,
+                                decoration: const InputDecoration(
+                                    labelText:
+                                        'How much does Cleanliness matter to you?'),
+                              ),
+                              const SizedBox(height: 10),
+                              FormBuilderSlider(
+                                name: 'noisiness',
+                                initialValue: 2,
+                                min: 0,
+                                max: 5,
+                                divisions: 5,
+                                decoration: const InputDecoration(
+                                    labelText:
+                                        'How much does Noisiness matter to you?'),
+                              ),
+                              const SizedBox(height: 10),
+                              FormBuilderSlider(
+                                name: 'nightlife',
+                                initialValue: 2,
+                                min: 0,
+                                max: 5,
+                                divisions: 5,
+                                decoration: const InputDecoration(
+                                    labelText:
+                                        'How much does Nightlife matter to you?'),
+                              ),
+                              const SizedBox(height: 10),
+                              FormBuilderDateTimePicker(
+                                name: 'bedtime',
+                                initialValue: DateTime(
+                                    DateTime.now().year,
+                                    DateTime.now().month,
+                                    DateTime.now().day,
+                                    23,
+                                    0), // 11:00 PM
+                                inputType: InputType.time,
+                                decoration: const InputDecoration(
+                                    labelText: 'When are you normally in bed?'),
+                                validator: (value) {
+                                  if (value == null) {
+                                    return "Please select a time you're asleep by";
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      Text(errorMessage),
+                      const SizedBox(height: 5),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: (profileInfoValid &
+                                  userInfoValid &
+                                  preferenceInfoValid)
+                              ? Theme.of(context).colorScheme.primary
+                              : Colors.grey,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                20), // Adjust the radius as needed
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal: 24), // Adjust padding as needed
+                        ),
+                        onPressed: () async {
+                          // Validate and save the form values
+
+                          if (_formKey.currentState?.saveAndValidate() ==
+                              false) {
+                            return;
+                          }
+
+                          // debugPrint(_formKey.currentState?.value.toString());
+
+                          String response =
+                              await Auth().registerWithUserDetails(
+                            _formKey.currentState?.fields['email']?.value,
+                            _formKey.currentState?.fields['password']?.value,
+                            _formKey.currentState?.value ?? {},
+                          );
+
+                          if (response == 'success') {
+                            Navigator.pushNamed(context, '/Scroller');
+                            return;
+                          } else {
+                            setState(() {
+                              var errors = {
+                                'invalid-email': 'Enter a valid email',
+                                'wrong-password': 'Incorrect password'
+                              };
+                              // error_message = errors[response] ?? response;
+                            });
+                          }
+                          return;
+                        },
+                        child: Text('Signup',
+                            style: GoogleFonts.redHatDisplay(
+                                color: Colors.white, fontSize: 16.5)),
+                      ),
+                      const SizedBox(height: 10),
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.pushNamed(context, '/Login');
+                        },
+                        child: const Text('Want to log in instead?'),
+                      )
+                    ],
+                  ),
                 ),
-              );
-            }
-          );
+              ),
+            ),
+          ],
+        ),
+      );
+    });
   }
-  Future<void> fetchJSON() async{
-    final String jsonContent = await rootBundle.loadString('assets/JSON/world_universities_and_domains.json');
+
+  Future<void> fetchJSON() async {
+    final String jsonContent = await rootBundle
+        .loadString('assets/JSON/world_universities_and_domains.json');
     universitiesData = json.decode(jsonContent);
     domains = universitiesData
         .map<List<dynamic>>((university) => university['domains'])
         .expand((list) => list)
-        .toList();// Fetch the data when the widget is created
+        .toList(); // Fetch the data when the widget is created
     setState(() {});
   }
 
-  void _validateForm(){
+  void _validateForm() {
     _validateUniversity(_universityController.text);
     final userInfoComplete =
-    (_formKey.currentState?.fields['forename']?.isValid ??
-        false) &
-    (_formKey.currentState?.fields['surname']?.isValid ??
-        false) &
-    (_formKey.currentState?.fields['email']?.isValid ??
-        false) &
-    (_formKey.currentState?.fields['password']?.isValid ??
-        false) &
-    (_formKey.currentState?.fields['password_conf']
-        ?.isValid ?? false);
+        (_formKey.currentState?.fields['forename']?.isValid ?? false) &
+            (_formKey.currentState?.fields['surname']?.isValid ?? false) &
+            (_formKey.currentState?.fields['email']?.isValid ?? false) &
+            (_formKey.currentState?.fields['password']?.isValid ?? false) &
+            (_formKey.currentState?.fields['password_conf']?.isValid ?? false);
 
     // Check if profile info section fields are complete
     final profileInfoComplete =
-    (_formKey.currentState?.fields['bio']?.isValid ??
-        false) &
-    (_formKey.currentState?.fields['dob']?.isValid ??
-        false) &
-    (_formKey.currentState?.fields['subject']?.isValid ??
-        false) &
-    (_universityValid) &
-    (_formKey.currentState?.fields['yearOfStudy']
-        ?.isValid ?? false);
+        (_formKey.currentState?.fields['bio']?.isValid ?? false) &
+            (_formKey.currentState?.fields['dob']?.isValid ?? false) &
+            (_formKey.currentState?.fields['subject']?.isValid ?? false) &
+            (_universityValid) &
+            (_formKey.currentState?.fields['yearOfStudy']?.isValid ?? false);
 
     final preferenceInfoComplete =
-    (_formKey.currentState?.fields['cleanliness']?.isValid ??
-        false) &
-    (_formKey.currentState?.fields['noisiness']?.isValid ??
-        false) &
-    (_formKey.currentState?.fields['nightlife']?.isValid ??
-        false) &
-    (_formKey.currentState?.fields['bedtime']?.isValid ??
-        false);
+        (_formKey.currentState?.fields['cleanliness']?.isValid ?? false) &
+            (_formKey.currentState?.fields['noisiness']?.isValid ?? false) &
+            (_formKey.currentState?.fields['nightlife']?.isValid ?? false) &
+            (_formKey.currentState?.fields['bedtime']?.isValid ?? false);
 
     setState(() {
       userInfoValid = userInfoComplete;
@@ -777,9 +791,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _validateUniversity(selectedUniversity) {
     bool temp = true;
-    final universitiesSuggestions = universitiesData
-        .map((university) => university['name'])
-        .toList();
+    final universitiesSuggestions =
+        universitiesData.map((university) => university['name']).toList();
 
     if (!universitiesSuggestions.contains(selectedUniversity)) {
       temp = false;
