@@ -5,7 +5,9 @@ import 'package:movein/navbar.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
 import 'package:movein/Scroller%20Code/swipe_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:movein/Pages/Scroller.dart';
 import '../Auth code/auth.dart';
+import '../main.dart';
 
 
 class Friends extends StatefulWidget {
@@ -20,6 +22,8 @@ class _FriendsState extends State<Friends> {
   late List<dynamic> searchResults;
   late List<dynamic> groupInvites;
   late List<dynamic> groupSearchResults;
+  late List<dynamic> blockedGroups;
+  late List<dynamic> blockedSearchResults;
   late List<dynamic> friendInvites;
   late List<dynamic> friendSearchResults;
   late List<dynamic> outgoingFriendInvites;
@@ -47,6 +51,7 @@ class _FriendsState extends State<Friends> {
   Future<List<List<dynamic>>> fetchFriendsData() async {
     List<Map<String,dynamic>> friends = [];
     List<Map<String,dynamic>> groupInvites = [];
+    List<Map<String,dynamic>> blockedGroups = [];
     List<Map<String,dynamic>> friendInvites = [];
     List<Map<String,dynamic>> outgoingFriendInvites = [];
     List<dynamic> allGroups = [];
@@ -89,8 +94,6 @@ class _FriendsState extends State<Friends> {
       }
       final usersSnapshot = await FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser()).get();
       final groupIds = List<String>.from(usersSnapshot.data()?['GroupInvites'] ?? []);
-
-      if (!groupIds.contains("")){
         for (String groupId in groupIds){
           final friendSnapshot = await FirebaseFirestore.instance
               .collection('Groups')
@@ -106,7 +109,22 @@ class _FriendsState extends State<Friends> {
             });
           }
         }
-      }
+      final blockedIds = List<String>.from(usersSnapshot.data()?['BlockedGroups'] ?? []);
+        for (String groupId in blockedIds){
+          final friendSnapshot = await FirebaseFirestore.instance
+              .collection('Groups')
+              .doc(groupId)
+              .get();
+          final groupData = friendSnapshot.data();
+          if (groupData != null) {
+            blockedGroups.add({
+              "Id": groupId,
+              "GroupName": groupData['GroupName'],
+              "GroupPicture": groupData['GroupPicture'],
+              "Members": groupData['Members'],
+            });
+          }
+        }
 
       final inviteIds = List<String>.from(usersSnapshot.data()?['FriendInvites'] ?? []);
       final friendsIds = List<String>.from(usersSnapshot.data()?['Friends'] ?? []);
@@ -189,7 +207,7 @@ class _FriendsState extends State<Friends> {
         plugin: 'cloud_firestore',
       );
     }
-    return [friends,friendInvites,groupInvites,outgoingFriendInvites, allGroups];
+    return [friends,friendInvites,groupInvites,outgoingFriendInvites, allGroups, blockedGroups];
   }
 
   Future<List<Friend>> searchUsers(String searchQuery) async {
@@ -240,6 +258,12 @@ class _FriendsState extends State<Friends> {
       groupSearchResults = groupInvites
           .where((group) =>
           group["Id"].toLowerCase().contains(query.toLowerCase()) ||
+          group["GroupName"].toLowerCase().contains(query.toLowerCase()))
+          .toList();
+
+      blockedSearchResults = blockedGroups
+          .where((group) =>
+      group["Id"].toLowerCase().contains(query.toLowerCase()) ||
           group["GroupName"].toLowerCase().contains(query.toLowerCase()))
           .toList();
 
@@ -295,6 +319,8 @@ class _FriendsState extends State<Friends> {
         applicationsResults = data[4][1];
         shortList = data[4][2];
         shortListResults = data[4][2];
+        blockedGroups = data[5];
+        blockedSearchResults = data[5];
         isLoading = false;
       });
     });
@@ -306,7 +332,6 @@ class _FriendsState extends State<Friends> {
     return Builder(
       builder: (context) {
         final navigator = Navigator.of(context);
-
         return Scaffold(
           body: SizedBox(
             height: MediaQuery.of(context).size.height,
@@ -401,11 +426,11 @@ class _FriendsState extends State<Friends> {
                     padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.grey[200], // Light grey background color
+                        color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: isLoading ? const Center(child: CircularProgressIndicator())
-                          : (joinedResults.isEmpty & applicationsResults.isEmpty & shortListResults.isEmpty) ? Padding(padding: const EdgeInsets.all(10), child: Text("no_groups".tr, style: Theme.of(context).textTheme.bodyMedium,))
+                          : (joinedResults.isEmpty & applicationsResults.isEmpty & shortListResults.isEmpty) ? Padding(padding: const EdgeInsets.all(10), child: Text('no_groups'.tr, style: Theme.of(context).textTheme.bodyMedium,))
                           : ListView.builder(
                         shrinkWrap: true,
                         itemCount: joinedResults.length + applicationsResults.length + shortListResults.length + 3,
@@ -648,19 +673,19 @@ class _FriendsState extends State<Friends> {
                   ),
                   SizedBox(
                       width: MediaQuery.of(context).size.width * 0.9,
-                      child: Text("Your_friends".tr, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.left,)
+                      child: Text("your_friends".tr, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.left,)
                   ),
                   Padding(
                     padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.grey[200], // Light grey background color
+                        color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Column(
                         children: [
                           isLoading ? const Center(child: CircularProgressIndicator())
-                              : searchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10),child: Text("No Friends", style: Theme.of(context).textTheme.bodyMedium,),)
+                              : searchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10),child: Text("no_friends".tr, style: Theme.of(context).textTheme.bodyMedium,),)
                               : ListView.builder(
                             shrinkWrap: true,
                             itemCount: searchResults.length,
@@ -838,7 +863,7 @@ class _FriendsState extends State<Friends> {
                     padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.grey[200], // Light grey background color
+                        color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Column(
@@ -940,13 +965,13 @@ class _FriendsState extends State<Friends> {
                     padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.grey[200], // Light grey background color
+                        color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Column(
                         children: [
                           isLoading ? const Center(child: CircularProgressIndicator())
-                              : friendSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10), child: Text("np_friend_invites".tr, style: Theme.of(context).textTheme.bodyMedium,))
+                              : friendSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10), child: Text("no_friend_invites".tr, style: Theme.of(context).textTheme.bodyMedium,))
                               : ListView.builder(
                             shrinkWrap: true,
                             itemCount: friendSearchResults.length,
@@ -1024,6 +1049,114 @@ class _FriendsState extends State<Friends> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 20),
+                  Text("Blocked Groups".tr, style: Theme.of(context).textTheme.headlineMedium),
+                  const Divider(),
+                  const SizedBox(height: 15),
+                  Padding(
+                    padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        children: [
+                          isLoading ? const Center(child: CircularProgressIndicator())
+                              : blockedSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10),child: Text("no-blocked-groups".tr, style: Theme.of(context).textTheme.bodyMedium,),)
+                              : ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: blockedSearchResults.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) => GroupExpand(
+                                        id: blockedSearchResults[index]["Id"],
+                                        groupName: blockedSearchResults[index]["GroupName"],
+                                        groupPicture: blockedSearchResults[index]["GroupPicture"],
+                                        members: blockedSearchResults[index]["Members"].cast<String>().toList(),
+                                        avgCleanliness: blockedSearchResults[index]["avgCleanliness"],
+                                        avgNoisiness: blockedSearchResults[index]["avgNoisiness"],
+                                        avgNightLife: blockedSearchResults[index]["avgNightLife"],
+                                        avgBedTime: blockedSearchResults[index]["avgBedTime"],
+                                      )
+                                  );
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: Colors.grey[300]!,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 40,
+                                          height: 40,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(100),
+                                            child: Image.asset(blockedSearchResults[index]["GroupPicture"]),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                blockedSearchResults[index]["GroupName"],
+                                                style: Theme.of(context).textTheme.headlineSmall,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        PopupMenuButton<String>(
+                                          itemBuilder: (context) => [
+                                            PopupMenuItem<String>(
+                                              value: 'unblock',
+                                              child: Text('unblock'.tr, style: Theme.of(context).textTheme.bodyMedium),
+                                            ),
+                                            PopupMenuItem<String>(
+                                              value: 'unblock-sList',
+                                              child: Text('unblock-sList'.tr, style: Theme.of(context).textTheme.bodyMedium),
+                                            ),
+                                            PopupMenuItem<String>(
+                                              value: 'unblock-apply',
+                                              child: Text('unblock-apply'.tr, style: Theme.of(context).textTheme.bodyMedium),
+                                            ),
+                                          ],
+                                          onSelected: (value) async{
+                                            if (value == 'unblock') {
+                                              await joinGroup(blockedSearchResults[index]["Id"], Auth().currentUser());
+                                              Navigator.of(context).pushReplacementNamed("/Friends");
+                                            } else if(value == 'unblock-sList'){
+                                              await unblock(blockedSearchResults[index]["Id"], value, Auth().currentUser());
+                                              Navigator.of(context).pushReplacementNamed("/Friends");
+                                            } else if(value == 'unblock-apply'){
+                                              await unblock(blockedSearchResults[index]["Id"], value, Auth().currentUser());
+                                              Navigator.of(context).pushReplacementNamed("/Friends");
+                                            }
+                                          },
+                                          icon: const Icon(Icons.more_vert),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
 
@@ -1050,4 +1183,30 @@ class Friend {
     required this.name,
     required this.id,
   });
+}
+
+Future<void> unblock(String groupId, String value, String currentUser) async {
+  try {
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(currentUser)
+        .update({
+      'BlockedGroups': FieldValue.arrayRemove([groupId])
+    });
+  } catch (e) {
+    throw FirebaseException(
+        message: 'Error removing from BlockedGroups": $e',
+        plugin: 'cloud_firestore',
+    );
+  }
+  if(value == 'unblock-sList'){
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(currentUser)
+        .update({
+      'ShortList': FieldValue.arrayUnion([groupId])
+    });
+  } else{
+    addToApplicants(groupId);
+  }
 }

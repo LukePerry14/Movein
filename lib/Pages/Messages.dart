@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
+import '../Themes/lMode.dart';
+
 
 class Messages extends StatefulWidget {
   const Messages({Key? key}) : super(key: key);
@@ -26,7 +28,7 @@ class _MessagesState extends State<Messages> {
           final navigator = Navigator.of(context);
 
           return Scaffold(
-            appBar: AppBar( //maybe replace with a sliverappbar to improve polish
+            appBar: AppBar(
               title: Text('${data['groupName']}', style: Theme
                   .of(context)
                   .textTheme
@@ -37,12 +39,12 @@ class _MessagesState extends State<Messages> {
               bottom: PreferredSize(
                 preferredSize: const Size.fromHeight(1.0),
                 child: Container(
-                  color: Theme.of(context).primaryColor,
+                  color: LAppTheme.lightTheme.primaryColor,
                   height: 1.0,
                 ),
               ),
               leading: IconButton(
-                icon: const Icon(LineAwesomeIcons.angle_left),
+                icon: Icon(LineAwesomeIcons.angle_left, color: LAppTheme.lightTheme.primaryColor,),
                 color: Colors.grey[500],
                 onPressed: () {
                   Navigator.pop(context);
@@ -51,7 +53,7 @@ class _MessagesState extends State<Messages> {
               actions: [
                 IconButton(
                   color: Colors.grey[500],
-                  icon: const Icon(Icons.more_vert, color: Colors.black),
+                  icon: Icon(Icons.more_vert, color: LAppTheme.lightTheme.primaryColor),
                   //Icon not showing
                   onPressed: () {
                     Navigator.pushNamed(context, '/GroupOptions', arguments: {

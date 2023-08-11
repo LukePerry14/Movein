@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:movein/Scroller%20Code/swipe_card.dart';
 import 'package:movein/Scroller%20Code/profile-data.dart';
+import '../Themes/lMode.dart';
 
 class Gscroller extends StatefulWidget {
   final String groupName;
@@ -45,11 +47,7 @@ class _GscrollerState extends State<Gscroller> {
     for (String id in widget.members) {
       try {
         final cardProfile = await CardProfile.fetchCardProfile(id);
-        if (cardProfile != null) {
-          loadedProfiles.add(cardProfile);
-        }
-        else{
-        }
+        loadedProfiles.add(cardProfile);
       } catch (e) {
         throw FirebaseException(
             message: 'Error creating cardProfile: $e',
@@ -116,7 +114,7 @@ class _GscrollerState extends State<Gscroller> {
                   title: Row(
                       children: [
                         const SizedBox(width: 20),
-                        Text("...", style: Theme.of(context).textTheme.headlineLarge,)
+                        Text("...", style: GoogleFonts.lexend(color:  LAppTheme.lightTheme.primaryColor, fontWeight: FontWeight.normal, fontSize: 26))
                       ]
                   ),
                   children: [

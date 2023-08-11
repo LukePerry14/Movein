@@ -4,6 +4,8 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
 
+import '../Themes/lMode.dart';
+
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
 
@@ -474,6 +476,7 @@ class _RadioLanguageState extends State<RadioLanguage> {
         ListTile(
           title: const Text('English'),
           leading: Radio<SingingCharacter>(
+            activeColor: LAppTheme.lightTheme.primaryColor,
             groupValue: _character,
             value: SingingCharacter.english,
             onChanged: (SingingCharacter? value) {
@@ -487,6 +490,7 @@ class _RadioLanguageState extends State<RadioLanguage> {
         ListTile(
           title: const Text('Français'),
           leading: Radio<SingingCharacter>(
+            activeColor: LAppTheme.lightTheme.primaryColor,
             groupValue: _character,
             value: SingingCharacter.french,
             onChanged: (SingingCharacter? value) {
@@ -500,6 +504,7 @@ class _RadioLanguageState extends State<RadioLanguage> {
         ListTile(
           title: const Text('Español'),
           leading: Radio<SingingCharacter>(
+            activeColor: LAppTheme.lightTheme.primaryColor,
             groupValue: _character,
             value: SingingCharacter.spanish,
             onChanged: (SingingCharacter? value) {
@@ -513,6 +518,7 @@ class _RadioLanguageState extends State<RadioLanguage> {
         ListTile(
           title: const Text('普通话'),
           leading: Radio<SingingCharacter>(
+            activeColor: LAppTheme.lightTheme.primaryColor,
             groupValue: _character,
             value: SingingCharacter.mandarin,
             onChanged: (SingingCharacter? value) {
@@ -526,6 +532,7 @@ class _RadioLanguageState extends State<RadioLanguage> {
         ListTile(
           title: const Text('हिंदी'),
           leading: Radio<SingingCharacter>(
+            activeColor: LAppTheme.lightTheme.primaryColor,
             groupValue: _character,
             value: SingingCharacter.hindi,
             onChanged: (SingingCharacter? value) {

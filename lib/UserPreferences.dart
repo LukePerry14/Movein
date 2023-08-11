@@ -3,7 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UserPreferences {
   static late SharedPreferences _preferences;
 
-  static const _keyUserId = 'userId';
   static const _keyLocale = 'locale';
   static const _keyBrightness = 'brightness';
   static const _keyAppsMax = 'AppsMax';

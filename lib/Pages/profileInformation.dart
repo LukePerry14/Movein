@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import '../Auth code/auth.dart';
+import '../Themes/lMode.dart';
+import '../main.dart';
 
 class ProfileInformation extends StatefulWidget {
   const ProfileInformation({super.key});
@@ -19,6 +21,8 @@ class _ProfileInformationState extends State<ProfileInformation> {
   late Timer _timer;
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController _passwordConfController = TextEditingController();
+  List<bool> expansionTileStates = [false, false, false];
+
 
   bool _passwordObscured = true;
   bool _passwordConfObscured = true;
@@ -58,6 +62,7 @@ class _ProfileInformationState extends State<ProfileInformation> {
   @override
   Widget build(BuildContext context) {
     return Builder(builder: (context) {
+      bool isDark = App.themeNotifier.value == ThemeMode.dark;
       if (userData['DOB'] == null) {
         return Container();
       } else {
@@ -72,7 +77,7 @@ class _ProfileInformationState extends State<ProfileInformation> {
                 // Make the SliverAppBar automatically hide when scrolling down
                 leading: IconButton(
                   icon: Icon(LineAwesomeIcons.angle_left,
-                      color: Theme.of(context).primaryColor),
+                      color: LAppTheme.lightTheme.primaryColor),
                   color: Colors.grey[500],
                   onPressed: () {
                     Navigator.pop(context);
@@ -91,7 +96,7 @@ class _ProfileInformationState extends State<ProfileInformation> {
                           children: [
                             Icon(
                               LineAwesomeIcons.user,
-                              color: Theme.of(context).primaryColor,
+                              color: isDark? Colors.white70 : Theme.of(context).primaryColor,
                               size: 50,
                             ),
                             const SizedBox(width: 10),
@@ -104,21 +109,29 @@ class _ProfileInformationState extends State<ProfileInformation> {
                         const SizedBox(height: 10),
                         Theme(
                           data: Theme.of(context)
-                              .copyWith(dividerColor: Colors.transparent),
+                              .copyWith(
+                              dividerColor: Colors.transparent,
+                          ),
                           child: ExpansionTile(
+                            initiallyExpanded: expansionTileStates[0],
+                            onExpansionChanged: (newState) {
+                              setState(() {
+                                expansionTileStates[0] = newState;
+                              });
+                            },
                             leading: Container(
                                 width: 50,
                                 height: 50,
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                      color: Theme.of(context).primaryColor,
+                                      color: LAppTheme.lightTheme.primaryColor,
                                       width: 1),
                                   borderRadius: BorderRadius.circular(100),
                                 ),
                                 child: Center(
                                     child: Text("1",
                                         textAlign: TextAlign.center,
-                                        style: GoogleFonts.lexend(
+                                        style: isDark? Theme.of(context).textTheme.headlineSmall :GoogleFonts.lexend(
                                             color:
                                                 Theme.of(context).primaryColor,
                                             fontWeight: FontWeight.normal,
@@ -170,30 +183,34 @@ class _ProfileInformationState extends State<ProfileInformation> {
                         const SizedBox(height: 25),
                         Theme(
                           data: Theme.of(context)
-                              .copyWith(dividerColor: Colors.transparent),
+                              .copyWith(dividerColor: Colors.transparent,
+                          ),
                           child: ExpansionTile(
+                            initiallyExpanded: expansionTileStates[1],
+                            onExpansionChanged: (newState) {
+                              setState(() {
+                                expansionTileStates[1] = newState;
+                              });
+                            },
                             leading: Container(
                                 width: 50,
                                 height: 50,
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                      color: Theme.of(context).primaryColor,
+                                      color: LAppTheme.lightTheme.primaryColor,
                                       width: 1),
                                   borderRadius: BorderRadius.circular(100),
                                 ),
                                 child: Center(
                                     child: Text("2",
                                         textAlign: TextAlign.center,
-                                        style: GoogleFonts.lexend(
+                                        style: isDark? Theme.of(context).textTheme.headlineSmall :GoogleFonts.lexend(
                                             color:
-                                                Theme.of(context).primaryColor,
+                                            Theme.of(context).primaryColor,
                                             fontWeight: FontWeight.normal,
                                             fontSize: 23)))),
                             title: Text("Profile Info",
-                                style: GoogleFonts.lexend(
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 20.0)),
+                                style: Theme.of(context).textTheme.headlineSmall),
                             children: [
                               const SizedBox(height: 10),
                               Padding(
@@ -262,30 +279,34 @@ class _ProfileInformationState extends State<ProfileInformation> {
                         const SizedBox(height: 25),
                         Theme(
                           data: Theme.of(context)
-                              .copyWith(dividerColor: Colors.transparent),
+                              .copyWith(dividerColor: Colors.transparent,
+                          ),
                           child: ExpansionTile(
+                            initiallyExpanded: expansionTileStates[2],
+                            onExpansionChanged: (newState) {
+                              setState(() {
+                                expansionTileStates[2] = newState;
+                              });
+                            },
                             leading: Container(
                                 width: 50,
                                 height: 50,
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                      color: Theme.of(context).primaryColor,
+                                      color: LAppTheme.lightTheme.primaryColor,
                                       width: 1),
                                   borderRadius: BorderRadius.circular(100),
                                 ),
                                 child: Center(
                                     child: Text("3",
                                         textAlign: TextAlign.center,
-                                        style: GoogleFonts.lexend(
+                                        style: isDark? Theme.of(context).textTheme.headlineSmall :GoogleFonts.lexend(
                                             color:
-                                                Theme.of(context).primaryColor,
+                                            Theme.of(context).primaryColor,
                                             fontWeight: FontWeight.normal,
                                             fontSize: 23)))),
                             title: Text("Preferences",
-                                style: GoogleFonts.lexend(
-                                    color: Colors.black87,
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 20.0)),
+                                style: Theme.of(context).textTheme.headlineSmall),
                             children: [
                               const SizedBox(height: 10),
                               Padding(
@@ -359,7 +380,7 @@ class _ProfileInformationState extends State<ProfileInformation> {
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: formValid
-                                ? Theme.of(context).colorScheme.primary
+                                ? LAppTheme.lightTheme.primaryColor
                                 : Colors.grey,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
@@ -370,17 +391,9 @@ class _ProfileInformationState extends State<ProfileInformation> {
                                 horizontal: 24), // Adjust padding as needed
                           ),
                           onPressed: () async {
-                            if (_formKey.currentState?.saveAndValidate() ==
-                                false) {
-                              return;
-                            }
-                            String response = await updateInfo();
-
-                            if (response == 'success') {
-                              Navigator.of(context).pop();
-                              return;
-                            } else {
-                              return;
+                            if (formValid) {
+                              await updateInfo();
+                              Navigator.of(context).pushReplacementNamed('/Profile');
                             }
                           },
                           child: Text('Save Changes',
@@ -409,7 +422,6 @@ class _ProfileInformationState extends State<ProfileInformation> {
 
       if (docSnapshot.exists) {
         userData = docSnapshot.data() as Map<String, dynamic>;
-        print(userData);
         setState(() {});
       }
     } catch (e) {
@@ -421,44 +433,62 @@ class _ProfileInformationState extends State<ProfileInformation> {
   }
 
   void _validateForm() {
-    final confFormvalid =
-        (_formKey.currentState?.fields['ForeName']?.isValid ?? false) &
-            (_formKey.currentState?.fields['SurName']?.isValid ?? false) &
-            (_formKey.currentState?.fields['Bio']?.isValid ?? false) &
-            (_formKey.currentState?.fields['DOB']?.isValid ?? false) &
-            (_formKey.currentState?.fields['Subject']?.isValid ?? false) &
-            (_formKey.currentState?.fields['YearOfStudy']?.isValid ?? false) &
-            (_formKey.currentState?.fields['Cleanliness']?.isValid ?? false) &
-            (_formKey.currentState?.fields['Noisiness']?.isValid ?? false) &
-            (_formKey.currentState?.fields['NightLife']?.isValid ?? false) &
-            (_formKey.currentState?.fields['Lights Out']?.isValid ?? false);
-
+    bool uservalid = true;
+    bool profileValid = true;
+    bool prefsValid = true;
+    if (expansionTileStates.contains(true)){
+      if(expansionTileStates[0] == true){
+        uservalid = (_formKey.currentState?.fields['ForeName']?.isValid ?? false) &
+        (_formKey.currentState?.fields['SurName']?.isValid ?? false);
+        userData['ForeName'] = _formKey.currentState?.fields['ForeName']?.value;
+        userData['SurName'] = _formKey.currentState?.fields['SurName']?.value;
+      }
+      if(expansionTileStates[1] == true){
+        profileValid = (_formKey.currentState?.fields['Bio']?.isValid ?? false) &
+        (_formKey.currentState?.fields['Subject']?.isValid ?? false) &
+        (_formKey.currentState?.fields['YearOfStudy']?.isValid ?? false);
+        userData['Bio'] = _formKey.currentState?.fields['Bio']?.value;
+        userData['Subject'] = _formKey.currentState?.fields['Subject']?.value;
+        userData['YearOfStudy'] = _formKey.currentState?.fields['YearOfStudy']?.value;
+      }
+      if(expansionTileStates[2] == true){
+        uservalid = (_formKey.currentState?.fields['Cleanliness']?.isValid ?? false) &
+        (_formKey.currentState?.fields['Noisiness']?.isValid ?? false) &
+        (_formKey.currentState?.fields['NightLife']?.isValid ?? false) &
+        (_formKey.currentState?.fields['Lights Out']?.isValid ?? false);
+        userData['Preferences']['Cleanliness'] = _formKey.currentState?.fields['Cleanliness']?.value;
+        userData['Preferences']['Noisiness'] = _formKey.currentState?.fields['Noisiness']?.value;
+        userData['Preferences']['NightLife'] = _formKey.currentState?.fields['NightLife']?.value;
+        userData['Preferences']['Lights Out'] = Timestamp.fromDate(_formKey.currentState?.fields['Lights Out']?.value);
+      }
+    }
+    final confFormvalid = uservalid & profileValid & prefsValid;
+    //print(confFormvalid);
     setState(() {
       formValid = confFormvalid;
     });
   }
 
-  Future<String> updateInfo() async {
+  Future<void> updateInfo() async {
     try {
       await FirebaseFirestore.instance
           .collection('Users')
           .doc(Auth().currentUser())
           .update({
-        'ForeName': _formKey.currentState?.fields['ForeName']?.value,
-        'SurName': _formKey.currentState?.fields['SurName']?.value,
-        'Bio': _formKey.currentState?.fields['Bio']?.value,
-        'DOB': _formKey.currentState?.fields['DOB']?.value,
-        'Subject': _formKey.currentState?.fields['Subject']?.value,
-        'YearOfStudy': _formKey.currentState?.fields['YearOfStudy']?.value,
+        'ForeName': userData['ForeName'],
+        'SurName': userData['SurName'],
+        'Bio': userData['Bio'],
+        'DOB': userData['DOB'],
+        'Subject': userData['Subject'],
+        'YearOfStudy': userData['YearOfStudy'],
         'Preferences': {
-          'Cleanliness': _formKey.currentState?.fields['Cleanliness']?.value,
-          'Noisiness': _formKey.currentState?.fields['Noisiness']?.value,
-          'NightLife': _formKey.currentState?.fields['NightLife']?.value,
-          'Lights Out': _formKey.currentState?.fields['Lights Out']?.value,
+          'Cleanliness': userData['Preferences']['Cleanliness'],
+          'Noisiness': userData['Preferences']['Noisiness'],
+          'NightLife': userData['Preferences']['NightLife'],
+          'Lights Out': userData['Preferences']['Lights Out'],
         }
       });
 
-      return "success";
     } catch (e) {
       throw FirebaseException(
         message: 'Error saving user data: $e',

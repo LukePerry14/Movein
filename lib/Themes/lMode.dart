@@ -71,5 +71,6 @@ class LAppTheme{
       bodyMedium: d_body,
       bodySmall: d_sBody,
     ),
+    hintColor: LAppTheme.lightTheme.primaryColor,
   );
 }

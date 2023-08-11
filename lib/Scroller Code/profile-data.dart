@@ -39,7 +39,7 @@ class CardProfile {
 
     return CardProfile(
       id: document.id,
-      foreName: data['Forename'],
+      foreName: data['ForeName'],
       age: yearsAgo,
       uni: data['UniAttended'],
       preferences: preferencesData ?? {}, // Use preferencesData if not null, otherwise use an empty map

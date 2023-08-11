@@ -48,12 +48,22 @@ class AppTranslations extends Translations {
           'cleanliness-importance': 'How much does Cleanliness matter to you?',
           'noisiness-importance': 'How much does Noisiness matter to you?',
           'nightlife-importance': 'How much does Nightlife matter to you?',
+          'my-cleanliness-importance': 'My Cleanliness importance',
+          'my-noisiness-importance': 'My Noisiness importance',
+          'my-nightlife-importance': 'My NightLife importance',
           'bedtime': 'When are you normally in bed?',
           'signup': 'Signup',
           'login?': 'Want to log in instead?',
           'privacy': 'Privacy and Security',
           't&c': 'Terms and Conditions',
           'change-password': 'Change Password',
+          'no_friends': 'No Friends',
+          "asleep-by": "I'm normally asleep by",
+          'no-blocked-groups': "No Blocked Groups",
+          "unblock": "Unblock",
+          "unblock-apply": "Unblock and Apply",
+          "unblock-sList": "Unblock and ShortList",
+
 
 
 
@@ -93,7 +103,7 @@ class AppTranslations extends Translations {
           'leave_group': 'Leave group',
           'attends': 'Attends',
           'studying': 'Studying',
-          'bio': 'Bio:',
+          'bio': 'Bio',
           'preferences': 'Preferences',
           'importance': 'importance for me',
           'night_desc': 'Nightlife is of ',

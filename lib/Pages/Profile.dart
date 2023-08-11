@@ -13,6 +13,7 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../Auth code/auth.dart';
+import '../Themes/lMode.dart';
 import '../main.dart';
 
 class Profile extends StatefulWidget {
@@ -90,26 +91,20 @@ class _ProfilePage extends State<Profile> {
         future: getName(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: FractionallySizedBox(
-                heightFactor: 0.3,
-                child: AspectRatio(
-                  aspectRatio: 1.0,
-                  child: CircularProgressIndicator(),
-                ),
-              ),
-            );
+            return Container();
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else {
             name = snapshot.data;
             return Builder(builder: (context) {
               final navigator = Navigator.of(context);
+              bool isDark = App.themeNotifier.value == ThemeMode.dark;
               return Scaffold(
                 body: SingleChildScrollView(
                   child: Container(
                     padding: const EdgeInsets.all(10.0),
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -183,18 +178,18 @@ class _ProfilePage extends State<Profile> {
                             height: 40,
                             decoration: BoxDecoration(
                               border: Border.all(
-                                  color: Theme.of(context).primaryColor,
+                                  color: isDark? Colors.white70 : Theme.of(context).primaryColor,
                                   width: 1),
                               borderRadius: BorderRadius.circular(100),
                             ),
                             child: Icon(LineAwesomeIcons.user,
-                                color: Theme.of(context).primaryColor),
+                                color: isDark? Colors.white70 : Theme.of(context).primaryColor),
                           ),
                           title: Text(
                             "edit_profile".tr,
                             style: Theme.of(context).textTheme.headlineSmall,
                           ),
-                          trailing: const Icon(LineAwesomeIcons.angle_right),
+                          trailing: Icon(LineAwesomeIcons.angle_right, color: LAppTheme.lightTheme.primaryColor),
                           onTap: () {
                             Navigator.pushNamed(context, '/profileInformation');
                           },
@@ -206,18 +201,18 @@ class _ProfilePage extends State<Profile> {
                               height: 40,
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                    color: Theme.of(context).primaryColor,
+                                    color: isDark? Colors.white70 : Theme.of(context).primaryColor,
                                     width: 1),
                                 borderRadius: BorderRadius.circular(100),
                               ),
                               child: Icon(LineAwesomeIcons.cog,
-                                  color: Theme.of(context).primaryColor),
+                                  color: isDark? Colors.white70 : Theme.of(context).primaryColor),
                             ),
                             title: Text(
                               "settings".tr,
                               style: Theme.of(context).textTheme.headlineSmall,
                             ),
-                            trailing: const Icon(LineAwesomeIcons.angle_right),
+                            trailing: Icon(LineAwesomeIcons.angle_right, color: LAppTheme.lightTheme.primaryColor),
                             onTap: () {
                               Navigator.pushNamed(context, '/Settings');
                             }),
@@ -351,7 +346,7 @@ Widget build(BuildContext context) {
       foregroundColor: Colors.white,
       backgroundColor: Theme.of(context).canvasColor,
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-      side: BorderSide(color: Theme.of(context).primaryColor, width: 1),
+      side: BorderSide(color: isDark? Colors.white70 : Theme.of(context).primaryColor, width: 1),
     ),
     onPressed: () async {
       await UserPreferences.setBrightness(!isDark);
@@ -364,7 +359,7 @@ Widget build(BuildContext context) {
       padding: const EdgeInsets.all(5.0),
       child: Icon(
         isDark ? LineAwesomeIcons.sun : LineAwesomeIcons.moon,
-        color: Theme.of(context).primaryColor,
+        color: isDark? Colors.white70 : Theme.of(context).primaryColor,
         size: 24,
       ),
     ),
@@ -380,23 +375,28 @@ class ButtonWidgetShareProfile extends StatelessWidget {
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) => ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        shape: const CircleBorder(),
-        foregroundColor: Colors.white,
-        backgroundColor: Theme.of(context).canvasColor,
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-        side: BorderSide(color: Theme.of(context).primaryColor, width: 1),
-      ),
-      onPressed: onClicked,
-      child: Padding(
-        padding: const EdgeInsets.all(5.0),
-        child: Icon(
-          LineAwesomeIcons.share_square,
-          color: Theme.of(context).primaryColor,
-          size: 24,
+  Widget build(BuildContext context) {
+    bool isDark = (App.themeNotifier.value == ThemeMode.dark);
+    return ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          shape: const CircleBorder(),
+          foregroundColor: Colors.white,
+          backgroundColor: Theme
+              .of(context)
+              .canvasColor,
+          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+          side: BorderSide(color: isDark? Colors.white70 : Theme.of(context).primaryColor, width: 1),
         ),
-      ));
+        onPressed: onClicked,
+        child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Icon(
+            LineAwesomeIcons.share_square,
+            color: isDark? Colors.white70 : Theme.of(context).primaryColor,
+            size: 24,
+          ),
+        ));
+  }
 }
 
 class ButtonWidgetLogOut extends StatelessWidget {

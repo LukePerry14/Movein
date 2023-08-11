@@ -112,6 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
             leading: null,
             expandedHeight: MediaQuery.of(context).size.height / 3,
             collapsedHeight: MediaQuery.of(context).size.height / 3,
+            backgroundColor: LAppTheme.lightTheme.primaryColor,
             forceElevated: true,
             elevation: 40,
             flexibleSpace: FlexibleSpaceBar(
@@ -128,6 +129,56 @@ class _LoginScreenState extends State<LoginScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: IconButton(
+                        icon: Icon(LineAwesomeIcons.language, color: LAppTheme.lightTheme.primaryColor),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                contentPadding: const EdgeInsets.all(0),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const SizedBox(height:5),
+                                    Stack(
+                                      children: [
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: IconButton(
+                                            icon: Icon(LineAwesomeIcons.angle_left, color: Theme.of(context).primaryColor),
+                                            color: Colors.grey[500],
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                        ),
+                                        Align(
+                                            alignment: Alignment.bottomCenter,
+                                            child: Text('language'.tr, style: Theme.of(context).textTheme.headlineSmall)
+                                        ),
+                                      ],
+                                    ),
+                                    const Padding(
+                                      padding: EdgeInsets.all(15.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          RadioLanguage(),
+                                          SizedBox(height: 20),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
                     const SizedBox(height: 50),
                     FormBuilderTextField(
                       name: 'email',
@@ -163,7 +214,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 5),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        backgroundColor: LAppTheme.lightTheme.primaryColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
                               20), // Adjust the radius as needed
@@ -208,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       child: Text('Want to sign up instead?',
                           style: GoogleFonts.redHatDisplay(
-                              color: Theme.of(context).primaryColor,
+                              color: LAppTheme.lightTheme.primaryColor,
                               fontSize: 16.5)),
                     )
                   ],
@@ -279,7 +330,7 @@ class _SignupScreenState extends State<SignupScreen> {
               // Make the SliverAppBar automatically hide when scrolling down
               leading: IconButton(
                 icon: Icon(LineAwesomeIcons.angle_left,
-                    color: Theme.of(context).primaryColor),
+                    color: LAppTheme.lightTheme.primaryColor),
                 color: Colors.grey[500],
                 onPressed: () {
                   Navigator.pop(context);
@@ -698,7 +749,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           backgroundColor: (profileInfoValid &
                           userInfoValid &
                           preferenceInfoValid)
-                              ? Theme.of(context).colorScheme.primary
+                              ? LAppTheme.lightTheme.primaryColor
                               : Colors.grey,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
@@ -725,7 +776,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           );
 
                           if (response == 'success') {
-                            Navigator.pushNamed(context, '/Scroller');
+                            Navigator.pushNamed(context, '/OnBoarding');
                             return;
                           } else {
                             setState(() {
@@ -745,7 +796,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       const SizedBox(height: 10),
                       TextButton(
                         onPressed: () async {
-                          Navigator.pushNamed(context, '/Login');
+                          Navigator.pushNamed(context, '/OnBoarding');
                         },
                         child: const Text('Want to log in instead?'),
                       )

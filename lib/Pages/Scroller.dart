@@ -62,84 +62,6 @@ class _ScrollerState extends State<Scroller> {
     return groups;
   }
 
-  Future<void> addToBlacklist(String groupId) async {
-    final CollectionReference groupCollection =
-        FirebaseFirestore.instance.collection('Groups');
-    final CollectionReference userCollection =
-        FirebaseFirestore.instance.collection('Users');
-
-    try {
-      // Access the group document
-      DocumentSnapshot groupSnapshot = await groupCollection.doc(groupId).get();
-
-      if (groupSnapshot.exists) {
-        // Perform array union on BlackList field within the group document
-        await groupCollection.doc(groupId).update({
-          'BlackList': FieldValue.arrayUnion([Auth().currentUser()])
-        });
-
-        // Access the user document
-        DocumentSnapshot userSnapshot = await userCollection.doc(Auth().currentUser()).get();
-        if (userSnapshot.exists) {
-          // Perform array union on BlockedGroups field within the user document
-          await userCollection.doc(Auth().currentUser()).update({
-            'BlockedGroups': FieldValue.arrayUnion([groupId])
-          });
-        } else {
-          throw FirebaseException(
-              message: 'Error: User Does not exist', plugin: 'cloud_firestore');
-        }
-      } else {
-        throw FirebaseException(
-            message: 'Error: Group Does not exist', plugin: 'cloud_firestore');
-      }
-    } catch (e) {
-      throw FirebaseException(
-          message: 'Error adding to BlackList: $e', plugin: 'cloud_firestore');
-    }
-  }
-
-  Future<void> addToShortList(String groupId) async {
-    final CollectionReference usersCollection =
-        FirebaseFirestore.instance.collection('Users');
-
-    usersCollection.doc(Auth().currentUser()).update({
-      'ShortList': FieldValue.arrayUnion([groupId])
-    }).catchError((e) {
-      throw FirebaseException(
-          message: 'Error adding to shortlist: $e', plugin: 'cloud_firestore');
-    });
-    addToBlacklist(groupId);
-  }
-
-  Future<void> addToApplicants(String groupId) async {
-    final CollectionReference groupsCollection =
-        FirebaseFirestore.instance.collection('Groups');
-
-    final DocumentReference groupDocRef = groupsCollection.doc(groupId);
-
-    groupDocRef.update({
-      'Applicants': FieldValue.arrayUnion([Auth().currentUser()])
-    }).catchError((e) {
-      throw FirebaseException(
-          message: 'Error adding to group field "Applicants": $e',
-          plugin: 'cloud_firestore');
-    });
-
-    final DocumentReference userDocRef =
-        FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser());
-
-    userDocRef.update({
-      'Applications': FieldValue.arrayUnion([groupId])
-    }).catchError((e) {
-      throw FirebaseException(
-          message: 'Error adding to user field "Applications": $e',
-          plugin: 'cloud_firestore');
-    });
-
-    addToBlacklist(groupId);
-  }
-
   void loadNativeAd() {
     // if (!kIsWeb) {
     //   _ad = NativeAd(
@@ -178,15 +100,7 @@ class _ScrollerState extends State<Scroller> {
       future: getGroups(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: FractionallySizedBox(
-              heightFactor: 0.3,
-              child: AspectRatio(
-                aspectRatio: 1.0,
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          );
+          return Container();
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
@@ -474,4 +388,83 @@ class NoGroups extends StatelessWidget {
       ),
     );
   }
+}
+
+
+Future<void> addToBlacklist(String groupId) async {
+  final CollectionReference groupCollection =
+  FirebaseFirestore.instance.collection('Groups');
+  final CollectionReference userCollection =
+  FirebaseFirestore.instance.collection('Users');
+
+  try {
+    // Access the group document
+    DocumentSnapshot groupSnapshot = await groupCollection.doc(groupId).get();
+
+    if (groupSnapshot.exists) {
+      // Perform array union on BlackList field within the group document
+      await groupCollection.doc(groupId).update({
+        'BlackList': FieldValue.arrayUnion([Auth().currentUser()])
+      });
+
+      // Access the user document
+      DocumentSnapshot userSnapshot = await userCollection.doc(Auth().currentUser()).get();
+      if (userSnapshot.exists) {
+        // Perform array union on BlockedGroups field within the user document
+        await userCollection.doc(Auth().currentUser()).update({
+          'BlockedGroups': FieldValue.arrayUnion([groupId])
+        });
+      } else {
+        throw FirebaseException(
+            message: 'Error: User Does not exist', plugin: 'cloud_firestore');
+      }
+    } else {
+      throw FirebaseException(
+          message: 'Error: Group Does not exist', plugin: 'cloud_firestore');
+    }
+  } catch (e) {
+    throw FirebaseException(
+        message: 'Error adding to BlackList: $e', plugin: 'cloud_firestore');
+  }
+}
+
+Future<void> addToShortList(String groupId) async {
+  final CollectionReference usersCollection =
+  FirebaseFirestore.instance.collection('Users');
+
+  usersCollection.doc(Auth().currentUser()).update({
+    'ShortList': FieldValue.arrayUnion([groupId])
+  }).catchError((e) {
+    throw FirebaseException(
+        message: 'Error adding to shortlist: $e', plugin: 'cloud_firestore');
+  });
+  addToBlacklist(groupId);
+}
+
+Future<void> addToApplicants(String groupId) async {
+  final CollectionReference groupsCollection =
+  FirebaseFirestore.instance.collection('Groups');
+
+  final DocumentReference groupDocRef = groupsCollection.doc(groupId);
+
+  groupDocRef.update({
+    'Applicants': FieldValue.arrayUnion([Auth().currentUser()])
+  }).catchError((e) {
+    throw FirebaseException(
+        message: 'Error adding to group field "Applicants": $e',
+        plugin: 'cloud_firestore');
+  });
+
+  final DocumentReference userDocRef =
+  FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser());
+
+  userDocRef.update({
+    'Applications': FieldValue.arrayUnion([groupId])
+  }).catchError((e) {
+    throw FirebaseException(
+        message: 'Error adding to user field "Applications": $e',
+        plugin: 'cloud_firestore');
+  });
+
+  addToBlacklist(groupId);
 }

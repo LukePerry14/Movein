@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
 import '../Auth code/auth.dart';
+import '../main.dart';
 
 class SwipeCard extends StatelessWidget {
   final String id;
@@ -199,15 +200,34 @@ class CustomDialog extends StatelessWidget {
     List<Widget> preferenceWidgets = preferences.entries.map((entry) {
       if (entry.key == "Lights Out") {
         return Text(
-          " - It's normally ${entry.key} at $formattedTime for me",
+          " - ${"asleep-by".tr}: $formattedTime",
           style: Theme.of(context).textTheme.bodyMedium,
         );
       } else {
-        return Text(
-          ' - ${entry.key} is of ${entry.value}/5 importance for me',
-          style: Theme.of(context).textTheme.bodyMedium,
-        );
+        switch (entry.key) {
+          case 'Cleanliness':
+            return Text(
+              ' - ${"my-cleanliness-importance".tr}: ${entry.value}/5',
+              style: Theme.of(context).textTheme.bodyMedium,
+            );
+          case 'Noisiness':
+            return Text(
+              ' - ${"my-noisiness-importance".tr}: ${entry.value}/5',
+              style: Theme.of(context).textTheme.bodyMedium,
+            );
+          case 'NightLife':
+            return Text(
+              ' - ${"my-nightlife-importance".tr}: ${entry.value}/5',
+              style: Theme.of(context).textTheme.bodyMedium,
+            );
+          default:
+            return Text(
+              ' - Empty',
+              style: Theme.of(context).textTheme.bodyMedium,
+            );
+        }
       }
+
     }).toList();
 
 
@@ -246,7 +266,7 @@ class CustomDialog extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               //width: MediaQuery.of(context).size.width,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.white,
                                 borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
                                 boxShadow: [
                                   BoxShadow(
@@ -277,7 +297,7 @@ class CustomDialog extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               //width: MediaQuery.of(context).size.width,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.white,
                                 borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
                                 boxShadow: [
                                   BoxShadow(
@@ -309,7 +329,7 @@ class CustomDialog extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               //width: MediaQuery.of(context).size.width,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.white,
                                 borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
                                 boxShadow: [
                                   BoxShadow(
@@ -340,7 +360,7 @@ class CustomDialog extends StatelessWidget {
                               padding: const EdgeInsets.all(10),
                               //width: MediaQuery.of(context).size.width,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.white,
                                 borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
                                 boxShadow: [
                                   BoxShadow(
