@@ -1,4 +1,6 @@
 // ignore_for_file: camel_case_types
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -46,25 +48,40 @@ class _ProfilePage extends State<Profile> {
   XFile? _image;
   final _picker = ImagePicker();
 
+  // This might be wrong
+  // Future<void> _openImagePicker() async {
+  //   try {
+  //   final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+  //   var ABlob = AzureStorage.parse('DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+  //   Uint8List? content = await pickedImage?.readAsBytes();
+  //   String? imagePath = pickedImage?.path;
+  //   String container='moveinimages';
+  //   String? contentType = lookupMimeType(imagePath!);
+  //   await ABlob.putBlob('/$container/$imagePath', bodyBytes: content, contentType: contentType, type: BlobType.BlockBlob);
+  //   } on AzureStorageException catch(ex) {
+  //     print('oh no');
+  //     print(ex.message);
+  //   } catch(err) {
+  //     print(err);
+  //   }
+  //   // setState(() {
+  //   //   print('hi');
+  //   // });
+  // }
+
+  String blobURL = 'https://movein.blob.core.windows.net/moveinimages?sp=rwd&st=2023-08-14T20:31:59Z&se=2023-08-31T04:31:59Z&sv=2022-11-02&sr=c&sig=zBKcrQRD6K%2FXTrqsa917DbUHcEy61KZXULcHXPXXDso%3D';
+  // New version
   Future<void> _openImagePicker() async {
     try {
-    final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
-    var ABlob = AzureStorage.parse('DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=aSkkUFABL48/iFzN7oMllHcWVEii3+VYQKjahb511l7UwYI3bqALqc/mygXRfknzlSrQq1aK8WKl+AStZUkDiQ==;EndpointSuffix=core.windows.net');
-    Uint8List? content = await pickedImage?.readAsBytes();
-    String? imagePath = pickedImage?.path;
-    String container='image';
-    String? contentType = lookupMimeType(imagePath!);
-    await ABlob.putBlob('/$container/$imagePath', bodyBytes: content, contentType: contentType, type: BlobType.BlockBlob);
-    } on AzureStorageException catch(ex) {
-      print('oh no');
-      print(ex.message);
+      File? _image;
+      final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+
     } catch(err) {
       print(err);
     }
-    // setState(() {
-    //   print('hi');
-    // });
   }
+
+
 
   @override
   Widget build(BuildContext context) {
