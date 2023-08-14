@@ -106,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
-        physics: const NeverScrollableScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
             leading: null,
@@ -114,6 +114,8 @@ class _LoginScreenState extends State<LoginScreen> {
             collapsedHeight: MediaQuery.of(context).size.height / 3,
             backgroundColor: LAppTheme.lightTheme.primaryColor,
             forceElevated: true,
+            pinned: true,
+            stretch: true,
             elevation: 40,
             flexibleSpace: FlexibleSpaceBar(
               background: Image.asset(
@@ -123,6 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           SliverFillRemaining(
+            hasScrollBody: false,
             child: Padding(
               padding: const EdgeInsets.all(50.0),
               child: FormBuilder(

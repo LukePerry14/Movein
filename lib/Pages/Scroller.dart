@@ -22,7 +22,8 @@ class _ScrollerState extends State<Scroller> {
   int index = 0;
   late NativeAd _ad;
   bool _isAdLoaded = false;
-  bool adTime = true;
+  bool _adTime = true;
+  final double _adAspectRatioMedium = (370.0 / 355.0);
 
   Future<List<Map<String, dynamic>>> getGroups() async {
     List<Map<String, dynamic>> groups = [];
@@ -46,10 +47,10 @@ class _ScrollerState extends State<Scroller> {
             'GroupPicture': data['GroupPicture'].toString(),
             'Members': List<String>.from(
                 data['Members'].map((member) => member.toString())),
-            'AvgCleanliness' : data['AvgCleanliness'],
-            'AvgNoisiness' : data['AvgNoisiness'],
-            'AvgNightLife' : data['AvgNightLife'],
-            'AvgBedTime' : data['AvgBedTime'],
+            'AvgCleanliness' : (data['AvgCleanliness'] as num).toDouble(),
+            'AvgNoisiness' : (data['AvgNoisiness'] as num).toDouble(),
+            'AvgNightLife' : (data['AvgNightLife'] as num).toDouble(),
+            'AvgBedTime' : data['AvgBedTime']
           };
           groups.add(groupData);
         }
@@ -62,37 +63,17 @@ class _ScrollerState extends State<Scroller> {
     return groups;
   }
 
-  void loadNativeAd() {
-    // if (!kIsWeb) {
-    //   _ad = NativeAd(
-    //     adUnitId:
-    //         'ca-app-pub-3940256099942544/2247696110', //AdHelper.nativeAdUnitId,
-    //     request: const AdRequest(),
-    //     listener: NativeAdListener(onAdLoaded: (ad) {
-    //       setState() {
-    //         _isAdLoaded = true;
-    //       }
-    //     }, onAdFailedToLoad: (ad, error) {
-    //       ad.dispose();
-    //       print("Error to load ad ${error.message}, ${error.code}");
-    //     }),
-    //   );
-    //
-    //   _ad.load();
-    // }
-  }
-
-  @override
-  void initState() {
-    loadNativeAd();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _ad.dispose();
-    super.dispose();
-  }
+  // @override
+  // void initState() {
+  //   _loadAd();
+  //   super.initState();
+  // }
+  //
+  // @override
+  // void dispose() {
+  //   _ad.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -109,179 +90,176 @@ class _ScrollerState extends State<Scroller> {
           return Builder(
             builder: (context) {
               final navigator = Navigator.of(context);
-              bool loadAd = ((index > 0) & (index % 3 == 0) & adTime);
-              adTime = !loadAd;
-              return Material(
-                color: Colors.transparent,
-                child: SafeArea(
-                  child: Scaffold(
-                    floatingActionButtonLocation:
-                        FloatingActionButtonLocation.centerFloat,
-                    body: Container(
-                      alignment: Alignment.center,
-                      child: (groupData.isEmpty)
-                          ? const NoGroups()
-                          : loadAd
-                              ? const Text('Add in CustomAd Widget here') //CustomAd(ad: _ad) // Replace CustomAd with the appropriate widget you want to show as the ad
-                              : Gscroller(
-                                  groupName: groupData[index]['GroupName'],
-                                  groupPicture: groupData[index]
-                                      ['GroupPicture'],
-                                  members: groupData[index]['Members'],
-                                  avgBedTime: groupData[index]['AvgBedTime'],
-                                  avgNoisiness: groupData[index]['AvgNoisiness'],
-                                  avgCleanliness: groupData[index]['AvgCleanliness'],
-                                  avgNightLife: groupData[index]['AvgNightLife'],
-                                  showFriend: true,
-                                ),
-                    ),
-                    floatingActionButton: Visibility(
-                      visible: groupData.isNotEmpty,
-                      child: loadAd
-                          ? FloatingActionButton(
-                              heroTag: "AdNext",
+              bool loadAd = ((index > 0) & (index % 3 == 0) & _adTime);
+              return Scaffold(
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.centerFloat,
+                body: SafeArea(
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: (groupData.isEmpty)
+                        ? const NoGroups()
+                        : loadAd ? Container()
+                    //         ? Stack(
+                    //   children: [
+                    //     SizedBox(
+                    //         height: MediaQuery.of(context).size.width,
+                    //         width: MediaQuery.of(context).size.width),
+                    //     if (_isAdLoaded)
+                    //       SizedBox(
+                    //           height: MediaQuery.of(context).size.width,
+                    //           width: MediaQuery.of(context).size.width,
+                    //           child: AdWidget(ad: _ad)),
+                    //   ],
+                    // )
+                            : Gscroller(
+                                groupName: groupData[index]['GroupName'],
+                                groupPicture: groupData[index]
+                                    ['GroupPicture'],
+                                members: groupData[index]['Members'],
+                                avgBedTime: groupData[index]['AvgBedTime'],
+                                avgNoisiness: groupData[index]['AvgNoisiness'],
+                                avgCleanliness: groupData[index]['AvgCleanliness'],
+                                avgNightLife: groupData[index]['AvgNightLife'],
+                                showFriend: true,
+                              ),
+                  ),
+                ),
+                floatingActionButton: Visibility(
+                  visible: groupData.isNotEmpty,
+                  child: loadAd
+                      ? Container()
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            FloatingActionButton(
+                              heroTag: "Block",
                               backgroundColor: Theme.of(context)
                                   .primaryColor
                                   .withOpacity(0.5),
                               onPressed: () {
-                                setState(() {
-                                  adTime = false;
+                                _adTime = true;
+                                addToBlacklist(groupData[index]['Id'])
+                                    .then((_) {
+                                  if (index < groupData.length - 1) {
+                                    setState(() {
+                                      index++;
+                                    });
+                                  } else {
+                                    navigator.pushReplacementNamed('/ScrollRefresh');
+                                  }
+                                }).catchError((e) {
+                                  throw FirebaseException(
+                                    message:
+                                        'Error calling addToBlacklist: $e',
+                                    plugin: 'cloud_firestore',
+                                  );
                                 });
                               },
-                              child: const Icon(
-                                  LineAwesomeIcons.angle_right,
-                                  color: Colors.white
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 9),
+                                  const Icon(LineAwesomeIcons.times, color: Colors.white),
+                                  Text("block".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                ]
                               ),
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                FloatingActionButton(
-                                  heroTag: "Block",
-                                  backgroundColor: Theme.of(context)
-                                      .primaryColor
-                                      .withOpacity(0.5),
-                                  onPressed: () {
-                                    addToBlacklist(groupData[index]['Id'])
-                                        .then((_) {
-                                      if (index < groupData.length - 1) {
-                                        setState(() {
-                                          index++;
-                                        });
-                                      } else {
-                                        navigator.pushReplacementNamed('/ScrollRefresh');
-                                      }
-                                    }).catchError((e) {
-                                      throw FirebaseException(
-                                        message:
-                                            'Error calling addToBlacklist: $e',
-                                        plugin: 'cloud_firestore',
-                                      );
-                                    });
-                                  },
-                                  child: Column(
-                                    children: [
-                                      const SizedBox(height: 9),
-                                      const Icon(LineAwesomeIcons.times, color: Colors.white),
-                                      Text("block".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
-                                    ]
-                                  ),
-                                ),
-                                FloatingActionButton(
-                                  heroTag: "Next",
-                                  backgroundColor: Theme.of(context)
-                                      .primaryColor
-                                      .withOpacity(0.5),
-                                  onPressed: () {
-                                    if (index < groupData.length - 1) {
-                                      setState(() {
-                                        index++;
-                                      });
-                                    } else {
-                                      navigator.pushReplacementNamed('/ScrollRefresh');
-                                    }
-                                  },
-                                  child: Column(
-                                      children: [
-                                        const SizedBox(height: 9),
-                                        const Icon(LineAwesomeIcons.angle_right, color: Colors.white),
-                                        Text("next".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
-                                      ]
-                                  ),
-                                ),
-                                FloatingActionButton(
-                                  heroTag: "Shortlist",
-                                  backgroundColor: Theme.of(context)
-                                      .primaryColor
-                                      .withOpacity(0.5),
-                                  onPressed: () {
-                                    addToShortList(groupData[index]['Id'])
-                                        .then((_) {
-                                      if (index < groupData.length - 1) {
-                                        setState(() {
-                                          index++;
-                                        });
-                                      } else {
-                                        navigator.pushReplacementNamed(
-                                            '/ScrollRefresh');
-                                      }
-                                    }).catchError((e) {
-                                      throw FirebaseException(
-                                        message:
-                                            'Error calling addToShortlist: $e',
-                                        plugin: 'cloud_firestore',
-                                      );
-                                    });
-                                  },
-                                  child: Column(
-                                      children: [
-                                        const SizedBox(height: 9),
-                                        const Icon(LineAwesomeIcons.archive, color: Colors.white),
-                                        Text("sList".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
-                                      ]
-                                  ),
-                                ),
-                                FloatingActionButton(
-                                  heroTag: "Apply",
-                                  backgroundColor: Theme.of(context)
-                                      .primaryColor
-                                      .withOpacity(0.5),
-                                  onPressed: () {
-                                    addToApplicants(groupData[index]['Id'])
-                                        .then((_) {
-                                      if (index < groupData.length - 1) {
-                                        setState(() {
-                                          index++;
-                                        });
-                                      } else {
-                                        navigator.pushReplacementNamed(
-                                            '/ScrollRefresh');
-                                      }
-                                    }).catchError((e) {
-                                      throw FirebaseException(
-                                        message:
-                                            'Error calling addToApplicants: $e',
-                                        plugin: 'cloud_firestore',
-                                      );
-                                    });
-                                  },
-                                  child: Column(
-                                      children: [
-                                        const SizedBox(height: 9),
-                                        const Icon(LineAwesomeIcons.check, color: Colors.white),
-                                        Text("apply".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
-                                      ]
-                                  ),
-                                ),
-                              ],
                             ),
-                    ),
-                    bottomNavigationBar: CustomNavbar(
-                      onItemSelected: (route) {
-                        navigator.pushReplacementNamed(route);
-                      },
-                    ),
-                  ),
+                            FloatingActionButton(
+                              heroTag: "Next",
+                              backgroundColor: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.5),
+                              onPressed: () {
+                                _adTime = true;
+                                if (index < groupData.length - 1) {
+                                  setState(() {
+                                    index++;
+                                  });
+                                } else {
+                                  navigator.pushReplacementNamed('/ScrollRefresh');
+                                }
+                              },
+                              child: Column(
+                                  children: [
+                                    const SizedBox(height: 9),
+                                    const Icon(LineAwesomeIcons.angle_right, color: Colors.white),
+                                    Text("next".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                  ]
+                              ),
+                            ),
+                            FloatingActionButton(
+                              heroTag: "Shortlist",
+                              backgroundColor: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.5),
+                              onPressed: () {
+                                _adTime = true;
+                                addToShortList(groupData[index]['Id'])
+                                    .then((_) {
+                                  if (index < groupData.length - 1) {
+                                    setState(() {
+                                      index++;
+                                    });
+                                  } else {
+                                    navigator.pushReplacementNamed(
+                                        '/ScrollRefresh');
+                                  }
+                                }).catchError((e) {
+                                  throw FirebaseException(
+                                    message:
+                                        'Error calling addToShortlist: $e',
+                                    plugin: 'cloud_firestore',
+                                  );
+                                });
+                              },
+                              child: Column(
+                                  children: [
+                                    const SizedBox(height: 9),
+                                    const Icon(LineAwesomeIcons.archive, color: Colors.white),
+                                    Text("sList".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                  ]
+                              ),
+                            ),
+                            FloatingActionButton(
+                              heroTag: "Apply",
+                              backgroundColor: Theme.of(context)
+                                  .primaryColor
+                                  .withOpacity(0.5),
+                              onPressed: () {
+                                _adTime = true;
+                                addToApplicants(groupData[index]['Id'])
+                                    .then((_) {
+                                  if (index < groupData.length - 1) {
+                                    setState(() {
+                                      index++;
+                                    });
+                                  } else {
+                                    navigator.pushReplacementNamed(
+                                        '/ScrollRefresh');
+                                  }
+                                }).catchError((e) {
+                                  throw FirebaseException(
+                                    message:
+                                        'Error calling addToApplicants: $e',
+                                    plugin: 'cloud_firestore',
+                                  );
+                                });
+                              },
+                              child: Column(
+                                  children: [
+                                    const SizedBox(height: 9),
+                                    const Icon(LineAwesomeIcons.check, color: Colors.white),
+                                    Text("apply".tr, style: GoogleFonts.redHatDisplay(color: Colors.white, fontSize: 8),)
+                                  ]
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+                bottomNavigationBar: CustomNavbar(
+                  onItemSelected: (route) {
+                    navigator.pushReplacementNamed(route);
+                  },
                 ),
               );
             },
@@ -290,6 +268,58 @@ class _ScrollerState extends State<Scroller> {
       },
     );
   }
+  void _loadAd() {
+    setState(() {
+      _isAdLoaded = false;
+    });
+
+    _ad = NativeAd(
+        adUnitId: AdHelper.nativeAdUnitId,
+        listener: NativeAdListener(
+          onAdLoaded: (ad) {
+            // ignore: avoid_print
+            print('$NativeAd loaded.');
+            setState(() {
+              _isAdLoaded = true;
+            });
+          },
+          onAdFailedToLoad: (ad, error) {
+            print('$NativeAd failedToLoad: $error');
+            _ad.dispose();
+          },
+          onAdClicked: (ad) {},
+          onAdImpression: (ad) {},
+          onAdClosed: (ad) {
+            _adTime = false;
+            _ad.dispose();
+          },
+          onAdOpened: (ad) {},
+          onAdWillDismissScreen: (ad) {},
+          onPaidEvent: (ad, valueMicros, precision, currencyCode) {},
+        ),
+        request: const AdRequest(),
+        nativeTemplateStyle: NativeTemplateStyle(
+            templateType: TemplateType.medium,
+            mainBackgroundColor: const Color(0xfffffbed),
+            callToActionTextStyle: NativeTemplateTextStyle(
+                textColor: Colors.white,
+                style: NativeTemplateFontStyle.monospace,
+                size: 16.0),
+            primaryTextStyle: NativeTemplateTextStyle(
+                textColor: Colors.black,
+                style: NativeTemplateFontStyle.bold,
+                size: 16.0),
+            secondaryTextStyle: NativeTemplateTextStyle(
+                textColor: Colors.black,
+                style: NativeTemplateFontStyle.italic,
+                size: 16.0),
+            tertiaryTextStyle: NativeTemplateTextStyle(
+                textColor: Colors.black,
+                style: NativeTemplateFontStyle.normal,
+                size: 16.0)))
+      ..load();
+  }
+
 }
 
 class CustomAd extends StatelessWidget {
@@ -448,7 +478,8 @@ Future<void> addToApplicants(String groupId) async {
   final DocumentReference groupDocRef = groupsCollection.doc(groupId);
 
   groupDocRef.update({
-    'Applicants': FieldValue.arrayUnion([Auth().currentUser()])
+    'Applicants': FieldValue.arrayUnion([Auth().currentUser()]),
+    'AppVals.${Auth().currentUser()}': {},
   }).catchError((e) {
     throw FirebaseException(
         message: 'Error adding to group field "Applicants": $e',

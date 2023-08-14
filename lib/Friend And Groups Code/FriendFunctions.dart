@@ -274,19 +274,20 @@ class GroupExpand extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      insetPadding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
       ),
       backgroundColor: Theme.of(context).canvasColor,
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.98,
-        height: MediaQuery.of(context).size.height * 0.98,
-        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: MediaQuery.of(context).size.height * 0.9,
+        //padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
         child: Stack(
           children: [
             SizedBox(
               width: double.maxFinite,
-              height: MediaQuery.of(context).size.height,
+              height: MediaQuery.of(context).size.height * 0.9,
               child: Gscroller(groupName: groupName, groupPicture: groupPicture, members: members, avgCleanliness: avgCleanliness, avgNoisiness: avgNoisiness, avgNightLife: avgNightLife, avgBedTime: avgBedTime,)
             ),
             Positioned(
@@ -546,10 +547,26 @@ class ConfirmGroupDel extends StatelessWidget {
 Future<void> removeGroupFromUser(String groupType, String groupId, userId) async {
   try {
     final DocumentReference userRef = FirebaseFirestore.instance.collection('Users').doc(userId);
+    final DocumentReference groupRef = FirebaseFirestore.instance.collection('Groups').doc(groupId);
 
     await userRef.update({
       groupType: FieldValue.arrayRemove([groupId]),
     });
+
+    if (groupType == "Applications") {
+      final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await groupRef.get() as DocumentSnapshot<Map<String, dynamic>>;
+      final appVals = groupSnapshot.data()?['AppVals'];
+
+      if (appVals != null && appVals.containsKey(userId)) {
+        appVals.remove(userId); // Remove the key-value pair from the map
+
+        await groupRef.update({
+          'BlackList': FieldValue.arrayRemove([userId]),
+          'Applicants': FieldValue.arrayRemove([userId]),
+          'AppVals': appVals, // Update the AppVals map without the removed key
+        });
+      }
+    }
   } catch (e) {
     throw FirebaseException(
       message: 'Error removing group from user: $e',
@@ -557,6 +574,7 @@ Future<void> removeGroupFromUser(String groupType, String groupId, userId) async
     );
   }
 }
+
 
 class CreateGroupForm extends StatefulWidget {
   const CreateGroupForm({Key? key}) : super(key: key);
@@ -786,8 +804,8 @@ class _SendFriendInviteState extends State<SendFriendInvite> {
                   labelText: 'Enter Friend Id',
                 ),
                 validator: (value) {
-                  if (value?.length != 20) {
-                  return 'Friend Id must have exactly 20 characters';
+                  if (value?.length != 28) {
+                  return 'Friend Id must have exactly 28 characters';
                   }
                   return null;
                 },

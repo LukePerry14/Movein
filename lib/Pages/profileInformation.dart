@@ -421,7 +421,22 @@ class _ProfileInformationState extends State<ProfileInformation> {
           .get();
 
       if (docSnapshot.exists) {
-        userData = docSnapshot.data() as Map<String, dynamic>;
+        Map<String, dynamic>? data = docSnapshot.data() as Map<String, dynamic>?;
+        userData = {
+          "ForeName": data?['ForeName'],
+          "SurName": data?['SurName'],
+          "Uni": data?['UniAttended'],
+          "Preferences": {
+            "Cleanliness" : (data?['Preferences']['Cleanliness'] as num).toDouble(),
+            "Noisiness" : (data?['Preferences']['Noisiness'] as num).toDouble(),
+            "NightLife" : (data?['Preferences']['NightLife'] as num).toDouble(),
+            "Lights Out" : data?['Preferences']['Lights Out']
+          },
+          "Images": data?['Images'],
+          "Bio": data?['Bio'],
+          "Subject": data?['Subject'],
+          "YearOfStudy": data?['YearOfStudy'],
+        };
         setState(() {});
       }
     } catch (e) {

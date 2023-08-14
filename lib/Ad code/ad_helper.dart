@@ -14,9 +14,9 @@ class AdHelper {
 
   static String get nativeAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/2247696110';
+      return 'ca-app-pub-9389688994405080/5815032173';
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/3986624511';
+      return 'ca-app-pub-9389688994405080/1492643785';
     } else {
       throw UnsupportedError('Unsupported platform');
     }
