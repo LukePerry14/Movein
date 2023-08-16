@@ -94,36 +94,34 @@ class _ScrollerState extends State<Scroller> {
               return Scaffold(
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.centerFloat,
-                body: SafeArea(
-                  child: Container(
-                    alignment: Alignment.center,
-                    child: (groupData.isEmpty)
-                        ? const NoGroups()
-                        : loadAd ? Container()
-                    //         ? Stack(
-                    //   children: [
-                    //     SizedBox(
-                    //         height: MediaQuery.of(context).size.width,
-                    //         width: MediaQuery.of(context).size.width),
-                    //     if (_isAdLoaded)
-                    //       SizedBox(
-                    //           height: MediaQuery.of(context).size.width,
-                    //           width: MediaQuery.of(context).size.width,
-                    //           child: AdWidget(ad: _ad)),
-                    //   ],
-                    // )
-                            : Gscroller(
-                                groupName: groupData[index]['GroupName'],
-                                groupPicture: groupData[index]
-                                    ['GroupPicture'],
-                                members: groupData[index]['Members'],
-                                avgBedTime: groupData[index]['AvgBedTime'],
-                                avgNoisiness: groupData[index]['AvgNoisiness'],
-                                avgCleanliness: groupData[index]['AvgCleanliness'],
-                                avgNightLife: groupData[index]['AvgNightLife'],
-                                showFriend: true,
-                              ),
-                  ),
+                body: Container(
+                  alignment: Alignment.center,
+                  child: (groupData.isEmpty)
+                      ? const NoGroups()
+                      : loadAd ? Container()
+                  //         ? Stack(
+                  //   children: [
+                  //     SizedBox(
+                  //         height: MediaQuery.of(context).size.width,
+                  //         width: MediaQuery.of(context).size.width),
+                  //     if (_isAdLoaded)
+                  //       SizedBox(
+                  //           height: MediaQuery.of(context).size.width,
+                  //           width: MediaQuery.of(context).size.width,
+                  //           child: AdWidget(ad: _ad)),
+                  //   ],
+                  // )
+                          : Gscroller(
+                              groupName: groupData[index]['GroupName'],
+                              groupPicture: groupData[index]
+                                  ['GroupPicture'],
+                              members: groupData[index]['Members'],
+                              avgBedTime: groupData[index]['AvgBedTime'],
+                              avgNoisiness: groupData[index]['AvgNoisiness'],
+                              avgCleanliness: groupData[index]['AvgCleanliness'],
+                              avgNightLife: groupData[index]['AvgNightLife'],
+                              showFriend: true,
+                            ),
                 ),
                 floatingActionButton: Visibility(
                   visible: groupData.isNotEmpty,

@@ -45,7 +45,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _loadSavedTheme();
-
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     return ValueListenableBuilder<ThemeMode>(
         valueListenable: App.themeNotifier,
         builder: (context, currentMode, child) {

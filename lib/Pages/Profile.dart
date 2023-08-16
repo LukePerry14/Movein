@@ -100,75 +100,98 @@ class _ProfilePage extends State<Profile> {
               final navigator = Navigator.of(context);
               bool isDark = App.themeNotifier.value == ThemeMode.dark;
               return Scaffold(
-                body: SafeArea(
-                  child: SingleChildScrollView(
-                    child: Container(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: <Widget>[
-                              backgroundButton(),
-                              Stack(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      print("testing");
-                                    },
-                                    child: Container(
-                                      width: 150,
-                                      // Set a fixed width for the container
-                                      height: 150,
-                                      // Set a fixed height for the container
-                                      decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const ClipOval(
-                                        child: Image(
-                                          image: AssetImage(
-                                              "assets/Pictures/dora.png"),
-                                          fit: BoxFit.cover,
-                                        ),
+                body: SingleChildScrollView(
+                  child: Container(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 20,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            backgroundButton(),
+                            Stack(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    print("testing");
+                                  },
+                                  child: Container(
+                                    width: 150,
+                                    // Set a fixed width for the container
+                                    height: 150,
+                                    // Set a fixed height for the container
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const ClipOval(
+                                      child: Image(
+                                        image: AssetImage(
+                                            "assets/Pictures/dora.png"),
+                                        fit: BoxFit.cover,
                                       ),
                                     ),
                                   ),
-                                ],
-                              ),
-                              shareProfileButton()
-                            ],
-                          ),
-                          const SizedBox(height: 20.0),
-                          Text(name,
-                              style: Theme.of(context).textTheme.headlineMedium),
-                          const SizedBox(height: 8.0),
-                          Row(mainAxisSize: MainAxisSize.min, children: [
-                            GestureDetector(
-                              onTap: () => _copyToClipboard(context),
-                              child: Container(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  Auth().currentUser(),
-                                  style: Theme.of(context).textTheme.bodySmall,
                                 ),
+                              ],
+                            ),
+                            shareProfileButton()
+                          ],
+                        ),
+                        const SizedBox(height: 20.0),
+                        Text(name,
+                            style: Theme.of(context).textTheme.headlineMedium),
+                        const SizedBox(height: 8.0),
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          GestureDetector(
+                            onTap: () => _copyToClipboard(context),
+                            child: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                Auth().currentUser(),
+                                style: Theme.of(context).textTheme.bodySmall,
                               ),
                             ),
-                            GestureDetector(
-                              onTap: () => _copyToClipboard(context),
-                              child: const Icon(Icons.copy),
-                            ),
-                          ]),
-                          const SizedBox(height: 50.0),
-                          upgradeAccountButton(),
-                          const SizedBox(height: 35.0),
-                          Divider(
-                            height: 1,
-                            color: Colors.grey.withOpacity(0.3),
                           ),
-                          const SizedBox(height: 35.0),
-                          ListTile(
+                          GestureDetector(
+                            onTap: () => _copyToClipboard(context),
+                            child: const Icon(Icons.copy),
+                          ),
+                        ]),
+                        const SizedBox(height: 50.0),
+                        upgradeAccountButton(),
+                        const SizedBox(height: 35.0),
+                        Divider(
+                          height: 1,
+                          color: Colors.grey.withOpacity(0.3),
+                        ),
+                        const SizedBox(height: 35.0),
+                        ListTile(
+                          leading: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: isDark? Colors.white70 : Theme.of(context).primaryColor,
+                                  width: 1),
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            child: Icon(LineAwesomeIcons.user,
+                                color: isDark? Colors.white70 : Theme.of(context).primaryColor),
+                          ),
+                          title: Text(
+                            "edit_profile".tr,
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                          trailing: Icon(LineAwesomeIcons.angle_right, color: LAppTheme.lightTheme.primaryColor),
+                          onTap: () {
+                            Navigator.pushNamed(context, '/profileInformation');
+                          },
+                        ),
+                        const SizedBox(height: 30.0),
+                        ListTile(
                             leading: Container(
                               width: 40,
                               height: 40,
@@ -178,66 +201,42 @@ class _ProfilePage extends State<Profile> {
                                     width: 1),
                                 borderRadius: BorderRadius.circular(100),
                               ),
-                              child: Icon(LineAwesomeIcons.user,
+                              child: Icon(LineAwesomeIcons.cog,
                                   color: isDark? Colors.white70 : Theme.of(context).primaryColor),
                             ),
                             title: Text(
-                              "edit_profile".tr,
+                              "settings".tr,
                               style: Theme.of(context).textTheme.headlineSmall,
                             ),
                             trailing: Icon(LineAwesomeIcons.angle_right, color: LAppTheme.lightTheme.primaryColor),
                             onTap: () {
-                              Navigator.pushNamed(context, '/profileInformation');
-                            },
-                          ),
-                          const SizedBox(height: 30.0),
-                          ListTile(
-                              leading: Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: isDark? Colors.white70 : Theme.of(context).primaryColor,
-                                      width: 1),
-                                  borderRadius: BorderRadius.circular(100),
-                                ),
-                                child: Icon(LineAwesomeIcons.cog,
-                                    color: isDark? Colors.white70 : Theme.of(context).primaryColor),
-                              ),
-                              title: Text(
-                                "settings".tr,
-                                style: Theme.of(context).textTheme.headlineSmall,
-                              ),
-                              trailing: Icon(LineAwesomeIcons.angle_right, color: LAppTheme.lightTheme.primaryColor),
-                              onTap: () {
-                                Navigator.pushNamed(context, '/Settings');
-                              }),
-                          const SizedBox(height: 30),
-                          ListTile(
-                            leading: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.red, width: 1),
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              child: const Icon(
-                                  LineAwesomeIcons.alternate_sign_out,
-                                  color: Colors.red),
+                              Navigator.pushNamed(context, '/Settings');
+                            }),
+                        const SizedBox(height: 30),
+                        ListTile(
+                          leading: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.red, width: 1),
+                              borderRadius: BorderRadius.circular(100),
                             ),
-                            title: Text("log_out".tr,
-                                style: GoogleFonts.lexend(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 20.0)),
-                            onTap: () => {
-                              FirebaseAuth.instance.signOut(),
-                              Navigator.pushNamedAndRemoveUntil(
-                                  context, '/Login', (route) => false)
-                            },
+                            child: const Icon(
+                                LineAwesomeIcons.alternate_sign_out,
+                                color: Colors.red),
                           ),
-                        ],
-                      ),
+                          title: Text("log_out".tr,
+                              style: GoogleFonts.lexend(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 20.0)),
+                          onTap: () => {
+                            FirebaseAuth.instance.signOut(),
+                            Navigator.pushNamedAndRemoveUntil(
+                                context, '/Login', (route) => false)
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ),

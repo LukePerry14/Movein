@@ -81,9 +81,9 @@ class _FriendsState extends State<Friends> {
                 "GroupName": groupData["GroupName"],
                 "GroupPicture": groupData["GroupPicture"],
                 "Members": groupData["Members"],
-                "avgCleanliness" : groupData["AvgCleanliness"],
-                "AvgNoisiness" : groupData["AvgNoisiness"],
-                "AvgNightLife" : groupData["AvgNightLife"],
+                "AvgCleanliness" : (groupData["AvgCleanliness"] as num).toDouble(),
+                "AvgNoisiness" : (groupData["AvgNoisiness"] as num).toDouble(),
+                "AvgNightLife" : (groupData["AvgNightLife"] as num).toDouble(),
                 "AvgBedTime" : groupData["AvgBedTime"],
               });
             }
@@ -341,289 +341,369 @@ class _FriendsState extends State<Friends> {
       builder: (context) {
         final navigator = Navigator.of(context);
         return Scaffold(
-          body: SafeArea(
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: SizedBox(
-                        height: 40,
-                        width: double.maxFinite,
-                        child: SearchBar(
-                          hintText: "search".tr,
-                          onChanged: (value) {
-                            searchText = value;
-                            filterSearchResults(value);
-                          },
-                          trailing: [
-                            IconButton(
-                              onPressed: () {
+          body: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: SizedBox(
+                      height: 40,
+                      width: double.maxFinite,
+                      child: SearchBar(
+                        hintText: "search".tr,
+                        onChanged: (value) {
+                          searchText = value;
+                          filterSearchResults(value);
+                        },
+                        trailing: [
+                          IconButton(
+                            onPressed: () {
+                              showDialog<String>(
+                                context: context,
+                                builder: (BuildContext context) => SendFriendInvite(userId: Auth().currentUser(),),
+                              );
+                            },
+                            icon: const Icon(LineAwesomeIcons.user_plus),
+                          ),
+                        ]
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text("your_groups".tr, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.left,),
+                          Expanded(child: Container()),
+                          ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
+                            ),
+                            onPressed: () {
+                              if (joined.length + applications.length == appsMax){
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('max_groups_title'.tr, style: Theme.of(context).textTheme.bodyMedium,),
+                                      content: Text('max_groups_desc'.tr, style: Theme.of(context).textTheme.bodySmall),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context); // Close the dialog
+                                          },
+                                          child: Text('ok'.tr, style: Theme.of(context).textTheme.bodyMedium,),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }else{
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Rounded top corners
+                                  ),
+                                  builder: (BuildContext context) {
+                                    return const CreateGroupForm(); // Using the extracted widget here
+                                  },
+                                );
+                              }
+                            },
+                            child: SizedBox(
+                              height: 30,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text('create_group'.tr, style: Theme.of(context).textTheme.bodyMedium),
+                                  Icon(LineAwesomeIcons.plus, size: 20, color: Theme.of(context).textTheme.bodyMedium?.color,),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: isLoading ? const Center(child: CircularProgressIndicator())
+                          : (joinedResults.isEmpty & applicationsResults.isEmpty & shortListResults.isEmpty) ? Padding(padding: const EdgeInsets.all(10), child: Text('no_groups'.tr, style: Theme.of(context).textTheme.bodyMedium,))
+                          : ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: joinedResults.length + applicationsResults.length + shortListResults.length + 3,
+                        itemBuilder: (context, index) {
+                          if (index == 0) {
+                            return joinedResults.isEmpty ? const SizedBox(height: 1,)
+                            : Row(
+                                children: [
+                                  const SizedBox(width: 20),
+                                  Text(
+                                    "joined".tr,
+                                    style: Theme.of(context).textTheme.headlineSmall,
+                                  ),
+                                  const SizedBox(width: 15),
+                                  Text(
+                                    "${applications.length + joined.length}/$appsMax",
+                                    style: Theme.of(context).textTheme.bodyLarge,
+                                  ),
+                                ]
+                            );
+                          } else if (index <= joinedResults.length) {
+                            int joinedIndex = index - 1;
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, '/Messages', arguments: {
+                                  'members': joinedResults[joinedIndex]["Members"],
+                                  'groupId': joinedResults[joinedIndex]["Id"],
+                                  'groupName': joinedResults[joinedIndex]["GroupName"],
+                                  'groupPicture' : joinedResults[joinedIndex]["GroupPicture"],
+                                });
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 40,
+                                        height: 40,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(100),
+                                          child: Image.asset(joinedResults[joinedIndex]["GroupPicture"]),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              joinedResults[joinedIndex]["GroupName"],
+                                              style: Theme.of(context).textTheme.headlineSmall,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          Navigator.pushNamed(context, '/Messages', arguments: {
+                                            'members': joinedResults[joinedIndex]["Members"],
+                                            'groupId': joinedResults[joinedIndex]["Id"],
+                                            'groupName': joinedResults[joinedIndex]["GroupName"],
+                                          });
+                                        },
+                                        splashRadius: 1,
+                                        icon: const Icon(Icons.mail),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          } else if (index == joinedResults.length + 1) {
+                            return applicationsResults.isEmpty ? const SizedBox(height: 1,)
+                                : Row(
+                                children: [
+                                  const SizedBox(width: 20),
+                                  Text(
+                                    "applications".tr,
+                                    style: Theme.of(context).textTheme.headlineSmall,
+                                  ),
+                                ]
+                            );
+                          } else if (index <= joinedResults.length + applicationsResults.length + 1) {
+                            int applicationIndex = index - joinedResults.length - 2;
+                            return GestureDetector(
+                              onTap: () {
                                 showDialog<String>(
                                   context: context,
-                                  builder: (BuildContext context) => SendFriendInvite(userId: Auth().currentUser(),),
+                                  builder: (BuildContext context) => GroupExpand(
+                                    id: applicationsResults[applicationIndex]["Id"],
+                                    groupName: applicationsResults[applicationIndex]["GroupName"],
+                                    groupPicture: applicationsResults[applicationIndex]["GroupPicture"],
+                                    members: applicationsResults[applicationIndex]["Members"].cast<String>().toList(),
+                                    avgCleanliness: applicationsResults[applicationIndex]["AvgCleanliness"],
+                                    avgNoisiness: applicationsResults[applicationIndex]["AvgNoisiness"],
+                                    avgNightLife: applicationsResults[applicationIndex]["AvgNightLife"],
+                                    avgBedTime: applicationsResults[applicationIndex]["AvgBedTime"],
+                                  ),
                                 );
                               },
-                              icon: const Icon(LineAwesomeIcons.user_plus),
-                            ),
-                          ]
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text("your_groups".tr, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.left,),
-                            Expanded(child: Container()),
-                            ElevatedButton(
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
-                              ),
-                              onPressed: () {
-                                if (joined.length + applications.length == appsMax){
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text('max_groups_title'.tr, style: Theme.of(context).textTheme.bodyMedium,),
-                                        content: Text('max_groups_desc'.tr, style: Theme.of(context).textTheme.bodySmall),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context); // Close the dialog
-                                            },
-                                            child: Text('ok'.tr, style: Theme.of(context).textTheme.bodyMedium,),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                }else{
-                                  showModalBottomSheet(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Rounded top corners
-                                    ),
-                                    builder: (BuildContext context) {
-                                      return const CreateGroupForm(); // Using the extracted widget here
-                                    },
-                                  );
-                                }
-                              },
-                              child: SizedBox(
-                                height: 30,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text('create_group'.tr, style: Theme.of(context).textTheme.bodyMedium),
-                                    Icon(LineAwesomeIcons.plus, size: 20, color: Theme.of(context).textTheme.bodyMedium?.color,),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: isLoading ? const Center(child: CircularProgressIndicator())
-                            : (joinedResults.isEmpty & applicationsResults.isEmpty & shortListResults.isEmpty) ? Padding(padding: const EdgeInsets.all(10), child: Text('no_groups'.tr, style: Theme.of(context).textTheme.bodyMedium,))
-                            : ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: joinedResults.length + applicationsResults.length + shortListResults.length + 3,
-                          itemBuilder: (context, index) {
-                            if (index == 0) {
-                              return joinedResults.isEmpty ? const SizedBox(height: 1,)
-                              : Row(
-                                  children: [
-                                    const SizedBox(width: 20),
-                                    Text(
-                                      "joined".tr,
-                                      style: Theme.of(context).textTheme.headlineSmall,
-                                    ),
-                                    const SizedBox(width: 15),
-                                    Text(
-                                      "${applications.length + joined.length}/$appsMax",
-                                      style: Theme.of(context).textTheme.bodyLarge,
-                                    ),
-                                  ]
-                              );
-                            } else if (index <= joinedResults.length) {
-                              int joinedIndex = index - 1;
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.pushNamed(context, '/Messages', arguments: {
-                                    'members': joinedResults[joinedIndex]["Members"],
-                                    'groupId': joinedResults[joinedIndex]["Id"],
-                                    'groupName': joinedResults[joinedIndex]["GroupName"],
-                                    'groupPicture' : joinedResults[joinedIndex]["GroupPicture"],
-                                  });
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          color: Colors.grey[300]!,
-                                        ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.grey[300]!,
                                       ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        SizedBox(
-                                          width: 40,
-                                          height: 40,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(100),
-                                            child: Image.asset(joinedResults[joinedIndex]["GroupPicture"]),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                joinedResults[joinedIndex]["GroupName"],
-                                                style: Theme.of(context).textTheme.headlineSmall,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        IconButton(
-                                          onPressed: () {
-                                            Navigator.pushNamed(context, '/Messages', arguments: {
-                                              'members': joinedResults[joinedIndex]["Members"],
-                                              'groupId': joinedResults[joinedIndex]["Id"],
-                                              'groupName': joinedResults[joinedIndex]["GroupName"],
-                                            });
-                                          },
-                                          splashRadius: 1,
-                                          icon: const Icon(Icons.mail),
-                                        ),
-                                      ],
                                     ),
                                   ),
-                                ),
-                              );
-                            } else if (index == joinedResults.length + 1) {
-                              return applicationsResults.isEmpty ? const SizedBox(height: 1,)
-                                  : Row(
-                                  children: [
-                                    const SizedBox(width: 20),
-                                    Text(
-                                      "applications".tr,
-                                      style: Theme.of(context).textTheme.headlineSmall,
-                                    ),
-                                  ]
-                              );
-                            } else if (index <= joinedResults.length + applicationsResults.length + 1) {
-                              int applicationIndex = index - joinedResults.length - 2;
-                              return GestureDetector(
-                                onTap: () {
-                                  showDialog<String>(
-                                    context: context,
-                                    builder: (BuildContext context) => GroupExpand(
-                                      id: applicationsResults[applicationIndex]["Id"],
-                                      groupName: applicationsResults[applicationIndex]["GroupName"],
-                                      groupPicture: applicationsResults[applicationIndex]["GroupPicture"],
-                                      members: applicationsResults[applicationIndex]["Members"].cast<String>().toList(),
-                                      avgCleanliness: applicationsResults[applicationIndex]["avgCleanliness"],
-                                      avgNoisiness: applicationsResults[applicationIndex]["avgNoisiness"],
-                                      avgNightLife: applicationsResults[applicationIndex]["avgNightLife"],
-                                      avgBedTime: applicationsResults[applicationIndex]["avgBedTime"],
-                                    ),
-                                  );
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          color: Colors.grey[300]!,
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 40,
+                                        height: 40,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(100),
+                                          child: Image.asset(applicationsResults[applicationIndex]["GroupPicture"]),
                                         ),
                                       ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              applicationsResults[applicationIndex]["GroupName"],
+                                              style: Theme.of(context).textTheme.headlineSmall,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          showDialog<String>(
+                                            context: context,
+                                            builder: (BuildContext context) => ConfirmGroupDel(groupId: applicationsResults[applicationIndex]["Id"], groupType: "Applications", userId: Auth().currentUser(),)
+                                          );
+                                        },
+                                        splashRadius: 1,
+                                        icon: const Icon(LineAwesomeIcons.trash),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          } else if (index == joinedResults.length + applicationsResults.length + 2) {
+                            return shortListResults.isEmpty ? const SizedBox(height: 1,)
+                                : Row(
+                                children: [
+                                  const SizedBox(width: 20),
+                                  Text(
+                                    "sList".tr,
+                                    style: Theme.of(context).textTheme.headlineSmall,
+                                  ),
+                                ]
+                            );
+                          } else {
+                            int shortlistIndex = index - joinedResults.length - applicationsResults.length - 3;
+                            return GestureDetector(
+                              onTap: () {
+                                showDialog<String>(
+                                  context: context,
+                                  builder: (BuildContext context) => GroupExpand(
+                                    id: shortListResults[shortlistIndex]["Id"],
+                                    groupName: shortListResults[shortlistIndex]["GroupName"],
+                                    groupPicture: shortListResults[shortlistIndex]["GroupPicture"],
+                                    members: shortListResults[shortlistIndex]["Members"].cast<String>().toList(),
+                                    avgCleanliness: shortListResults[shortlistIndex]["avgCleanliness"],
+                                    avgNoisiness: shortListResults[shortlistIndex]["avgNoisiness"],
+                                    avgNightLife: shortListResults[shortlistIndex]["avgNightLife"],
+                                    avgBedTime: shortListResults[shortlistIndex]["avgBedTime"],
+                                  ),
+                                );
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.grey[300]!,
+                                      ),
                                     ),
-                                    child: Row(
-                                      children: [
-                                        SizedBox(
-                                          width: 40,
-                                          height: 40,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(100),
-                                            child: Image.asset(applicationsResults[applicationIndex]["GroupPicture"]),
-                                          ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 40,
+                                        height: 40,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(100),
+                                          child: Image.asset(shortListResults[shortlistIndex]["GroupPicture"]),
                                         ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                applicationsResults[applicationIndex]["GroupName"],
-                                                style: Theme.of(context).textTheme.headlineSmall,
-                                              ),
-                                            ],
-                                          ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              shortListResults[shortlistIndex]["GroupName"],
+                                              style: Theme.of(context).textTheme.headlineSmall,
+                                            ),
+                                          ],
                                         ),
-                                        IconButton(
-                                          onPressed: () {
-                                            showDialog<String>(
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          showDialog<String>(
                                               context: context,
-                                              builder: (BuildContext context) => ConfirmGroupDel(groupId: applicationsResults[applicationIndex]["Id"], groupType: "Applications", userId: Auth().currentUser(),)
-                                            );
-                                          },
-                                          splashRadius: 1,
-                                          icon: const Icon(LineAwesomeIcons.trash),
-                                        ),
-                                      ],
-                                    ),
+                                              builder: (BuildContext context) => ConfirmGroupDel(groupId: shortListResults[shortlistIndex]["Id"], groupType: "ShortList", userId: Auth().currentUser(),)
+                                          );
+                                        },
+                                        splashRadius: 1,
+                                        icon: const Icon(LineAwesomeIcons.trash),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              );
-                            } else if (index == joinedResults.length + applicationsResults.length + 2) {
-                              return shortListResults.isEmpty ? const SizedBox(height: 1,)
-                                  : Row(
-                                  children: [
-                                    const SizedBox(width: 20),
-                                    Text(
-                                      "sList".tr,
-                                      style: Theme.of(context).textTheme.headlineSmall,
-                                    ),
-                                  ]
-                              );
-                            } else {
-                              int shortlistIndex = index - joinedResults.length - applicationsResults.length - 3;
+                              ),
+                            );
+                          }
+                        },
+                      ),
+
+                    ),
+                  ),
+                  SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      child: Text("your_friends".tr, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.left,)
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        children: [
+                          isLoading ? const Center(child: CircularProgressIndicator())
+                              : (searchResults.isEmpty & outgoingFriendInvitesResults.isEmpty) ? Padding(padding: const EdgeInsets.all(10),child: Text("no_friends".tr, style: Theme.of(context).textTheme.bodyMedium,),)
+                              : ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: searchResults.length,
+                            itemBuilder: (context, index) {
                               return GestureDetector(
                                 onTap: () {
                                   showDialog<String>(
-                                    context: context,
-                                    builder: (BuildContext context) => GroupExpand(
-                                      id: shortListResults[shortlistIndex]["Id"],
-                                      groupName: shortListResults[shortlistIndex]["GroupName"],
-                                      groupPicture: shortListResults[shortlistIndex]["GroupPicture"],
-                                      members: shortListResults[shortlistIndex]["Members"].cast<String>().toList(),
-                                      avgCleanliness: shortListResults[shortlistIndex]["avgCleanliness"],
-                                      avgNoisiness: shortListResults[shortlistIndex]["avgNoisiness"],
-                                      avgNightLife: shortListResults[shortlistIndex]["avgNightLife"],
-                                      avgBedTime: shortListResults[shortlistIndex]["avgBedTime"],
-                                    ),
+                                      context: context,
+                                      builder: (BuildContext context) => CustomDialog(id: searchResults[index]["Id"], foreName: searchResults[index]["ForeName"], age: searchResults[index]["Age"], uni: searchResults[index]["Uni"], preferences: searchResults[index]["Preferences"], images: searchResults[index]["Images"], bio: searchResults[index]["Bio"], subject: searchResults[index]["Subject"], yearOfStudy: searchResults[index]["YearOfStudy"], showFriend: true,)
                                   );
                                 },
                                 child: Padding(
@@ -644,7 +724,7 @@ class _FriendsState extends State<Friends> {
                                           height: 40,
                                           child: ClipRRect(
                                             borderRadius: BorderRadius.circular(100),
-                                            child: Image.asset(shortListResults[shortlistIndex]["GroupPicture"]),
+                                            child: Image.asset(searchResults[index]["Images"][0]),
                                           ),
                                         ),
                                         const SizedBox(width: 8),
@@ -653,59 +733,69 @@ class _FriendsState extends State<Friends> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                shortListResults[shortlistIndex]["GroupName"],
+                                                "${searchResults[index]["ForeName"]} ${searchResults[index]["SurName"]}",
                                                 style: Theme.of(context).textTheme.headlineSmall,
+                                              ),
+                                              Text(
+                                                searchResults[index]["Id"],
+                                                style: Theme.of(context).textTheme.bodySmall,
                                               ),
                                             ],
                                           ),
                                         ),
-                                        IconButton(
-                                          onPressed: () {
-                                            showDialog<String>(
-                                                context: context,
-                                                builder: (BuildContext context) => ConfirmGroupDel(groupId: shortListResults[shortlistIndex]["Id"], groupType: "ShortList", userId: Auth().currentUser(),)
-                                            );
+                                        PopupMenuButton<String>(
+                                          itemBuilder: (context) => [
+                                            PopupMenuItem<String>(
+                                              value: 'invite',
+                                              child: Text('Invite to Group', style: Theme.of(context).textTheme.bodyMedium),
+                                            ),
+                                            PopupMenuItem<String>(
+                                              value: 'remove',
+                                              child: Text('Remove Friend', style: Theme.of(context).textTheme.bodyMedium),
+                                            ),
+                                          ],
+                                          onSelected: (value) {
+                                            if (value == 'invite') {
+                                              showDialog<String>(
+                                                  context: context,
+                                                  builder: (BuildContext context) => GroupInvite(inviteeId: searchResults[index]["Id"], userId: Auth().currentUser(),)
+                                              );
+
+                                            } else if (value == 'remove') {
+                                              showDialog<String>(
+                                                  context: context,
+                                                  builder: (BuildContext context) => ConfirmDel(friendId: searchResults[index]["Id"])
+                                              );
+                                              //Navigator.pushReplacementNamed(context, "/Friends"); //Dirty way of rebuilding app.
+                                            }
                                           },
-                                          splashRadius: 1,
-                                          icon: const Icon(LineAwesomeIcons.trash),
+                                          icon: const Icon(Icons.more_vert),
                                         ),
                                       ],
                                     ),
                                   ),
                                 ),
                               );
-                            }
-                          },
-                        ),
 
-                      ),
-                    ),
-                    SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        child: Text("your_friends".tr, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.left,)
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          children: [
-                            isLoading ? const Center(child: CircularProgressIndicator())
-                                : (searchResults.isEmpty & outgoingFriendInvitesResults.isEmpty) ? Padding(padding: const EdgeInsets.all(10),child: Text("no_friends".tr, style: Theme.of(context).textTheme.bodyMedium,),)
-                                : ListView.builder(
+                            },
+                          ),
+                          if (outgoingFriendInvitesResults.isNotEmpty)
+                            SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.9,
+                                child: Text('outGoing_friend_invite'.tr, style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)
+                            ),
+                          if (outgoingFriendInvitesResults.isNotEmpty)
+                            ListView.builder(
                               shrinkWrap: true,
-                              itemCount: searchResults.length,
+                              itemCount: outgoingFriendInvitesResults.length,
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                   onTap: () {
                                     showDialog<String>(
-                                        context: context,
-                                        builder: (BuildContext context) => CustomDialog(id: searchResults[index]["Id"], foreName: searchResults[index]["ForeName"], age: searchResults[index]["Age"], uni: searchResults[index]["Uni"], preferences: searchResults[index]["Preferences"], images: searchResults[index]["Images"], bio: searchResults[index]["Bio"], subject: searchResults[index]["Subject"], yearOfStudy: searchResults[index]["YearOfStudy"], showFriend: true,)
+                                      context: context,
+                                      builder: (BuildContext context) => CustomDialog(id: outgoingFriendInvitesResults[index]["Id"], foreName: outgoingFriendInvitesResults[index]["ForeName"], age: outgoingFriendInvitesResults[index]["Age"], uni: outgoingFriendInvitesResults[index]["Uni"], preferences: outgoingFriendInvitesResults[index]["Preferences"], images: outgoingFriendInvitesResults[index]["Images"], bio: outgoingFriendInvitesResults[index]["Bio"], subject: outgoingFriendInvitesResults[index]["Subject"], yearOfStudy: outgoingFriendInvitesResults[index]["YearOfStudy"],)
                                     );
-                                  },
+                                    },
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Container(
@@ -718,458 +808,367 @@ class _FriendsState extends State<Friends> {
                                         ),
                                       ),
                                       child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 40,
-                                            height: 40,
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(100),
-                                              child: Image.asset(searchResults[index]["Images"][0]),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "${searchResults[index]["ForeName"]} ${searchResults[index]["SurName"]}",
-                                                  style: Theme.of(context).textTheme.headlineSmall,
-                                                ),
-                                                Text(
-                                                  searchResults[index]["Id"],
-                                                  style: Theme.of(context).textTheme.bodySmall,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          PopupMenuButton<String>(
-                                            itemBuilder: (context) => [
-                                              PopupMenuItem<String>(
-                                                value: 'invite',
-                                                child: Text('Invite to Group', style: Theme.of(context).textTheme.bodyMedium),
-                                              ),
-                                              PopupMenuItem<String>(
-                                                value: 'remove',
-                                                child: Text('Remove Friend', style: Theme.of(context).textTheme.bodyMedium),
-                                              ),
-                                            ],
-                                            onSelected: (value) {
-                                              if (value == 'invite') {
-                                                showDialog<String>(
-                                                    context: context,
-                                                    builder: (BuildContext context) => GroupInvite(inviteeId: searchResults[index]["Id"], userId: Auth().currentUser(),)
-                                                );
-
-                                              } else if (value == 'remove') {
-                                                showDialog<String>(
-                                                    context: context,
-                                                    builder: (BuildContext context) => ConfirmDel(friendId: searchResults[index]["Id"])
-                                                );
-                                                //Navigator.pushReplacementNamed(context, "/Friends"); //Dirty way of rebuilding app.
-                                              }
-                                            },
-                                            icon: const Icon(Icons.more_vert),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-
-                              },
-                            ),
-                            if (outgoingFriendInvitesResults.isNotEmpty)
-                              SizedBox(
-                                  width: MediaQuery.of(context).size.width * 0.9,
-                                  child: Text('outGoing_friend_invite'.tr, style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)
-                              ),
-                            if (outgoingFriendInvitesResults.isNotEmpty)
-                              ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: outgoingFriendInvitesResults.length,
-                                itemBuilder: (context, index) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      showDialog<String>(
-                                        context: context,
-                                        builder: (BuildContext context) => CustomDialog(id: outgoingFriendInvitesResults[index]["Id"], foreName: outgoingFriendInvitesResults[index]["ForeName"], age: outgoingFriendInvitesResults[index]["Age"], uni: outgoingFriendInvitesResults[index]["Uni"], preferences: outgoingFriendInvitesResults[index]["Preferences"], images: outgoingFriendInvitesResults[index]["Images"], bio: outgoingFriendInvitesResults[index]["Bio"], subject: outgoingFriendInvitesResults[index]["Subject"], yearOfStudy: outgoingFriendInvitesResults[index]["YearOfStudy"],)
-                                      );
-                                      },
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
-                                        decoration: BoxDecoration(
-                                          border: Border(
-                                            bottom: BorderSide(
-                                              color: Colors.grey[300]!,
-                                            ),
+                                      children: [
+                                        SizedBox(
+                                          width: 40,
+                                          height: 40,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(100),
+                                            child: Image.asset(outgoingFriendInvitesResults[index]["Images"][0]),
                                           ),
                                         ),
-                                        child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 40,
-                                            height: 40,
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(100),
-                                              child: Image.asset(outgoingFriendInvitesResults[index]["Images"][0]),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "${outgoingFriendInvitesResults[index]['ForeName']} ${outgoingFriendInvitesResults[index]['SurName']}",
-                                                  style: Theme.of(context).textTheme.headlineSmall,
-                                                ),
-                                                Text(
-                                                  outgoingFriendInvitesResults[index]["Id"],
-                                                  style: Theme.of(context).textTheme.bodySmall,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          PopupMenuButton<String>(
-                                            itemBuilder: (context) => [
-                                              PopupMenuItem<String>(
-                                                value: 'remove',
-                                                child: Text('cancel_invite', style: Theme.of(context).textTheme.bodyMedium),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "${outgoingFriendInvitesResults[index]['ForeName']} ${outgoingFriendInvitesResults[index]['SurName']}",
+                                                style: Theme.of(context).textTheme.headlineSmall,
+                                              ),
+                                              Text(
+                                                outgoingFriendInvitesResults[index]["Id"],
+                                                style: Theme.of(context).textTheme.bodySmall,
                                               ),
                                             ],
-                                            onSelected: (value) async {
-                                              if (value == 'remove') {
-                                                await removeOutFriendInvite(outgoingFriendInvitesResults[index]['Id'], Auth().currentUser(),);
-                                                Navigator.of(context).pushReplacementNamed("/Friends");
-                                              }
-                                            },
-                                            icon: const Icon(Icons.more_vert),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                        PopupMenuButton<String>(
+                                          itemBuilder: (context) => [
+                                            PopupMenuItem<String>(
+                                              value: 'remove',
+                                              child: Text('cancel_invite', style: Theme.of(context).textTheme.bodyMedium),
+                                            ),
+                                          ],
+                                          onSelected: (value) async {
+                                            if (value == 'remove') {
+                                              await removeOutFriendInvite(outgoingFriendInvitesResults[index]['Id'], Auth().currentUser(),);
+                                              Navigator.of(context).pushReplacementNamed("/Friends");
+                                            }
+                                          },
+                                          icon: const Icon(Icons.more_vert),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: 20),
-                    Text("invites".tr, style: Theme.of(context).textTheme.headlineMedium),
-                    const Divider(),
-                    const SizedBox(height: 15),
-                    SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        child: Text("group_invites".tr, style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          children: [
-                            isLoading ? const Center(child: CircularProgressIndicator())
-                                : groupSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10),child: Text("no_group_invites".tr, style: Theme.of(context).textTheme.bodyMedium,),)
-                                : ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: groupSearchResults.length,
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    showDialog<String>(
-                                        context: context,
-                                        builder: (BuildContext context) => GroupExpand(
-                                            id: groupSearchResults[index]["Id"],
-                                            groupName: groupSearchResults[index]["GroupName"],
-                                            groupPicture: groupSearchResults[index]["GroupPicture"],
-                                            members: groupSearchResults[index]["Members"].cast<String>().toList(),
-                                            avgCleanliness: groupSearchResults[index]["AvgCleanliness"],
-                                            avgNoisiness: groupSearchResults[index]["AvgNoisiness"],
-                                            avgNightLife: groupSearchResults[index]["AvgNightLife"],
-                                            avgBedTime: groupSearchResults[index]["AvgBedTime"],
-                                        )
-                                    );
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
-                                      decoration: BoxDecoration(
-                                        border: Border(
-                                          bottom: BorderSide(
-                                            color: Colors.grey[300]!,
-                                          ),
+                  const SizedBox(height: 20),
+                  Text("invites".tr, style: Theme.of(context).textTheme.headlineMedium),
+                  const Divider(),
+                  const SizedBox(height: 15),
+                  SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      child: Text("group_invites".tr, style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        children: [
+                          isLoading ? const Center(child: CircularProgressIndicator())
+                              : groupSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10),child: Text("no_group_invites".tr, style: Theme.of(context).textTheme.bodyMedium,),)
+                              : ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: groupSearchResults.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) => GroupExpand(
+                                          id: groupSearchResults[index]["Id"],
+                                          groupName: groupSearchResults[index]["GroupName"],
+                                          groupPicture: groupSearchResults[index]["GroupPicture"],
+                                          members: groupSearchResults[index]["Members"].cast<String>().toList(),
+                                          avgCleanliness: groupSearchResults[index]["AvgCleanliness"],
+                                          avgNoisiness: groupSearchResults[index]["AvgNoisiness"],
+                                          avgNightLife: groupSearchResults[index]["AvgNightLife"],
+                                          avgBedTime: groupSearchResults[index]["AvgBedTime"],
+                                      )
+                                  );
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: Colors.grey[300]!,
                                         ),
                                       ),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 40,
-                                            height: 40,
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(100),
-                                              child: Image.asset(groupSearchResults[index]["GroupPicture"]),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  groupSearchResults[index]["GroupName"],
-                                                  style: Theme.of(context).textTheme.headlineSmall,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          PopupMenuButton<String>(
-                                            itemBuilder: (context) => [
-                                              PopupMenuItem<String>(
-                                                value: 'accept',
-                                                child: Text('apply_to_group'.tr, style: Theme.of(context).textTheme.bodyMedium),
-                                              ),
-                                              PopupMenuItem<String>(
-                                                value: 'reject',
-                                                child: Text('reject_group'.tr, style: Theme.of(context).textTheme.bodyMedium),
-                                              ),
-                                            ],
-                                            onSelected: (value) async{
-                                              if (value == 'accept') {
-                                                await joinGroup(groupSearchResults[index]["Id"], Auth().currentUser());
-                                                Navigator.of(context).pushReplacementNamed("/Friends");
-                                              } else if (value == 'reject') {
-                                                await removeGroupInvite(groupSearchResults[index]["Id"], Auth().currentUser(),);
-                                                Navigator.of(context).pushReplacementNamed("/Friends");
-                                              }
-                                            },
-                                            icon: const Icon(Icons.more_vert),
-                                          ),
-                                        ],
-                                      ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        child: Text("friend_invites".tr, style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          children: [
-                            isLoading ? const Center(child: CircularProgressIndicator())
-                                : friendSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10), child: Text("no_friend_invites".tr, style: Theme.of(context).textTheme.bodyMedium,))
-                                : ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: friendSearchResults.length,
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    showDialog<String>(
-                                        context: context,
-                                        builder: (BuildContext context) => CustomDialog(id: friendSearchResults[index]["Id"], foreName: friendSearchResults[index]["ForeName"], age: friendSearchResults[index]["Age"], uni: friendSearchResults[index]["Uni"], preferences: friendSearchResults[index]["Preferences"], images: friendSearchResults[index]["Images"], bio: friendSearchResults[index]["Bio"], subject: friendSearchResults[index]["Subject"], yearOfStudy: friendSearchResults[index]["YearOfStudy"])
-                                    );
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
-                                      decoration: BoxDecoration(
-                                        border: Border(
-                                          bottom: BorderSide(
-                                            color: Colors.grey[300]!,
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 40,
+                                          height: 40,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(100),
+                                            child: Image.asset(groupSearchResults[index]["GroupPicture"]),
                                           ),
                                         ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 40,
-                                            height: 40,
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(100),
-                                              child: Image.asset(friendSearchResults[index]["Images"][0]),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "${friendSearchResults[index]['ForeName']} ${friendSearchResults[index]['SurName']}",
-                                                  style: Theme.of(context).textTheme.headlineSmall,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          PopupMenuButton<String>(
-                                            itemBuilder: (context) => [
-                                              PopupMenuItem<String>(
-                                                value: 'accept',
-                                                child: Text('accept_friend'.tr, style: Theme.of(context).textTheme.bodyMedium),
-                                              ),
-                                              PopupMenuItem<String>(
-                                                value: 'reject',
-                                                child: Text('reject_friend', style: Theme.of(context).textTheme.bodyMedium),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                groupSearchResults[index]["GroupName"],
+                                                style: Theme.of(context).textTheme.headlineSmall,
                                               ),
                                             ],
-                                            onSelected: (value) async{
-                                              if (value == 'accept') {
-                                                await addFriend(friendSearchResults[index]["Id"], Auth().currentUser(),);
-                                                Navigator.of(context).pushReplacementNamed("/Friends");
-                                              } else if (value == 'reject') {
-                                                await removeFriendInvite(friendSearchResults[index]["Id"], Auth().currentUser(),);
-                                                Navigator.of(context).pushReplacementNamed("/Friends");
-                                              }
-                                            },
-                                            icon: const Icon(Icons.more_vert),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text("Blocked Groups".tr, style: Theme.of(context).textTheme.headlineMedium),
-                    const Divider(),
-                    const SizedBox(height: 15),
-                    Padding(
-                      padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          children: [
-                            isLoading ? const Center(child: CircularProgressIndicator())
-                                : blockedSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10),child: Text("no-blocked-groups".tr, style: Theme.of(context).textTheme.bodyMedium,),)
-                                : ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: blockedSearchResults.length,
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    showDialog<String>(
-                                        context: context,
-                                        builder: (BuildContext context) => GroupExpand(
-                                          id: blockedSearchResults[index]["Id"],
-                                          groupName: blockedSearchResults[index]["GroupName"],
-                                          groupPicture: blockedSearchResults[index]["GroupPicture"],
-                                          members: blockedSearchResults[index]["Members"].cast<String>().toList(),
-                                          avgCleanliness: blockedSearchResults[index]["AvgCleanliness"],
-                                          avgNoisiness: blockedSearchResults[index]["AvgNoisiness"],
-                                          avgNightLife: blockedSearchResults[index]["AvgNightLife"],
-                                          avgBedTime: blockedSearchResults[index]["AvgBedTime"],
-                                        )
-                                    );
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
-                                      decoration: BoxDecoration(
-                                        border: Border(
-                                          bottom: BorderSide(
-                                            color: Colors.grey[300]!,
                                           ),
                                         ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 40,
-                                            height: 40,
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(100),
-                                              child: Image.asset(blockedSearchResults[index]["GroupPicture"]),
+                                        PopupMenuButton<String>(
+                                          itemBuilder: (context) => [
+                                            PopupMenuItem<String>(
+                                              value: 'accept',
+                                              child: Text('apply_to_group'.tr, style: Theme.of(context).textTheme.bodyMedium),
                                             ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  blockedSearchResults[index]["GroupName"],
-                                                  style: Theme.of(context).textTheme.headlineSmall,
-                                                ),
-                                              ],
+                                            PopupMenuItem<String>(
+                                              value: 'reject',
+                                              child: Text('reject_group'.tr, style: Theme.of(context).textTheme.bodyMedium),
                                             ),
-                                          ),
-                                          PopupMenuButton<String>(
-                                            itemBuilder: (context) => [
-                                              PopupMenuItem<String>(
-                                                value: 'unblock',
-                                                child: Text('unblock'.tr, style: Theme.of(context).textTheme.bodyMedium),
-                                              ),
-                                              PopupMenuItem<String>(
-                                                value: 'unblock-sList',
-                                                child: Text('unblock-sList'.tr, style: Theme.of(context).textTheme.bodyMedium),
-                                              ),
-                                              PopupMenuItem<String>(
-                                                value: 'unblock-apply',
-                                                child: Text('unblock-apply'.tr, style: Theme.of(context).textTheme.bodyMedium),
-                                              ),
-                                            ],
-                                            onSelected: (value) async{
-                                              if (value == 'unblock') {
-                                                await unblock(blockedSearchResults[index]["Id"],value,  Auth().currentUser());
-                                                Navigator.of(context).pushReplacementNamed("/Friends");
-                                              } else if(value == 'unblock-sList'){
-                                                await unblock(blockedSearchResults[index]["Id"], value, Auth().currentUser());
-                                                Navigator.of(context).pushReplacementNamed("/Friends");
-                                              } else if(value == 'unblock-apply'){
-                                                await unblock(blockedSearchResults[index]["Id"], value, Auth().currentUser());
-                                                Navigator.of(context).pushReplacementNamed("/Friends");
-                                              }
-                                            },
-                                            icon: const Icon(Icons.more_vert),
-                                          ),
-                                        ],
-                                      ),
+                                          ],
+                                          onSelected: (value) async{
+                                            if (value == 'accept') {
+                                              await joinGroup(groupSearchResults[index]["Id"], Auth().currentUser());
+                                              Navigator.of(context).pushReplacementNamed("/Friends");
+                                            } else if (value == 'reject') {
+                                              await removeGroupInvite(groupSearchResults[index]["Id"], Auth().currentUser(),);
+                                              Navigator.of(context).pushReplacementNamed("/Friends");
+                                            }
+                                          },
+                                          icon: const Icon(Icons.more_vert),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-
+                  ),
+                  const SizedBox(height: 15),
+                  SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      child: Text("friend_invites".tr, style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        children: [
+                          isLoading ? const Center(child: CircularProgressIndicator())
+                              : friendSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10), child: Text("no_friend_invites".tr, style: Theme.of(context).textTheme.bodyMedium,))
+                              : ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: friendSearchResults.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) => CustomDialog(id: friendSearchResults[index]["Id"], foreName: friendSearchResults[index]["ForeName"], age: friendSearchResults[index]["Age"], uni: friendSearchResults[index]["Uni"], preferences: friendSearchResults[index]["Preferences"], images: friendSearchResults[index]["Images"], bio: friendSearchResults[index]["Bio"], subject: friendSearchResults[index]["Subject"], yearOfStudy: friendSearchResults[index]["YearOfStudy"])
+                                  );
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: Colors.grey[300]!,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 40,
+                                          height: 40,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(100),
+                                            child: Image.asset(friendSearchResults[index]["Images"][0]),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "${friendSearchResults[index]['ForeName']} ${friendSearchResults[index]['SurName']}",
+                                                style: Theme.of(context).textTheme.headlineSmall,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        PopupMenuButton<String>(
+                                          itemBuilder: (context) => [
+                                            PopupMenuItem<String>(
+                                              value: 'accept',
+                                              child: Text('accept_friend'.tr, style: Theme.of(context).textTheme.bodyMedium),
+                                            ),
+                                            PopupMenuItem<String>(
+                                              value: 'reject',
+                                              child: Text('reject_friend', style: Theme.of(context).textTheme.bodyMedium),
+                                            ),
+                                          ],
+                                          onSelected: (value) async{
+                                            if (value == 'accept') {
+                                              await addFriend(friendSearchResults[index]["Id"], Auth().currentUser(),);
+                                              Navigator.of(context).pushReplacementNamed("/Friends");
+                                            } else if (value == 'reject') {
+                                              await removeFriendInvite(friendSearchResults[index]["Id"], Auth().currentUser(),);
+                                              Navigator.of(context).pushReplacementNamed("/Friends");
+                                            }
+                                          },
+                                          icon: const Icon(Icons.more_vert),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text("Blocked Groups".tr, style: Theme.of(context).textTheme.headlineMedium),
+                  const Divider(),
+                  const SizedBox(height: 15),
+                  Padding(
+                    padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        children: [
+                          isLoading ? const Center(child: CircularProgressIndicator())
+                              : blockedSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10),child: Text("no-blocked-groups".tr, style: Theme.of(context).textTheme.bodyMedium,),)
+                              : ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: blockedSearchResults.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) => GroupExpand(
+                                        id: blockedSearchResults[index]["Id"],
+                                        groupName: blockedSearchResults[index]["GroupName"],
+                                        groupPicture: blockedSearchResults[index]["GroupPicture"],
+                                        members: blockedSearchResults[index]["Members"].cast<String>().toList(),
+                                        avgCleanliness: blockedSearchResults[index]["AvgCleanliness"],
+                                        avgNoisiness: blockedSearchResults[index]["AvgNoisiness"],
+                                        avgNightLife: blockedSearchResults[index]["AvgNightLife"],
+                                        avgBedTime: blockedSearchResults[index]["AvgBedTime"],
+                                      )
+                                  );
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: Colors.grey[300]!,
+                                        ),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 40,
+                                          height: 40,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(100),
+                                            child: Image.asset(blockedSearchResults[index]["GroupPicture"]),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                blockedSearchResults[index]["GroupName"],
+                                                style: Theme.of(context).textTheme.headlineSmall,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        PopupMenuButton<String>(
+                                          itemBuilder: (context) => [
+                                            PopupMenuItem<String>(
+                                              value: 'unblock',
+                                              child: Text('unblock'.tr, style: Theme.of(context).textTheme.bodyMedium),
+                                            ),
+                                            PopupMenuItem<String>(
+                                              value: 'unblock-sList',
+                                              child: Text('unblock-sList'.tr, style: Theme.of(context).textTheme.bodyMedium),
+                                            ),
+                                            PopupMenuItem<String>(
+                                              value: 'unblock-apply',
+                                              child: Text('unblock-apply'.tr, style: Theme.of(context).textTheme.bodyMedium),
+                                            ),
+                                          ],
+                                          onSelected: (value) async{
+                                            if (value == 'unblock') {
+                                              await unblock(blockedSearchResults[index]["Id"],value,  Auth().currentUser());
+                                              Navigator.of(context).pushReplacementNamed("/Friends");
+                                            } else if(value == 'unblock-sList'){
+                                              await unblock(blockedSearchResults[index]["Id"], value, Auth().currentUser());
+                                              Navigator.of(context).pushReplacementNamed("/Friends");
+                                            } else if(value == 'unblock-apply'){
+                                              await unblock(blockedSearchResults[index]["Id"], value, Auth().currentUser());
+                                              Navigator.of(context).pushReplacementNamed("/Friends");
+                                            }
+                                          },
+                                          icon: const Icon(Icons.more_vert),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
+
             ),
           ),
           bottomNavigationBar: CustomNavbar(

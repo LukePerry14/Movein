@@ -35,11 +35,11 @@ class _ProfileInformationState extends State<ProfileInformation> {
     'Bio': "",
     'DOB': null,
     'Subject': "",
-    'YearOfStudy': 1,
+    'YearOfStudy': 1.0,
     'Preferences': {
-      'Cleanliness': 1,
-      'Noisiness': 1,
-      'NightLife': 1,
+      'Cleanliness': 1.0,
+      'Noisiness': 1.0,
+      'NightLife': 1.0,
       'Lights Out': null,
     }
   };
@@ -339,8 +339,7 @@ class _ProfileInformationState extends State<ProfileInformation> {
                                     const SizedBox(height: 10),
                                     FormBuilderSlider(
                                       name: 'NightLife',
-                                      initialValue: userData['Preferences']
-                                          ['NightLife'],
+                                      initialValue: userData['Preferences']['NightLife'],
                                       min: 0,
                                       max: 5,
                                       divisions: 5,
@@ -426,6 +425,7 @@ class _ProfileInformationState extends State<ProfileInformation> {
           "ForeName": data?['ForeName'],
           "SurName": data?['SurName'],
           "Uni": data?['UniAttended'],
+          "DOB": data?['DOB'],
           "Preferences": {
             "Cleanliness" : (data?['Preferences']['Cleanliness'] as num).toDouble(),
             "Noisiness" : (data?['Preferences']['Noisiness'] as num).toDouble(),
@@ -435,7 +435,7 @@ class _ProfileInformationState extends State<ProfileInformation> {
           "Images": data?['Images'],
           "Bio": data?['Bio'],
           "Subject": data?['Subject'],
-          "YearOfStudy": data?['YearOfStudy'],
+          "YearOfStudy": (data?['YearOfStudy'] as num).toDouble(),
         };
         setState(() {});
       }
@@ -478,7 +478,6 @@ class _ProfileInformationState extends State<ProfileInformation> {
       }
     }
     final confFormvalid = uservalid & profileValid & prefsValid;
-    //print(confFormvalid);
     setState(() {
       formValid = confFormvalid;
     });
