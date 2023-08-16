@@ -1,5 +1,5 @@
 // ignore_for_file: camel_case_types
-import 'dart:io';
+// import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +10,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:movein/navbar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:azblob/azblob.dart';
 import 'package:mime/mime.dart';
+import 'package:http/http.dart' as http;
+import 'package:azstore/azstore.dart' as AzureStorage;
 
 import '../main.dart';
 
@@ -69,22 +70,29 @@ class _ProfilePage extends State<Profile> {
   //   // });
   // }
 
-  String blobURL = 'https://movein.blob.core.windows.net/moveinimages?sp=racwdli&st=2023-08-16T08:49:36Z&se=2024-04-17T16:49:36Z&sv=2022-11-02&sr=c&sig=odutsBXNqOBDLMkTdcqjIYSfBZMtZAxqFY%2Bw4OT9XM8%3D';
-  String SASToken = 'sp=racwdli&st=2023-08-16T08:49:36Z&se=2024-04-17T16:49:36Z&sv=2022-11-02&sr=c&sig=odutsBXNqOBDLMkTdcqjIYSfBZMtZAxqFY%2Bw4OT9XM8%3D';
-  // New version
-  Future<void> _openImagePicker() async {
-    try {
-      File? _image;
-      final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
-      final Uri fullURL = Uri.parse('$blobURL$SASToken');
-
-      final response = await azblob.put
-    } catch(err) {
-      print(err);
+  Future<File?> pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      return File(image.path);
+    } else {
+      print('No image selected.');
+      return null;
     }
   }
 
-
+  String blobURL = 'https://movein.blob.core.windows.net/moveinimages?sp=racwdli&st=2023-08-16T08:49:36Z&se=2024-04-17T16:49:36Z&sv=2022-11-02&sr=c&sig=odutsBXNqOBDLMkTdcqjIYSfBZMtZAxqFY%2Bw4OT9XM8%3D';
+  String SASToken = 'sp=racwdli&st=2023-08-16T08:49:36Z&se=2024-04-17T16:49:36Z&sv=2022-11-02&sr=c&sig=odutsBXNqOBDLMkTdcqjIYSfBZMtZAxqFY%2Bw4OT9XM8%3D';
+  // New version
+  Future<void> _uploadImageToAzure(File imageFile) async {
+    Uint8List bytes = imageFile.readAsBytesSync();
+    var x = AzureStorage.AzureStorage.parse('DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+    try {
+      await x.putBlob('/moveinimages/userimage.jpg', contentType: 'image/jpg', bodyBytes: bytes);
+    } catch (e) {
+      print('Exception: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,8 +114,11 @@ class _ProfilePage extends State<Profile> {
                     Stack(
                       children: [
                         GestureDetector(
-                          onTap: () {
-                            _openImagePicker();
+                          onTap: () async {
+                            final pickedImage = await pickImage();
+                            if (pickedImage != null) {
+                              await _uploadImageToAzure(pickedImage);
+                            }
                           },
                           child: Container(
                             width: 150, // Set a fixed width for the container

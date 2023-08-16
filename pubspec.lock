@@ -41,6 +41,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.0"
+  azstore:
+    dependency: "direct main"
+    description:
+      name: azstore
+      sha256: "0689f7461bf797973d84d14af7b62c2c74f34451423ad3782ee6863d5cf2f2b2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   boolean_selector:
     dependency: transitive
     description:
