@@ -1,5 +1,4 @@
 // ignore_for_file: camel_case_types
-// import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +12,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
 import 'package:azstore/azstore.dart' as AzureStorage;
+import 'package:file/file.dart';
+import 'dart:io';
 
 import '../main.dart';
 
@@ -45,30 +46,6 @@ class _ProfilePage extends State<Profile> {
       ),
     );
   }
-
-  XFile? _image;
-  final _picker = ImagePicker();
-
-  // This might be wrong
-  // Future<void> _openImagePicker() async {
-  //   try {
-  //   final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
-  //   var ABlob = AzureStorage.parse('DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
-  //   Uint8List? content = await pickedImage?.readAsBytes();
-  //   String? imagePath = pickedImage?.path;
-  //   String container='moveinimages';
-  //   String? contentType = lookupMimeType(imagePath!);
-  //   await ABlob.putBlob('/$container/$imagePath', bodyBytes: content, contentType: contentType, type: BlobType.BlockBlob);
-  //   } on AzureStorageException catch(ex) {
-  //     print('oh no');
-  //     print(ex.message);
-  //   } catch(err) {
-  //     print(err);
-  //   }
-  //   // setState(() {
-  //   //   print('hi');
-  //   // });
-  // }
 
   Future<File?> pickImage() async {
     final ImagePicker _picker = ImagePicker();

@@ -52,6 +52,7 @@ dependencies:
   azblob: ^2.4.0
   mime: ^1.0.4
   azstore: ^1.0.3
+  file: ^6.1.4
 
 flutter_native_splash:
   android: true
