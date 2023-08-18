@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:movein/Pages/Sendbird.dart';
 import 'package:movein/navbar.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
 import 'package:movein/Scroller%20Code/swipe_card.dart';
@@ -463,8 +464,12 @@ class _FriendsState extends State<Friends> {
                           } else if (index <= joinedResults.length) {
                             int joinedIndex = index - 1;
                             return GestureDetector(
-                              onTap: () {
+                              onTap: () async{
+                                ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),'test');
+                                final groupChannel = await ConnectSendbird().returnChannel(joinedResults[joinedIndex]["Id"]);
+                                
                                 Navigator.pushNamed(context, '/Messages', arguments: {
+                                  'channel':groupChannel,
                                   'members': joinedResults[joinedIndex]["Members"],
                                   'groupId': joinedResults[joinedIndex]["Id"],
                                   'groupName': joinedResults[joinedIndex]["GroupName"],
@@ -505,13 +510,26 @@ class _FriendsState extends State<Friends> {
                                         ),
                                       ),
                                       IconButton(
-                                        onPressed: () {
-                                          Navigator.pushNamed(context, '/Messages', arguments: {
+                                       onPressed: ()  async{
+
+                                        // retrieves group channel to see if channelurl is valid 
+                                          ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),'test');
+                                          String response = await ConnectSendbird().findChannel(joinedResults[joinedIndex]["Id"]);/*joinedResults[joinedIndex]["Id"]);*/
+                                          if (response =="success")
+                                          {
+                                            final groupChannel = await ConnectSendbird().returnChannel(joinedResults[joinedIndex]["Id"]);
+                                            Navigator.pushNamed(context, '/Messages', arguments: {
+                                            'channel':groupChannel,
                                             'members': joinedResults[joinedIndex]["Members"],
                                             'groupId': joinedResults[joinedIndex]["Id"],
                                             'groupName': joinedResults[joinedIndex]["GroupName"],
-                                          });
-                                        },
+                                          }
+                                          );
+                                          }
+                                          else{print('error');}
+                                          
+                                        }
+                                        ,
                                         splashRadius: 1,
                                         icon: const Icon(Icons.mail),
                                       ),

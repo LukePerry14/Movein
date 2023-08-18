@@ -797,7 +797,7 @@ class _SendFriendInviteState extends State<SendFriendInvite> {
               },
               child: TextFormField(
                 controller: _textEditingController,
-                maxLength: 20,
+                maxLength: 28,
                 autocorrect: false,
                 decoration: const InputDecoration(
                   border: UnderlineInputBorder(),

@@ -17,9 +17,11 @@ import 'package:movein/Pages/profileInformation.dart';
 import 'package:movein/Pages/GroupOptions.dart';
 import 'package:movein/Pages/Friends.dart';
 import 'package:movein/Pages/ScrollRefresh.dart';
+import 'package:movein/Pages/Sendbird.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:movein/Translations.dart';
 import 'package:movein/UserPreferences.dart';
+
 import 'Auth code/auth.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -238,6 +240,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 .currentState?.fields['password']?.value);
 
                         if (response == 'success') {
+                          // connect to sendbird server
+                          ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),'test');
+
+
                           Navigator.pushNamed(context, '/Scroller');
                           return;
                         } else {
@@ -779,6 +785,9 @@ class _SignupScreenState extends State<SignupScreen> {
                           );
 
                           if (response == 'success') {
+                            //insert code to create/sign into sendbird account 
+                            ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),'test');
+
                             Navigator.pushNamed(context, '/OnBoarding');
                             return;
                           } else {

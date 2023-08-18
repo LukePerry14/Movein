@@ -52,6 +52,9 @@ dependencies:
   introduction_screen: ^3.1.11
   email_validator: ^2.1.17
   flutter_typeahead: ^4.6.2
+  sendbird_sdk: ^3.2.17
+  dash_chat_2: ^0.0.17
+  sendbird_chat_sdk: ^4.0.6
 
 flutter_native_splash:
   android: true
