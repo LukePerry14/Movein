@@ -63,6 +63,7 @@ class AppTranslations extends Translations {
           "unblock": "Unblock",
           "unblock-apply": "Unblock and Apply",
           "unblock-sList": "Unblock and ShortList",
+          "yearofstudy": "Average year of study: ",
 
 
 

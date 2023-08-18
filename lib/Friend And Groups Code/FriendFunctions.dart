@@ -143,9 +143,11 @@ class GroupInvite extends StatelessWidget {
 
 class ConfirmDel extends StatelessWidget {
   final String friendId;
+  final String userId;
   const ConfirmDel({
     Key? key,
     required this.friendId,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -180,7 +182,7 @@ class ConfirmDel extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                       onPressed: () {
-                        removeFriend(friendId).then((_){
+                        removeFriend(friendId, userId).then((_){
                           Navigator.of(context).pushReplacementNamed('/Friends');
                         });
 
@@ -199,8 +201,7 @@ class ConfirmDel extends StatelessWidget {
   }
 }
 
-Future<void> removeFriend(String friendId) async{
-  const userId = "iKxLSxcDqlT6vtHe71Bp";
+Future<void> removeFriend(String friendId, String userId) async{
   final userRef = FirebaseFirestore.instance.collection('Users').doc(userId);
 
   try {
@@ -256,6 +257,7 @@ class GroupExpand extends StatelessWidget {
   final double avgCleanliness;
   final double avgNoisiness;
   final double avgNightLife;
+  final double avgYearOfStudy;
   final Timestamp avgBedTime;
 
   const GroupExpand({
@@ -267,6 +269,7 @@ class GroupExpand extends StatelessWidget {
     required this.avgCleanliness,
     required this.avgNoisiness,
     required this.avgNightLife,
+    required this.avgYearOfStudy,
     required this.avgBedTime,
 
   }) : super(key: key);
@@ -279,7 +282,7 @@ class GroupExpand extends StatelessWidget {
         borderRadius: BorderRadius.circular(20.0),
       ),
       backgroundColor: Theme.of(context).canvasColor,
-      child: Container(
+      child: SizedBox(
         width: MediaQuery.of(context).size.width * 0.9,
         height: MediaQuery.of(context).size.height * 0.9,
         //padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -288,7 +291,7 @@ class GroupExpand extends StatelessWidget {
             SizedBox(
               width: double.maxFinite,
               height: MediaQuery.of(context).size.height * 0.9,
-              child: Gscroller(groupName: groupName, groupPicture: groupPicture, members: members, avgCleanliness: avgCleanliness, avgNoisiness: avgNoisiness, avgNightLife: avgNightLife, avgBedTime: avgBedTime,)
+              child: Gscroller(groupName: groupName, groupPicture: groupPicture, members: members, avgCleanliness: avgCleanliness, avgNoisiness: avgNoisiness, avgNightLife: avgNightLife, avgBedTime: avgBedTime, avgYearOfStudy: avgYearOfStudy,)
             ),
             Positioned(
               top: 0,
@@ -577,7 +580,11 @@ Future<void> removeGroupFromUser(String groupType, String groupId, userId) async
 
 
 class CreateGroupForm extends StatefulWidget {
-  const CreateGroupForm({Key? key}) : super(key: key);
+  final String userId;
+  const CreateGroupForm({
+    Key? key,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   State<CreateGroupForm> createState() => _CreateGroupFormState();
@@ -588,7 +595,6 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
   bool _isButtonEnabled = false;
   final TextEditingController _groupNameController = TextEditingController(text: "GroupName");
   File? _selectedImage;
-  final String userId = "iKxLSxcDqlT6vtHe71Bp";
 
 
   Future<void> _pickImage() async {
@@ -616,7 +622,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
       // final groupPicture = await response.stream.bytesToString();
 
       final CollectionReference groupsCollection = FirebaseFirestore.instance.collection('Groups');
-      final DocumentReference userDocument = FirebaseFirestore.instance.collection('Users').doc(userId);
+      final DocumentReference userDocument = FirebaseFirestore.instance.collection('Users').doc(widget.userId);
       final DocumentSnapshot userSnapshot = await userDocument.get();
       final Map<String,dynamic> prefs = userSnapshot.get('Preferences');
       List<String> allowedUnis = [userSnapshot.get('UniAttended')];
@@ -626,11 +632,11 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
       int avgCleanliness = prefs['Cleanliness'];
       int avgNightLife = prefs['NightLife'];
       int avgNoisiness = prefs['Noisiness'];
-      List<String> blackList = [userId];
+      List<String> blackList = [widget.userId];
       List<String> invitees = [];
       Map<String, dynamic> kickVals = {};
       List<String> kicks = [];
-      List<String> members = [userId];
+      List<String> members = [widget.userId];
 
       final newGroupDocument = await groupsCollection.add({
         'AllowedUnis': allowedUnis,
@@ -640,9 +646,10 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
         'AvgCleanliness': avgCleanliness,
         'AvgNightLife': avgNightLife,
         'AvgNoisiness': avgNoisiness,
+        'AvgYearOfStudy': userSnapshot.get('YearOfStudy'),
         'BlackList': blackList,
         'GroupName': groupName,
-        'GroupPicture': "assets/Pictures/ph.png",
+        'GroupPicture': "assets/Pictures/logo.png",
         'Invitees': invitees,
         'KickVals': kickVals,
         'Kicks': kicks,

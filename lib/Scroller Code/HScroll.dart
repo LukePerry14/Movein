@@ -14,6 +14,7 @@ class Gscroller extends StatefulWidget {
   final double avgNoisiness;
   final double avgCleanliness;
   final double avgNightLife;
+  final double avgYearOfStudy;
   final Timestamp avgBedTime;
   final bool showFriend;
 
@@ -25,6 +26,7 @@ class Gscroller extends StatefulWidget {
     required this.avgNoisiness,
     required this.avgCleanliness,
     required this.avgNightLife,
+    required this.avgYearOfStudy,
     required this.avgBedTime,
 
     this.showFriend = false,
@@ -155,6 +157,14 @@ class _GscrollerState extends State<Gscroller> {
                       alignment: Alignment.center,
                       child: Text(
                         "${"nightlife".tr}: ${widget.avgNightLife}/5",
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                    ),
+                    const SizedBox(height: 10), // Add space between the children
+                    Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "${"yearofstudy".tr}: ${widget.avgYearOfStudy}/7",
                         style: Theme.of(context).textTheme.headlineSmall,
                       ),
                     ),

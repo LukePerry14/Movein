@@ -84,6 +84,7 @@ class _FriendsState extends State<Friends> {
                 "AvgCleanliness" : (groupData["AvgCleanliness"] as num).toDouble(),
                 "AvgNoisiness" : (groupData["AvgNoisiness"] as num).toDouble(),
                 "AvgNightLife" : (groupData["AvgNightLife"] as num).toDouble(),
+                'AvgYearOfStudy': (groupData["AvgYearOfStudy"] as num).toDouble(),
                 "AvgBedTime" : groupData["AvgBedTime"],
               });
             }
@@ -109,6 +110,7 @@ class _FriendsState extends State<Friends> {
               "AvgCleanliness": (groupData['AvgCleanliness'] as num).toDouble(),
               "AvgNoisiness": (groupData['AvgNoisiness'] as num).toDouble(),
               "AvgNightLife": (groupData['AvgNightLife'] as num).toDouble(),
+              'AvgYearOfStudy': (groupData["AvgYearOfStudy"] as num).toDouble(),
               "AvgBedTime": groupData['AvgBedTime'],
             });
           }
@@ -130,6 +132,7 @@ class _FriendsState extends State<Friends> {
               "AvgNoisiness": (groupData['AvgNoisiness'] as num).toDouble(),
               "AvgNightLife": (groupData['AvgNightLife'] as num).toDouble(),
               "AvgBedTime": groupData['AvgBedTime'],
+              "AvgYearOfStudy": groupData['AvgYearOfStudy'],
             });
           }
         }
@@ -410,7 +413,7 @@ class _FriendsState extends State<Friends> {
                                     borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Rounded top corners
                                   ),
                                   builder: (BuildContext context) {
-                                    return const CreateGroupForm(); // Using the extracted widget here
+                                    return CreateGroupForm(userId: Auth().currentUser(),); // Using the extracted widget here
                                   },
                                 );
                               }
@@ -546,6 +549,7 @@ class _FriendsState extends State<Friends> {
                                     avgNoisiness: applicationsResults[applicationIndex]["AvgNoisiness"],
                                     avgNightLife: applicationsResults[applicationIndex]["AvgNightLife"],
                                     avgBedTime: applicationsResults[applicationIndex]["AvgBedTime"],
+                                    avgYearOfStudy: applicationsResults[applicationIndex]["AvgYearOfStudy"],
                                   ),
                                 );
                               },
@@ -619,10 +623,12 @@ class _FriendsState extends State<Friends> {
                                     groupName: shortListResults[shortlistIndex]["GroupName"],
                                     groupPicture: shortListResults[shortlistIndex]["GroupPicture"],
                                     members: shortListResults[shortlistIndex]["Members"].cast<String>().toList(),
-                                    avgCleanliness: shortListResults[shortlistIndex]["avgCleanliness"],
-                                    avgNoisiness: shortListResults[shortlistIndex]["avgNoisiness"],
-                                    avgNightLife: shortListResults[shortlistIndex]["avgNightLife"],
-                                    avgBedTime: shortListResults[shortlistIndex]["avgBedTime"],
+                                    avgCleanliness: shortListResults[shortlistIndex]["AvgCleanliness"],
+                                    avgNoisiness: shortListResults[shortlistIndex]["AvgNoisiness"],
+                                    avgNightLife: shortListResults[shortlistIndex]["AvgNightLife"],
+                                    avgBedTime: shortListResults[shortlistIndex]["AvgBedTime"],
+                                    avgYearOfStudy: shortListResults[shortlistIndex]["AvgYearOfStudy"],
+
                                   ),
                                 );
                               },
@@ -764,7 +770,7 @@ class _FriendsState extends State<Friends> {
                                             } else if (value == 'remove') {
                                               showDialog<String>(
                                                   context: context,
-                                                  builder: (BuildContext context) => ConfirmDel(friendId: searchResults[index]["Id"])
+                                                  builder: (BuildContext context) => ConfirmDel(friendId: searchResults[index]["Id"], userId: Auth().currentUser(),)
                                               );
                                               //Navigator.pushReplacementNamed(context, "/Friends"); //Dirty way of rebuilding app.
                                             }
@@ -896,6 +902,7 @@ class _FriendsState extends State<Friends> {
                                           avgNoisiness: groupSearchResults[index]["AvgNoisiness"],
                                           avgNightLife: groupSearchResults[index]["AvgNightLife"],
                                           avgBedTime: groupSearchResults[index]["AvgBedTime"],
+                                        avgYearOfStudy: groupSearchResults[index]["AvgYearOfStudy"],
                                       )
                                   );
                                 },
@@ -1090,6 +1097,7 @@ class _FriendsState extends State<Friends> {
                                         avgNoisiness: blockedSearchResults[index]["AvgNoisiness"],
                                         avgNightLife: blockedSearchResults[index]["AvgNightLife"],
                                         avgBedTime: blockedSearchResults[index]["AvgBedTime"],
+                                        avgYearOfStudy: blockedSearchResults[index]["AvgYearOfStudy"],
                                       )
                                   );
                                 },
