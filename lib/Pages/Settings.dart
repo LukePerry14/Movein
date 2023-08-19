@@ -6,14 +6,14 @@ import 'package:movein/navbar.dart';
 
 import '../Themes/lMode.dart';
 
-class Settings extends StatefulWidget {
-  const Settings({Key? key}) : super(key: key);
+class SettingsScaffold extends StatefulWidget {
+  const SettingsScaffold({Key? key}) : super(key: key);
 
   @override
-  State<Settings> createState() => _SettingsState();
+  State<SettingsScaffold> createState() => _SettingsScaffoldState();
 }
 
-class _SettingsState extends State<Settings> {
+class _SettingsScaffoldState extends State<SettingsScaffold> {
   @override
   Widget build(BuildContext context) {
     return Builder(

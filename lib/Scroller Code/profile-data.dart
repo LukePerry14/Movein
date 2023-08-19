@@ -32,21 +32,29 @@ class CardProfile {
     final yearsAgo = difference.inDays ~/ 365;
 
     final preferencesData = data['Preferences'] as Map<String, dynamic>?; // Check if 'Preferences' exists and assign it to preferencesData
-
+    final castedPreferences = <String, dynamic>{};
+    preferencesData?.forEach((key, value) {
+      if (key == 'NightLife' || key == 'Cleanliness' || key == 'Noisiness') {
+        castedPreferences[key] = value.toInt();
+      } else {
+        castedPreferences[key] = value;
+      }
+    });
     final bed_dateTime = preferencesData?['BedTime']?.toDate(); // Check if 'BedTime' exists within preferencesData and assign it to bed_dateTime
     final timeFormat = DateFormat('hh:mm a');
     final timeOfDay = bed_dateTime != null ? timeFormat.format(bed_dateTime) : ''; // Format the time only if bed_dateTime is not null
+
 
     return CardProfile(
       id: document.id,
       foreName: data['ForeName'],
       age: yearsAgo,
       uni: data['UniAttended'],
-      preferences: preferencesData ?? {}, // Use preferencesData if not null, otherwise use an empty map
+      preferences: castedPreferences ?? {},
       images: List<String>.from(data['Images']),
       bio: data['Bio'],
       subject: data['Subject'],
-      yearOfStudy: data['YearOfStudy'],
+      yearOfStudy: data['YearOfStudy'].toInt(),
     );
   }
 

@@ -78,11 +78,12 @@ class OnBoardingPage extends StatelessWidget {
   DotsDecorator getDotDecoration(context) => DotsDecorator(
     color: Colors.grey,
     activeColor: Theme.of(context).primaryColor,
-    size: const Size(10,10),
-    activeSize: const Size(22,13),
+    size: const Size(8, 8),
+    activeSize: const Size(18, 12), // Decrease the size a bit
+    spacing: const EdgeInsets.symmetric(horizontal: 4), // Add some horizontal spacing between dots
     activeShape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(24)
-    )
-
+      borderRadius: BorderRadius.circular(12), // Adjust the border radius
+    ),
   );
+
 }

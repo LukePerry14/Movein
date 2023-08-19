@@ -55,6 +55,7 @@ dependencies:
   sendbird_sdk: ^3.2.17
   dash_chat_2: ^0.0.17
   sendbird_chat_sdk: ^4.0.6
+  timer_count_down: ^2.2.2
 
 flutter_native_splash:
   android: true

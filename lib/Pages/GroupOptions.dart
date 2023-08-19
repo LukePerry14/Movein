@@ -36,6 +36,7 @@ class _GroupOptionsState extends State<GroupOptions> {
     double avgCleanliness;
     double avgNoisiness ;
     double avgNightLife;
+    double avgYearOfStudy;
     Timestamp avgBedTime;
 
     final CollectionReference docUsers =
@@ -55,6 +56,7 @@ class _GroupOptionsState extends State<GroupOptions> {
         avgCleanliness = (groupData?['AvgCleanliness'] as num).toDouble();
         avgNoisiness = (groupData?['AvgNoisiness'] as num).toDouble();
         avgNightLife = (groupData?['AvgNightLife']as num).toDouble();
+        avgYearOfStudy = (groupData?['AvgYearOfStudy']as num).toDouble();
         avgBedTime = groupData?['AvgBedTime'];
 
         var tempKickVals = groupData?["KickVals"];
@@ -171,6 +173,7 @@ class _GroupOptionsState extends State<GroupOptions> {
       avgNoisiness,
       avgNightLife,
       avgBedTime,
+      avgYearOfStudy,
     ];
   }
 
@@ -213,6 +216,7 @@ class _GroupOptionsState extends State<GroupOptions> {
           var avgNoisiness = data[8];
           var avgNightLife = data[9];
           var avgBedTime = data[10];
+          var avgYearOfStudy = data[11];
 
           return Scaffold(
             body: SingleChildScrollView(
@@ -747,6 +751,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                       avgNoisiness: avgNoisiness,
                                       avgNightLife: avgNightLife,
                                       avgBedTime: avgBedTime,
+                                      avgYearOfStudy: avgYearOfStudy,
                                     )
                                 );
                               },

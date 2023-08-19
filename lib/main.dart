@@ -21,13 +21,14 @@ import 'package:movein/Pages/Sendbird.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:movein/Translations.dart';
 import 'package:movein/UserPreferences.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Auth code/auth.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -68,7 +69,7 @@ class App extends StatelessWidget {
               '/ScrollRefresh': (context) => const RanOut(),
               '/Messages': (context) => const Messages(),
               '/Profile': (context) => const Profile(),
-              '/Settings': (context) => const Settings(),
+              '/Settings': (context) => const SettingsScaffold(),
               '/profileInformation': (context) => const ProfileInformation(),
               '/Friends': (context) => const Friends(),
               '/Houses': (context) => const Houses(),
@@ -240,10 +241,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                 .currentState?.fields['password']?.value);
 
                         if (response == 'success') {
-                          // connect to sendbird server
                           ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),'test');
+                          final userDoc = await FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser()).get();
 
+                          if (userDoc.exists) {
+                            final userData = userDoc.data() as Map<String, dynamic>?;
 
+                            if (userData != null) {
+                              final subscribed = userData['Subscribed'];
+                              final uniAttended = userData['UniAttended'];
+                              await UserPreferences.setAppsMax(subscribed? 5:3);
+                              await UserPreferences.setUni(uniAttended);
+                            }
+                          }
                           Navigator.pushNamed(context, '/Scroller');
                           return;
                         } else {
@@ -301,7 +311,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _universityController = TextEditingController();
   final _universityFocusNode = FocusNode();
   bool _universityValid = true;
-
+  bool _loadApp = false;
   String errorMessage = "";
   bool userInfoValid = false;
   bool profileInfoValid = false;
@@ -347,7 +357,17 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
             ),
             SliverToBoxAdapter(
-              child: Padding(
+              child: !_loadApp ? Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context)
+                      .size
+                      .width * 0.8, // Adjust the width to control the size
+                  height: MediaQuery.of(context)
+                      .size
+                      .width * 0.8, // Adjust the height to control the size
+                  child: const CircularProgressIndicator(),
+                ),
+              ): Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: FormBuilder(
                   autovalidateMode: AutovalidateMode.always,
@@ -785,8 +805,9 @@ class _SignupScreenState extends State<SignupScreen> {
                           );
 
                           if (response == 'success') {
-                            //insert code to create/sign into sendbird account 
                             ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),'test');
+                            await UserPreferences.setUni(data['UniAttended']);
+                            await UserPreferences.setAppsMax(3);
 
                             Navigator.pushNamed(context, '/OnBoarding');
                             return;
@@ -831,37 +852,42 @@ class _SignupScreenState extends State<SignupScreen> {
         .map<List<dynamic>>((university) => university['domains'])
         .expand((list) => list)
         .toList(); // Fetch the data when the widget is created
-    setState(() {});
+    setState(() {
+      _loadApp = true;
+    });
   }
 
   void _validateForm() {
-    _validateUniversity(_universityController.text);
-    final userInfoComplete =
-    (_formKey.currentState?.fields['ForeName']?.isValid ?? false) &
-    (_formKey.currentState?.fields['SurName']?.isValid ?? false) &
-    (_formKey.currentState?.fields['email']?.isValid ?? false) &
-    (_formKey.currentState?.fields['password']?.isValid ?? false) &
-    (_formKey.currentState?.fields['password_conf']?.isValid ?? false);
+    if(_loadApp) {
+      _validateUniversity(_universityController.text);
+      final userInfoComplete =
+      (_formKey.currentState?.fields['ForeName']?.isValid ?? false) &
+      (_formKey.currentState?.fields['SurName']?.isValid ?? false) &
+      (_formKey.currentState?.fields['email']?.isValid ?? false) &
+      (_formKey.currentState?.fields['password']?.isValid ?? false) &
+      (_formKey.currentState?.fields['password_conf']?.isValid ?? false);
 
-    // Check if profile info section fields are complete
-    final profileInfoComplete =
-    (_formKey.currentState?.fields['Bio']?.isValid ?? false) &
-    (_formKey.currentState?.fields['DOB']?.isValid ?? false) &
-    (_formKey.currentState?.fields['Subject']?.isValid ?? false) &
-    (_universityValid) &
-    (_formKey.currentState?.fields['YearOfStudy']?.isValid ?? false);
+      // Check if profile info section fields are complete
+      final profileInfoComplete =
+      (_formKey.currentState?.fields['Bio']?.isValid ?? false) &
+      (_formKey.currentState?.fields['DOB']?.isValid ?? false) &
+      (_formKey.currentState?.fields['Subject']?.isValid ?? false) &
+      (_universityValid) &
+      (_formKey.currentState?.fields['YearOfStudy']?.isValid ?? false);
 
-    final preferenceInfoComplete =
-    (_formKey.currentState?.fields['Cleanliness']?.isValid ?? false) &
-    (_formKey.currentState?.fields['Noisiness']?.isValid ?? false) &
-    (_formKey.currentState?.fields['NightLife']?.isValid ?? false) &
-    (_formKey.currentState?.fields['Lights Out']?.isValid ?? false);
+      final preferenceInfoComplete =
+      (_formKey.currentState?.fields['Cleanliness']?.isValid ?? false) &
+      (_formKey.currentState?.fields['Noisiness']?.isValid ?? false) &
+      (_formKey.currentState?.fields['NightLife']?.isValid ?? false) &
+      (_formKey.currentState?.fields['Lights Out']?.isValid ?? false);
 
-    setState(() {
-      userInfoValid = userInfoComplete;
-      profileInfoValid = profileInfoComplete;
-      preferenceInfoValid = preferenceInfoComplete;
-    });
+      print(userInfoComplete);
+      setState(() {
+        userInfoValid = userInfoComplete;
+        profileInfoValid = profileInfoComplete;
+        preferenceInfoValid = preferenceInfoComplete;
+      });
+    }
   }
 
   void _validateUniversity(selectedUniversity) {
@@ -896,6 +922,7 @@ class _SignupScreenState extends State<SignupScreen> {
     data['OutgoingFriendInvites'] = [];
     data['ShortList'] = [];
     data['Images'] = ["assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png"];
+    data['Subscribed'] = false;
     return data;
   }
 }

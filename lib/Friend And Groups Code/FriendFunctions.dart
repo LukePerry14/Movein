@@ -143,9 +143,11 @@ class GroupInvite extends StatelessWidget {
 
 class ConfirmDel extends StatelessWidget {
   final String friendId;
+  final String userId;
   const ConfirmDel({
     Key? key,
     required this.friendId,
+    required this.userId,
   }) : super(key: key);
 
   @override
@@ -180,7 +182,7 @@ class ConfirmDel extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                       onPressed: () {
-                        removeFriend(friendId).then((_){
+                        removeFriend(friendId, userId).then((_){
                           Navigator.of(context).pushReplacementNamed('/Friends');
                         });
 
@@ -199,8 +201,7 @@ class ConfirmDel extends StatelessWidget {
   }
 }
 
-Future<void> removeFriend(String friendId) async{
-  const userId = "iKxLSxcDqlT6vtHe71Bp";
+Future<void> removeFriend(String friendId, String userId) async{
   final userRef = FirebaseFirestore.instance.collection('Users').doc(userId);
 
   try {
@@ -256,6 +257,7 @@ class GroupExpand extends StatelessWidget {
   final double avgCleanliness;
   final double avgNoisiness;
   final double avgNightLife;
+  final double avgYearOfStudy;
   final Timestamp avgBedTime;
 
   const GroupExpand({
@@ -267,6 +269,7 @@ class GroupExpand extends StatelessWidget {
     required this.avgCleanliness,
     required this.avgNoisiness,
     required this.avgNightLife,
+    required this.avgYearOfStudy,
     required this.avgBedTime,
 
   }) : super(key: key);
@@ -279,7 +282,7 @@ class GroupExpand extends StatelessWidget {
         borderRadius: BorderRadius.circular(20.0),
       ),
       backgroundColor: Theme.of(context).canvasColor,
-      child: Container(
+      child: SizedBox(
         width: MediaQuery.of(context).size.width * 0.9,
         height: MediaQuery.of(context).size.height * 0.9,
         //padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -288,7 +291,7 @@ class GroupExpand extends StatelessWidget {
             SizedBox(
               width: double.maxFinite,
               height: MediaQuery.of(context).size.height * 0.9,
-              child: Gscroller(groupName: groupName, groupPicture: groupPicture, members: members, avgCleanliness: avgCleanliness, avgNoisiness: avgNoisiness, avgNightLife: avgNightLife, avgBedTime: avgBedTime,)
+              child: Gscroller(groupName: groupName, groupPicture: groupPicture, members: members, avgCleanliness: avgCleanliness, avgNoisiness: avgNoisiness, avgNightLife: avgNightLife, avgBedTime: avgBedTime, avgYearOfStudy: avgYearOfStudy,)
             ),
             Positioned(
               top: 0,
@@ -577,7 +580,11 @@ Future<void> removeGroupFromUser(String groupType, String groupId, userId) async
 
 
 class CreateGroupForm extends StatefulWidget {
-  const CreateGroupForm({Key? key}) : super(key: key);
+  final String userId;
+  const CreateGroupForm({
+    Key? key,
+    required this.userId,
+  }) : super(key: key);
 
   @override
   State<CreateGroupForm> createState() => _CreateGroupFormState();
@@ -588,7 +595,6 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
   bool _isButtonEnabled = false;
   final TextEditingController _groupNameController = TextEditingController(text: "GroupName");
   File? _selectedImage;
-  final String userId = "iKxLSxcDqlT6vtHe71Bp";
 
 
   Future<void> _pickImage() async {
@@ -614,25 +620,23 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
       //
       // final response = await request.send();
       // final groupPicture = await response.stream.bytesToString();
-
       final CollectionReference groupsCollection = FirebaseFirestore.instance.collection('Groups');
-      final DocumentReference userDocument = FirebaseFirestore.instance.collection('Users').doc(userId);
+      final DocumentReference userDocument = FirebaseFirestore.instance.collection('Users').doc(widget.userId);
       final DocumentSnapshot userSnapshot = await userDocument.get();
       final Map<String,dynamic> prefs = userSnapshot.get('Preferences');
       List<String> allowedUnis = [userSnapshot.get('UniAttended')];
       Map<String, dynamic> appVals = {};
       List<String> applicants = [];
       var avgBedTime = prefs['Lights Out'];
-      int avgCleanliness = prefs['Cleanliness'];
-      int avgNightLife = prefs['NightLife'];
-      int avgNoisiness = prefs['Noisiness'];
-      List<String> blackList = [userId];
+      int avgCleanliness = prefs['Cleanliness'].toInt();
+      int avgNightLife = prefs['NightLife'].toInt();
+      int avgNoisiness = prefs['Noisiness'].toInt();
+      List<String> blackList = [widget.userId];
       List<String> invitees = [];
       Map<String, dynamic> kickVals = {};
       List<String> kicks = [];
-      List<String> members = [userId];
-
-      final newGroupDocument = await groupsCollection.add({
+      List<String> members = [widget.userId];
+      Map<String,dynamic> groupDoc = {
         'AllowedUnis': allowedUnis,
         'AppVals': appVals,
         'Applicants': applicants,
@@ -640,14 +644,16 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
         'AvgCleanliness': avgCleanliness,
         'AvgNightLife': avgNightLife,
         'AvgNoisiness': avgNoisiness,
+        'AvgYearOfStudy': userSnapshot.get('YearOfStudy'),
         'BlackList': blackList,
         'GroupName': groupName,
-        'GroupPicture': "assets/Pictures/ph.png",
+        'GroupPicture': "assets/Pictures/reversed.png",
         'Invitees': invitees,
         'KickVals': kickVals,
         'Kicks': kicks,
         'Members': members,
-      });
+      };
+      final newGroupDocument = await groupsCollection.add(groupDoc);
       await userDocument.update({
         'Joined': FieldValue.arrayUnion([newGroupDocument.id]),
       });
@@ -656,88 +662,89 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: MediaQuery.of(context).size.width * 0.35,
-            height: 5,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: const BorderRadius.horizontal(
-                  left: Radius.circular(20), // Sets the radius for the left corner
-                  right: Radius.circular(20), // Sets the radius for the right corner
+    return IntrinsicHeight(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.35,
+              height: 5,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: const BorderRadius.horizontal(
+                    left: Radius.circular(20), // Sets the radius for the left corner
+                    right: Radius.circular(20), // Sets the radius for the right corner
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 15),
-          SizedBox(width: MediaQuery.of(context).size.width,child: Text("Create Group", style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.start,),),
-          Form(
-            autovalidateMode: AutovalidateMode.always,
-            key: _formKey,
-            onChanged: () {
-              setState(() {
-                _isButtonEnabled = _formKey.currentState?.validate() ?? false;
-              });
-            },
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: _groupNameController,
-                  maxLength: 15,
-                  autocorrect: false,
-                  decoration: const InputDecoration(
-                    border: UnderlineInputBorder(),
-                    labelText: 'Change Groupname',
-                  ),
-                  validator: (value) {
-                    if (value!.trim().isEmpty) {
-                      return 'Group name must exist';
-                    }
-                    return null;
-                  },
-                  onTap: () {
-                    // Select the whole text when tapped
-                    _groupNameController.selection = TextSelection(
-                      baseOffset: 0,
-                      extentOffset: _groupNameController.text.length,
-                    );
-                  },
-                ),
-                GestureDetector(
-                  onTap: _pickImage,
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8),
+            const SizedBox(height: 15),
+            SizedBox(width: MediaQuery.of(context).size.width,child: Text("Create Group", style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.start,),),
+            Form(
+              autovalidateMode: AutovalidateMode.always,
+              key: _formKey,
+              onChanged: () {
+                setState(() {
+                  _isButtonEnabled = _formKey.currentState?.validate() ?? false;
+                });
+              },
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _groupNameController,
+                    maxLength: 15,
+                    autocorrect: false,
+                    decoration: const InputDecoration(
+                      border: UnderlineInputBorder(),
+                      labelText: 'Change Groupname',
                     ),
-                    child: _selectedImage != null
-                        ? Image.file(_selectedImage!, fit: BoxFit.cover)
-                        : const Icon(Icons.add_a_photo, color: Colors.grey),
+                    validator: (value) {
+                      if (value!.trim().isEmpty) {
+                        return 'Group name must exist';
+                      }
+                      return null;
+                    },
+                    onTap: () {
+                      // Select the whole text when tapped
+                      _groupNameController.selection = TextSelection(
+                        baseOffset: 0,
+                        extentOffset: _groupNameController.text.length,
+                      );
+                    },
                   ),
-                ),
-              ],
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: _selectedImage != null
+                          ? Image.file(_selectedImage!, fit: BoxFit.cover)
+                          : const Icon(Icons.add_a_photo, color: Colors.grey),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: _isButtonEnabled
-                ? () async {
-              if (_formKey.currentState?.validate() ?? false) {
-                await _submitForm().then((value) => Navigator.of(context).pushReplacementNamed('/Friends'));
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _isButtonEnabled
+                  ? () async {
+                if (_formKey.currentState?.validate() ?? false) {
+                  await _submitForm().then((value) => Navigator.of(context).pushReplacementNamed('/Friends'));
+                }
               }
-            }
-                : null,
-            child: const Text('Submit'),
-          ),
-        ],
+                  : null,
+              child: const Text('Submit'),
+            ),
+          ],
+        ),
       ),
     );
   }
