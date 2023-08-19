@@ -49,11 +49,8 @@ class _ScrollerState extends State<Scroller> {
     List<Map<String, dynamic>> groups = [];
     final CollectionReference docGroups =
         FirebaseFirestore.instance.collection("Groups");
-
     try {
-      QuerySnapshot querySnapshot =
-          await docGroups.where('AllowedUnis', arrayContains: 'Durham').get();
-
+      QuerySnapshot querySnapshot = await docGroups.where('AllowedUnis', arrayContains: UserPreferences.getUni()).get();
       for (QueryDocumentSnapshot docSnapshot in querySnapshot.docs) {
         Map<String, dynamic>? data =
             docSnapshot.data() as Map<String, dynamic>?;

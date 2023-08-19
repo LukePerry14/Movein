@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -66,7 +67,7 @@ class App extends StatelessWidget {
               '/ScrollRefresh': (context) => const RanOut(),
               '/Messages': (context) => const Messages(),
               '/Profile': (context) => const Profile(),
-              '/Settings': (context) => const Settings(),
+              '/Settings': (context) => const SettingsScaffold(),
               '/profileInformation': (context) => const ProfileInformation(),
               '/Friends': (context) => const Friends(),
               '/Houses': (context) => const Houses(),
@@ -238,6 +239,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                 .currentState?.fields['password']?.value);
 
                         if (response == 'success') {
+                          final userDoc = await FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser()).get();
+
+                          if (userDoc.exists) {
+                            final userData = userDoc.data() as Map<String, dynamic>?;
+
+                            if (userData != null) {
+                              final subscribed = userData['Subscribed'];
+                              final uniAttended = userData['UniAttended'];
+                              await UserPreferences.setAppsMax(subscribed? 5:3);
+                              await UserPreferences.setUni(uniAttended);
+                            }
+                          }
                           Navigator.pushNamed(context, '/Scroller');
                           return;
                         } else {
@@ -779,6 +792,9 @@ class _SignupScreenState extends State<SignupScreen> {
                           );
 
                           if (response == 'success') {
+                            await UserPreferences.setUni(data['UniAttended']);
+                            await UserPreferences.setAppsMax(3);
+
                             Navigator.pushNamed(context, '/OnBoarding');
                             return;
                           } else {
@@ -887,6 +903,7 @@ class _SignupScreenState extends State<SignupScreen> {
     data['OutgoingFriendInvites'] = [];
     data['ShortList'] = [];
     data['Images'] = ["assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png"];
+    data['Subscribed'] = false;
     return data;
   }
 }
