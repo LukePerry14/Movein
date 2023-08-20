@@ -251,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             if (userData != null) {
                               final subscribed = userData['Subscribed'];
                               final uniAttended = userData['UniAttended'];
-                              //await UserPreferences.setAppsMax(subscribed? 5:3);
+                              await UserPreferences.setAppsMax(subscribed? 5:3);
                               await UserPreferences.setUni(uniAttended);
                               ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),userData['ForeName']);
                             }

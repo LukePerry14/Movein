@@ -146,6 +146,10 @@ Future<void> getMessages(GroupChannel channel) async {
 // add own code here--------------------------------------------------------------------------------
               child: DashChat
               (
+                messageOptions: const MessageOptions
+                (
+                      showCurrentUserAvatar: false,
+                ),
                 currentUser: user,
                 onSend: (ChatMessage messagew) async
                 { 
