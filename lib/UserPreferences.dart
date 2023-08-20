@@ -58,4 +58,6 @@ class UserPreferences {
       await _preferences.setInt(_keyYearPref, input);
 
   static int getYearPref() => _preferences.getInt(_keyYearPref) ?? 0;
+
 }
+

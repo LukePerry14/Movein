@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/Scroller%20Code/HScroll.dart';
+import 'package:movein/Pages/Sendbird.dart' ;
+
+
 import 'dart:io';
 //import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -657,6 +660,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
       await userDocument.update({
         'Joined': FieldValue.arrayUnion([newGroupDocument.id]),
       });
+      var newChannel = ConnectSendbird().createChannel(widget.userId, groupName, null , newGroupDocument.id) ;
     }
   }
 
@@ -737,6 +741,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
               onPressed: _isButtonEnabled
                   ? () async {
                 if (_formKey.currentState?.validate() ?? false) {
+
                   await _submitForm().then((value) => Navigator.of(context).pushReplacementNamed('/Friends'));
                 }
               }

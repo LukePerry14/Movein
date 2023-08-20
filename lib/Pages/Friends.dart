@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:movein/Pages/Sendbird.dart';
 import 'package:movein/navbar.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
 import 'package:movein/Scroller%20Code/swipe_card.dart';
@@ -466,8 +467,10 @@ class _FriendsState extends State<Friends> {
                           } else if (index <= joinedResults.length) {
                             int joinedIndex = index - 1;
                             return GestureDetector(
-                              onTap: () {
+                              onTap: () async{
+                                final groupChannel = await ConnectSendbird().returnChannel(joinedResults[joinedIndex]["Id"]);
                                 Navigator.pushNamed(context, '/Messages', arguments: {
+                                  'channel':groupChannel,
                                   'members': joinedResults[joinedIndex]["Members"],
                                   'groupId': joinedResults[joinedIndex]["Id"],
                                   'groupName': joinedResults[joinedIndex]["GroupName"],
@@ -507,9 +510,12 @@ class _FriendsState extends State<Friends> {
                                           ],
                                         ),
                                       ),
+                                      // message icon
                                       IconButton(
-                                        onPressed: () {
+                                        onPressed: () async{
+                                           final groupChannel = await ConnectSendbird().returnChannel(joinedResults[joinedIndex]["Id"]);
                                           Navigator.pushNamed(context, '/Messages', arguments: {
+                                            'channel':groupChannel,
                                             'members': joinedResults[joinedIndex]["Members"],
                                             'groupId': joinedResults[joinedIndex]["Id"],
                                             'groupName': joinedResults[joinedIndex]["GroupName"],

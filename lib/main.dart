@@ -18,15 +18,18 @@ import 'package:movein/Pages/profileInformation.dart';
 import 'package:movein/Pages/GroupOptions.dart';
 import 'package:movein/Pages/Friends.dart';
 import 'package:movein/Pages/ScrollRefresh.dart';
+import 'package:movein/Pages/Sendbird.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:movein/Translations.dart';
 import 'package:movein/UserPreferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Auth code/auth.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -239,7 +242,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 .currentState?.fields['password']?.value);
 
                         if (response == 'success') {
-                          final userDoc = await FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser()).get();
+                          
+               final userDoc = await FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser()).get();
 
                           if (userDoc.exists) {
                             final userData = userDoc.data() as Map<String, dynamic>?;
@@ -249,6 +253,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               final uniAttended = userData['UniAttended'];
                               await UserPreferences.setAppsMax(subscribed? 5:3);
                               await UserPreferences.setUni(uniAttended);
+
+  //sign in - find sendbird account
+                              ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),userData['ForeName']);
+
                             }
                           }
                           Navigator.pushNamed(context, '/Scroller');
@@ -802,6 +810,9 @@ class _SignupScreenState extends State<SignupScreen> {
                           );
 
                           if (response == 'success') {
+
+                            ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), data['ForeName']);
+
                             await UserPreferences.setUni(data['UniAttended']);
                             await UserPreferences.setAppsMax(3);
 
@@ -877,7 +888,11 @@ class _SignupScreenState extends State<SignupScreen> {
       (_formKey.currentState?.fields['NightLife']?.isValid ?? false) &
       (_formKey.currentState?.fields['Lights Out']?.isValid ?? false);
 
+
+      //print(userInfoComplete);
+
       print(userInfoComplete);
+
       setState(() {
         userInfoValid = userInfoComplete;
         profileInfoValid = profileInfoComplete;
