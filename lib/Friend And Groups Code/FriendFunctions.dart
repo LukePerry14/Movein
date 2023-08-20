@@ -741,8 +741,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
               onPressed: _isButtonEnabled
                   ? () async {
                 if (_formKey.currentState?.validate() ?? false) {
-                  // create new group
-                  
+
                   await _submitForm().then((value) => Navigator.of(context).pushReplacementNamed('/Friends'));
                 }
               }

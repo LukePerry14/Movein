@@ -87,7 +87,9 @@ class _ScrollerState extends State<Scroller> {
   @override
   void initState() {
     getGroups();
-    //_loadAd();
+    
+    
+    _loadAd();
     super.initState();
   }
 
@@ -209,7 +211,9 @@ class _ScrollerState extends State<Scroller> {
                         : Colors.grey.withOpacity(0.5),
                     onPressed: _isButtonEnabled
                         ? () {
-                           // _loadAd();
+
+                
+                            _loadAd();
                             _adCountdown = 2;
                             setState(() {
                               _showApp = false;
@@ -454,6 +458,7 @@ class _ScrollerState extends State<Scroller> {
     yearPref = UserPreferences.getMemPref();
   }
 
+
   double calculateScore(Map<String, dynamic> group) {
     const double memberWeight = 6;
     const double cleanWeight = 2;
@@ -473,6 +478,28 @@ class _ScrollerState extends State<Scroller> {
     groupData.sort((group1, group2) {
       double score1 = calculateScore(group1);
       double score2 = calculateScore(group2);
+
+
+  double calculateScore(Map<String, dynamic> group) {
+    const double memberWeight = 6;
+    const double cleanWeight = 2;
+    const double noiseWeight = 2;
+    const double nightWeight = 2;
+    const double yearWeight = 1;
+
+    double memberScore = memPref != 0 ? ((group['Members'] as List).length - memPref).abs() * memberWeight : 0;
+    double cleanScore = cleanPref != 0 ? ((group['AvgCleanliness'] as double) - cleanPref).abs() * cleanWeight : 0;
+    double noiseScore = noisePref != 0 ? ((group['AvgNoisiness'] as double) - noisePref).abs() * noiseWeight : 0;
+    double nightScore = nightPref != 0 ? ((group['AvgNightLife'] as double) - nightPref).abs() * nightWeight : 0;
+    double yearScore = yearPref != 0 ? ((group['AvgYearOfStudy'] as double) - yearPref).abs() * yearWeight : 0;
+    return memberScore + cleanScore + noiseScore + nightScore + yearScore;
+  }
+
+  void sortGroupsByPreferences() {
+    groupData.sort((group1, group2) {
+      double score1 = calculateScore(group1);
+      double score2 = calculateScore(group2);
+
 
       // Sort in ascending order - groups with lower scores come first
       return score1.compareTo(score2);
@@ -757,4 +784,4 @@ class _FiltersScreenState extends State<FiltersScreen> {
       print("Error setting preferences: $e");
     }
   }
-}
+
