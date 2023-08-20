@@ -37,4 +37,24 @@ Future<GroupChannel> returnChannel(String channelUrl) async
     }
     
   }
+
+  Future<GroupChannel> createChannel(String userId, String groupName, String? groupIcon, String channelURL) async
+  {
+      try {
+
+        final params = GroupChannelParams()
+        .. userIds = [userId]
+        ..channelUrl = channelURL
+        ..name = groupName;
+        final groupChannel = await GroupChannel.createChannel(params);
+        return groupChannel;
+        //..coverImage = groupIcon;
+      }
+      catch(e)
+      {
+              print('createChannel: ERROR: $e');
+              throw e;
+      }
+      
+  }
 }

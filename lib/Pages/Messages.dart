@@ -171,6 +171,7 @@ Future<void> getMessages(GroupChannel channel) async {
                     final params = UserMessageParams(message:messagew.text)
                     //..data = 'DATA'
                     ..customType = 'custom'
+                    
 
                     ;
                     UserMessage sentMessage = groupChannel.sendUserMessage(params);
@@ -237,6 +238,8 @@ Future<void> getMessages(GroupChannel channel) async {
           user: asDashChatUser(user),
            createdAt: DateTime.fromMillisecondsSinceEpoch(message.createdAt),
            text: message.message,
+           
+           
            
            
            ),

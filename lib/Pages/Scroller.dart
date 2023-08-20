@@ -87,7 +87,7 @@ class _ScrollerState extends State<Scroller> {
   @override
   void initState() {
     getGroups();
-    _loadAd();
+    //_loadAd();
     super.initState();
   }
 
@@ -209,7 +209,7 @@ class _ScrollerState extends State<Scroller> {
                         : Colors.grey.withOpacity(0.5),
                     onPressed: _isButtonEnabled
                         ? () {
-                            _loadAd();
+                           // _loadAd();
                             _adCountdown = 2;
                             setState(() {
                               _showApp = false;

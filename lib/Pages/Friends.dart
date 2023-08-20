@@ -510,6 +510,7 @@ class _FriendsState extends State<Friends> {
                                           ],
                                         ),
                                       ),
+                                      // message icon
                                       IconButton(
                                         onPressed: () async{
                                            final groupChannel = await ConnectSendbird().returnChannel(joinedResults[joinedIndex]["Id"]);
