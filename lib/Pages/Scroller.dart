@@ -99,12 +99,6 @@ class _ScrollerState extends State<Scroller> {
     super.dispose();
   }
 
-  @override
-  void didChangeMetrics() {
-    setState(() {
-      _showApp = true;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -480,27 +474,6 @@ class _ScrollerState extends State<Scroller> {
       double score2 = calculateScore(group2);
 
 
-  double calculateScore(Map<String, dynamic> group) {
-    const double memberWeight = 6;
-    const double cleanWeight = 2;
-    const double noiseWeight = 2;
-    const double nightWeight = 2;
-    const double yearWeight = 1;
-
-    double memberScore = memPref != 0 ? ((group['Members'] as List).length - memPref).abs() * memberWeight : 0;
-    double cleanScore = cleanPref != 0 ? ((group['AvgCleanliness'] as double) - cleanPref).abs() * cleanWeight : 0;
-    double noiseScore = noisePref != 0 ? ((group['AvgNoisiness'] as double) - noisePref).abs() * noiseWeight : 0;
-    double nightScore = nightPref != 0 ? ((group['AvgNightLife'] as double) - nightPref).abs() * nightWeight : 0;
-    double yearScore = yearPref != 0 ? ((group['AvgYearOfStudy'] as double) - yearPref).abs() * yearWeight : 0;
-    return memberScore + cleanScore + noiseScore + nightScore + yearScore;
-  }
-
-  void sortGroupsByPreferences() {
-    groupData.sort((group1, group2) {
-      double score1 = calculateScore(group1);
-      double score2 = calculateScore(group2);
-
-
       // Sort in ascending order - groups with lower scores come first
       return score1.compareTo(score2);
     });
@@ -669,7 +642,10 @@ class _FiltersScreenState extends State<FiltersScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(
-              width: MediaQuery.of(context).size.width * 0.35,
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width * 0.35,
               height: 5,
               child: Container(
                 decoration: BoxDecoration(
@@ -685,14 +661,26 @@ class _FiltersScreenState extends State<FiltersScreen> {
             ),
             const SizedBox(height: 15),
             SizedBox(
-              width: MediaQuery.of(context).size.width,
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width,
               child: Text("Group Preference Filters",
-                  style: Theme.of(context).textTheme.headlineMedium),
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .headlineMedium),
             ),
             SizedBox(
-              width: MediaQuery.of(context).size.width,
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width,
               child: Text("Leave as 0 for no filter",
-                  style: Theme.of(context).textTheme.bodySmall),
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .bodySmall),
             ),
             FormBuilder(
               key: _formKey,
@@ -706,7 +694,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     initialValue: UserPreferences.getMemPref().toDouble(),
                     divisions: 15,
                     decoration:
-                        const InputDecoration(labelText: 'number of Members'),
+                    const InputDecoration(labelText: 'number of Members'),
                   ),
                   FormBuilderSlider(
                     name: 'averageCleanliness',
@@ -715,7 +703,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     initialValue: UserPreferences.getCleanPref().toDouble(),
                     divisions: 5,
                     decoration:
-                        const InputDecoration(labelText: 'Average Cleanliness'),
+                    const InputDecoration(labelText: 'Average Cleanliness'),
                   ),
                   FormBuilderSlider(
                     name: 'averageNoisiness',
@@ -724,7 +712,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     initialValue: UserPreferences.getNoisePref().toDouble(),
                     divisions: 5,
                     decoration:
-                        const InputDecoration(labelText: 'Average Noisiness'),
+                    const InputDecoration(labelText: 'Average Noisiness'),
                   ),
                   FormBuilderSlider(
                     name: 'averageNightLife',
@@ -733,7 +721,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     initialValue: UserPreferences.getNightPref().toDouble(),
                     divisions: 5,
                     decoration:
-                        const InputDecoration(labelText: 'Average NightLife'),
+                    const InputDecoration(labelText: 'Average NightLife'),
                   ),
                   FormBuilderSlider(
                     name: 'averageYearOfStudy',
@@ -742,7 +730,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     initialValue: UserPreferences.getYearPref().toDouble(),
                     divisions: 7,
                     decoration:
-                        const InputDecoration(labelText: 'Average Year of Study'),
+                    const InputDecoration(labelText: 'Average Year of Study'),
                   ),
                 ],
               ),
@@ -751,15 +739,21 @@ class _FiltersScreenState extends State<FiltersScreen> {
               onPressed: () async {
                 await changePreferences(
                   _formKey.currentState?.fields['members']?.value.toInt(),
-                  _formKey.currentState?.fields['averageCleanliness']?.value.toInt(),
-                  _formKey.currentState?.fields['averageNoisiness']?.value.toInt(),
-                  _formKey.currentState?.fields['averageNightLife']?.value.toInt(),
-                  _formKey.currentState?.fields['averageYearOfStudy']?.value.toInt(),
+                  _formKey.currentState?.fields['averageCleanliness']?.value
+                      .toInt(),
+                  _formKey.currentState?.fields['averageNoisiness']?.value
+                      .toInt(),
+                  _formKey.currentState?.fields['averageNightLife']?.value
+                      .toInt(),
+                  _formKey.currentState?.fields['averageYearOfStudy']?.value
+                      .toInt(),
                 );
                 Navigator.of(context).pushReplacementNamed('/Scroller');
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
+                backgroundColor: Theme
+                    .of(context)
+                    .primaryColor,
               ),
               child: Text(
                 'Submit Filters',
@@ -784,4 +778,4 @@ class _FiltersScreenState extends State<FiltersScreen> {
       print("Error setting preferences: $e");
     }
   }
-
+}

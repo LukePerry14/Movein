@@ -22,7 +22,6 @@ import 'package:movein/Pages/Sendbird.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:movein/Translations.dart';
 import 'package:movein/UserPreferences.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Auth code/auth.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -36,49 +35,92 @@ Future<void> main() async {
   MobileAds.instance.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await UserPreferences.init();
-  // await Settings.init(cacheProvider: CustomCacheProvider());
-  // Run the app
   runApp(const App());
 }
 
-class App extends StatelessWidget {
-  static final ValueNotifier<ThemeMode> themeNotifier =
-  ValueNotifier(ThemeMode.light);
+class App extends StatefulWidget {
+  static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
   const App({Key? key}) : super(key: key);
 
   @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  bool loggedIn = FirebaseAuth.instance.currentUser != null;
+  bool appReady = false;
+  String currentUserForeName = "";
+  void autoMessagingLogIn() async{
+    currentUserForeName = (await FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser()).get())['ForeName'];
+    setState(() {
+      appReady = true;
+    });
+  }
+
+  @override
+  initState() {
+    if(loggedIn){
+      autoMessagingLogIn();
+    } else{
+      appReady = true;
+    }
+    super.initState();
+  }
+  @override
   Widget build(BuildContext context) {
-    _loadSavedTheme();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    return ValueListenableBuilder<ThemeMode>(
-        valueListenable: App.themeNotifier,
-        builder: (context, currentMode, child) {
-          return GetMaterialApp(
-            debugShowCheckedModeBanner: false,
-            translations: AppTranslations(),
-            locale: Get.deviceLocale,
-            theme: LAppTheme.lightTheme,
-            darkTheme: LAppTheme.darkTheme,
-            themeMode: currentMode,
-            initialRoute: FirebaseAuth.instance.currentUser == null
-                ? '/Login'
-                : '/Scroller',
-            routes: {
-              '/Login': (context) => const LoginScreen(),
-              '/Signup': (context) => const SignupScreen(),
-              '/Scroller': (context) => const Scroller(),
-              '/ScrollRefresh': (context) => const RanOut(),
-              '/Messages': (context) => const Messages(),
-              '/Profile': (context) => const Profile(),
-              '/Settings': (context) => const SettingsScaffold(),
-              '/profileInformation': (context) => const ProfileInformation(),
-              '/Friends': (context) => const Friends(),
-              '/Houses': (context) => const Houses(),
-              '/GroupOptions': (context) => const GroupOptions(),
-              '/OnBoarding': (context) => const OnBoardingPage(),
-            },
-          );
-        });
+    if (appReady) {
+      _loadSavedTheme();
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+      return ValueListenableBuilder<ThemeMode>(
+          valueListenable: App.themeNotifier,
+          builder: (context, currentMode, child) {
+            if (loggedIn) {
+              ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), currentUserForeName);
+            }
+            return GetMaterialApp(
+              debugShowCheckedModeBanner: false,
+              translations: AppTranslations(),
+              locale: Get.deviceLocale,
+              theme: LAppTheme.lightTheme,
+              darkTheme: LAppTheme.darkTheme,
+              themeMode: currentMode,
+              initialRoute: !loggedIn
+                  ? '/Login'
+                  : '/Scroller',
+              routes: {
+                '/Login': (context) => const LoginScreen(),
+                '/Signup': (context) => const SignupScreen(),
+                '/Scroller': (context) => const Scroller(),
+                '/ScrollRefresh': (context) => const RanOut(),
+                '/Messages': (context) => const Messages(),
+                '/Profile': (context) => const Profile(),
+                '/Settings': (context) => const SettingsScaffold(),
+                '/profileInformation': (context) => const ProfileInformation(),
+                '/Friends': (context) => const Friends(),
+                '/Houses': (context) => const Houses(),
+                '/GroupOptions': (context) => const GroupOptions(),
+                '/OnBoarding': (context) => const OnBoardingPage(),
+              },
+            );
+          });
+    }
+    else{
+      return MaterialApp(
+        home: Scaffold(
+          body: Container(
+            color: const Color(0xFFF8AC41),
+            child: Center(
+              child: Image.asset(
+                'assets/Pictures/logo.png',
+                // Adjust width and height as needed
+                width: MediaQuery.of(context).size.width * 0.5,
+                height: MediaQuery.of(context).size.height * 0.5,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   void _loadSavedTheme() {
@@ -89,10 +131,11 @@ class App extends StatelessWidget {
 
     bool? isDarkMode = UserPreferences.getBrightness();
     if (isDarkMode != null) {
-      themeNotifier.value = isDarkMode ? ThemeMode.dark : ThemeMode.light;
+      App.themeNotifier.value = isDarkMode ? ThemeMode.dark : ThemeMode.light;
     }
   }
 }
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -243,7 +286,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         if (response == 'success') {
                           
-               final userDoc = await FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser()).get();
+                        final userDoc = await FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser()).get();
 
                           if (userDoc.exists) {
                             final userData = userDoc.data() as Map<String, dynamic>?;
@@ -323,6 +366,7 @@ class _SignupScreenState extends State<SignupScreen> {
   bool preferenceInfoValid = false;
   late List<dynamic> universitiesData;
   late List<dynamic> domains;
+  late List<dynamic> universitiesSuggestions;
 
   @override
   void initState() {
@@ -859,6 +903,8 @@ class _SignupScreenState extends State<SignupScreen> {
         .map<List<dynamic>>((university) => university['domains'])
         .expand((list) => list)
         .toList(); // Fetch the data when the widget is created
+
+    universitiesSuggestions = universitiesData.map((university) => university['name']).toList();
     setState(() {
       _loadApp = true;
     });
@@ -903,8 +949,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _validateUniversity(selectedUniversity) {
     bool temp = true;
-    final universitiesSuggestions =
-    universitiesData.map((university) => university['name']).toList();
 
     if (!universitiesSuggestions.contains(selectedUniversity)) {
       temp = false;
@@ -937,237 +981,3 @@ class _SignupScreenState extends State<SignupScreen> {
     return data;
   }
 }
-
-// class AuthScreen extends StatefulWidget {
-//   const AuthScreen({super.key});
-
-//   @override
-//   State<AuthScreen> createState() => _AuthScreenState();
-// }
-
-// class _AuthScreenState extends State<AuthScreen> {
-//   String state = "email-unknown";
-
-//   //Use this form key to validate user's input
-//   final _formKey = GlobalKey<FormState>();
-
-//   //Use this to store user inputs
-//   final TextEditingController _emailController = TextEditingController();
-//   final TextEditingController _passwordController = TextEditingController();
-
-//   final TextEditingController _firstNameController = TextEditingController();
-//   final TextEditingController _lastNameController = TextEditingController();
-
-//   back() {
-//     setState(() {
-//       state = "email-unknown";
-//     });
-//   }
-
-//   handleSubmit() async {
-//     final email = _emailController.value.text;
-//     if (state == "email-unknown") {
-//       if (await Auth().hasAccount(email)) {
-//         state = "email-known-has-account";
-//       } else {
-//         state = "new-email-needs-account";
-//       }
-//       setState(() {
-//         state;
-//       });
-//       return;
-//     }
-
-//     if (state == "email-known-has-account") {
-//       final password = _passwordController.value.text;
-//       Auth().signInWithEmailAndPassword(email, password);
-//       Navigator.pushNamed(context, '/Scroller'); // THIS SHOULD BE CONDITIONAL
-//       return;
-//     }
-
-//     if (state == 'new-email-needs-account') {
-//       if (_formKey.currentState!.validate()) {
-//         final password = _passwordController.value.text;
-//         final firstName = _firstNameController.value.text;
-//         final lastName = _lastNameController.value.text;
-
-//         Auth().registerWithUserDetails(email, password, firstName, lastName);
-//         Navigator.pushNamed(context, '/Scroller'); // THIS SHOULD BE CONDITIONAL
-//       }
-//     }
-//     return;
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Auth Screen'),
-//       ),
-//       body: Padding(
-//           padding: const EdgeInsets.all(16.0),
-//           child: Column(
-//             children: [
-//               Form(
-//                 //Add form to key to the Form Widget
-//                 key: _formKey,
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     GestureDetector(
-//                       behavior: HitTestBehavior.opaque,
-//                       onTap: back,
-//                       child: TextFormField(
-//                         enabled: state == 'email-unknown',
-//                         //Assign controller
-//                         controller: _emailController,
-//                         //Use this function to validate user input
-//                         validator: (value) {
-//                           if (value == null || value.isEmpty) {
-//                             return 'Please enter your email';
-//                           }
-//                           return null;
-//                         },
-//                         decoration: const InputDecoration(
-//                           hintText: 'Email',
-//                         ),
-//                       ),
-//                     ),
-//                     if (state != 'email-unknown') ...[
-//                       TextFormField(
-//                         controller: _passwordController,
-//                         validator: (value) {
-//                           if (value == null ||
-//                               value.isEmpty ||
-//                               value.length < 8) {
-//                             return 'Password must be greater than eight characters.';
-//                           }
-//                           return null;
-//                         },
-//                         decoration: const InputDecoration(
-//                           hintText: 'Password',
-//                         ),
-//                       )
-//                     ],
-//                     if (state == 'new-email-needs-account') ...[
-//                       TextFormField(
-//                           controller: _firstNameController,
-//                           decoration: const InputDecoration(
-//                             hintText: 'First Name',
-//                           ),
-//                           validator: (value) {
-//                             if (value == null || value.isEmpty) {
-//                               return 'You must enter a first name.';
-//                             }
-//                             return null;
-//                           }),
-//                       TextFormField(
-//                         controller: _lastNameController,
-//                         decoration: const InputDecoration(
-//                           hintText: 'Last Name',
-//                         ),
-//                       )
-//                     ],
-//                     const SizedBox(height: 16.0),
-//                     ElevatedButton(
-//                       //Assigned onPressed to submit
-//                       onPressed: handleSubmit,
-//                       //Conditionally show the button label
-//                       child: Text(state == 'email-unknown'
-//                           ? 'Next'
-//                           : (state == 'new-email-needs-account'
-//                               ? 'Sign up'
-//                               : 'Login')),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ],
-//           )),
-//     );
-//   }
-// }
-
-
-
-
-
-
-// class CustomCacheProvider extends CacheProvider {
-//   @override
-//   bool containsKey(String key, {String? defaultValue}) {
-//     return Settings.getValue(key);
-//   }
-
-//   @override
-//   bool? getBool(String key, {bool? defaultValue}) {
-//     return Settings.getValue(key, defaultValue: true);
-//   }
-
-//   @override
-//   double getDouble(String key, {double? defaultValue}) {
-//     return Settings.getValue(key);
-//   }
-
-//   @override
-//   int getInt(String key, {int? defaultValue}) {
-//     return Settings.getValue(key);
-//   }
-
-//   @override
-//   Set getKeys() {
-//     throw UnimplementedError();
-//   }
-
-//   @override
-//   String getString(String key, {String? defaultValue}) {
-//     return Settings.getValue(key);
-//   }
-
-//   @override
-//   T getValue<T>(String key, {T? defaultValue}) {
-//     return Settings.getValue(key);
-//   }
-
-//   @override
-//   Future<void> init() {
-//     return Settings.init();
-//   }
-
-//   @override
-//   Future<void> remove(String key, {Key? defaultValue}) {
-//     Settings.getValue(key, defaultValue: 'hello');
-//     throw UnimplementedError();
-//   }
-
-//   @override
-//   Future<void> removeAll() {
-//     // Needs to be done
-//     throw UnimplementedError();
-//   }
-
-//   @override
-//   Future<void> setBool(String key, bool? value) {
-//     return Settings.setValue(key, value);
-//   }
-
-//   @override
-//   Future<void> setDouble(String key, double? value) {
-//     return Settings.setValue(key, value);
-//   }
-
-//   @override
-//   Future<void> setInt(String key, int? value) {
-//     return Settings.setValue(key, value);
-//   }
-
-//   @override
-//   Future<void> setObject<T>(String key, T? value) {
-//     return Settings.setValue(key, value);
-//   }
-
-//   @override
-//   Future<void> setString(String key, String? value) {
-//     return Settings.setValue(key, value);
-//   }
-// }

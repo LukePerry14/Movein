@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/Scroller%20Code/HScroll.dart';
 import 'package:movein/Pages/Sendbird.dart' ;
@@ -27,17 +31,19 @@ Future<List<Map<String, dynamic>>> getUserJoinedGroups(userId) async {
         final groupData = groupDoc.data();
         final groupName = groupData['GroupName'] as String;
         final memberIds = groupData['Members'] as List<dynamic>;
+        final groupPicture = groupData['GroupPicture'] as String;
         final documentId = groupDoc.id;
 
         final List<String> memberForeNames = [];
         for (var memberId in memberIds) {
           final memberDoc = await usersCollectionRef.doc(memberId).get();
-          final memberForeName = memberDoc.data()?['Forename'] as String;
+          final memberForeName = memberDoc.data()?['ForeName'] as String;
           memberForeNames.add(memberForeName);
         }
 
         result.add({
           'GroupName': groupName,
+          "GroupPicture": groupPicture,
           'Members': memberForeNames,
           'Id': documentId,
         });
@@ -94,11 +100,11 @@ class GroupInvite extends StatelessWidget {
               child: Stack(
                 children: [
                   Positioned(
-                    top: 2,
-                    right: 2,
+                    top: 1,
+                    right: 1,
                     child: IconButton(
                       splashRadius: 5,
-                      icon: const Icon(LineAwesomeIcons.times_circle),
+                      icon: Icon(LineAwesomeIcons.times_circle, color: Theme.of(context).primaryColor),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -106,7 +112,10 @@ class GroupInvite extends StatelessWidget {
                   ),
                   Column(
                     children: [
-                      Text("Invite to group:", style: Theme.of(context).textTheme.headlineSmall),
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                          child: Text("Invite to group:", style: Theme.of(context).textTheme.headlineSmall)
+                      ),
                       const Divider(),
                       Container(
                         padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -118,16 +127,31 @@ class GroupInvite extends StatelessWidget {
                             shrinkWrap: true,
                             itemCount: data.length,
                             itemBuilder: (context, index) {
-                              return ListTile(
-                                title: Text(data[index]['GroupName'], style: Theme.of(context).textTheme.bodyMedium),
-                                subtitle: Text(
+                              return Container(
+                                decoration: BoxDecoration(
+                                  border: Border(bottom: BorderSide(color: Colors.grey.withOpacity(0.6))), // Add a bottom border
+                                ),
+                                child: ListTile(
+                                  leading: SizedBox(
+                                    width: 40,
+                                    height: 40,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(100),
+                                      child: Image.asset(data[index]["GroupPicture"] ?? "assets/Pictures/reversed.png"),
+                                    ),
+                                  ),
+                                  title: Text(data[index]['GroupName'], style: Theme.of(context).textTheme.bodyMedium),
+                                  subtitle: Text(
                                     data[index]?["Members"]!.join(', '),
-                                    style: Theme.of(context).textTheme.bodySmall),
-                                onTap: () {
-                                  inviteFriendToGroup(inviteeId, data[index]?["Id"], userId);
-                                  Navigator.of(context).pop();
-                                },
+                                    style: Theme.of(context).textTheme.bodySmall,
+                                  ),
+                                  onTap: () {
+                                    inviteFriendToGroup(inviteeId, data[index]?["Id"], userId);
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
                               );
+
                             },
                           ),
                         ),
@@ -862,5 +886,188 @@ class _SendFriendInviteState extends State<SendFriendInvite> {
         ),
       ),
     );
+  }
+}
+
+class changeAllowedUnis extends StatefulWidget {
+  final List<dynamic> allowedUnis;
+  final String groupId;
+  const changeAllowedUnis({
+    Key? key,
+    required this.allowedUnis,
+    required this.groupId,
+  }) : super(key: key);
+
+  @override
+  State<changeAllowedUnis> createState() => _changeAllowedUnisState();
+}
+
+class _changeAllowedUnisState extends State<changeAllowedUnis> {
+  final _universityController = TextEditingController();
+  late List<dynamic> universitiesData;
+  late List<dynamic> allowedUnis;
+  late List<dynamic> universitiesSuggestions;
+  bool _loadDialog = false;
+  bool _universityValid = false;
+
+  @override
+  void initState() {
+    super.initState();
+    allowedUnis = widget.allowedUnis;
+    fetchJSON();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      insetPadding: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.0),
+      ),
+      backgroundColor: Theme.of(context).canvasColor,
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.8,
+        height: MediaQuery.of(context).size.height * 0.6,
+        //padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+        child: !_loadDialog ? Center(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.width,
+              child: const CircularProgressIndicator()
+          ),
+        )
+            : Stack(
+          children: [
+            SizedBox(
+              width: double.maxFinite,
+              height: MediaQuery.of(context).size.height * 0.9,
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    TypeAheadFormField(
+                      textFieldConfiguration: TextFieldConfiguration(
+                        decoration: const InputDecoration(
+                          labelText: 'Add University',
+                        ),
+                        controller: _universityController,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please select a university';
+                        }
+                        final universitiesSuggestions =
+                        universitiesData
+                            .map((university) =>
+                        university['name'])
+                            .toList();
+
+                        if (!universitiesSuggestions
+                            .contains(value)) {
+                          return 'Please select a valid university from the suggestions';
+                        }
+                        return null;
+                      },
+                      suggestionsCallback: (pattern) {
+                        // Return filtered universities based on the pattern
+                        return universitiesData
+                            .where((university) => university['name']
+                            .toLowerCase()
+                            .contains(pattern.toLowerCase()))
+                            .map((university) => university['name'])
+                            .toList();
+                      },
+                      itemBuilder: (context, suggestion) {
+                        return ListTile(
+                          title: Text(suggestion),
+                        );
+                      },
+                      onSuggestionSelected: (value) async {
+                        if (_validateUniversity(value)){
+                          await addUniToAllowedUnis(value);
+                          allowedUnis.add(value);
+                        }
+                        _universityController.text = value;
+                      },
+                    ),
+                    const Divider(),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: allowedUnis.length,
+                        itemBuilder: (context, index) {
+                          final allowedUni = allowedUnis[index];
+                          return ListTile(
+                            title: Text(allowedUni),
+                            trailing: (index == 0)? const Text(""): IconButton(
+                              icon: const Icon(LineAwesomeIcons.times, color: Colors.grey,),
+                              onPressed: () async{
+                                if (allowedUnis.length > 1){
+                                  await removeUniFromAllowedUnis(allowedUni);
+                                  setState(() {
+                                    allowedUnis.remove(allowedUni);
+                                  });
+                                }
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: IconButton(
+                splashRadius: 20,
+                icon: const Icon(LineAwesomeIcons.times_circle),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  Future<void> fetchJSON() async {
+    final String jsonContent = await rootBundle
+        .loadString('assets/JSON/world_universities_and_domains.json');
+    universitiesData = json.decode(jsonContent);
+    universitiesSuggestions = universitiesData.map((university) => university['name']).toList();
+    setState(() {
+      _loadDialog = true;
+    });
+  }
+
+  bool _validateUniversity(selectedUniversity) {
+    bool temp = true;
+
+    if (!universitiesSuggestions.contains(selectedUniversity)) {
+      temp = false;
+    }
+    return temp;
+  }
+
+  Future<void> addUniToAllowedUnis(String university) async {
+    final groupsCollectionRef = FirebaseFirestore.instance.collection('Groups');
+    final groupDocRef = groupsCollectionRef.doc(widget.groupId);
+
+    await groupDocRef.update({
+      'AllowedUnis': FieldValue.arrayUnion([university]),
+    });
+  }
+
+  Future<void> removeUniFromAllowedUnis(String university) async {
+    final groupsCollectionRef = FirebaseFirestore.instance.collection('Groups');
+    final groupDocRef = groupsCollectionRef.doc(widget.groupId);
+
+    await groupDocRef.update({
+      'AllowedUnis': FieldValue.arrayRemove([university]),
+    });
   }
 }

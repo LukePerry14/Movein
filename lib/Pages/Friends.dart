@@ -58,17 +58,13 @@ class _FriendsState extends State<Friends> {
     List<dynamic> allGroups = [];
 
     try {
+      final CollectionReference docGroups = FirebaseFirestore.instance.collection("Groups");
+      final CollectionReference docUsers = FirebaseFirestore.instance.collection("Users");
+      DocumentSnapshot docSnapshot = await docUsers.doc(Auth().currentUser()).get();
+      Map<String, dynamic>? data = docSnapshot.data() as Map<String, dynamic>?;
       for (String type in ["Joined", "Applications", "ShortList"]) {
         List<Map<String, dynamic>> groups = [];
         List<String> tGroups = [];
-        final CollectionReference docGroups =
-        FirebaseFirestore.instance.collection("Groups");
-        final CollectionReference docUsers =
-        FirebaseFirestore.instance.collection("Users");
-
-
-        DocumentSnapshot docSnapshot = await docUsers.doc(Auth().currentUser()).get();
-        Map<String, dynamic>? data = docSnapshot.data() as Map<String, dynamic>?;
 
         tGroups = List<String>.from(data?[type] ?? []);
 
@@ -94,8 +90,7 @@ class _FriendsState extends State<Friends> {
 
           allGroups.add(groups);
       }
-      final usersSnapshot = await FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser()).get();
-      final groupIds = List<String>.from(usersSnapshot.data()?['GroupInvites'] ?? []);
+      final groupIds = List<String>.from(data?['GroupInvites'] ?? []);
         for (String groupId in groupIds){
           final friendSnapshot = await FirebaseFirestore.instance
               .collection('Groups')
@@ -116,7 +111,7 @@ class _FriendsState extends State<Friends> {
             });
           }
         }
-      final blockedIds = List<String>.from(usersSnapshot.data()?['BlockedGroups'] ?? []);
+      final blockedIds = List<String>.from(data?['BlockedGroups'] ?? []);
         for (String groupId in blockedIds){
           final friendSnapshot = await FirebaseFirestore.instance
               .collection('Groups')
@@ -138,9 +133,9 @@ class _FriendsState extends State<Friends> {
           }
         }
 
-      final inviteIds = List<String>.from(usersSnapshot.data()?['FriendInvites'] ?? []);
-      final friendsIds = List<String>.from(usersSnapshot.data()?['Friends'] ?? []);
-      final outgoingIds = List<String>.from(usersSnapshot.data()?['OutgoingFriendInvites'] ?? []);
+      final inviteIds = List<String>.from(data?['FriendInvites'] ?? []);
+      final friendsIds = List<String>.from(data?['Friends'] ?? []);
+      final outgoingIds = List<String>.from(data?['OutgoingFriendInvites'] ?? []);
 
         for (String inviteId in inviteIds) {
           final friendSnapshot = await FirebaseFirestore.instance

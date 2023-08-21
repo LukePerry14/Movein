@@ -20,68 +20,84 @@ Future<void> updateGroupName(String newName, String groupId) async {
 }
 
 Future<void> removeFromGroupAndUser(String groupId, String userId) async {
+
   try {
     final groupsCollectionRef = FirebaseFirestore.instance.collection('Groups');
     final groupDocRef = groupsCollectionRef.doc(groupId);
+    groupDocRef.update({
+      "Members" : FieldValue.arrayRemove([userId]),
+    });
+
+    final usersCollectionRef = FirebaseFirestore.instance.collection('Users');
+    final userDocRef = usersCollectionRef.doc(userId);
+    userDocRef.update({
+      "Joined": FieldValue.arrayRemove([groupId]),
+    });
+
     final DocumentSnapshot groupSnapshot = await groupDocRef.get();
     final List<dynamic> members = groupSnapshot.get('Members');
     int groupSize = members.length;
 
-    if (groupSize == 1) {
-      // If the group has only one member (current user), delete the entire group document
+    if (groupSize == 0) {
       await groupDocRef.delete();
     } else {
-
-      // Calculate the new average values
+// Calculate the new average values
       double avgCleanliness = groupSnapshot.get('AvgCleanliness');
       double avgNightLife = groupSnapshot.get('AvgNightLife');
       double avgNoisiness = groupSnapshot.get('AvgNoisiness');
       DateTime avgBedTime = groupSnapshot.get('AvgBedTime').toDate();
+      double avgYearOfStudy = groupSnapshot.get('AvgYearOfStudy');
 
-      // Get the user document of the current user
+// Get the user document of the current user
       final usersCollectionRef = FirebaseFirestore.instance.collection('Users');
       final userDocRef = usersCollectionRef.doc(userId);
       final DocumentSnapshot userSnapshot = await userDocRef.get();
 
-      // Get the 'Preferences' map field from the user document
+// Get the 'Preferences' map field from the user document
       final Map<String, dynamic> prefs = userSnapshot.get('Preferences');
 
-      // Get the corresponding fields from the user document
+// Get the corresponding fields from the user document
       double userCleanliness = prefs['Cleanliness'];
       double userNightLife = prefs['NightLife'];
       double userNoisiness = prefs['Noisiness'];
+      int userYearOfStudy = prefs['YearOfStudy'];
 
-      // Calculate the new average values after removing the user from the group
+// Calculate the new average values after removing the user from the group
       avgCleanliness = (avgCleanliness * groupSize - userCleanliness) / (groupSize - 1);
       avgNightLife = (avgNightLife * groupSize - userNightLife) / (groupSize - 1);
       avgNoisiness = (avgNoisiness * groupSize - userNoisiness) / (groupSize - 1);
+      avgYearOfStudy = (avgYearOfStudy * groupSize - userYearOfStudy) / (groupSize - 1);
 
-      // Calculate the new average bed time after removing the user from the group
+// Calculate the new average bed time after removing the user from the group
       int totalBedTimeInMilliseconds = 0;
+      int totalYearOfStudy = 0;
+
       for (String memberId in members) {
-        if (memberId != userId) {
           final DocumentSnapshot memberSnapshot = await usersCollectionRef.doc(memberId).get();
           final Map<String, dynamic> memberPrefs = memberSnapshot.get('Preferences');
           DateTime memberBedTime = memberPrefs['Lights Out'].toDate();
           totalBedTimeInMilliseconds += memberBedTime.millisecondsSinceEpoch;
-        }
+
+          int memberYearOfStudy = memberPrefs['YearOfStudy'];
+          totalYearOfStudy += memberYearOfStudy;
       }
+
       avgBedTime = DateTime.fromMillisecondsSinceEpoch(totalBedTimeInMilliseconds ~/ (groupSize - 1));
       final Timestamp avgBedTimeTimestamp = Timestamp.fromDate(avgBedTime);
-      // Update the group document with the new average values and remove the user from the 'Members' array
+
+      avgYearOfStudy = totalYearOfStudy / (groupSize - 1);
+
+// Update the group document with the new average values and remove the user from the 'Members' array
       await groupDocRef.update({
         'AvgCleanliness': avgCleanliness,
         'AvgNightLife': avgNightLife,
         'AvgNoisiness': avgNoisiness,
         'AvgBedTime': avgBedTimeTimestamp,
+        'AvgYearOfStudy': avgYearOfStudy,
         'Members': FieldValue.arrayRemove([userId]),
         'BlackList' : FieldValue.arrayRemove([userId]),
       });
 
-      // Update the user document to remove the group from the 'Joined' array
-      await userDocRef.update({
-        'Joined': FieldValue.arrayRemove([groupId]),
-      });
     }
   } catch (e) {
     throw FirebaseException(

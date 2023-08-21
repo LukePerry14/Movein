@@ -7,10 +7,8 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
 import 'package:movein/Scroller%20Code/swipe_card.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/GroupFunctions.dart';
-
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
-import '../UserPreferences.dart';
 import '../main.dart';
 
 class GroupOptions extends StatefulWidget {
@@ -37,6 +35,7 @@ class _GroupOptionsState extends State<GroupOptions> {
     double avgNoisiness ;
     double avgNightLife;
     double avgYearOfStudy;
+    List<dynamic> allowedUnis;
     Timestamp avgBedTime;
 
     final CollectionReference docUsers =
@@ -58,6 +57,7 @@ class _GroupOptionsState extends State<GroupOptions> {
         avgNightLife = (groupData?['AvgNightLife']as num).toDouble();
         avgYearOfStudy = (groupData?['AvgYearOfStudy']as num).toDouble();
         avgBedTime = groupData?['AvgBedTime'];
+        allowedUnis = groupData?['AllowedUnis'];
 
         var tempKickVals = groupData?["KickVals"];
         for (var key in tempKickVals.keys) {
@@ -174,6 +174,7 @@ class _GroupOptionsState extends State<GroupOptions> {
       avgNightLife,
       avgBedTime,
       avgYearOfStudy,
+      allowedUnis
     ];
   }
 
@@ -217,6 +218,7 @@ class _GroupOptionsState extends State<GroupOptions> {
           var avgNightLife = data[9];
           var avgBedTime = data[10];
           var avgYearOfStudy = data[11];
+          var allowedUnis = data[12];
 
           return Scaffold(
             body: SingleChildScrollView(
@@ -737,6 +739,19 @@ class _GroupOptionsState extends State<GroupOptions> {
                         padding: const EdgeInsets.fromLTRB(10, 0.0, 10.0, 0.0),
                         child: Column(
                           children: [
+                            ListTile(
+                              splashColor: Theme.of(context).primaryColor,
+                              onTap: () async {
+                                await showDialog<String>(
+                                    context: context,
+                                    builder: (BuildContext context) => changeAllowedUnis(allowedUnis: allowedUnis, groupId: groupId,)
+                                );
+                              },
+                              title: Text(
+                                "add-allowed-unis".tr,
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ),
                             ListTile(
                               splashColor: Theme.of(context).primaryColor,
                               onTap: () async {
