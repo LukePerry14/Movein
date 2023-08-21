@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
+import 'package:movein/Pages/profilePreview.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart' ;
 
 
@@ -79,6 +80,14 @@ class _MessagesState extends State<Messages> with ChannelEventHandler {
       _messages.add(message);
     });
   }
+Future<void> readMessages(GroupChannel channel) async {
+ @override
+ onReadReceiptUpdated(GroupChannel channel) {
+    // TODO: implement onReadReceiptUpdated
+    super.onReadReceiptUpdated(channel);
+  }}
+
+
 
 Future<void> getMessages(GroupChannel channel) async {
     try {
@@ -146,11 +155,25 @@ Future<void> getMessages(GroupChannel channel) async {
 // add own code here--------------------------------------------------------------------------------
               child: DashChat
               (
-                messageOptions: const MessageOptions
+                messageOptions:  MessageOptions
                 (
                       showCurrentUserAvatar: false,
+                      onPressAvatar: (ChatUser user)
+                      
+                      {
+                          showDialog<String> 
+                          (
+                            context:context,
+                            builder: (BuildContext context) => PreviewCard(foreName: 'placeholder', profileImg: 'placeholder')
+                          );
+                      },
+
+
                 ),
                 currentUser: user,
+
+                
+
                 onSend: (ChatMessage messagew) async
                 { 
                 //ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),'test');
@@ -242,6 +265,7 @@ Future<void> getMessages(GroupChannel channel) async {
           user: asDashChatUser(user),
            createdAt: DateTime.fromMillisecondsSinceEpoch(message.createdAt),
            text: message.message,
+           customProperties: {'messageId':message.messageId},
            
            
            
@@ -254,7 +278,20 @@ Future<void> getMessages(GroupChannel channel) async {
   return result;
     }
 
-   
+   Future <BaseMessage> findMessage (int id) async
+  {
+    GroupChannel groupChannel = data['channel'];
+    try{
+      final params = MessageRetrievalParams(channelType: ChannelType.group, channelUrl: groupChannel.channelUrl, messageId: id);
+      //await??
+      final message =  BaseMessage.getMessage(params);
+      return message;
+    }
+    catch (e)
+    {
+      throw (e);
+    }
+  }
 
 
 }
