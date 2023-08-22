@@ -122,7 +122,7 @@ class _AppState extends State<App> {
       );
     }
   }
-
+// fix size of image
   void _loadSavedTheme() {
     String? locale = UserPreferences.getLocale();
 

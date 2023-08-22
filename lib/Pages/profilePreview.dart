@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-
+import 'package:movein/Scroller Code/swipe_card.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:dash_chat_2/dash_chat_2.dart';
 
 class PreviewCard extends StatefulWidget {
   final String foreName;
-  final String profileImg;
+  final ChatUser user;
 
   const PreviewCard(
     {
       Key? key,
       required this.foreName,
-      required this.profileImg,
+      required this.user,
     }
   ): super(key:key);
 
@@ -33,8 +35,49 @@ class PreviewCard extends StatefulWidget {
            child: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).canvasColor,
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(20.0),
         ),
+        width: MediaQuery.of(context).size.width * 0.50,
+        height: MediaQuery.of(context).size.height * 0.50,
+        padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+        child: Stack
+        (
+          children: 
+          [ 
+            SizedBox
+            (
+              width:double.maxFinite,
+              child: Container (
+              decoration: BoxDecoration
+              (
+                shape: BoxShape.circle,
+                image:  DecorationImage(
+                  image: NetworkImage(widget.user.profileImage!)
+                )
+              ),
+              )
+            ),
+            Positioned(
+              top: 0,
+              right:0,
+              child: IconButton
+              (
+                                splashRadius: 20,
+                icon: const Icon(LineAwesomeIcons.times_circle),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+    
+              
+              )
+            
+
+          ],
+
+        ),
+
+
            )
 
       );

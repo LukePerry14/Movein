@@ -164,7 +164,7 @@ Future<void> getMessages(GroupChannel channel) async {
                           showDialog<String> 
                           (
                             context:context,
-                            builder: (BuildContext context) => PreviewCard(foreName: 'placeholder', profileImg: 'placeholder')
+                            builder: (BuildContext context) => PreviewCard(foreName: 'placeholder', user: user)
                           );
                       },
 
