@@ -38,44 +38,118 @@ Future<void> main() async {
   runApp(const App());
 }
 
-class App extends StatefulWidget {
+// class App extends StatefulWidget {
+//   static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+//   const App({Key? key}) : super(key: key);
+//
+//   @override
+//   State<App> createState() => _AppState();
+// }
+//
+// class _AppState extends State<App> {
+//   bool loggedIn = FirebaseAuth.instance.currentUser != null;
+//   bool appReady = false;
+//   String currentUserForeName = "";
+//   void autoMessagingLogIn() async{
+//     currentUserForeName = (await FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser()).get())['ForeName'];
+//     setState(() {
+//       appReady = true;
+//     });
+//   }
+//
+//   @override
+//   initState() {
+//     if(loggedIn){
+//       autoMessagingLogIn();
+//     } else{
+//       appReady = true;
+//     }
+//     super.initState();
+//   }
+//   @override
+//   Widget build(BuildContext context) {
+//     if (appReady) {
+//       _loadSavedTheme();
+//       SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+//       return ValueListenableBuilder<ThemeMode>(
+//           valueListenable: App.themeNotifier,
+//           builder: (context, currentMode, child) {
+//             if (loggedIn) {
+//               ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), currentUserForeName);
+//             }
+//             return GetMaterialApp(
+//               debugShowCheckedModeBanner: false,
+//               translations: AppTranslations(),
+//               locale: Get.deviceLocale,
+//               theme: LAppTheme.lightTheme,
+//               darkTheme: LAppTheme.darkTheme,
+//               themeMode: currentMode,
+//               initialRoute: !loggedIn
+//                   ? '/Login'
+//                   : '/Scroller',
+//               routes: {
+//                 '/Login': (context) => const LoginScreen(),
+//                 '/Signup': (context) => const SignupScreen(),
+//                 '/Scroller': (context) => const Scroller(),
+//                 '/ScrollRefresh': (context) => const RanOut(),
+//                 '/Messages': (context) => const Messages(),
+//                 '/Profile': (context) => const Profile(),
+//                 '/Settings': (context) => const SettingsScaffold(),
+//                 '/profileInformation': (context) => const ProfileInformation(),
+//                 '/Friends': (context) => const Friends(),
+//                 '/Houses': (context) => const Houses(),
+//                 '/GroupOptions': (context) => const GroupOptions(),
+//                 '/OnBoarding': (context) => const OnBoardingPage(),
+//               },
+//             );
+//           });
+//     }
+//     else{
+//       return MaterialApp(
+//         home: Scaffold(
+//           body: Container(
+//             color: const Color(0xFFF8AC41),
+//             child: Center(
+//               child: Image.asset(
+//                 'assets/Pictures/logo.png',
+//                 // Adjust width and height as needed
+//                 width: MediaQuery.of(context).size.width * 0.5,
+//                 height: MediaQuery.of(context).size.height * 0.5,
+//               ),
+//             ),
+//           ),
+//         ),
+//       );
+//     }
+//   }
+//
+//   void _loadSavedTheme() {
+//     String? locale = UserPreferences.getLocale();
+//
+//     Get.updateLocale(Locale(locale));
+//
+//
+//     bool? isDarkMode = UserPreferences.getBrightness();
+//     if (isDarkMode != null) {
+//       App.themeNotifier.value = isDarkMode ? ThemeMode.dark : ThemeMode.light;
+//     }
+//   }
+// }
+
+class App extends StatelessWidget {
   static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
   const App({Key? key}) : super(key: key);
-
-  @override
-  State<App> createState() => _AppState();
-}
-
-class _AppState extends State<App> {
-  bool loggedIn = FirebaseAuth.instance.currentUser != null;
-  bool appReady = false;
-  String currentUserForeName = "";
-  void autoMessagingLogIn() async{
-    currentUserForeName = (await FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser()).get())['ForeName'];
-    setState(() {
-      appReady = true;
-    });
-  }
-
-  @override
-  initState() {
-    if(loggedIn){
-      autoMessagingLogIn();
-    } else{
-      appReady = true;
-    }
-    super.initState();
-  }
   @override
   Widget build(BuildContext context) {
-    if (appReady) {
       _loadSavedTheme();
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
       return ValueListenableBuilder<ThemeMode>(
           valueListenable: App.themeNotifier,
           builder: (context, currentMode, child) {
-            if (loggedIn) {
-              ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), currentUserForeName);
+            final String foreName = UserPreferences.getForeName();
+            final bool loggedIn = (foreName != "NotLoggedInError");
+            if (foreName != "NotLoggedInError") {
+              ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), foreName);
             }
             return GetMaterialApp(
               debugShowCheckedModeBanner: false,
@@ -103,24 +177,6 @@ class _AppState extends State<App> {
               },
             );
           });
-    }
-    else{
-      return MaterialApp(
-        home: Scaffold(
-          body: Container(
-            color: const Color(0xFFF8AC41),
-            child: Center(
-              child: Image.asset(
-                'assets/Pictures/logo.png',
-                // Adjust width and height as needed
-                width: MediaQuery.of(context).size.width * 0.5,
-                height: MediaQuery.of(context).size.height * 0.5,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
   }
 // fix size of image
   void _loadSavedTheme() {
@@ -293,11 +349,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             if (userData != null) {
                               final subscribed = userData['Subscribed'];
-                              final uniAttended = userData['UniAttended'];
                               await UserPreferences.setAppsMax(subscribed? 5:3);
-                              await UserPreferences.setUni(uniAttended);
-
-  //sign in - find sendbird account
+                              await UserPreferences.setUni(userData['UniAttended']);
+                              await UserPreferences.setForeName(userData['ForeName']);
                               ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),userData['ForeName']);
 
                             }
@@ -859,6 +913,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                             await UserPreferences.setUni(data['UniAttended']);
                             await UserPreferences.setAppsMax(3);
+                            await UserPreferences.setForeName(data['ForeName']);
 
                             Navigator.pushNamed(context, '/OnBoarding');
                             return;
