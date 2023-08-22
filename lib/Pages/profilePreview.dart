@@ -40,17 +40,24 @@ class PreviewCard extends StatefulWidget {
         width: MediaQuery.of(context).size.width * 0.50,
         height: MediaQuery.of(context).size.height * 0.50,
         padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+        // changed from stack to column
         child: Stack
         (
+          
           children: 
           [ 
             SizedBox
             (
               width:double.maxFinite,
               child: Container (
+                padding:EdgeInsets.fromLTRB(10,0,10,0),
               decoration: BoxDecoration
+              
               (
+                border:Border.all(width:5),
+                
                 shape: BoxShape.circle,
+                
                 image:  DecorationImage(
                   image: NetworkImage(widget.user.profileImage!)
                 )
@@ -70,12 +77,20 @@ class PreviewCard extends StatefulWidget {
               ),
     
               
-              )
+              ),
             
-
+          Row(
+            children: 
+            [
+              IconButton(onPressed: (){}, icon: Icon(Icons.info)),
+              IconButton(onPressed:(){}, icon: Icon(Icons.chat)),
+            ],
+          )
+          
           ],
 
         ),
+        
 
 
            )
