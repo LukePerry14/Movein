@@ -230,10 +230,11 @@ class _ProfilePage extends State<Profile> {
                                   color: Colors.red,
                                   fontWeight: FontWeight.normal,
                                   fontSize: 20.0)),
-                          onTap: () => {
-                            FirebaseAuth.instance.signOut(),
+                          onTap: () async{
+                            await UserPreferences.setForeName("NotLoggedInError");
+                            FirebaseAuth.instance.signOut();
                             Navigator.pushNamedAndRemoveUntil(
-                                context, '/Login', (route) => false)
+                                context, '/Login', (route) => false);
                           },
                         ),
                       ],
