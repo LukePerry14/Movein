@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:movein/Pages/Sendbird.dart';
 
 
 Future<void> updateGroupName(String newName, String groupId) async {
@@ -267,6 +268,7 @@ class ConfirmLeave extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                       onPressed: () {
+                        ConnectSendbird().leaveChannel(userId, groupId);
                         removeFromGroupAndUser(groupId, userId).then((_) {
                           Navigator.of(context).pushReplacementNamed('/Friends');
                         });

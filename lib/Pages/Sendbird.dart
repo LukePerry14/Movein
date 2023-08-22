@@ -57,4 +57,16 @@ Future<GroupChannel> returnChannel(String channelUrl) async
       }
       
   }
+  void leaveChannel(String userId, String groupId) async
+    {
+      try 
+      {
+
+         final channel = await returnChannel(groupId);
+         await channel.leave();
+
+      }
+      catch(e)
+      {print('Error');}
+    }
 }
