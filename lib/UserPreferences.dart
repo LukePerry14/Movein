@@ -18,7 +18,7 @@ class UserPreferences {
   static Future setAppsMax(int AppsMax)  async =>
       await _preferences.setInt(_keyAppsMax, AppsMax);
 
-  static int getAppsMax() => _preferences.getInt(_keyAppsMax) ?? 3;
+  static int getAppsMax() => _preferences.getInt(_keyAppsMax) ?? 2;
 
   static Future setLocale(String locale)  async =>
       await _preferences.setString(_keyLocale, locale);

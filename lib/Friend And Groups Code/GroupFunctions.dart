@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
 import 'package:movein/Pages/Sendbird.dart';
+import 'package:movein/UserPreferences.dart';
 
 
 Future<void> updateGroupName(String newName, String groupId) async {
@@ -345,6 +347,9 @@ Future<void> isKickVotesThresholdReached(String groupId, String kickId, int grou
         if ((posSum > groupSize / 2) | (negSum.abs() >= groupSize / 2)) {
           if (posSum > groupSize / 2) {
             await removeFromGroupAndUser(groupId, kickId);
+            await groupRef.update({
+              'BlackList': FieldValue.arrayRemove([kickId])
+            });
           }
           // Remove kickId from 'Kicks' array field
           await groupRef.update({
@@ -396,11 +401,14 @@ Future<void> updateKickVote(String groupId, bool agree, String kickId, int group
 Future<void> isAppVotesThresholdReached(String groupId, String appId, int groupSize) async {
   try {
     final DocumentReference groupRef = FirebaseFirestore.instance.collection('Groups').doc(groupId);
+    final DocumentReference userRef = FirebaseFirestore.instance.collection('Users').doc(appId);
 
     final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
-
     final Map<String, dynamic>? appVals = groupSnapshot.data()?['AppVals'];
 
+    final DocumentSnapshot<Map<String, dynamic>> userSnapshot = await FirebaseFirestore.instance.collection('Users').doc(appId).get();
+    final List<dynamic> joined = userSnapshot.data()?['Joined'];
+    final int length = joined.length;
     if (appVals != null && appVals.containsKey(appId)) {
       final Map<String, dynamic>? appVotes = appVals[appId] as Map<String, dynamic>?;
 
@@ -418,19 +426,34 @@ Future<void> isAppVotesThresholdReached(String groupId, String appId, int groupS
         });
 
         if ((posSum > groupSize / 2) | (negSum.abs() >= groupSize / 2)) {
+          appVals.remove(appId);
+          await groupRef.update({
+            'AppVals': appVals,
+            'Applicants': FieldValue.arrayRemove([appId]),
+          });
+          await userRef.update({
+            'Applications': FieldValue.arrayRemove([groupId]),
+          });
           if (posSum > groupSize / 2) {
             await groupRef.update({
-              'Applicants': FieldValue.arrayRemove([appId]),
               'Members': FieldValue.arrayUnion([appId]),
               'BlackList': FieldValue.arrayUnion([appId])
             });
+            await userRef.update({
+              'Joined': FieldValue.arrayUnion([groupId]),
+            });
+            if(length+1 == UserPreferences.getAppsMax()){
+              await maxGroupsReached(appId);
+            }
+          } else{
+            await groupRef.update({
+              'BlackList': FieldValue.arrayRemove([appId])
+            });
           }
-
-          appVals.remove(appId);
-          await groupRef.update({'AppVals': appVals});
         }
       }
     }
+
   } catch (e) {
     // Error occurred
     throw FirebaseException(

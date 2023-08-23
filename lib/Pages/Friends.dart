@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/Pages/Sendbird.dart';
+import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
 import 'package:movein/Scroller%20Code/swipe_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:movein/Pages/Scroller.dart';
 import '../Auth code/auth.dart';
+import '../Themes/lMode.dart';
 import '../main.dart';
 
 
@@ -40,7 +43,7 @@ class _FriendsState extends State<Friends> {
   late List<dynamic> fSSearchResults;
   bool loadExtra = false;
   String searchText = "";
-  final appsMax = 3;
+  final appsMax = UserPreferences.getAppsMax();
 
   int stampToYear(var dateTime) {
     final currentDate = DateTime.now();
@@ -54,6 +57,7 @@ class _FriendsState extends State<Friends> {
     List<Map<String,dynamic>> groupInvites = [];
     List<Map<String,dynamic>> blockedGroups = [];
     List<Map<String,dynamic>> friendInvites = [];
+    List<dynamic> blockIgnores = [];
     List<Map<String,dynamic>> outgoingFriendInvites = [];
     List<dynamic> allGroups = [];
 
@@ -73,6 +77,7 @@ class _FriendsState extends State<Friends> {
             DocumentSnapshot groupSnapshot = await docGroups.doc(group).get();
             Map<String, dynamic>? groupData = groupSnapshot.data() as Map<String, dynamic>?;
             if (groupData != null){
+              blockIgnores.add(group);
               groups.add({
                 "Id": group,
                 "GroupName": groupData["GroupName"],
@@ -112,13 +117,14 @@ class _FriendsState extends State<Friends> {
           }
         }
       final blockedIds = List<String>.from(data?['BlockedGroups'] ?? []);
+        blockedIds.removeWhere((element) => blockIgnores.contains(element));
         for (String groupId in blockedIds){
           final friendSnapshot = await FirebaseFirestore.instance
               .collection('Groups')
               .doc(groupId)
               .get();
           final groupData = friendSnapshot.data();
-          if (groupData != null) {
+          if (groupData != null){
             blockedGroups.add({
               "Id": groupId,
               "GroupName": groupData['GroupName'],
@@ -380,10 +386,10 @@ class _FriendsState extends State<Friends> {
                           Expanded(child: Container()),
                           ElevatedButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(Theme.of(context).primaryColor),
+                              backgroundColor: MaterialStateProperty.all<Color>(LAppTheme.lightTheme.primaryColor),
                             ),
                             onPressed: () {
-                              if (joined.length + applications.length == appsMax){
+                              if (joined.length== appsMax){
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
@@ -395,7 +401,7 @@ class _FriendsState extends State<Friends> {
                                           onPressed: () {
                                             Navigator.pop(context); // Close the dialog
                                           },
-                                          child: Text('ok'.tr, style: Theme.of(context).textTheme.bodyMedium,),
+                                          child: Text('ok'.tr, style: GoogleFonts.redHatDisplay(color: LAppTheme.lightTheme.primaryColor, fontSize: 16.5)),
                                         ),
                                       ],
                                     );
@@ -420,8 +426,8 @@ class _FriendsState extends State<Friends> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text('create_group'.tr, style: Theme.of(context).textTheme.bodyMedium),
-                                  Icon(LineAwesomeIcons.plus, size: 20, color: Theme.of(context).textTheme.bodyMedium?.color,),
+                                  Text('create_group'.tr, style: GoogleFonts.redHatDisplay(color: Colors.grey[100], fontSize: 16.0)),
+                                  Icon(LineAwesomeIcons.plus, size: 20, color: Colors.grey[100]),
                                 ],
                               ),
                             ),
@@ -434,14 +440,36 @@ class _FriendsState extends State<Friends> {
                     padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: isLoading ? const Center(child: CircularProgressIndicator())
-                          : (joinedResults.isEmpty & applicationsResults.isEmpty & shortListResults.isEmpty) ? Padding(padding: const EdgeInsets.all(10), child: Text('no_groups'.tr, style: Theme.of(context).textTheme.bodyMedium,))
+                          borderRadius: const BorderRadius.all(Radius.circular(42)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: LAppTheme.lightTheme.primaryColor.withAlpha(200),
+                              offset: const Offset(0, 20),
+                              blurRadius: 30,
+                              spreadRadius: -5,
+                            ),
+                          ],
+                          gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                LAppTheme.lightTheme.primaryColor.withAlpha(150),
+                                LAppTheme.lightTheme.primaryColor.withAlpha(200),
+                                LAppTheme.lightTheme.primaryColor,
+                                LAppTheme.lightTheme.primaryColor,
+                              ],
+                              stops: const [
+                                0.1,
+                                0.3,
+                                0.9,
+                                1.0
+                              ])),
+                      child: isLoading ? Text("")
+                          : (joinedResults.isEmpty & applicationsResults.isEmpty) ? Padding(padding: const EdgeInsets.all(10), child: Text("no_groups".tr, style: Theme.of(context).textTheme.bodyLarge,))
                           : ListView.builder(
                         shrinkWrap: true,
-                        itemCount: joinedResults.length + applicationsResults.length + shortListResults.length + 3,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: joinedResults.length + applicationsResults.length + 3,
                         itemBuilder: (context, index) {
                           if (index == 0) {
                             return joinedResults.isEmpty ? const SizedBox(height: 1,)
@@ -450,12 +478,12 @@ class _FriendsState extends State<Friends> {
                                   const SizedBox(width: 20),
                                   Text(
                                     "joined".tr,
-                                    style: Theme.of(context).textTheme.headlineSmall,
+                                    style: GoogleFonts.lexend(color: Colors.grey[100], fontWeight: FontWeight.bold, fontSize: 23),
                                   ),
                                   const SizedBox(width: 15),
                                   Text(
-                                    "${applications.length + joined.length}/$appsMax",
-                                    style: Theme.of(context).textTheme.bodyLarge,
+                                    "${joined.length}/$appsMax",
+                                    style: GoogleFonts.redHatDisplay(color: Colors.grey[100], fontSize: 16.5, fontWeight: FontWeight.bold),
                                   ),
                                 ]
                             );
@@ -473,15 +501,12 @@ class _FriendsState extends State<Friends> {
                                 });
                               },
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                                 child: Container(
-                                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
                                   decoration: BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Colors.grey[300]!,
-                                      ),
-                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.grey[100]?.withOpacity(0.15),
                                   ),
                                   child: Row(
                                     children: [
@@ -500,7 +525,7 @@ class _FriendsState extends State<Friends> {
                                           children: [
                                             Text(
                                               joinedResults[joinedIndex]["GroupName"],
-                                              style: Theme.of(context).textTheme.headlineSmall,
+                                              style: GoogleFonts.lexend(color: Colors.grey[100], fontWeight: FontWeight.normal, fontSize: 20.0),
                                             ),
                                           ],
                                         ),
@@ -517,7 +542,7 @@ class _FriendsState extends State<Friends> {
                                           });
                                         },
                                         splashRadius: 1,
-                                        icon: const Icon(Icons.mail),
+                                        icon: Icon(Icons.mail, color: Colors.grey[100]),
                                       ),
                                     ],
                                   ),
@@ -531,11 +556,13 @@ class _FriendsState extends State<Friends> {
                                   const SizedBox(width: 20),
                                   Text(
                                     "applications".tr,
-                                    style: Theme.of(context).textTheme.headlineSmall,
+                                    style: GoogleFonts.lexend(color: Colors.grey[100], fontWeight: FontWeight.bold, fontSize: 23),
                                   ),
                                 ]
                             );
-                          } else if (index <= joinedResults.length + applicationsResults.length + 1) {
+                          }else if(index == joinedResults.length + applicationsResults.length + 2) {
+                            return const SizedBox(height:15);
+                          }else{
                             int applicationIndex = index - joinedResults.length - 2;
                             return GestureDetector(
                               onTap: () {
@@ -555,15 +582,12 @@ class _FriendsState extends State<Friends> {
                                 );
                               },
                               child: Padding(
-                                padding: const EdgeInsets.all(8.0),
+                                padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                                 child: Container(
-                                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
                                   decoration: BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Colors.grey[300]!,
-                                      ),
-                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.grey[100]?.withOpacity(0.15),
                                   ),
                                   child: Row(
                                     children: [
@@ -582,7 +606,7 @@ class _FriendsState extends State<Friends> {
                                           children: [
                                             Text(
                                               applicationsResults[applicationIndex]["GroupName"],
-                                              style: Theme.of(context).textTheme.headlineSmall,
+                                              style: GoogleFonts.lexend(color: Colors.grey[100], fontWeight: FontWeight.normal, fontSize: 20.0),
                                             ),
                                           ],
                                         ),
@@ -595,86 +619,7 @@ class _FriendsState extends State<Friends> {
                                           );
                                         },
                                         splashRadius: 1,
-                                        icon: const Icon(LineAwesomeIcons.trash),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          } else if (index == joinedResults.length + applicationsResults.length + 2) {
-                            return shortListResults.isEmpty ? const SizedBox(height: 1,)
-                                : Row(
-                                children: [
-                                  const SizedBox(width: 20),
-                                  Text(
-                                    "sList".tr,
-                                    style: Theme.of(context).textTheme.headlineSmall,
-                                  ),
-                                ]
-                            );
-                          } else {
-                            int shortlistIndex = index - joinedResults.length - applicationsResults.length - 3;
-                            return GestureDetector(
-                              onTap: () {
-                                showDialog<String>(
-                                  context: context,
-                                  builder: (BuildContext context) => GroupExpand(
-                                    id: shortListResults[shortlistIndex]["Id"],
-                                    groupName: shortListResults[shortlistIndex]["GroupName"],
-                                    groupPicture: shortListResults[shortlistIndex]["GroupPicture"],
-                                    members: shortListResults[shortlistIndex]["Members"].cast<String>().toList(),
-                                    avgCleanliness: shortListResults[shortlistIndex]["AvgCleanliness"],
-                                    avgNoisiness: shortListResults[shortlistIndex]["AvgNoisiness"],
-                                    avgNightLife: shortListResults[shortlistIndex]["AvgNightLife"],
-                                    avgBedTime: shortListResults[shortlistIndex]["AvgBedTime"],
-                                    avgYearOfStudy: shortListResults[shortlistIndex]["AvgYearOfStudy"],
-
-                                  ),
-                                );
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
-                                  decoration: BoxDecoration(
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Colors.grey[300]!,
-                                      ),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 40,
-                                        height: 40,
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(100),
-                                          child: Image.asset(shortListResults[shortlistIndex]["GroupPicture"]),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              shortListResults[shortlistIndex]["GroupName"],
-                                              style: Theme.of(context).textTheme.headlineSmall,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {
-                                          showDialog<String>(
-                                              context: context,
-                                              builder: (BuildContext context) => ConfirmGroupDel(groupId: shortListResults[shortlistIndex]["Id"], groupType: "ShortList", userId: Auth().currentUser(),)
-                                          );
-                                        },
-                                        splashRadius: 1,
-                                        icon: const Icon(LineAwesomeIcons.trash),
+                                        icon: Icon(LineAwesomeIcons.trash, color: Colors.grey[100]),
                                       ),
                                     ],
                                   ),
@@ -701,9 +646,10 @@ class _FriendsState extends State<Friends> {
                       child: Column(
                         children: [
                           isLoading ? const Center(child: CircularProgressIndicator())
-                              : (searchResults.isEmpty & outgoingFriendInvitesResults.isEmpty) ? Padding(padding: const EdgeInsets.all(10),child: Text("no_friends".tr, style: Theme.of(context).textTheme.bodyMedium,),)
+                              : (searchResults.isEmpty & outgoingFriendInvitesResults.isEmpty) ? const Padding(padding: EdgeInsets.all(10),child: SizedBox(height:6, width: double.maxFinite))
                               : ListView.builder(
                             shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
                             itemCount: searchResults.length,
                             itemBuilder: (context, index) {
                               return GestureDetector(
@@ -794,6 +740,7 @@ class _FriendsState extends State<Friends> {
                           if (outgoingFriendInvitesResults.isNotEmpty)
                             ListView.builder(
                               shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
                               itemCount: outgoingFriendInvitesResults.length,
                               itemBuilder: (context, index) {
                                 return GestureDetector(
@@ -866,7 +813,99 @@ class _FriendsState extends State<Friends> {
                       ),
                     ),
                   ),
+                  SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      child: Text("sList".tr, style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.left,)
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: (App.themeNotifier.value == ThemeMode.dark)? Theme.of(context).primaryColor : Colors.grey[200], // Light grey background color
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        children: [
+                          isLoading ? const Center(child: CircularProgressIndicator())
+                              : (shortListResults.isEmpty) ? const Padding(padding: EdgeInsets.all(10),child: SizedBox(height:6, width: double.maxFinite),)
+                              :
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: shortListResults.length,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) => GroupExpand(
+                                        id: shortListResults[index]["Id"],
+                                        groupName: shortListResults[index]["GroupName"],
+                                        groupPicture: shortListResults[index]["GroupPicture"],
+                                        members: shortListResults[index]["Members"].cast<String>().toList(),
+                                        avgCleanliness: shortListResults[index]["AvgCleanliness"],
+                                        avgNoisiness: shortListResults[index]["AvgNoisiness"],
+                                        avgNightLife: shortListResults[index]["AvgNightLife"],
+                                        avgBedTime: shortListResults[index]["AvgBedTime"],
+                                        avgYearOfStudy: shortListResults[index]["AvgYearOfStudy"],
 
+                                      ),
+                                    );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            color: Colors.grey[300]!,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 40,
+                                            height: 40,
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(100),
+                                              child: Image.asset(shortListResults[index]["GroupPicture"]),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  shortListResults[index]["GroupName"],
+                                                  style: Theme.of(context).textTheme.headlineSmall,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              showDialog<String>(
+                                                  context: context,
+                                                  builder: (BuildContext context) => ConfirmGroupDel(groupId: shortListResults[index]["Id"], groupType: "ShortList", userId: Auth().currentUser(),)
+                                              );
+                                            },
+                                            splashRadius: 1,
+                                            icon: const Icon(LineAwesomeIcons.trash),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   Text("invites".tr, style: Theme.of(context).textTheme.headlineMedium),
                   const Divider(),
@@ -885,9 +924,10 @@ class _FriendsState extends State<Friends> {
                       child: Column(
                         children: [
                           isLoading ? const Center(child: CircularProgressIndicator())
-                              : groupSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10),child: Text("no_group_invites".tr, style: Theme.of(context).textTheme.bodyMedium,),)
+                              : groupSearchResults.isEmpty ? const Padding(padding: EdgeInsets.all(10),child: SizedBox(height:6, width: double.maxFinite))
                               : ListView.builder(
                             shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
                             itemCount: groupSearchResults.length,
                             itemBuilder: (context, index) {
                               return GestureDetector(
@@ -989,9 +1029,10 @@ class _FriendsState extends State<Friends> {
                       child: Column(
                         children: [
                           isLoading ? const Center(child: CircularProgressIndicator())
-                              : friendSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10), child: Text("no_friend_invites".tr, style: Theme.of(context).textTheme.bodyMedium,))
+                              : friendSearchResults.isEmpty ? const Padding(padding: EdgeInsets.all(10), child: SizedBox(height:6, width: double.maxFinite))
                               : ListView.builder(
                             shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
                             itemCount: friendSearchResults.length,
                             itemBuilder: (context, index) {
                               return GestureDetector(
@@ -1083,9 +1124,10 @@ class _FriendsState extends State<Friends> {
                       child: Column(
                         children: [
                           isLoading ? const Center(child: CircularProgressIndicator())
-                              : blockedSearchResults.isEmpty ? Padding(padding: const EdgeInsets.all(10),child: Text("no-blocked-groups".tr, style: Theme.of(context).textTheme.bodyMedium,),)
+                              : blockedSearchResults.isEmpty ? const Padding(padding: EdgeInsets.all(10),child: SizedBox(height:6, width: double.maxFinite),)
                               : ListView.builder(
                             shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
                             itemCount: blockedSearchResults.length,
                             itemBuilder: (context, index) {
                               return GestureDetector(

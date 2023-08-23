@@ -349,7 +349,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             if (userData != null) {
                               final subscribed = userData['Subscribed'];
-                              await UserPreferences.setAppsMax(subscribed? 5:3);
+                              await UserPreferences.setAppsMax(subscribed? 5:2);
                               await UserPreferences.setUni(userData['UniAttended']);
                               await UserPreferences.setForeName(userData['ForeName']);
                               ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),userData['ForeName']);
@@ -912,7 +912,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), data['ForeName']);
 
                             await UserPreferences.setUni(data['UniAttended']);
-                            await UserPreferences.setAppsMax(3);
+                            await UserPreferences.setAppsMax(2);
                             await UserPreferences.setForeName(data['ForeName']);
 
                             Navigator.pushNamed(context, '/OnBoarding');

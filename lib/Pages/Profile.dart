@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:movein/Pages/Settings.dart';
 import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
@@ -19,26 +20,16 @@ import '../main.dart';
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
 
-  // void _copyToClipboard(BuildContext context) {
-  //   Clipboard.setData(const ClipboardData(text: 'iKxLSxcDqlT6vtHe71Bp'));
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(
-  //       content: Text('Copied to clipboard', style: Theme.of(context).textTheme.bodySmall,),
-  //       backgroundColor: Theme.of(context).primaryColor,
-  //       duration: const Duration(seconds: 1),
-  //     ),
-  //   );
-  // }
 
   @override
   State<Profile> createState() => _ProfilePage();
 }
 
 class _ProfilePage extends State<Profile> {
-  var name;
-
+  var data;
+  final TextEditingController _copyController = TextEditingController();
   void _copyToClipboard(BuildContext context) {
-    Clipboard.setData(const ClipboardData(text: 'iKxLSxcDqlT6vtHe71Bp'));
+    Clipboard.setData(ClipboardData(text: _copyController.text));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -51,51 +42,38 @@ class _ProfilePage extends State<Profile> {
     );
   }
 
-  Future<String> getName() async {
+  Future<List<String>> getNameAndPic() async {
     try {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection("Users")
           .doc(Auth().currentUser())
           .get();
 
-      if (!userDoc.exists) {
-        return "User document not found";
-      }
-
       String foreName = userDoc.get("ForeName");
       String surname = userDoc.get("SurName");
-
+      String profPic = userDoc.get("Images")[0];
       String fullName = "$foreName $surname";
 
-      return fullName;
+      return [fullName, profPic];
     } catch (e) {
-      return "Error: $e";
+      throw FirebaseException(
+          message: 'Error retrieving name or profile picture: $e', plugin: 'cloud_firestore');
     }
-  }
-
-  XFile? _image;
-  final _picker = ImagePicker();
-
-  Future<void> _openImagePicker() async {
-    final XFile? pickedImage =
-        await _picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      _image = pickedImage;
-      // azure upload will go here
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String>(
-        future: getName(),
+    return FutureBuilder<List<String>>(
+        future: getNameAndPic(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Container();
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else {
-            name = snapshot.data;
+            data = snapshot.data;
+            var name = data[0];
+            var profPic = data[1];
             return Builder(builder: (context) {
               final navigator = Navigator.of(context);
               bool isDark = App.themeNotifier.value == ThemeMode.dark;
@@ -111,33 +89,27 @@ class _ProfilePage extends State<Profile> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: <Widget>[
-                            backgroundButton(),
+                            const ButtonWidgetBackground(),
                             Stack(
                               children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    print("testing");
-                                  },
-                                  child: Container(
-                                    width: 150,
-                                    // Set a fixed width for the container
-                                    height: 150,
-                                    // Set a fixed height for the container
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const ClipOval(
-                                      child: Image(
-                                        image: AssetImage(
-                                            "assets/Pictures/dora.png"),
-                                        fit: BoxFit.cover,
-                                      ),
+                                Container(
+                                  width: 150,
+                                  // Set a fixed width for the container
+                                  height: 150,
+                                  // Set a fixed height for the container
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: ClipOval(
+                                    child: Image(
+                                      image: AssetImage(profPic),
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
                               ],
                             ),
-                            shareProfileButton()
+                            ButtonWidgetShareProfile(onClicked: () {})
                           ],
                         ),
                         const SizedBox(height: 20.0),
@@ -161,7 +133,41 @@ class _ProfilePage extends State<Profile> {
                           ),
                         ]),
                         const SizedBox(height: 50.0),
-                        upgradeAccountButton(),
+                      GestureDetector(
+                        onTap: () => showDialog(builder: (BuildContext context) => const AdvertisementDialog(), context: context),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.all(Radius.circular(42)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: LAppTheme.lightTheme.primaryColor.withAlpha(200),
+                                  offset: const Offset(0, 20),
+                                  blurRadius: 30,
+                                  spreadRadius: -5,
+                                ),
+                              ],
+                              gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    LAppTheme.lightTheme.primaryColor.withAlpha(150),
+                                    LAppTheme.lightTheme.primaryColor.withAlpha(200),
+                                    LAppTheme.lightTheme.primaryColor,
+                                    LAppTheme.lightTheme.primaryColor,
+                                  ],
+                                  stops: const [
+                                    0.1,
+                                    0.3,
+                                    0.9,
+                                    1.0
+                                  ])),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 15, horizontal: MediaQuery.of(context).size.width*0.125),
+                            child: Text('upgrade'.tr, style: GoogleFonts.redHatDisplay(color: Colors.grey[100], fontSize: 16.5)),
+                          ),
+                        ),
+                      ),
+
                         const SizedBox(height: 35.0),
                         Divider(
                           height: 1,
@@ -233,8 +239,7 @@ class _ProfilePage extends State<Profile> {
                           onTap: () async{
                             await UserPreferences.setForeName("NotLoggedInError");
                             FirebaseAuth.instance.signOut();
-                            Navigator.pushNamedAndRemoveUntil(
-                                context, '/Login', (route) => false);
+                            Navigator.pushNamedAndRemoveUntil(context, '/Login', (route) => false);
                           },
                         ),
                       ],
@@ -329,9 +334,8 @@ class ButtonWidgetSettings extends StatelessWidget {
 }
 
 class ButtonWidgetBackground extends StatelessWidget {
-  final VoidCallback onClicked;
 
-  const ButtonWidgetBackground({Key? key, required this.onClicked})
+  const ButtonWidgetBackground({Key? key})
       : super(key: key);
 
 @override
@@ -422,10 +426,4 @@ class ButtonWidgetLogOut extends StatelessWidget {
         Text(text)
       ]));
 }
-
-Widget upgradeAccountButton() =>
-    ButtonWidget(text: 'upgrade'.tr, onClicked: () {});
-
-Widget backgroundButton() => ButtonWidgetBackground(onClicked: () {});
-Widget shareProfileButton() => ButtonWidgetShareProfile(onClicked: () {});
 

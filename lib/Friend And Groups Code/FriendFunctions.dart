@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Scroller%20Code/HScroll.dart';
 import 'package:movein/Pages/Sendbird.dart' ;
 
@@ -12,6 +13,9 @@ import 'package:movein/Pages/Sendbird.dart' ;
 import 'dart:io';
 //import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:movein/UserPreferences.dart';
+
+import 'GroupFunctions.dart';
 
 
 Future<List<Map<String, dynamic>>> getUserJoinedGroups(userId) async {
@@ -252,6 +256,7 @@ Future<void> inviteFriendToGroup(String friendId, String groupId, userId) async 
     final DocumentReference userRef = FirebaseFirestore.instance.collection('Users').doc(friendId);
 
     final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await groupRef.get() as DocumentSnapshot<Map<String, dynamic>>;
+    final int groupSize = groupSnapshot['Members'].length;
     final List<String> members = List<String>.from(groupSnapshot.data()!['Members']);
 
     if (!members.contains(friendId)) {
@@ -270,7 +275,7 @@ Future<void> inviteFriendToGroup(String friendId, String groupId, userId) async 
       appVals[friendId] = {userId: 1};
       await groupRef.update({'AppVals': appVals});
     }
-
+    await isAppVotesThresholdReached(groupId, friendId, groupSize);
   } catch (e) {
     throw FirebaseException(message: 'Error Inviting friend: $e', plugin: 'cloud_firestore');
   }
@@ -581,12 +586,15 @@ Future<void> removeGroupFromUser(String groupType, String groupId, userId) async
 
     await userRef.update({
       groupType: FieldValue.arrayRemove([groupId]),
+      "BlockedGroups": FieldValue.arrayRemove([groupId]),
     });
 
-    if (groupType == "Applications") {
       final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await groupRef.get() as DocumentSnapshot<Map<String, dynamic>>;
+      await groupRef.update({
+        'BlackList': FieldValue.arrayRemove([userId]), // Update the AppVals map without the removed key
+      });
+    if (groupType == "Applications") {
       final appVals = groupSnapshot.data()?['AppVals'];
-
       if (appVals != null && appVals.containsKey(userId)) {
         appVals.remove(userId); // Remove the key-value pair from the map
 
@@ -635,7 +643,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
     }
   }
 
-  Future<void> _submitForm() async {
+  Future<void> _submitForm(int appsMax) async {
     if (_formKey.currentState!.validate()) {
       final String groupName = _groupNameController.text;
 
@@ -684,7 +692,15 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
       await userDocument.update({
         'Joined': FieldValue.arrayUnion([newGroupDocument.id]),
       });
-      var newChannel = ConnectSendbird().createChannel(widget.userId, groupName, null , newGroupDocument.id) ;
+      var newChannel = ConnectSendbird().createChannel(widget.userId, groupName, null , newGroupDocument.id);
+
+      List<dynamic> joinedGroups = userSnapshot.get('Joined');
+
+      // Check if the user has joined the maximum number of groups
+      if (joinedGroups.length >= appsMax) {
+        // Call maxGroupsReached if the condition is met
+        await maxGroupsReached(widget.userId);
+      }
     }
   }
 
@@ -766,7 +782,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                   ? () async {
                 if (_formKey.currentState?.validate() ?? false) {
 
-                  await _submitForm().then((value) => Navigator.of(context).pushReplacementNamed('/Friends'));
+                  await _submitForm(UserPreferences.getAppsMax()).then((value) => Navigator.of(context).pushReplacementNamed('/Friends'));
                 }
               }
                   : null,
@@ -1070,4 +1086,26 @@ class _changeAllowedUnisState extends State<changeAllowedUnis> {
       'AllowedUnis': FieldValue.arrayRemove([university]),
     });
   }
+}
+
+
+Future<void> maxGroupsReached(String userId) async {
+  final usersCollectionRef = FirebaseFirestore.instance.collection('Users');
+  final userDocRef = usersCollectionRef.doc(userId);
+
+  final DocumentSnapshot userSnapshot = await userDocRef.get();
+
+  List<dynamic> applications = userSnapshot.get('Applications');
+  List<dynamic> blockedGroups = userSnapshot.get('BlockedGroups');
+  List<dynamic> shortList = userSnapshot.get('ShortList');
+  for (var id in applications){
+    await removeGroupFromUser("Applications", id, userId);
+    await addToShortList(id);
+  }
+
+  await userDocRef.update({
+    'ShortList': shortList,
+    'BlockedGroups': blockedGroups,
+    'Applications': FieldValue.arrayRemove(applications),
+  });
 }
