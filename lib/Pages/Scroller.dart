@@ -1,10 +1,6 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,6 +14,7 @@ import 'package:timer_count_down/timer_controller.dart';
 import 'package:timer_count_down/timer_count_down.dart';
 
 import '../Auth code/auth.dart';
+import '../Themes/lMode.dart';
 
 class Scroller extends StatefulWidget {
   const Scroller({Key? key}) : super(key: key);
@@ -112,8 +109,7 @@ class _ScrollerState extends State<Scroller> {
           });
         }
         return Scaffold(
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerFloat,
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
           body: (!_loadApp & !_showApp)
               ? Center(
                   child: SizedBox(
@@ -201,7 +197,7 @@ class _ScrollerState extends State<Scroller> {
                 ? FloatingActionButton(
                     heroTag: "Skip",
                     backgroundColor: _isButtonEnabled
-                        ? Theme.of(context).primaryColor.withOpacity(0.5)
+                        ? LAppTheme.lightTheme.primaryColor.withOpacity(0.5)
                         : Colors.grey.withOpacity(0.5),
                     onPressed: _isButtonEnabled
                         ? () {
@@ -241,12 +237,12 @@ class _ScrollerState extends State<Scroller> {
                       FloatingActionButton(
                         heroTag: "Block",
                         backgroundColor:
-                            Theme.of(context).primaryColor.withOpacity(0.5),
+                        LAppTheme.lightTheme.primaryColor.withOpacity(0.5),
                         onPressed: () {
                           if (!loadAd & (_adCountdown != 0)) {
                             _adCountdown--;
                           }
-                          addToBlacklist(groupData[index]['Id']).then((_) {
+                          addToBlacklist(groupData[index]['Id'], true).then((_) {
                             if (index < groupData.length - 1) {
                               setState(() {
                                 index++;
@@ -278,7 +274,7 @@ class _ScrollerState extends State<Scroller> {
                       FloatingActionButton(
                         heroTag: "Next",
                         backgroundColor:
-                            Theme.of(context).primaryColor.withOpacity(0.5),
+                        LAppTheme.lightTheme.primaryColor.withOpacity(0.5),
                         onPressed: () {
                           if (!loadAd & (_adCountdown != 0)) {
                             _adCountdown--;
@@ -308,7 +304,7 @@ class _ScrollerState extends State<Scroller> {
                       FloatingActionButton(
                         heroTag: "Shortlist",
                         backgroundColor:
-                            Theme.of(context).primaryColor.withOpacity(0.5),
+                        LAppTheme.lightTheme.primaryColor.withOpacity(0.5),
                         onPressed: () {
                           if (!loadAd & (_adCountdown != 0)) {
                             _adCountdown--;
@@ -345,12 +341,13 @@ class _ScrollerState extends State<Scroller> {
                       FloatingActionButton(
                         heroTag: "Apply",
                         backgroundColor:
-                            Theme.of(context).primaryColor.withOpacity(0.5),
+                        LAppTheme.lightTheme.primaryColor.withOpacity(0.5),
                         onPressed: () {
                           if (!loadAd & (_adCountdown != 0)) {
                             _adCountdown--;
                           }
-                          addToApplicants(groupData[index]['Id']).then((_) {
+                          addToApplicants(groupData[index]['Id']).then((result) {
+                            if(result == true){
                             if (index < groupData.length - 1) {
                               setState(() {
                                 index++;
@@ -360,6 +357,25 @@ class _ScrollerState extends State<Scroller> {
                               setState(() {
                                 groupData = [];
                               });
+                            }
+                          }else{
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text('max_groups_title'.tr, style: Theme.of(context).textTheme.bodyMedium,),
+                                    content: Text('max_groups_desc'.tr, style: Theme.of(context).textTheme.bodySmall),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context); // Close the dialog
+                                        },
+                                        child: Text('ok'.tr, style: GoogleFonts.redHatDisplay(color: LAppTheme.lightTheme.primaryColor, fontSize: 16.5)),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                             }
                           }).catchError((e) {
                             throw FirebaseException(
@@ -393,55 +409,55 @@ class _ScrollerState extends State<Scroller> {
   }
 
   void _loadAd() {
-    setState(() {
-      _isAdLoaded = false;
-    });
-    _ad = NativeAd(
-        adUnitId: AdHelper.nativeAdUnitId,
-        listener: NativeAdListener(
-          onAdLoaded: (ad) {
-            setState(() {
-              _isAdLoaded = true;
-            });
-          },
-          onAdFailedToLoad: (ad, error) {
-            _ad.dispose();
-          },
-          onAdClicked: (ad) {},
-          onAdImpression: (ad) {},
-          onAdClosed: (ad) {
-            _ad.dispose();
-            setState(() {
-              _adCountdown = 2;
-            });
-          },
-          onAdOpened: (ad) {},
-          onAdWillDismissScreen: (ad) {},
-          onPaidEvent: (ad, valueMicros, precision, currencyCode) {},
-        ),
-        request: const AdRequest(),
-        nativeTemplateStyle: NativeTemplateStyle(
-          templateType: TemplateType.medium,
-          mainBackgroundColor: const Color(0xfffffbed),
-          callToActionTextStyle: NativeTemplateTextStyle(
-              textColor: Colors.white,
-              style: NativeTemplateFontStyle.monospace,
-              size: 16.0),
-          primaryTextStyle: NativeTemplateTextStyle(
-              textColor: Colors.black,
-              style: NativeTemplateFontStyle.bold,
-              size: 16.0),
-          secondaryTextStyle: NativeTemplateTextStyle(
-              textColor: Colors.black,
-              style: NativeTemplateFontStyle.italic,
-              size: 16.0),
-          tertiaryTextStyle: NativeTemplateTextStyle(
-              textColor: Colors.black,
-              style: NativeTemplateFontStyle.normal,
-              size: 16.0),
-          cornerRadius: 15,
-        ))
-      ..load();
+    // setState(() {
+    //   _isAdLoaded = false;
+    // });
+    // _ad = NativeAd(
+    //     adUnitId: AdHelper.nativeAdUnitId,
+    //     listener: NativeAdListener(
+    //       onAdLoaded: (ad) {
+    //         setState(() {
+    //           _isAdLoaded = true;
+    //         });
+    //       },
+    //       onAdFailedToLoad: (ad, error) {
+    //         _ad.dispose();
+    //       },
+    //       onAdClicked: (ad) {},
+    //       onAdImpression: (ad) {},
+    //       onAdClosed: (ad) {
+    //         _ad.dispose();
+    //         setState(() {
+    //           _adCountdown = 2;
+    //         });
+    //       },
+    //       onAdOpened: (ad) {},
+    //       onAdWillDismissScreen: (ad) {},
+    //       onPaidEvent: (ad, valueMicros, precision, currencyCode) {},
+    //     ),
+    //     request: const AdRequest(),
+    //     nativeTemplateStyle: NativeTemplateStyle(
+    //       templateType: TemplateType.medium,
+    //       mainBackgroundColor: const Color(0xfffffbed),
+    //       callToActionTextStyle: NativeTemplateTextStyle(
+    //           textColor: Colors.white,
+    //           style: NativeTemplateFontStyle.monospace,
+    //           size: 16.0),
+    //       primaryTextStyle: NativeTemplateTextStyle(
+    //           textColor: Colors.black,
+    //           style: NativeTemplateFontStyle.bold,
+    //           size: 16.0),
+    //       secondaryTextStyle: NativeTemplateTextStyle(
+    //           textColor: Colors.black,
+    //           style: NativeTemplateFontStyle.italic,
+    //           size: 16.0),
+    //       tertiaryTextStyle: NativeTemplateTextStyle(
+    //           textColor: Colors.black,
+    //           style: NativeTemplateFontStyle.normal,
+    //           size: 16.0),
+    //       cornerRadius: 15,
+    //     ))
+    //   ..load();
   }
 
   void loadFilters() {
@@ -543,11 +559,9 @@ class NoGroups extends StatelessWidget {
   }
 }
 
-Future<void> addToBlacklist(String groupId) async {
-  final CollectionReference groupCollection =
-      FirebaseFirestore.instance.collection('Groups');
-  final CollectionReference userCollection =
-      FirebaseFirestore.instance.collection('Users');
+Future<void> addToBlacklist(String groupId, bool block) async {
+  final CollectionReference groupCollection = FirebaseFirestore.instance.collection('Groups');
+  final CollectionReference userCollection = FirebaseFirestore.instance.collection('Users');
 
   try {
     // Access the group document
@@ -559,17 +573,18 @@ Future<void> addToBlacklist(String groupId) async {
         'BlackList': FieldValue.arrayUnion([Auth().currentUser()])
       });
 
-      // Access the user document
-      DocumentSnapshot userSnapshot =
-          await userCollection.doc(Auth().currentUser()).get();
-      if (userSnapshot.exists) {
-        // Perform array union on BlockedGroups field within the user document
-        await userCollection.doc(Auth().currentUser()).update({
-          'BlockedGroups': FieldValue.arrayUnion([groupId])
-        });
-      } else {
-        throw FirebaseException(
-            message: 'Error: User Does not exist', plugin: 'cloud_firestore');
+      if(block) {
+        DocumentSnapshot userSnapshot = await userCollection.doc(
+            Auth().currentUser()).get();
+        if (userSnapshot.exists) {
+          // Perform array union on BlockedGroups field within the user document
+          await userCollection.doc(Auth().currentUser()).update({
+            'BlockedGroups': FieldValue.arrayUnion([groupId])
+          });
+        } else {
+          throw FirebaseException(
+              message: 'Error: User Does not exist', plugin: 'cloud_firestore');
+        }
       }
     } else {
       throw FirebaseException(
@@ -584,6 +599,8 @@ Future<void> addToBlacklist(String groupId) async {
 Future<void> addToShortList(String groupId) async {
   final CollectionReference usersCollection =
       FirebaseFirestore.instance.collection('Users');
+  final CollectionReference groupsCollection =
+  FirebaseFirestore.instance.collection('Groups');
 
   usersCollection.doc(Auth().currentUser()).update({
     'ShortList': FieldValue.arrayUnion([groupId])
@@ -591,36 +608,49 @@ Future<void> addToShortList(String groupId) async {
     throw FirebaseException(
         message: 'Error adding to shortlist: $e', plugin: 'cloud_firestore');
   });
-  addToBlacklist(groupId);
+  addToBlacklist(groupId, false);
 }
 
-Future<void> addToApplicants(String groupId) async {
+Future<bool> addToApplicants(String groupId) async {
   final CollectionReference groupsCollection =
       FirebaseFirestore.instance.collection('Groups');
-
   final DocumentReference groupDocRef = groupsCollection.doc(groupId);
 
-  groupDocRef.update({
-    'Applicants': FieldValue.arrayUnion([Auth().currentUser()]),
-    'AppVals.${Auth().currentUser()}': {},
-  }).catchError((e) {
-    throw FirebaseException(
-        message: 'Error adding to group field "Applicants": $e',
-        plugin: 'cloud_firestore');
-  });
+  final DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(Auth().currentUser())
+          .get();
 
-  final DocumentReference userDocRef =
-      FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser());
+  final int joinedGroups = userSnapshot.data()?['Joined'].length;
 
-  userDocRef.update({
-    'Applications': FieldValue.arrayUnion([groupId])
-  }).catchError((e) {
-    throw FirebaseException(
-        message: 'Error adding to user field "Applications": $e',
-        plugin: 'cloud_firestore');
-  });
+  if (joinedGroups == UserPreferences.getAppsMax()) {
+    return false;
+  } else {
+    groupDocRef.update({
+      'Applicants': FieldValue.arrayUnion([Auth().currentUser()]),
+      'AppVals.${Auth().currentUser()}': {},
+    }).catchError((e) {
+      throw FirebaseException(
+          message: 'Error adding to group field "Applicants": $e',
+          plugin: 'cloud_firestore');
+    });
 
-  addToBlacklist(groupId);
+    final DocumentReference userDocRef = FirebaseFirestore.instance
+        .collection('Users')
+        .doc(Auth().currentUser());
+
+    userDocRef.update({
+      'Applications': FieldValue.arrayUnion([groupId])
+    }).catchError((e) {
+      throw FirebaseException(
+          message: 'Error adding to user field "Applications": $e',
+          plugin: 'cloud_firestore');
+    });
+
+    await addToBlacklist(groupId, false);
+    return true;
+  }
 }
 
 class FiltersScreen extends StatefulWidget {
@@ -775,7 +805,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
       await UserPreferences.setNightPref(value4 ?? 0);
       await UserPreferences.setYearPref(value5 ?? 0);
     } catch (e) {
-      print("Error setting preferences: $e");
+      throw Exception("Error while updating preferences: $e");
     }
   }
 }

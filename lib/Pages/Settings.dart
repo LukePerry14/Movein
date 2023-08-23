@@ -358,39 +358,7 @@ GestureDetector buildChangeLanguage(BuildContext context, String title) {
 GestureDetector buildReviewAds(BuildContext context, String title) {
   return GestureDetector(
     onTap: () {
-      showDialog(context: context, builder: (BuildContext context) {
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Theme.of(context).primaryColor,
-            centerTitle: true,
-            elevation: 0,
-            leading: IconButton(
-                icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.white),
-                color: Colors.grey[500],
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-          ),
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: [
-                  const Text('Advertisements', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-                  const SizedBox(height: 20),
-                  const Text('Information about how ads work here'),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: ElevatedButton(onPressed: () => {print('Takes them to unime website to update adveritsement')}, child: const Text('Upgrade Account', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),)),
-                  )
-                ],
-              ),
-            ),
-          )
-        );
-      });
+      showDialog(context: context, builder: (BuildContext context) => const AdvertisementDialog());
     },
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
@@ -544,6 +512,34 @@ class _RadioLanguageState extends State<RadioLanguage> {
           ),
         )
       ],
+    );
+  }
+}
+
+
+class AdvertisementDialog extends StatelessWidget {
+  const AdvertisementDialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                children: [
+                  const Text('Advertisements', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                  const SizedBox(height: 20),
+                  const Text('Information about how ads work here'),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: ElevatedButton(onPressed: () => {print('Takes them to unime website to update adveritsement')}, child: const Text('Upgrade Account', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),)),
+                  )
+                ],
+              ),
+            ),
+          ),
     );
   }
 }

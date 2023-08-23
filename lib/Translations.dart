@@ -8,7 +8,7 @@ class AppTranslations extends Translations {
           'max_groups_title': 'Maximum Number of Groups Reached',
           'max_groups_desc': 'You are already in the maximum number of groups. To create your own group, you need to leave one of your existing groups.',
           'ok': 'Ok',
-          'no_groups': 'No Groups',
+          'no_groups': 'Consider exploring some groups',
           'outGoing_friend_invite': 'OutGoing Friend Invites',
           'invites': 'Invites',
           'empty': "Empty",
@@ -65,7 +65,9 @@ class AppTranslations extends Translations {
           "unblock-sList": "Unblock and ShortList",
           "yearofstudy": "Average year of study: ",
           "add-allowed-unis": "Add Allowed Unis",
-
+          "no-sList": "Empty ShortList",
+          'applicants': 'Applicants',
+          'vote-kick': 'Vote-kick',
 
 
 
@@ -82,8 +84,8 @@ class AppTranslations extends Translations {
           'search': 'Search',
           'your_groups': 'Your Groups',
           'joined': 'Joined',
-          'applications': 'Applicants',
-          'your_friends': 'Your Friends',
+          'applications': 'Applications',
+          'your_friends': 'Friends',
           'create_group': 'Create Group',
           'change_groupname': 'Change Groupname',
           'submit': 'Submit',

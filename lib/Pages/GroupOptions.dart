@@ -407,12 +407,12 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 child: Column(
                                                   children: [
                                                     Text(
-                                                      "start_vote_kick".tr,
+                                                      "vote-kick".tr,
                                                       style:
                                                       GoogleFonts.sourceCodePro(
                                                         color: Colors.red,
                                                         fontWeight: FontWeight.bold,
-                                                        fontSize: 20.0,
+                                                        fontSize: 16.0,
                                                       ),
                                                     ),
                                                     Row(
