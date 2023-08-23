@@ -40,6 +40,26 @@ class _ScrollerState extends State<Scroller> {
   List<Map<String, dynamic>> groupData = [];
   final CountdownController _timerController = CountdownController();
   final double _adAspectRatioMedium = (370.0 / 355.0);
+  late Widget _groupDisplay;
+
+  Widget nextGroup(){
+    return Gscroller(
+      key: ValueKey(index),
+      groupName: groupData[index]['GroupName'],
+      groupPicture: groupData[index]
+      ['GroupPicture'],
+      members: groupData[index]['Members'],
+      avgBedTime: groupData[index]['AvgBedTime'],
+      avgNoisiness: groupData[index]
+      ['AvgNoisiness'],
+      avgYearOfStudy: groupData[index]['AvgYearOfStudy'],
+      avgCleanliness: groupData[index]
+      ['AvgCleanliness'],
+      avgNightLife: groupData[index]
+      ['AvgNightLife'],
+      showFriend: true,
+    );
+  }
 
   void getGroups() async {
     loadFilters();
@@ -77,6 +97,7 @@ class _ScrollerState extends State<Scroller> {
     groupData = groups;
     sortGroupsByPreferences();
     setState(() {
+      _groupDisplay = nextGroup();
       _loadApp = true;
     });
   }
@@ -84,8 +105,6 @@ class _ScrollerState extends State<Scroller> {
   @override
   void initState() {
     getGroups();
-    
-    
    _loadAd();
     super.initState();
   }
@@ -101,6 +120,7 @@ class _ScrollerState extends State<Scroller> {
   Widget build(BuildContext context) {
     return Builder(
       builder: (context) {
+        //_fadeIn();
         final navigator = Navigator.of(context);
         bool loadAd = ((_adCountdown == 0) & _isAdLoaded);
         if (loadAd) {
@@ -108,6 +128,7 @@ class _ScrollerState extends State<Scroller> {
             _timerController.start();
           });
         }
+
         return Scaffold(
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
           body: (!_loadApp & !_showApp)
@@ -148,21 +169,32 @@ class _ScrollerState extends State<Scroller> {
                                           child: AdWidget(ad: _ad)),
                                   ],
                                 )
-                              : Gscroller(
-                                  groupName: groupData[index]['GroupName'],
-                                  groupPicture: groupData[index]
-                                      ['GroupPicture'],
-                                  members: groupData[index]['Members'],
-                                  avgBedTime: groupData[index]['AvgBedTime'],
-                                  avgNoisiness: groupData[index]
-                                      ['AvgNoisiness'],
-                                  avgYearOfStudy: groupData[index]['AvgYearOfStudy'],
-                                  avgCleanliness: groupData[index]
-                                      ['AvgCleanliness'],
-                                  avgNightLife: groupData[index]
-                                      ['AvgNightLife'],
-                                  showFriend: true,
-                                ),
+                              : AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 400),
+                        switchInCurve: Curves.easeInSine,
+                        switchOutCurve: Curves.easeOutSine,
+                          transitionBuilder: (widget, animation) {
+                            if (widget.key == ValueKey(index)) {
+                              return SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(1, 0),
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: widget,
+                              );
+                            } else {
+                              return SlideTransition(
+                                position: Tween<Offset>(
+                                  begin: const Offset(-1, 0),
+                                  end: Offset.zero,
+                                ).animate(animation),
+                                child: widget,
+                              );
+                            }
+                          },
+
+                                child: _groupDisplay
+                              ),
                     ),
                     Align(
                         alignment: Alignment.topRight,
@@ -201,8 +233,6 @@ class _ScrollerState extends State<Scroller> {
                         : Colors.grey.withOpacity(0.5),
                     onPressed: _isButtonEnabled
                         ? () {
-
-                
                             _loadAd();
                             _adCountdown = 2;
                             setState(() {
@@ -244,8 +274,9 @@ class _ScrollerState extends State<Scroller> {
                           }
                           addToBlacklist(groupData[index]['Id'], true).then((_) {
                             if (index < groupData.length - 1) {
+                              index++;
                               setState(() {
-                                index++;
+                                _groupDisplay = nextGroup();
                                 _showApp = false;
                               });
                             } else {
@@ -280,8 +311,9 @@ class _ScrollerState extends State<Scroller> {
                             _adCountdown--;
                           }
                           if (index < groupData.length - 1) {
+                            index++;
                             setState(() {
-                              index++;
+                              _groupDisplay = nextGroup();
                               _showApp = false;
                             });
                           } else {
@@ -311,8 +343,9 @@ class _ScrollerState extends State<Scroller> {
                           }
                           addToShortList(groupData[index]['Id']).then((_) {
                             if (index < groupData.length - 1) {
+                              index++;
                               setState(() {
-                                index++;
+                                _groupDisplay = nextGroup();
                                 _showApp = false;
                               });
                             } else {
@@ -349,8 +382,9 @@ class _ScrollerState extends State<Scroller> {
                           addToApplicants(groupData[index]['Id']).then((result) {
                             if(result == true){
                             if (index < groupData.length - 1) {
+                              index++;
                               setState(() {
-                                index++;
+                                _groupDisplay = nextGroup();
                                 _showApp = false;
                               });
                             } else {

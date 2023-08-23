@@ -234,17 +234,12 @@ class ConfirmDel extends StatelessWidget {
 
 Future<void> removeFriend(String friendId, String userId) async{
   final userRef = FirebaseFirestore.instance.collection('Users').doc(userId);
+  final friendRef = FirebaseFirestore.instance.collection('Users').doc(friendId);
+
 
   try {
-    final userDoc = await userRef.get();
-    if (userDoc.exists) {
-      final List<dynamic>? friends = userDoc.data()?['Friends'];
-
-      if (friends != null && friends.contains(friendId)) {
-        friends.remove(friendId);
-        await userRef.update({'Friends': friends});
-      }
-    }
+        await userRef.update({'Friends': FieldValue.arrayRemove([friendId])});
+        await friendRef.update({'Friends': FieldValue.arrayRemove([userId])});
   } catch (e) {
     throw FirebaseException(message: 'Error removing friend: $e', plugin: 'cloud_firestore');
   }
@@ -256,26 +251,12 @@ Future<void> inviteFriendToGroup(String friendId, String groupId, userId) async 
     final DocumentReference userRef = FirebaseFirestore.instance.collection('Users').doc(friendId);
 
     final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await groupRef.get() as DocumentSnapshot<Map<String, dynamic>>;
-    final int groupSize = groupSnapshot['Members'].length;
     final List<String> members = List<String>.from(groupSnapshot.data()!['Members']);
 
     if (!members.contains(friendId)) {
       await userRef.update({'GroupInvites': FieldValue.arrayUnion([groupId])});
     }
 
-    // Update Kicks field in the group's document
-    await groupRef.update({
-      'Applicants': FieldValue.arrayUnion([friendId]),
-    });
-    //final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
-    final Map<String, dynamic>? appVals = groupSnapshot.data()?['AppVals'];
-
-    if (appVals != null) {
-      // Update the KickVals field with the new key-value pair
-      appVals[friendId] = {userId: 1};
-      await groupRef.update({'AppVals': appVals});
-    }
-    await isAppVotesThresholdReached(groupId, friendId, groupSize);
   } catch (e) {
     throw FirebaseException(message: 'Error Inviting friend: $e', plugin: 'cloud_firestore');
   }

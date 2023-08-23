@@ -68,7 +68,9 @@ class AppTranslations extends Translations {
           "no-sList": "Empty ShortList",
           'applicants': 'Applicants',
           'vote-kick': 'Vote-kick',
-
+          'messages': 'Messages',
+          'more': 'More',
+          'remove': 'Remove',
 
 
 
@@ -100,7 +102,7 @@ class AppTranslations extends Translations {
           'no_friend_invites': 'No Friend Invites',
           'accept_friend': 'Accept Friend',
           'reject_friend': 'Reject Friend',
-          'preview': 'Preview Group',
+          'preview': 'Preview',
           'add_friend': 'Add Friend',
           'start_vote_kick': 'Start Vote-Kick',
           'edit_groupname': 'Edit Groupname',

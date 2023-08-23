@@ -701,7 +701,7 @@ class _CustomDialogState extends State<CustomDialog> {
                   splashRadius: 20,
                   icon: _friended?  Icon(LineAwesomeIcons.user_check, color: LAppTheme.lightTheme.primaryColor,) : const Icon(LineAwesomeIcons.user_plus),
                   onPressed: () {
-                    if(_friended){
+                    if(!_friended){
                       sendFriendInvite(widget.id, Auth().currentUser(),);
                       ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
