@@ -57,6 +57,27 @@ Future<GroupChannel> returnChannel(String channelUrl) async
       }
       
   }
+
+    Future<GroupChannel> createDM(List <String> userIds, String groupName, String? groupIcon, String channelURL) async
+  {
+      try {
+
+        final params = GroupChannelParams()
+        .. userIds = userIds
+        ..channelUrl = channelURL
+        ..isDistinct = true
+        ..name = groupName;
+        final groupChannel = await GroupChannel.createChannel(params);
+        return groupChannel;
+        //..coverImage = groupIcon;
+      }
+      catch(e)
+      {
+              print('createChannel: ERROR: $e');
+              throw e;
+      }
+      
+  }
   void leaveChannel(String userId, String groupId) async
     {
       try 

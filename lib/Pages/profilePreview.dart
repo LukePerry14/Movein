@@ -23,7 +23,7 @@ class PreviewCard extends StatefulWidget {
     @override
     Widget build(BuildContext context)
     {
-
+      
       return Dialog 
       (
           insetPadding: EdgeInsets.zero,
@@ -33,37 +33,27 @@ class PreviewCard extends StatefulWidget {
             borderRadius: BorderRadius.circular(20.0)
           ),
            child: Container(
+            
         decoration: BoxDecoration(
-          color: Theme.of(context).canvasColor,
+          color: Theme.of(context).primaryColor,
           borderRadius: BorderRadius.circular(20.0),
         ),
         width: MediaQuery.of(context).size.width * 0.50,
         height: MediaQuery.of(context).size.height * 0.50,
         padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
         // changed from stack to column
-        child: Stack
-        (
+        
+        
+        
           
+            
+          child: Stack (
           children: 
           [ 
-            SizedBox
-            (
-              width:double.maxFinite,
-              child: Container (
-                padding:EdgeInsets.fromLTRB(10,0,10,0),
-              decoration: BoxDecoration
-              
-              (
-                border:Border.all(width:5),
-                
-                shape: BoxShape.circle,
-                
-                image:  DecorationImage(
-                  image: NetworkImage(widget.user.profileImage!)
-                )
-              ),
-              )
-            ),
+            
+            Align(
+              alignment: Alignment.topCenter,
+              child:Text(widget.user.firstName!)),
             Positioned(
               top: 0,
               right:0,
@@ -78,21 +68,90 @@ class PreviewCard extends StatefulWidget {
     
               
               ),
-            
-          Row(
-            children: 
-            [
-              IconButton(onPressed: (){}, icon: Icon(Icons.info)),
-              IconButton(onPressed:(){}, icon: Icon(Icons.chat)),
-            ],
-          )
           
-          ],
+      // diplay profile picture 
+          Stack(
+            
+            
+          children: [ 
+            Align(
+            alignment: Alignment.center,
+           child:SizedBox
+            (
+              //width:double.maxFinite,
+              
+              child: Container (
+                width:200,
+                height:200,
+                padding:EdgeInsets.fromLTRB(10,20,10,20),
+              decoration: BoxDecoration
+              
+              (
+                border:Border.all(width:2),
+                
+                shape: BoxShape.circle,
+                
+                image:  DecorationImage(
+                  image: widget.user.profileImage != "" ? NetworkImage(widget.user.profileImage!) :  AssetImage('assets/Images/reversed.jpg') as ImageProvider,
+                  fit: BoxFit.fill
+                )
+              ),
+              ),
+            ),
+            )
+          ]
+          ),
+          
+            
+            
+            
+          
+            
+          Positioned(
+            bottom:0,
+            left:0,  
+              child:IconButton(onPressed: ()
+              {
+              /*showDialog<String>(
+                                        /context: context,
+                                        builder: (BuildContext context) =>
+                                        // RETRIEVE USER INFO!!
+                                            CustomDialog(
+                                              id: widget.user.id,
+                                              foreName: widget.user.f
+                                              age: memberDetails[index]['Age'],
+                                              uni: memberDetails[index]['Uni'],
+                                              preferences: memberDetails[index]
+                                              ['Preferences'],
+                                              images: memberDetails[index]['Images'],
+                                              bio: memberDetails[index]['Bio'],
+                                              subject: memberDetails[index]['Subject'],
+                                              yearOfStudy: memberDetails[index]
+                                              ['YearOfStudy'],
+                                            ),
+                                      );*/
+
+              }
+              
+              , icon: Icon(Icons.info)),
+              
+            
+          ),
+          Positioned(
+          bottom: 0,
+          right: 0,
+          child:IconButton(onPressed:(){}, icon: Icon(Icons.chat)),
+          
+          ), 
+          
+          ]
+          
 
         ),
         
 
 
+           
            )
 
       );

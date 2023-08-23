@@ -954,6 +954,7 @@ class _FriendsState extends State<Friends> {
                                           onSelected: (value) async{
                                             if (value == 'accept') {
                                               await joinGroup(groupSearchResults[index]["Id"], Auth().currentUser());
+                                             
                                               Navigator.of(context).pushReplacementNamed("/Friends");
                                             } else if (value == 'reject') {
                                               await removeGroupInvite(groupSearchResults[index]["Id"], Auth().currentUser(),);
@@ -1047,6 +1048,8 @@ class _FriendsState extends State<Friends> {
                                           onSelected: (value) async{
                                             if (value == 'accept') {
                                               await addFriend(friendSearchResults[index]["Id"], Auth().currentUser(),);
+                                               //create new group - with current user and other user
+                                              ConnectSendbird().createDM([friendSearchResults[index]["Id"],Auth().currentUser()], 'ee' , null , friendSearchResults[index]['Id'] + Auth().currentUser()) ;
                                               Navigator.of(context).pushReplacementNamed("/Friends");
                                             } else if (value == 'reject') {
                                               await removeFriendInvite(friendSearchResults[index]["Id"], Auth().currentUser(),);
