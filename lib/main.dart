@@ -28,13 +28,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-
+import 'Auth code/auth.dart';
+import 'package:azblob/azblob.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await UserPreferences.init();
+
+  // var ABlob = AzureStorage.parse('https://movein.blob.core.windows.net/moveinimages');
+
   runApp(const App());
 }
 

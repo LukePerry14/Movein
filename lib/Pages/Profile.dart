@@ -1,5 +1,7 @@
 // ignore_for_file: camel_case_types
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -12,6 +14,9 @@ import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mime/mime.dart';
+import 'package:http/http.dart' as http;
+import 'package:azstore/azstore.dart' as AzureStorage;
 
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
@@ -58,6 +63,27 @@ class _ProfilePage extends State<Profile> {
     } catch (e) {
       throw FirebaseException(
           message: 'Error retrieving name or profile picture: $e', plugin: 'cloud_firestore');
+  Future<File?> pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      return File(image.path);
+    } else {
+      print('No image selected.');
+      return null;
+    }
+  }
+
+  // String blobURL = 'https://movein.blob.core.windows.net/moveinimages?sp=racwdli&st=2023-08-16T08:49:36Z&se=2024-04-17T16:49:36Z&sv=2022-11-02&sr=c&sig=odutsBXNqOBDLMkTdcqjIYSfBZMtZAxqFY%2Bw4OT9XM8%3D';
+  // String SASToken = 'sp=racwdli&st=2023-08-16T08:49:36Z&se=2024-04-17T16:49:36Z&sv=2022-11-02&sr=c&sig=odutsBXNqOBDLMkTdcqjIYSfBZMtZAxqFY%2Bw4OT9XM8%3D';
+  // New version
+  Future<void> _uploadImageToAzure(File imageFile) async {
+    Uint8List bytes = imageFile.readAsBytesSync();
+    var x = AzureStorage.AzureStorage.parse('DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+    try {
+      await x.putBlob('/moveinimages/userimage.jpg', contentType: 'image/jpg', bodyBytes: bytes);
+    } catch (e) {
+      print('Exception: $e');
     }
   }
 
@@ -84,30 +110,18 @@ class _ProfilePage extends State<Profile> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const SizedBox(height: 20,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: <Widget>[
-                            const ButtonWidgetBackground(),
-                            Stack(
-                              children: [
-                                Container(
-                                  width: 150,
-                                  // Set a fixed width for the container
-                                  height: 150,
-                                  // Set a fixed height for the container
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: ClipOval(
-                                    child: Image(
-                                      image: AssetImage(profPic),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                        GestureDetector(
+                          onTap: () async {
+                            final pickedImage = await pickImage();
+                            if (pickedImage != null) {
+                              await _uploadImageToAzure(pickedImage);
+                            }
+                          },
+                          child: Container(
+                            width: 150, // Set a fixed width for the container
+                            height: 150, // Set a fixed height for the container
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
                             ),
                             ButtonWidgetShareProfile(onClicked: () {})
                           ],
