@@ -62,21 +62,8 @@ class _ProfilePage extends State<Profile> {
       return [fullName, profPic];
     } catch (e) {
       throw FirebaseException(
-          message: 'Error retrieving name or profile picture: $e', plugin: 'cloud_firestore');
-  Future<File?> pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      return File(image.path);
-    } else {
-      print('No image selected.');
-      return null;
-    }
-  }
+          message: 'Error retrieving name or profile picture: $e', plugin: 'cloud_firestore');}}
 
-  // String blobURL = 'https://movein.blob.core.windows.net/moveinimages?sp=racwdli&st=2023-08-16T08:49:36Z&se=2024-04-17T16:49:36Z&sv=2022-11-02&sr=c&sig=odutsBXNqOBDLMkTdcqjIYSfBZMtZAxqFY%2Bw4OT9XM8%3D';
-  // String SASToken = 'sp=racwdli&st=2023-08-16T08:49:36Z&se=2024-04-17T16:49:36Z&sv=2022-11-02&sr=c&sig=odutsBXNqOBDLMkTdcqjIYSfBZMtZAxqFY%2Bw4OT9XM8%3D';
-  // New version
   Future<void> _uploadImageToAzure(File imageFile) async {
     Uint8List bytes = imageFile.readAsBytesSync();
     var x = AzureStorage.AzureStorage.parse('DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
@@ -123,7 +110,7 @@ class _ProfilePage extends State<Profile> {
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
                             ),
-                            ButtonWidgetShareProfile(onClicked: () {})
+                            ButtonWidgetShareProfile(onClicked: () {  },))
                           ],
                         ),
                         const SizedBox(height: 20.0),
