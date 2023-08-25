@@ -10,11 +10,14 @@ import 'package:movein/navbar.dart';
 import 'package:movein/Scroller%20Code/HScroll.dart';
 import 'package:movein/Ad%20code/ad_helper.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:timer_count_down/timer_controller.dart';
 import 'package:timer_count_down/timer_count_down.dart';
 
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
+import 'Friends.dart';
+import 'Profile.dart';
 
 class Scroller extends StatefulWidget {
   const Scroller({Key? key}) : super(key: key);
@@ -434,6 +437,18 @@ class _ScrollerState extends State<Scroller> {
           ),
           bottomNavigationBar: CustomNavbar(
             onItemSelected: (route) {
+              switch (route){
+                case '/Scroller':
+                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Scroller(), duration: const Duration(milliseconds: 400)));
+                  break;
+
+                case '/Friends':
+                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeftJoined, child: const Friends(), childCurrent: widget, duration: const Duration(milliseconds: 400)));
+                  break;
+
+                case '/Profile':
+                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeftJoined, child: const Profile(), childCurrent: widget, duration: const Duration(milliseconds: 400)));
+              }
               navigator.pushReplacementNamed(route);
             },
           ),

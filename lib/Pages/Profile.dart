@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:movein/Pages/Settings.dart';
+import 'package:movein/Pages/profileInformation.dart';
 import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
@@ -17,14 +18,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
 import 'package:azstore/azstore.dart' as AzureStorage;
+import 'package:page_transition/page_transition.dart';
 
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
 import '../main.dart';
+import 'Friends.dart';
+import 'Scroller.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
-
 
   @override
   State<Profile> createState() => _ProfilePage();
@@ -33,6 +36,7 @@ class Profile extends StatefulWidget {
 class _ProfilePage extends State<Profile> {
   var data;
   final TextEditingController _copyController = TextEditingController();
+
   void _copyToClipboard(BuildContext context) {
     Clipboard.setData(ClipboardData(text: _copyController.text));
     ScaffoldMessenger.of(context).showSnackBar(
@@ -62,7 +66,11 @@ class _ProfilePage extends State<Profile> {
       return [fullName, profPic];
     } catch (e) {
       throw FirebaseException(
-          message: 'Error retrieving name or profile picture: $e', plugin: 'cloud_firestore');
+          message: 'Error retrieving name or profile picture: $e',
+          plugin: 'cloud_firestore');
+    }
+  }
+
   Future<File?> pickImage() async {
     final ImagePicker _picker = ImagePicker();
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -79,9 +87,11 @@ class _ProfilePage extends State<Profile> {
   // New version
   Future<void> _uploadImageToAzure(File imageFile) async {
     Uint8List bytes = imageFile.readAsBytesSync();
-    var x = AzureStorage.AzureStorage.parse('DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+    var x = AzureStorage.AzureStorage.parse(
+        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
     try {
-      await x.putBlob('/moveinimages/userimage.jpg', contentType: 'image/jpg', bodyBytes: bytes);
+      await x.putBlob('/moveinimages/userimage.jpg',
+          contentType: 'image/jpg', bodyBytes: bytes);
     } catch (e) {
       print('Exception: $e');
     }
@@ -110,6 +120,7 @@ class _ProfilePage extends State<Profile> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        const SizedBox(height:20),
                         GestureDetector(
                           onTap: () async {
                             final pickedImage = await pickImage();
@@ -118,13 +129,16 @@ class _ProfilePage extends State<Profile> {
                             }
                           },
                           child: Container(
-                            width: 150, // Set a fixed width for the container
-                            height: 150, // Set a fixed height for the container
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                            ),
-                            ButtonWidgetShareProfile(onClicked: () {})
-                          ],
+                              width: 150,
+                              // Set a fixed width for the container
+                              height: 150,
+                              // Set a fixed height for the container
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                              ),
+                              child: ButtonWidgetShareProfile(
+                                onClicked: () {},
+                              )),
                         ),
                         const SizedBox(height: 20.0),
                         Text(name,
@@ -147,41 +161,53 @@ class _ProfilePage extends State<Profile> {
                           ),
                         ]),
                         const SizedBox(height: 50.0),
-                      GestureDetector(
-                        onTap: () => showDialog(builder: (BuildContext context) => const AdvertisementDialog(), context: context),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.all(Radius.circular(42)),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: LAppTheme.lightTheme.primaryColor.withAlpha(200),
-                                  offset: const Offset(0, 20),
-                                  blurRadius: 30,
-                                  spreadRadius: -5,
-                                ),
-                              ],
-                              gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    LAppTheme.lightTheme.primaryColor.withAlpha(150),
-                                    LAppTheme.lightTheme.primaryColor.withAlpha(200),
-                                    LAppTheme.lightTheme.primaryColor,
-                                    LAppTheme.lightTheme.primaryColor,
-                                  ],
-                                  stops: const [
-                                    0.1,
-                                    0.3,
-                                    0.9,
-                                    1.0
-                                  ])),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 15, horizontal: MediaQuery.of(context).size.width*0.125),
-                            child: Text('upgrade'.tr, style: GoogleFonts.redHatDisplay(color: Colors.grey[100], fontSize: 16.5)),
+                        GestureDetector(
+                          onTap: () => showDialog(
+                              builder: (BuildContext context) =>
+                                  const AdvertisementDialog(),
+                              context: context),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(42)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: LAppTheme.lightTheme.primaryColor
+                                        .withAlpha(200),
+                                    offset: const Offset(0, 20),
+                                    blurRadius: 30,
+                                    spreadRadius: -5,
+                                  ),
+                                ],
+                                gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      LAppTheme.lightTheme.primaryColor
+                                          .withAlpha(150),
+                                      LAppTheme.lightTheme.primaryColor
+                                          .withAlpha(200),
+                                      LAppTheme.lightTheme.primaryColor,
+                                      LAppTheme.lightTheme.primaryColor,
+                                    ],
+                                    stops: const [
+                                      0.1,
+                                      0.3,
+                                      0.9,
+                                      1.0
+                                    ])),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 15,
+                                  horizontal:
+                                      MediaQuery.of(context).size.width *
+                                          0.125),
+                              child: Text('upgrade'.tr,
+                                  style: GoogleFonts.redHatDisplay(
+                                      color: Colors.grey[100], fontSize: 16.5)),
+                            ),
                           ),
                         ),
-                      ),
-
                         const SizedBox(height: 35.0),
                         Divider(
                           height: 1,
@@ -194,20 +220,31 @@ class _ProfilePage extends State<Profile> {
                             height: 40,
                             decoration: BoxDecoration(
                               border: Border.all(
-                                  color: isDark? Colors.white70 : Theme.of(context).primaryColor,
+                                  color: isDark
+                                      ? Colors.white70
+                                      : Theme.of(context).primaryColor,
                                   width: 1),
                               borderRadius: BorderRadius.circular(100),
                             ),
                             child: Icon(LineAwesomeIcons.user,
-                                color: isDark? Colors.white70 : Theme.of(context).primaryColor),
+                                color: isDark
+                                    ? Colors.white70
+                                    : Theme.of(context).primaryColor),
                           ),
                           title: Text(
                             "edit_profile".tr,
                             style: Theme.of(context).textTheme.headlineSmall,
                           ),
-                          trailing: Icon(LineAwesomeIcons.angle_right, color: LAppTheme.lightTheme.primaryColor),
+                          trailing: Icon(LineAwesomeIcons.angle_right,
+                              color: LAppTheme.lightTheme.primaryColor),
                           onTap: () {
-                            Navigator.pushNamed(context, '/profileInformation');
+                            Navigator.push(context, PageTransition(
+                              type: PageTransitionType.rightToLeftWithFade,
+                              alignment: Alignment.topCenter,
+                              child: const ProfileInformation(),
+                              duration: const Duration(milliseconds: 400),
+                              reverseDuration: const Duration(milliseconds: 400),
+                            ),);
                           },
                         ),
                         const SizedBox(height: 30.0),
@@ -217,20 +254,31 @@ class _ProfilePage extends State<Profile> {
                               height: 40,
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                    color: isDark? Colors.white70 : Theme.of(context).primaryColor,
+                                    color: isDark
+                                        ? Colors.white70
+                                        : Theme.of(context).primaryColor,
                                     width: 1),
                                 borderRadius: BorderRadius.circular(100),
                               ),
                               child: Icon(LineAwesomeIcons.cog,
-                                  color: isDark? Colors.white70 : Theme.of(context).primaryColor),
+                                  color: isDark
+                                      ? Colors.white70
+                                      : Theme.of(context).primaryColor),
                             ),
                             title: Text(
                               "settings".tr,
                               style: Theme.of(context).textTheme.headlineSmall,
                             ),
-                            trailing: Icon(LineAwesomeIcons.angle_right, color: LAppTheme.lightTheme.primaryColor),
+                            trailing: Icon(LineAwesomeIcons.angle_right,
+                                color: LAppTheme.lightTheme.primaryColor),
                             onTap: () {
-                              Navigator.pushNamed(context, '/Settings');
+                              Navigator.push(context, PageTransition(
+                                type: PageTransitionType.rightToLeftWithFade,
+                                alignment: Alignment.topCenter,
+                                child: const SettingsScaffold(),
+                                duration: const Duration(milliseconds: 400),
+                                reverseDuration: const Duration(milliseconds: 400),
+                              ),);
                             }),
                         const SizedBox(height: 30),
                         ListTile(
@@ -250,10 +298,16 @@ class _ProfilePage extends State<Profile> {
                                   color: Colors.red,
                                   fontWeight: FontWeight.normal,
                                   fontSize: 20.0)),
-                          onTap: () async{
-                            await UserPreferences.setForeName("NotLoggedInError");
+                          onTap: () async {
+                            await UserPreferences.setForeName(
+                                "NotLoggedInError");
                             FirebaseAuth.instance.signOut();
-                            Navigator.pushNamedAndRemoveUntil(context, '/Login', (route) => false);
+                            Navigator.pushReplacement(
+                                context, PageTransition(
+                              type: PageTransitionType.fade,
+                              child: const LoginScreen(),
+                              duration: Duration(milliseconds: 400),
+                            ),);
                           },
                         ),
                       ],
@@ -262,7 +316,19 @@ class _ProfilePage extends State<Profile> {
                 ),
                 bottomNavigationBar: CustomNavbar(
                   onItemSelected: (route) {
-                    navigator.pushNamed(route);
+                    switch (route){
+                      case '/Scroller':
+                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.leftToRightJoined, child: const Scroller(), childCurrent: widget, duration: const Duration(milliseconds: 400)));
+                        break;
+
+                      case '/Friends':
+                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.leftToRightJoined, child: const Friends(), childCurrent: widget, duration: const Duration(milliseconds: 400)));
+                        break;
+
+                      case '/Profile':
+                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Profile(), duration: const Duration(milliseconds: 400)));
+                    }
+                    navigator.pushReplacementNamed(route);
                   },
                 ),
               );
@@ -285,13 +351,16 @@ class ButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ElevatedButton(
       style: ElevatedButton.styleFrom(
-          shape: const StadiumBorder(),
-          padding: const EdgeInsets.symmetric(horizontal: 62, vertical: 22),
-          foregroundColor: Colors.white,
-          backgroundColor: Theme.of(context).primaryColor,
+        shape: const StadiumBorder(),
+        padding: const EdgeInsets.symmetric(horizontal: 62, vertical: 22),
+        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       onPressed: onClicked,
-      child: Text(text, style: Theme.of(context).textTheme.bodySmall,));
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.bodySmall,
+      ));
 }
 
 class ButtonWidgetProfileInformation extends StatelessWidget {
@@ -348,39 +417,38 @@ class ButtonWidgetSettings extends StatelessWidget {
 }
 
 class ButtonWidgetBackground extends StatelessWidget {
+  const ButtonWidgetBackground({Key? key}) : super(key: key);
 
-  const ButtonWidgetBackground({Key? key})
-      : super(key: key);
-
-@override
-Widget build(BuildContext context) {
-  bool isDark = (App.themeNotifier.value == ThemeMode.dark);
-  return ElevatedButton(
-    style: ElevatedButton.styleFrom(
-      shape: const CircleBorder(),
-      foregroundColor: Colors.white,
-      backgroundColor: Theme.of(context).canvasColor,
-      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-      side: BorderSide(color: isDark? Colors.white70 : Theme.of(context).primaryColor, width: 1),
-    ),
-    onPressed: () async {
-      await UserPreferences.setBrightness(!isDark);
-      App.themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
-
-      // Update the isDark variable after the theme mode has been updated.
-      isDark = !isDark;
-    },
-    child: Padding(
-      padding: const EdgeInsets.all(5.0),
-      child: Icon(
-        isDark ? LineAwesomeIcons.sun : LineAwesomeIcons.moon,
-        color: isDark? Colors.white70 : Theme.of(context).primaryColor,
-        size: 24,
+  @override
+  Widget build(BuildContext context) {
+    bool isDark = (App.themeNotifier.value == ThemeMode.dark);
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        shape: const CircleBorder(),
+        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).canvasColor,
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+        side: BorderSide(
+            color: isDark ? Colors.white70 : Theme.of(context).primaryColor,
+            width: 1),
       ),
-    ),
-  );
-}
+      onPressed: () async {
+        await UserPreferences.setBrightness(!isDark);
+        App.themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
 
+        // Update the isDark variable after the theme mode has been updated.
+        isDark = !isDark;
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(5.0),
+        child: Icon(
+          isDark ? LineAwesomeIcons.sun : LineAwesomeIcons.moon,
+          color: isDark ? Colors.white70 : Theme.of(context).primaryColor,
+          size: 24,
+        ),
+      ),
+    );
+  }
 }
 
 class ButtonWidgetShareProfile extends StatelessWidget {
@@ -396,18 +464,18 @@ class ButtonWidgetShareProfile extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           shape: const CircleBorder(),
           foregroundColor: Colors.white,
-          backgroundColor: Theme
-              .of(context)
-              .canvasColor,
+          backgroundColor: Theme.of(context).canvasColor,
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
-          side: BorderSide(color: isDark? Colors.white70 : Theme.of(context).primaryColor, width: 1),
+          side: BorderSide(
+              color: isDark ? Colors.white70 : Theme.of(context).primaryColor,
+              width: 1),
         ),
         onPressed: onClicked,
         child: Padding(
           padding: const EdgeInsets.all(5.0),
           child: Icon(
             LineAwesomeIcons.share_square,
-            color: isDark? Colors.white70 : Theme.of(context).primaryColor,
+            color: isDark ? Colors.white70 : Theme.of(context).primaryColor,
             size: 24,
           ),
         ));
@@ -440,4 +508,3 @@ class ButtonWidgetLogOut extends StatelessWidget {
         Text(text)
       ]));
 }
-

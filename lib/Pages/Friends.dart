@@ -10,9 +10,13 @@ import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
 import 'package:movein/Scroller%20Code/swipe_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:movein/Pages/Scroller.dart';
+import 'package:page_transition/page_transition.dart';
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
 import '../main.dart';
+import 'GroupOptions.dart';
+import 'Messages.dart';
+import 'Profile.dart';
 
 
 class Friends extends StatefulWidget {
@@ -465,7 +469,7 @@ class _FriendsState extends State<Friends> {
                                 0.9,
                                 1.0
                               ])),
-                      child: isLoading ? Text("")
+                      child: isLoading ? const Text("")
                           : (joinedResults.isEmpty & applicationsResults.isEmpty) ? Padding(padding: const EdgeInsets.all(10), child: Text("no_groups".tr, style: Theme.of(context).textTheme.bodyLarge,))
                           : ListView.builder(
                         shrinkWrap: true,
@@ -504,12 +508,20 @@ class _FriendsState extends State<Friends> {
                                     SlidableAction(
                                       onPressed: (context) async{
                                         final groupChannel = await ConnectSendbird().returnChannel(joinedResults[joinedIndex]["Id"]);
-                                        Navigator.pushNamed(context, '/Messages', arguments: {
-                                          'channel': groupChannel,
-                                          'members': joinedResults[joinedIndex]["Members"],
-                                          'groupId': joinedResults[joinedIndex]["Id"],
-                                          'groupName': joinedResults[joinedIndex]["GroupName"],
-                                        });
+                                        Navigator.push(context, PageTransition(
+                                            curve: Curves.linear,
+                                            type: PageTransitionType.topToBottom,
+                                            child: const Messages(),
+                                            settings: RouteSettings(
+                                                arguments: {
+                                                  'channel': groupChannel,
+                                                  'members': joinedResults[joinedIndex]["Members"],
+                                                  'groupId': joinedResults[joinedIndex]["Id"],
+                                                  'groupName': joinedResults[joinedIndex]["GroupName"],
+                                                  'groupPicture' : joinedResults[joinedIndex]["GroupPicture"],
+                                                }
+                                            )),
+                                        );
                                       },
                                       backgroundColor: Colors.white,
                                       foregroundColor: LAppTheme.lightTheme.primaryColor,
@@ -518,12 +530,19 @@ class _FriendsState extends State<Friends> {
                                     ),
                                     SlidableAction(
                                       onPressed: (context) {
-                                        Navigator.pushNamed(context, '/GroupOptions', arguments: {
-                                          'members': joinedResults[joinedIndex]["Members"],
-                                          'groupId': joinedResults[joinedIndex]["Id"],
-                                          'groupName':joinedResults[joinedIndex]["GroupName"],
-                                          'groupPicture' : joinedResults[joinedIndex]['groupPicture'],
-                                        });
+                                        Navigator.push(context, PageTransition(
+                                            curve: Curves.linear,
+                                            type: PageTransitionType.topToBottom,
+                                            child: const GroupOptions(),
+                                            settings: RouteSettings(
+                                                arguments: {
+                                                  'members': joinedResults[joinedIndex]["Members"],
+                                                  'groupId': joinedResults[joinedIndex]["Id"],
+                                                  'groupName': joinedResults[joinedIndex]["GroupName"],
+                                                  'groupPicture' : joinedResults[joinedIndex]["GroupPicture"],
+                                                }
+                                            )),
+                                        );
                                       },
                                       backgroundColor: Colors.white,
                                       foregroundColor: LAppTheme.lightTheme.primaryColor,
@@ -535,13 +554,20 @@ class _FriendsState extends State<Friends> {
                                 child: GestureDetector(
                                   onTap: () async{
                                     final groupChannel = await ConnectSendbird().returnChannel(joinedResults[joinedIndex]["Id"]);
-                                    Navigator.pushNamed(context, '/Messages', arguments: {
-                                      'channel':groupChannel,
-                                      'members': joinedResults[joinedIndex]["Members"],
-                                      'groupId': joinedResults[joinedIndex]["Id"],
-                                      'groupName': joinedResults[joinedIndex]["GroupName"],
-                                      'groupPicture' : joinedResults[joinedIndex]["GroupPicture"],
-                                    });
+                                    Navigator.push(context, PageTransition(
+                                        curve: Curves.linear,
+                                        type: PageTransitionType.topToBottom,
+                                        child: const Messages(),
+                                        settings: RouteSettings(
+                                            arguments: {
+                                              'channel': groupChannel,
+                                              'members': joinedResults[joinedIndex]["Members"],
+                                              'groupId': joinedResults[joinedIndex]["Id"],
+                                              'groupName': joinedResults[joinedIndex]["GroupName"],
+                                              'groupPicture' : joinedResults[joinedIndex]["GroupPicture"],
+                                            }
+                                        )),
+                                    );
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
@@ -818,7 +844,6 @@ class _FriendsState extends State<Friends> {
                                                     context: context,
                                                     builder: (BuildContext context) => ConfirmDel(friendId: searchResults[index]["Id"], userId: Auth().currentUser(),)
                                                 );
-                                                //Navigator.pushReplacementNamed(context, "/Friends"); //Dirty way of rebuilding app.
                                               }
                                             },
                                             icon: const Icon(Icons.more_vert),
@@ -850,7 +875,7 @@ class _FriendsState extends State<Friends> {
                                       SlidableAction(
                                         onPressed: (context) async {
                                           await removeOutFriendInvite(outgoingFriendInvitesResults[index]['Id'], Auth().currentUser(),);
-                                          Navigator.of(context).pushReplacementNamed("/Friends");
+                                          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
                                         },
                                         backgroundColor: Colors.redAccent,
                                         icon: LineAwesomeIcons.remove_user,
@@ -1070,7 +1095,7 @@ class _FriendsState extends State<Friends> {
                                       onPressed: (context) async {
                                         await removeGroupInvite(groupSearchResults[index]["Id"], Auth().currentUser(),);
                                         await addToApplicants(groupSearchResults[index]["Id"]);
-                                        Navigator.of(context).pushReplacementNamed("/Friends");
+                                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
                                       },
                                       backgroundColor: Colors.lightGreen,
                                       icon: LineAwesomeIcons.check,
@@ -1079,7 +1104,7 @@ class _FriendsState extends State<Friends> {
                                     SlidableAction(
                                       onPressed: (context) async {
                                         await removeGroupInvite(groupSearchResults[index]["Id"], Auth().currentUser(),);
-                                        Navigator.of(context).pushReplacementNamed("/Friends");
+                                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
                                       },
                                       backgroundColor: Colors.redAccent,
                                       icon: LineAwesomeIcons.times,
@@ -1177,7 +1202,7 @@ class _FriendsState extends State<Friends> {
                                     SlidableAction(
                                       onPressed: (context) async {
                                           await addFriend(friendSearchResults[index]["Id"], Auth().currentUser(),);
-                                          Navigator.of(context).pushReplacementNamed("/Friends");
+                                          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
                                       },
                                       backgroundColor: Colors.lightGreen,
                                       icon: LineAwesomeIcons.user_plus,
@@ -1186,7 +1211,7 @@ class _FriendsState extends State<Friends> {
                                     SlidableAction(
                                       onPressed: (context) async {
                                         await removeFriendInvite(friendSearchResults[index]["Id"], Auth().currentUser(),);
-                                        Navigator.of(context).pushReplacementNamed("/Friends");
+                                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
                                       },
                                       backgroundColor: Colors.redAccent,
                                       icon: LineAwesomeIcons.user_minus,
@@ -1334,13 +1359,13 @@ class _FriendsState extends State<Friends> {
                                           onSelected: (value) async{
                                             if (value == 'unblock') {
                                               await unblock(blockedSearchResults[index]["Id"],value,  Auth().currentUser());
-                                              Navigator.of(context).pushReplacementNamed("/Friends");
+                                              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
                                             } else if(value == 'unblock-sList'){
                                               await unblock(blockedSearchResults[index]["Id"], value, Auth().currentUser());
-                                              Navigator.of(context).pushReplacementNamed("/Friends");
+                                              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
                                             } else if(value == 'unblock-apply'){
                                               await unblock(blockedSearchResults[index]["Id"], value, Auth().currentUser());
-                                              Navigator.of(context).pushReplacementNamed("/Friends");
+                                              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
                                             }
                                           },
                                           icon: const Icon(Icons.more_vert),
@@ -1363,6 +1388,18 @@ class _FriendsState extends State<Friends> {
           ),
           bottomNavigationBar: CustomNavbar(
             onItemSelected: (route) {
+              switch (route){
+                case '/Scroller':
+                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.leftToRightJoined, child: const Scroller(),childCurrent: widget, duration: const Duration(milliseconds: 400)));
+                  break;
+
+                case '/Friends':
+                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
+                  break;
+
+                case '/Profile':
+                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeftJoined, child: const Profile(), childCurrent: widget, duration: const Duration(milliseconds: 400)));
+              }
               navigator.pushReplacementNamed(route);
             },
           ),

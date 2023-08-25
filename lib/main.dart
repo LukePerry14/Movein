@@ -10,14 +10,7 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/Pages/OnBoarding.dart';
 import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Themes/lMode.dart';
-import 'package:movein/Pages/Houses.dart';
-import 'package:movein/Pages/Messages.dart';
-import 'package:movein/Pages/Profile.dart';
 import 'package:movein/Pages/Settings.dart';
-import 'package:movein/Pages/profileInformation.dart';
-import 'package:movein/Pages/GroupOptions.dart';
-import 'package:movein/Pages/Friends.dart';
-import 'package:movein/Pages/ScrollRefresh.dart';
 import 'package:movein/Pages/Sendbird.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:movein/Translations.dart';
@@ -30,13 +23,13 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'Auth code/auth.dart';
 import 'package:azblob/azblob.dart';
+import 'package:page_transition/page_transition.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await UserPreferences.init();
-
   // var ABlob = AzureStorage.parse('https://movein.blob.core.windows.net/moveinimages');
 
   runApp(const App());
@@ -68,19 +61,16 @@ class App extends StatelessWidget {
                   ? '/Login'
                   : '/Scroller',
               routes: {
-                '/Login': (context) => const LoginScreen(),
-                '/Signup': (context) => const SignupScreen(),
-                '/Scroller': (context) => const Scroller(),
-                '/ScrollRefresh': (context) => const RanOut(),
-                '/Messages': (context) => const Messages(),
-                '/Profile': (context) => const Profile(),
-                '/Settings': (context) => const SettingsScaffold(),
-                '/profileInformation': (context) => const ProfileInformation(),
-                '/Friends': (context) => const Friends(),
-                '/Houses': (context) => const Houses(),
-                '/GroupOptions': (context) => const GroupOptions(),
                 '/OnBoarding': (context) => const OnBoardingPage(),
               },
+                onGenerateInitialRoutes: (initialRoute) {
+                  if (initialRoute == '/Scroller') {
+                    return [MaterialPageRoute(builder: (context) => const Scroller())];
+                  }
+                  else {
+                    return [MaterialPageRoute(builder: (context) => const LoginScreen())];
+                  }
+                }
             );
           });
   }
@@ -262,7 +252,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             }
                           }
-                          Navigator.pushNamed(context, '/Scroller');
+                        Navigator.push(
+                          context,
+                          PageTransition(
+                            type: PageTransitionType.fade,
+                            child: const Scroller(),
+                            isIos: true,
+                            duration: Duration(milliseconds: 400),
+                          ),
+                        );
                           return;
                         } else {
                           setState(() {
@@ -282,7 +280,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 10),
                     TextButton(
                       onPressed: () async {
-                        Navigator.pushNamed(context, '/Signup');
+                        Navigator.push(
+                          context,
+                          PageTransition(
+                            type: PageTransitionType.rightToLeft,
+                            child: const SignupScreen(),
+                            duration: const Duration(seconds: 1),
+                            reverseDuration: const Duration(seconds: 1),
+                          ),
+                        );
                       },
                       child: Text('Want to sign up instead?',
                           style: GoogleFonts.redHatDisplay(
@@ -838,13 +844,6 @@ class _SignupScreenState extends State<SignupScreen> {
                             style: GoogleFonts.redHatDisplay(
                                 color: Colors.white, fontSize: 16.5)),
                       ),
-                      const SizedBox(height: 10),
-                      TextButton(
-                        onPressed: () async {
-                          Navigator.pushNamed(context, '/OnBoarding');
-                        },
-                        child: const Text('Want to log in instead?'),
-                      )
                     ],
                   ),
                 ),
@@ -894,11 +893,6 @@ class _SignupScreenState extends State<SignupScreen> {
       (_formKey.currentState?.fields['Noisiness']?.isValid ?? false) &
       (_formKey.currentState?.fields['NightLife']?.isValid ?? false) &
       (_formKey.currentState?.fields['Lights Out']?.isValid ?? false);
-
-
-      //print(userInfoComplete);
-
-      print(userInfoComplete);
 
       setState(() {
         userInfoValid = userInfoComplete;

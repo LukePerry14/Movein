@@ -3,6 +3,8 @@ import 'package:introduction_screen/introduction_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 
+import 'Scroller.dart';
+
 class OnBoardingPage extends StatelessWidget {
   const OnBoardingPage({Key? key}) : super(key: key);
 
@@ -61,7 +63,7 @@ class OnBoardingPage extends StatelessWidget {
   Widget buildImage(String path) =>
       Center(child: Image.asset(path, width: 350));
 
-  void goToHome(context) => Navigator.of(context).pushReplacementNamed('/Scroller');
+  void goToHome(context) => MaterialPageRoute(builder: (context) => const Scroller());
 
   PageDecoration getPageDecoration(context) => PageDecoration(
     titleTextStyle: Theme.of(context).textTheme.headlineSmall ?? GoogleFonts.lexend(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 20.0),

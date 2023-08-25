@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:movein/Pages/profilePreview.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart' ;
 
 
 import 'package:movein/Pages/Sendbird.dart';
 import '../Themes/lMode.dart';
 import '../Auth code/auth.dart';
+import 'GroupOptions.dart';
 
 
 
@@ -139,12 +141,19 @@ Future<void> getMessages(GroupChannel channel) async {
                   icon: Icon(Icons.more_vert, color: LAppTheme.lightTheme.primaryColor),
                   //Icon not showing
                   onPressed: () {
-                    Navigator.pushNamed(context, '/GroupOptions', arguments: {
-                      'members': data['members'],
-                      'groupId': data['groupId'],
-                      'groupName': data['groupName'],
-                      'groupPicture' : data['groupPicture'],
-                    });
+                    Navigator.push(context, PageTransition(
+                        curve: Curves.linear,
+                        type: PageTransitionType.topToBottom,
+                        child: const GroupOptions(),
+                        settings: RouteSettings(
+                            arguments: {
+                              'members': data["members"],
+                              'groupId': data["groupId"],
+                              'groupName': data["groupName"],
+                              'groupPicture' : data["groupPicture"],
+                            }
+                        )),
+                    );
                   },
                 ),
               ],
