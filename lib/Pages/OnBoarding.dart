@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:page_transition/page_transition.dart';
 
 import 'Scroller.dart';
 
@@ -50,10 +51,10 @@ class OnBoardingPage extends StatelessWidget {
           ],
 
           done: Text("Got it", style: Theme.of(context).textTheme.bodyMedium),
-          onDone: () => goToHome(context),
+          onDone: () => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Scroller(), duration: const Duration(milliseconds: 200))),
           showSkipButton: true,
           skip: Text('Skip', style: Theme.of(context).textTheme.bodyMedium),
-          onSkip: () => goToHome(context),
+          onSkip: () => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Scroller(), duration: const Duration(milliseconds: 200))),
           next: const Icon(LineAwesomeIcons.arrow_right, color: Colors.black87),
           dotsDecorator: getDotDecoration(context),
         )
@@ -63,7 +64,6 @@ class OnBoardingPage extends StatelessWidget {
   Widget buildImage(String path) =>
       Center(child: Image.asset(path, width: 350));
 
-  void goToHome(context) => MaterialPageRoute(builder: (context) => const Scroller());
 
   PageDecoration getPageDecoration(context) => PageDecoration(
     titleTextStyle: Theme.of(context).textTheme.headlineSmall ?? GoogleFonts.lexend(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 20.0),

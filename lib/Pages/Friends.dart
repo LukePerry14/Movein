@@ -470,7 +470,7 @@ class _FriendsState extends State<Friends> {
                                 1.0
                               ])),
                       child: isLoading ? const Text("")
-                          : (joinedResults.isEmpty & applicationsResults.isEmpty) ? Padding(padding: const EdgeInsets.all(10), child: Text("no_groups".tr, style: Theme.of(context).textTheme.bodyLarge,))
+                          : (joinedResults.isEmpty & applicationsResults.isEmpty) ? Padding(padding: const EdgeInsets.all(10), child: Text("no_groups".tr, style: GoogleFonts.redHatDisplay(color: Colors.grey[100], fontSize: 16.5, fontWeight: FontWeight.bold),))
                           : ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
