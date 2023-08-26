@@ -46,7 +46,7 @@ class _ScrollerState extends State<Scroller> {
   Widget _groupDisplay = const CircularProgressIndicator();
 
   Widget nextGroup(){
-    return Gscroller(
+    return Center(child: SizedBox(height: MediaQuery.of(context).size.height, width: MediaQuery.of(context).size.width, child: SingleChildScrollView(child:Gscroller(
       key: ValueKey(index),
       groupName: groupData[index]['GroupName'],
       groupPicture: groupData[index]
@@ -61,7 +61,7 @@ class _ScrollerState extends State<Scroller> {
       avgNightLife: groupData[index]
       ['AvgNightLife'],
       showFriend: true,
-    );
+    ))));
   }
   Widget initial(){
     return SizedBox(width: MediaQuery.of(context).size.width, height: MediaQuery.of(context).size.width, child : const CircularProgressIndicator());
@@ -199,7 +199,7 @@ class _ScrollerState extends State<Scroller> {
                       }
                     },
 
-                    child: Center(child: SizedBox(height: MediaQuery.of(context).size.height, width: MediaQuery.of(context).size.width, child: SingleChildScrollView(child: _groupDisplay)))
+                    child: _groupDisplay
                 ),
               ),
               Align(
