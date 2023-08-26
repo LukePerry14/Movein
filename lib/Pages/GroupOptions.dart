@@ -384,19 +384,6 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                       .textTheme
                                                       .headlineSmall,
                                                 ),
-                                                Text(
-                                                  "${memberDetails[index]["Id"]}",
-                                                  style: isVoteKick
-                                                      ? GoogleFonts.sourceCodePro(
-                                                    color: Colors.red,
-                                                    fontWeight:
-                                                    FontWeight.bold,
-                                                    fontSize: 12.0,
-                                                  )
-                                                      : Theme.of(context)
-                                                      .textTheme
-                                                      .bodySmall,
-                                                ),
                                               ],
                                             ),
                                             Expanded(child: Container()),

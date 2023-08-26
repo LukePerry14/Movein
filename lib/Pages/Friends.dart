@@ -501,105 +501,107 @@ class _FriendsState extends State<Friends> {
                             int joinedIndex = index - 1;
                             return Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                              child: Slidable(
-                                endActionPane: ActionPane(
-                                  motion: const ScrollMotion(),
-                                  children: [
-                                    SlidableAction(
-                                      onPressed: (context) async{
-                                        final groupChannel = await ConnectSendbird().returnChannel(joinedResults[joinedIndex]["Id"]);
-                                        Navigator.push(context, PageTransition(
-                                            curve: Curves.linear,
-                                            type: PageTransitionType.topToBottom,
-                                            child: const Messages(),
-                                            settings: RouteSettings(
-                                                arguments: {
-                                                  'channel': groupChannel,
-                                                  'members': joinedResults[joinedIndex]["Members"],
-                                                  'groupId': joinedResults[joinedIndex]["Id"],
-                                                  'groupName': joinedResults[joinedIndex]["GroupName"],
-                                                  'groupPicture' : joinedResults[joinedIndex]["GroupPicture"],
-                                                }
-                                            )),
-                                        );
-                                      },
-                                      backgroundColor: Colors.white,
-                                      foregroundColor: LAppTheme.lightTheme.primaryColor,
-                                      icon: Icons.mail,
-                                      label: 'messages'.tr,
-                                    ),
-                                    SlidableAction(
-                                      onPressed: (context) {
-                                        Navigator.push(context, PageTransition(
-                                            curve: Curves.linear,
-                                            type: PageTransitionType.topToBottom,
-                                            child: const GroupOptions(),
-                                            settings: RouteSettings(
-                                                arguments: {
-                                                  'members': joinedResults[joinedIndex]["Members"],
-                                                  'groupId': joinedResults[joinedIndex]["Id"],
-                                                  'groupName': joinedResults[joinedIndex]["GroupName"],
-                                                  'groupPicture' : joinedResults[joinedIndex]["GroupPicture"],
-                                                }
-                                            )),
-                                        );
-                                      },
-                                      backgroundColor: Colors.white,
-                                      foregroundColor: LAppTheme.lightTheme.primaryColor,
-                                      icon: Icons.more_vert,
-                                      label: 'more'.tr,
-                                    ),
-                                  ],
-                                ),
-                                child: GestureDetector(
-                                  onTap: () async{
-                                    final groupChannel = await ConnectSendbird().returnChannel(joinedResults[joinedIndex]["Id"]);
-                                    Navigator.push(context, PageTransition(
-                                        curve: Curves.linear,
-                                        type: PageTransitionType.topToBottom,
-                                        child: const Messages(),
-                                        settings: RouteSettings(
-                                            arguments: {
-                                              'channel': groupChannel,
-                                              'members': joinedResults[joinedIndex]["Members"],
-                                              'groupId': joinedResults[joinedIndex]["Id"],
-                                              'groupName': joinedResults[joinedIndex]["GroupName"],
-                                              'groupPicture' : joinedResults[joinedIndex]["GroupPicture"],
-                                            }
-                                        )),
-                                    );
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        top: BorderSide(width: 1, color: Colors.grey[100]!.withOpacity(0.3)), // Top border
-                                        bottom: BorderSide(width: 1, color: Colors.grey[100]!.withOpacity(0.3)), // Bottom border
+                              child: ClipRect(
+                                child: Slidable(
+                                  endActionPane: ActionPane(
+                                    motion: const ScrollMotion(),
+                                    children: [
+                                      SlidableAction(
+                                        onPressed: (context) async{
+                                          final groupChannel = await ConnectSendbird().returnChannel(joinedResults[joinedIndex]["Id"]);
+                                          Navigator.push(context, PageTransition(
+                                              curve: Curves.linear,
+                                              type: PageTransitionType.topToBottom,
+                                              child: const Messages(),
+                                              settings: RouteSettings(
+                                                  arguments: {
+                                                    'channel': groupChannel,
+                                                    'members': joinedResults[joinedIndex]["Members"],
+                                                    'groupId': joinedResults[joinedIndex]["Id"],
+                                                    'groupName': joinedResults[joinedIndex]["GroupName"],
+                                                    'groupPicture' : joinedResults[joinedIndex]["GroupPicture"],
+                                                  }
+                                              )),
+                                          );
+                                        },
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: LAppTheme.lightTheme.primaryColor,
+                                        icon: Icons.mail,
+                                        label: 'messages'.tr,
                                       ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        SizedBox(
-                                          width: 40,
-                                          height: 40,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(100),
-                                            child: Image.asset(joinedResults[joinedIndex]["GroupPicture"]),
-                                          ),
+                                      SlidableAction(
+                                        onPressed: (context) {
+                                          Navigator.push(context, PageTransition(
+                                              curve: Curves.linear,
+                                              type: PageTransitionType.topToBottom,
+                                              child: const GroupOptions(),
+                                              settings: RouteSettings(
+                                                  arguments: {
+                                                    'members': joinedResults[joinedIndex]["Members"],
+                                                    'groupId': joinedResults[joinedIndex]["Id"],
+                                                    'groupName': joinedResults[joinedIndex]["GroupName"],
+                                                    'groupPicture' : joinedResults[joinedIndex]["GroupPicture"],
+                                                  }
+                                              )),
+                                          );
+                                        },
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: LAppTheme.lightTheme.primaryColor,
+                                        icon: Icons.more_vert,
+                                        label: 'more'.tr,
+                                      ),
+                                    ],
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () async{
+                                      final groupChannel = await ConnectSendbird().returnChannel(joinedResults[joinedIndex]["Id"]);
+                                      Navigator.push(context, PageTransition(
+                                          curve: Curves.linear,
+                                          type: PageTransitionType.topToBottom,
+                                          child: const Messages(),
+                                          settings: RouteSettings(
+                                              arguments: {
+                                                'channel': groupChannel,
+                                                'members': joinedResults[joinedIndex]["Members"],
+                                                'groupId': joinedResults[joinedIndex]["Id"],
+                                                'groupName': joinedResults[joinedIndex]["GroupName"],
+                                                'groupPicture' : joinedResults[joinedIndex]["GroupPicture"],
+                                              }
+                                          )),
+                                      );
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          top: BorderSide(width: 1, color: Colors.grey[100]!.withOpacity(0.3)), // Top border
+                                          bottom: BorderSide(width: 1, color: Colors.grey[100]!.withOpacity(0.3)), // Bottom border
                                         ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                joinedResults[joinedIndex]["GroupName"],
-                                                style: GoogleFonts.lexend(color: Colors.grey[100], fontWeight: FontWeight.normal, fontSize: 20.0),
-                                              ),
-                                            ],
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 40,
+                                            height: 40,
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(100),
+                                              child: Image.asset(joinedResults[joinedIndex]["GroupPicture"]),
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  joinedResults[joinedIndex]["GroupName"],
+                                                  style: GoogleFonts.lexend(color: Colors.grey[100], fontWeight: FontWeight.normal, fontSize: 20.0),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -622,94 +624,96 @@ class _FriendsState extends State<Friends> {
                             int applicationIndex = index - joinedResults.length - 2;
                             return Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                              child: Slidable(
-                                endActionPane: ActionPane(
-                                  motion: const ScrollMotion(),
-                                  children: [
-                                    SlidableAction(
-                                      onPressed: (context) {
-                                        showDialog<String>(
-                                          context: context,
-                                          builder: (BuildContext context) => GroupExpand(
-                                            id: applicationsResults[applicationIndex]["Id"],
-                                            groupName: applicationsResults[applicationIndex]["GroupName"],
-                                            groupPicture: applicationsResults[applicationIndex]["GroupPicture"],
-                                            members: applicationsResults[applicationIndex]["Members"].cast<String>().toList(),
-                                            avgCleanliness: applicationsResults[applicationIndex]["AvgCleanliness"],
-                                            avgNoisiness: applicationsResults[applicationIndex]["AvgNoisiness"],
-                                            avgNightLife: applicationsResults[applicationIndex]["AvgNightLife"],
-                                            avgBedTime: applicationsResults[applicationIndex]["AvgBedTime"],
-                                            avgYearOfStudy: applicationsResults[applicationIndex]["AvgYearOfStudy"],
-                                          ),
-                                        );
-                                      },
-                                      backgroundColor: Colors.white,
-                                      foregroundColor: LAppTheme.lightTheme.primaryColor,
-                                      icon: LineAwesomeIcons.search,
-                                      label: 'preview'.tr,
-                                    ),
-                                    SlidableAction(
-                                      onPressed: (context) {
-                                        showDialog<String>(
+                              child: ClipRect(
+                                child: Slidable(
+                                  endActionPane: ActionPane(
+                                    motion: const ScrollMotion(),
+                                    children: [
+                                      SlidableAction(
+                                        onPressed: (context) {
+                                          showDialog<String>(
                                             context: context,
-                                            builder: (BuildContext context) => ConfirmGroupDel(groupId: applicationsResults[applicationIndex]["Id"], groupType: "Applications", userId: Auth().currentUser(),)
-                                        );
-                                      },
-                                      backgroundColor: Colors.white,
-                                      foregroundColor: LAppTheme.lightTheme.primaryColor,
-                                      icon: LineAwesomeIcons.alternate_trash,
-                                      label: 'remove'.tr,
-                                    ),
-                                  ],
-                                ),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    showDialog<String>(
-                                      context: context,
-                                      builder: (BuildContext context) => GroupExpand(
-                                        id: applicationsResults[applicationIndex]["Id"],
-                                        groupName: applicationsResults[applicationIndex]["GroupName"],
-                                        groupPicture: applicationsResults[applicationIndex]["GroupPicture"],
-                                        members: applicationsResults[applicationIndex]["Members"].cast<String>().toList(),
-                                        avgCleanliness: applicationsResults[applicationIndex]["AvgCleanliness"],
-                                        avgNoisiness: applicationsResults[applicationIndex]["AvgNoisiness"],
-                                        avgNightLife: applicationsResults[applicationIndex]["AvgNightLife"],
-                                        avgBedTime: applicationsResults[applicationIndex]["AvgBedTime"],
-                                        avgYearOfStudy: applicationsResults[applicationIndex]["AvgYearOfStudy"],
+                                            builder: (BuildContext context) => GroupExpand(
+                                              id: applicationsResults[applicationIndex]["Id"],
+                                              groupName: applicationsResults[applicationIndex]["GroupName"],
+                                              groupPicture: applicationsResults[applicationIndex]["GroupPicture"],
+                                              members: applicationsResults[applicationIndex]["Members"].cast<String>().toList(),
+                                              avgCleanliness: applicationsResults[applicationIndex]["AvgCleanliness"],
+                                              avgNoisiness: applicationsResults[applicationIndex]["AvgNoisiness"],
+                                              avgNightLife: applicationsResults[applicationIndex]["AvgNightLife"],
+                                              avgBedTime: applicationsResults[applicationIndex]["AvgBedTime"],
+                                              avgYearOfStudy: applicationsResults[applicationIndex]["AvgYearOfStudy"],
+                                            ),
+                                          );
+                                        },
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: LAppTheme.lightTheme.primaryColor,
+                                        icon: LineAwesomeIcons.search,
+                                        label: 'preview'.tr,
                                       ),
-                                    );
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
-                                    decoration: BoxDecoration(
-                                      border: Border(
-                                        top: BorderSide(width: 1, color: Colors.grey[100]!.withOpacity(0.3)), // Top border
-                                        bottom: BorderSide(width: 1, color: Colors.grey[100]!.withOpacity(0.3)), // Bottom border
+                                      SlidableAction(
+                                        onPressed: (context) {
+                                          showDialog<String>(
+                                              context: context,
+                                              builder: (BuildContext context) => ConfirmGroupDel(groupId: applicationsResults[applicationIndex]["Id"], groupType: "Applications", userId: Auth().currentUser(),)
+                                          );
+                                        },
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: LAppTheme.lightTheme.primaryColor,
+                                        icon: LineAwesomeIcons.alternate_trash,
+                                        label: 'remove'.tr,
                                       ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        SizedBox(
-                                          width: 40,
-                                          height: 40,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(100),
-                                            child: Image.asset(applicationsResults[applicationIndex]["GroupPicture"]),
-                                          ),
+                                    ],
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      showDialog<String>(
+                                        context: context,
+                                        builder: (BuildContext context) => GroupExpand(
+                                          id: applicationsResults[applicationIndex]["Id"],
+                                          groupName: applicationsResults[applicationIndex]["GroupName"],
+                                          groupPicture: applicationsResults[applicationIndex]["GroupPicture"],
+                                          members: applicationsResults[applicationIndex]["Members"].cast<String>().toList(),
+                                          avgCleanliness: applicationsResults[applicationIndex]["AvgCleanliness"],
+                                          avgNoisiness: applicationsResults[applicationIndex]["AvgNoisiness"],
+                                          avgNightLife: applicationsResults[applicationIndex]["AvgNightLife"],
+                                          avgBedTime: applicationsResults[applicationIndex]["AvgBedTime"],
+                                          avgYearOfStudy: applicationsResults[applicationIndex]["AvgYearOfStudy"],
                                         ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                applicationsResults[applicationIndex]["GroupName"],
-                                                style: GoogleFonts.lexend(color: Colors.grey[100], fontWeight: FontWeight.normal, fontSize: 20.0),
-                                              ),
-                                            ],
-                                          ),
+                                      );
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 12.0),
+                                      decoration: BoxDecoration(
+                                        border: Border(
+                                          top: BorderSide(width: 1, color: Colors.grey[100]!.withOpacity(0.3)), // Top border
+                                          bottom: BorderSide(width: 1, color: Colors.grey[100]!.withOpacity(0.3)), // Bottom border
                                         ),
-                                      ],
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 40,
+                                            height: 40,
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(100),
+                                              child: Image.asset(applicationsResults[applicationIndex]["GroupPicture"]),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  applicationsResults[applicationIndex]["GroupName"],
+                                                  style: GoogleFonts.lexend(color: Colors.grey[100], fontWeight: FontWeight.normal, fontSize: 20.0),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -741,7 +745,7 @@ class _FriendsState extends State<Friends> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: searchResults.length,
                             itemBuilder: (context, index) {
-                              return Slidable(
+                              return ClipRect(child: Slidable(
                                 endActionPane: ActionPane(
                                   motion: const ScrollMotion(),
                                   children: [
@@ -821,39 +825,12 @@ class _FriendsState extends State<Friends> {
                                               ],
                                             ),
                                           ),
-                                          PopupMenuButton<String>(
-                                            itemBuilder: (context) => [
-                                              PopupMenuItem<String>(
-                                                value: 'invite',
-                                                child: Text('Invite to Group', style: Theme.of(context).textTheme.bodyMedium),
-                                              ),
-                                              PopupMenuItem<String>(
-                                                value: 'remove',
-                                                child: Text('Remove Friend', style: Theme.of(context).textTheme.bodyMedium),
-                                              ),
-                                            ],
-                                            onSelected: (value) {
-                                              if (value == 'invite') {
-                                                showDialog<String>(
-                                                    context: context,
-                                                    builder: (BuildContext context) => GroupInvite(inviteeId: searchResults[index]["Id"], userId: Auth().currentUser(),)
-                                                );
-
-                                              } else if (value == 'remove') {
-                                                showDialog<String>(
-                                                    context: context,
-                                                    builder: (BuildContext context) => ConfirmDel(friendId: searchResults[index]["Id"], userId: Auth().currentUser(),)
-                                                );
-                                              }
-                                            },
-                                            icon: const Icon(Icons.more_vert),
-                                          ),
                                         ],
                                       ),
                                     ),
                                   ),
                                 ),
-                              );
+                              ));
 
                             },
                           ),
@@ -868,70 +845,72 @@ class _FriendsState extends State<Friends> {
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: outgoingFriendInvitesResults.length,
                               itemBuilder: (context, index) {
-                                return Slidable(
-                                  endActionPane: ActionPane(
-                                    motion: const ScrollMotion(),
-                                    children: [
-                                      SlidableAction(
-                                        onPressed: (context) async {
-                                          await removeOutFriendInvite(outgoingFriendInvitesResults[index]['Id'], Auth().currentUser(),);
-                                          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
-                                        },
-                                        backgroundColor: Colors.redAccent,
-                                        icon: LineAwesomeIcons.remove_user,
-                                        label: 'cancel_invite'.tr,
-                                      ),
-                                    ],
-                                  ),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      showDialog<String>(
-                                        context: context,
-                                        builder: (BuildContext context) => CustomDialog(id: outgoingFriendInvitesResults[index]["Id"], foreName: outgoingFriendInvitesResults[index]["ForeName"], age: outgoingFriendInvitesResults[index]["Age"], uni: outgoingFriendInvitesResults[index]["Uni"], preferences: outgoingFriendInvitesResults[index]["Preferences"], images: outgoingFriendInvitesResults[index]["Images"], bio: outgoingFriendInvitesResults[index]["Bio"], subject: outgoingFriendInvitesResults[index]["Subject"], yearOfStudy: outgoingFriendInvitesResults[index]["YearOfStudy"],)
-                                      );
-                                      },
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
-                                        decoration: BoxDecoration(
-                                          border: Border(
-                                            bottom: BorderSide(
-                                              color: Colors.grey[300]!,
-                                            ),
-                                          ),
+                                return ClipRect(
+                                  child: Slidable(
+                                    endActionPane: ActionPane(
+                                      motion: const ScrollMotion(),
+                                      children: [
+                                        SlidableAction(
+                                          onPressed: (context) async {
+                                            await removeOutFriendInvite(outgoingFriendInvitesResults[index]['Id'], Auth().currentUser(),);
+                                            Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
+                                          },
+                                          backgroundColor: Colors.redAccent,
+                                          icon: LineAwesomeIcons.remove_user,
+                                          label: 'cancel_invite'.tr,
                                         ),
-                                        child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 40,
-                                            height: 40,
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(100),
-                                              child: Image.asset(outgoingFriendInvitesResults[index]["Images"][0]),
+                                      ],
+                                    ),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        showDialog<String>(
+                                          context: context,
+                                          builder: (BuildContext context) => CustomDialog(id: outgoingFriendInvitesResults[index]["Id"], foreName: outgoingFriendInvitesResults[index]["ForeName"], age: outgoingFriendInvitesResults[index]["Age"], uni: outgoingFriendInvitesResults[index]["Uni"], preferences: outgoingFriendInvitesResults[index]["Preferences"], images: outgoingFriendInvitesResults[index]["Images"], bio: outgoingFriendInvitesResults[index]["Bio"], subject: outgoingFriendInvitesResults[index]["Subject"], yearOfStudy: outgoingFriendInvitesResults[index]["YearOfStudy"],)
+                                        );
+                                        },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              bottom: BorderSide(
+                                                color: Colors.grey[300]!,
+                                              ),
                                             ),
                                           ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "${outgoingFriendInvitesResults[index]['ForeName']} ${outgoingFriendInvitesResults[index]['SurName']}",
-                                                  style: Theme.of(context).textTheme.headlineSmall,
-                                                ),
-                                                Text(
-                                                  outgoingFriendInvitesResults[index]["Id"],
-                                                  style: Theme.of(context).textTheme.bodySmall,
-                                                ),
-                                              ],
+                                          child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 40,
+                                              height: 40,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(100),
+                                                child: Image.asset(outgoingFriendInvitesResults[index]["Images"][0]),
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "${outgoingFriendInvitesResults[index]['ForeName']} ${outgoingFriendInvitesResults[index]['SurName']}",
+                                                    style: Theme.of(context).textTheme.headlineSmall,
+                                                  ),
+                                                  Text(
+                                                    outgoingFriendInvitesResults[index]["Id"],
+                                                    style: Theme.of(context).textTheme.bodySmall,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
                               ),
+                                  ),
                                 );
                             },
                           ),
@@ -960,98 +939,100 @@ class _FriendsState extends State<Friends> {
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: shortListResults.length,
                               itemBuilder: (context, index) {
-                                return Slidable(
-                                  endActionPane: ActionPane(
-                                    motion: const ScrollMotion(),
-                                    children: [
-                                      SlidableAction(
-                                        onPressed: (context) {
-                                          showDialog<String>(
-                                            context: context,
-                                            builder: (BuildContext context) => GroupExpand(
-                                              id: shortListResults[index]["Id"],
-                                              groupName: shortListResults[index]["GroupName"],
-                                              groupPicture: shortListResults[index]["GroupPicture"],
-                                              members: shortListResults[index]["Members"].cast<String>().toList(),
-                                              avgCleanliness: shortListResults[index]["AvgCleanliness"],
-                                              avgNoisiness: shortListResults[index]["AvgNoisiness"],
-                                              avgNightLife: shortListResults[index]["AvgNightLife"],
-                                              avgBedTime: shortListResults[index]["AvgBedTime"],
-                                              avgYearOfStudy: shortListResults[index]["AvgYearOfStudy"],
-
-                                            ),
-                                          );
-                                        },
-                                        backgroundColor: LAppTheme.lightTheme.primaryColor,
-                                        foregroundColor: Colors.white,
-                                        icon: LineAwesomeIcons.search,
-                                        label: 'preview'.tr,
-                                      ),
-                                      SlidableAction(
-                                        onPressed: (context) {
-                                          showDialog<String>(
+                                return ClipRect(
+                                  child: Slidable(
+                                    endActionPane: ActionPane(
+                                      motion: const ScrollMotion(),
+                                      children: [
+                                        SlidableAction(
+                                          onPressed: (context) {
+                                            showDialog<String>(
                                               context: context,
-                                              builder: (BuildContext context) => ConfirmGroupDel(groupId: shortListResults[index]["Id"], groupType: "ShortList", userId: Auth().currentUser(),)
-                                          );
-                                        },
-                                        backgroundColor: Colors.redAccent,
-                                        icon: LineAwesomeIcons.alternate_trash,
-                                        label: 'remove'.tr,
-                                      ),
-                                    ],
-                                  ),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      showDialog<String>(
-                                        context: context,
-                                        builder: (BuildContext context) => GroupExpand(
-                                          id: shortListResults[index]["Id"],
-                                          groupName: shortListResults[index]["GroupName"],
-                                          groupPicture: shortListResults[index]["GroupPicture"],
-                                          members: shortListResults[index]["Members"].cast<String>().toList(),
-                                          avgCleanliness: shortListResults[index]["AvgCleanliness"],
-                                          avgNoisiness: shortListResults[index]["AvgNoisiness"],
-                                          avgNightLife: shortListResults[index]["AvgNightLife"],
-                                          avgBedTime: shortListResults[index]["AvgBedTime"],
-                                          avgYearOfStudy: shortListResults[index]["AvgYearOfStudy"],
+                                              builder: (BuildContext context) => GroupExpand(
+                                                id: shortListResults[index]["Id"],
+                                                groupName: shortListResults[index]["GroupName"],
+                                                groupPicture: shortListResults[index]["GroupPicture"],
+                                                members: shortListResults[index]["Members"].cast<String>().toList(),
+                                                avgCleanliness: shortListResults[index]["AvgCleanliness"],
+                                                avgNoisiness: shortListResults[index]["AvgNoisiness"],
+                                                avgNightLife: shortListResults[index]["AvgNightLife"],
+                                                avgBedTime: shortListResults[index]["AvgBedTime"],
+                                                avgYearOfStudy: shortListResults[index]["AvgYearOfStudy"],
 
+                                              ),
+                                            );
+                                          },
+                                          backgroundColor: LAppTheme.lightTheme.primaryColor,
+                                          foregroundColor: Colors.white,
+                                          icon: LineAwesomeIcons.search,
+                                          label: 'preview'.tr,
                                         ),
-                                      );
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Container(
-                                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
-                                        decoration: BoxDecoration(
-                                          border: Border(
-                                            bottom: BorderSide(
-                                              color: Colors.grey[300]!,
+                                        SlidableAction(
+                                          onPressed: (context) {
+                                            showDialog<String>(
+                                                context: context,
+                                                builder: (BuildContext context) => ConfirmGroupDel(groupId: shortListResults[index]["Id"], groupType: "ShortList", userId: Auth().currentUser(),)
+                                            );
+                                          },
+                                          backgroundColor: Colors.redAccent,
+                                          icon: LineAwesomeIcons.alternate_trash,
+                                          label: 'remove'.tr,
+                                        ),
+                                      ],
+                                    ),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        showDialog<String>(
+                                          context: context,
+                                          builder: (BuildContext context) => GroupExpand(
+                                            id: shortListResults[index]["Id"],
+                                            groupName: shortListResults[index]["GroupName"],
+                                            groupPicture: shortListResults[index]["GroupPicture"],
+                                            members: shortListResults[index]["Members"].cast<String>().toList(),
+                                            avgCleanliness: shortListResults[index]["AvgCleanliness"],
+                                            avgNoisiness: shortListResults[index]["AvgNoisiness"],
+                                            avgNightLife: shortListResults[index]["AvgNightLife"],
+                                            avgBedTime: shortListResults[index]["AvgBedTime"],
+                                            avgYearOfStudy: shortListResults[index]["AvgYearOfStudy"],
+
+                                          ),
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                          decoration: BoxDecoration(
+                                            border: Border(
+                                              bottom: BorderSide(
+                                                color: Colors.grey[300]!,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            SizedBox(
-                                              width: 40,
-                                              height: 40,
-                                              child: ClipRRect(
-                                                borderRadius: BorderRadius.circular(100),
-                                                child: Image.asset(shortListResults[index]["GroupPicture"]),
+                                          child: Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 40,
+                                                height: 40,
+                                                child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(100),
+                                                  child: Image.asset(shortListResults[index]["GroupPicture"]),
+                                                ),
                                               ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    shortListResults[index]["GroupName"],
-                                                    style: Theme.of(context).textTheme.headlineSmall,
-                                                  ),
-                                                ],
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      shortListResults[index]["GroupName"],
+                                                      style: Theme.of(context).textTheme.headlineSmall,
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -1087,7 +1068,7 @@ class _FriendsState extends State<Friends> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: groupSearchResults.length,
                             itemBuilder: (context, index) {
-                              return Slidable(
+                              return ClipRect(child: Slidable(
                                 endActionPane: ActionPane(
                                   motion: const ScrollMotion(),
                                   children: [
@@ -1167,7 +1148,7 @@ class _FriendsState extends State<Friends> {
                                   ),
                                 ),
                               ),
-                              );
+                              ));
                             },
                           ),
                         ],
@@ -1195,71 +1176,73 @@ class _FriendsState extends State<Friends> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: friendSearchResults.length,
                             itemBuilder: (context, index) {
-                              return Slidable(
-                                endActionPane: ActionPane(
-                                  motion: const ScrollMotion(),
-                                  children: [
-                                    SlidableAction(
-                                      onPressed: (context) async {
-                                          await addFriend(friendSearchResults[index]["Id"], Auth().currentUser(),);
+                              return ClipRect(
+                                child: Slidable(
+                                  endActionPane: ActionPane(
+                                    motion: const ScrollMotion(),
+                                    children: [
+                                      SlidableAction(
+                                        onPressed: (context) async {
+                                            await addFriend(friendSearchResults[index]["Id"], Auth().currentUser(),);
+                                            Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
+                                        },
+                                        backgroundColor: Colors.lightGreen,
+                                        icon: LineAwesomeIcons.user_plus,
+                                        label: 'accept_friend'.tr,
+                                      ),
+                                      SlidableAction(
+                                        onPressed: (context) async {
+                                          await removeFriendInvite(friendSearchResults[index]["Id"], Auth().currentUser(),);
                                           Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
-                                      },
-                                      backgroundColor: Colors.lightGreen,
-                                      icon: LineAwesomeIcons.user_plus,
-                                      label: 'accept_friend'.tr,
-                                    ),
-                                    SlidableAction(
-                                      onPressed: (context) async {
-                                        await removeFriendInvite(friendSearchResults[index]["Id"], Auth().currentUser(),);
-                                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
-                                      },
-                                      backgroundColor: Colors.redAccent,
-                                      icon: LineAwesomeIcons.user_minus,
-                                      label: 'reject_friend'.tr,
-                                    ),
-                                  ],
-                                ),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    showDialog<String>(
-                                        context: context,
-                                        builder: (BuildContext context) => CustomDialog(id: friendSearchResults[index]["Id"], foreName: friendSearchResults[index]["ForeName"], age: friendSearchResults[index]["Age"], uni: friendSearchResults[index]["Uni"], preferences: friendSearchResults[index]["Preferences"], images: friendSearchResults[index]["Images"], bio: friendSearchResults[index]["Bio"], subject: friendSearchResults[index]["Subject"], yearOfStudy: friendSearchResults[index]["YearOfStudy"])
-                                    );
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                      padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
-                                      decoration: BoxDecoration(
-                                        border: Border(
-                                          bottom: BorderSide(
-                                            color: Colors.grey[300]!,
+                                        },
+                                        backgroundColor: Colors.redAccent,
+                                        icon: LineAwesomeIcons.user_minus,
+                                        label: 'reject_friend'.tr,
+                                      ),
+                                    ],
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      showDialog<String>(
+                                          context: context,
+                                          builder: (BuildContext context) => CustomDialog(id: friendSearchResults[index]["Id"], foreName: friendSearchResults[index]["ForeName"], age: friendSearchResults[index]["Age"], uni: friendSearchResults[index]["Uni"], preferences: friendSearchResults[index]["Preferences"], images: friendSearchResults[index]["Images"], bio: friendSearchResults[index]["Bio"], subject: friendSearchResults[index]["Subject"], yearOfStudy: friendSearchResults[index]["YearOfStudy"])
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 15),
+                                        decoration: BoxDecoration(
+                                          border: Border(
+                                            bottom: BorderSide(
+                                              color: Colors.grey[300]!,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 40,
-                                            height: 40,
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(100),
-                                              child: Image.asset(friendSearchResults[index]["Images"][0]),
+                                        child: Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 40,
+                                              height: 40,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(100),
+                                                child: Image.asset(friendSearchResults[index]["Images"][0]),
+                                              ),
                                             ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "${friendSearchResults[index]['ForeName']} ${friendSearchResults[index]['SurName']}",
-                                                  style: Theme.of(context).textTheme.headlineSmall,
-                                                ),
-                                              ],
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "${friendSearchResults[index]['ForeName']} ${friendSearchResults[index]['SurName']}",
+                                                    style: Theme.of(context).textTheme.headlineSmall,
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -1390,15 +1373,15 @@ class _FriendsState extends State<Friends> {
             onItemSelected: (route) {
               switch (route){
                 case '/Scroller':
-                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.leftToRightJoined, child: const Scroller(),childCurrent: widget, duration: const Duration(milliseconds: 400)));
+                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.leftToRightJoined, child: const Scroller(),childCurrent: widget, duration: const Duration(milliseconds: 200)));
                   break;
 
                 case '/Friends':
-                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
+                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 200)));
                   break;
 
                 case '/Profile':
-                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeftJoined, child: const Profile(), childCurrent: widget, duration: const Duration(milliseconds: 400)));
+                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeftJoined, child: const Profile(), childCurrent: widget, duration: const Duration(milliseconds: 200)));
               }
               navigator.pushReplacementNamed(route);
             },

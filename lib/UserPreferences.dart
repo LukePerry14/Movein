@@ -33,7 +33,7 @@ class UserPreferences {
   static Future setForeName(String foreName)  async =>
       await _preferences.setString(_keyForeName, foreName);
 
-  static String getForeName() => _preferences.getString(_keyForeName) ?? "error";
+  static String getForeName() => _preferences.getString(_keyForeName) ?? "NotLoggedInError";
 
   static Future setBrightness(bool brightness) async =>
       await _preferences.setBool(_keyBrightness, brightness);

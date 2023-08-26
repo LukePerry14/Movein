@@ -3,6 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
 import 'package:movein/Pages/Sendbird.dart';
 import 'package:movein/UserPreferences.dart';
+import 'package:page_transition/page_transition.dart';
+
+import '../Pages/Friends.dart';
 
 
 Future<void> updateGroupName(String newName, String groupId) async {
@@ -272,7 +275,7 @@ class ConfirmLeave extends StatelessWidget {
                       onPressed: () {
                         ConnectSendbird().leaveChannel(userId, groupId);
                         removeFromGroupAndUser(groupId, userId).then((_) {
-                          Navigator.of(context).pushReplacementNamed('/Friends');
+                          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
                         });
                       },
                       child: Text("Confirm", style: Theme.of(context).textTheme.bodyMedium)

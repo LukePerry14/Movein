@@ -318,15 +318,15 @@ class _ProfilePage extends State<Profile> {
                   onItemSelected: (route) {
                     switch (route){
                       case '/Scroller':
-                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.leftToRightJoined, child: const Scroller(), childCurrent: widget, duration: const Duration(milliseconds: 400)));
+                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.leftToRightJoined, child: const Scroller(), childCurrent: widget, duration: const Duration(milliseconds: 200)));
                         break;
 
                       case '/Friends':
-                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.leftToRightJoined, child: const Friends(), childCurrent: widget, duration: const Duration(milliseconds: 400)));
+                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.leftToRightJoined, child: const Friends(), childCurrent: widget, duration: const Duration(milliseconds: 200)));
                         break;
 
                       case '/Profile':
-                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Profile(), duration: const Duration(milliseconds: 400)));
+                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Profile(), duration: const Duration(milliseconds: 200)));
                     }
                     navigator.pushReplacementNamed(route);
                   },

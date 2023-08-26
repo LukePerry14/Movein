@@ -43,7 +43,7 @@ class _ScrollerState extends State<Scroller> {
   List<Map<String, dynamic>> groupData = [];
   final CountdownController _timerController = CountdownController();
   final double _adAspectRatioMedium = (370.0 / 355.0);
-  late Widget _groupDisplay;
+  Widget _groupDisplay = const CircularProgressIndicator();
 
   Widget nextGroup(){
     return Gscroller(
@@ -62,6 +62,9 @@ class _ScrollerState extends State<Scroller> {
       ['AvgNightLife'],
       showFriend: true,
     );
+  }
+  Widget initial(){
+    return SizedBox(width: MediaQuery.of(context).size.width, height: MediaQuery.of(context).size.width, child : const CircularProgressIndicator());
   }
 
   void getGroups() async {
@@ -123,7 +126,6 @@ class _ScrollerState extends State<Scroller> {
   Widget build(BuildContext context) {
     return Builder(
       builder: (context) {
-        //_fadeIn();
         final navigator = Navigator.of(context);
         bool loadAd = ((_adCountdown == 0) & _isAdLoaded);
         if (loadAd) {
@@ -136,318 +138,319 @@ class _ScrollerState extends State<Scroller> {
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
           body: (!_loadApp & !_showApp)
               ? Center(
-                  child: SizedBox(
-                    width: MediaQuery.of(context)
-                        .size
-                        .width * 0.8, // Adjust the width to control the size
-                    height: MediaQuery.of(context)
-                        .size
-                        .width * 0.8, // Adjust the height to control the size
-                    child: const CircularProgressIndicator(),
-                  ),
-                )
+            child: SizedBox(
+              width: MediaQuery.of(context)
+                  .size
+                  .width * 0.8, // Adjust the width to control the size
+              height: MediaQuery.of(context)
+                  .size
+                  .width * 0.8, // Adjust the height to control the size
+              child: const CircularProgressIndicator(),
+            ),
+          )
               : Stack(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: (groupData.isEmpty)
+                    ? const NoGroups()
+                    : loadAd
+                    ? Stack(
                   children: [
-                    Container(
-                      alignment: Alignment.center,
-                      child: (groupData.isEmpty)
-                          ? const NoGroups()
-                          : loadAd
-                              ? Stack(
-                                  children: [
-                                    SizedBox(
-                                        height:
-                                            MediaQuery.of(context).size.width,
-                                        width:
-                                            MediaQuery.of(context).size.height *
-                                                _adAspectRatioMedium),
-                                    if (_isAdLoaded)
-                                      SizedBox(
-                                          height:
-                                              MediaQuery.of(context).size.width,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              _adAspectRatioMedium,
-                                          child: AdWidget(ad: _ad)),
-                                  ],
-                                )
-                              : AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 400),
-                        switchInCurve: Curves.easeInSine,
-                        switchOutCurve: Curves.easeOutSine,
-                          transitionBuilder: (widget, animation) {
-                            if (widget.key == ValueKey(index)) {
-                              return SlideTransition(
-                                position: Tween<Offset>(
-                                  begin: const Offset(1, 0),
-                                  end: Offset.zero,
-                                ).animate(animation),
-                                child: widget,
-                              );
-                            } else {
-                              return SlideTransition(
-                                position: Tween<Offset>(
-                                  begin: const Offset(-1, 0),
-                                  end: Offset.zero,
-                                ).animate(animation),
-                                child: widget,
-                              );
-                            }
-                          },
-
-                                child: _groupDisplay
-                              ),
-                    ),
-                    Align(
-                        alignment: Alignment.topRight,
-                        child: Padding(
-                            padding: const EdgeInsets.all(15),
-                            child: IconButton(
-                              splashRadius: 35,
-                              icon: Icon(
-                                LineAwesomeIcons.horizontal_sliders,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(
-                                            20)), // Rounded top corners
-                                  ),
-                                  builder: (BuildContext context) {
-                                    return const FiltersScreen(); // Using the extracted widget here
-                                  },
-                                );
-                              },
-                            ))),
+                    SizedBox(
+                        height:
+                        MediaQuery.of(context).size.width,
+                        width:
+                        MediaQuery.of(context).size.height *
+                            _adAspectRatioMedium),
+                    if (_isAdLoaded)
+                      SizedBox(
+                          height:
+                          MediaQuery.of(context).size.width,
+                          width: MediaQuery.of(context)
+                              .size
+                              .height *
+                              _adAspectRatioMedium,
+                          child: AdWidget(ad: _ad)),
                   ],
+                )
+                    : AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 400),
+                    switchInCurve: Curves.easeInSine,
+                    switchOutCurve: Curves.easeOutSine,
+                    transitionBuilder: (widget, animation) {
+                      if (widget.key == ValueKey(index)) {
+                        return SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(1, 0),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: widget,
+                        );
+                      } else {
+                        return SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(-1, 0),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: widget,
+                        );
+                      }
+                    },
+
+                    child: Center(child: SizedBox(height: MediaQuery.of(context).size.height, width: MediaQuery.of(context).size.width, child: SingleChildScrollView(child: _groupDisplay)))
                 ),
+              ),
+              Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: IconButton(
+                        splashRadius: 35,
+                        icon: Icon(
+                          LineAwesomeIcons.horizontal_sliders,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(
+                                      20)), // Rounded top corners
+                            ),
+                            builder: (BuildContext context) {
+                              return const FiltersScreen(); // Using the extracted widget here
+                            },
+                          );
+                        },
+                      ))),
+            ],
+          ),
           floatingActionButton: Visibility(
             visible: groupData.isNotEmpty,
             child: loadAd
                 ? FloatingActionButton(
-                    heroTag: "Skip",
-                    backgroundColor: _isButtonEnabled
-                        ? LAppTheme.lightTheme.primaryColor.withOpacity(0.5)
-                        : Colors.grey.withOpacity(0.5),
-                    onPressed: _isButtonEnabled
-                        ? () {
-                            _loadAd();
-                            _adCountdown = 2;
-                            setState(() {
-                              _showApp = false;
-                            });
-                          }
-                        : null,
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 9),
-                        const Icon(LineAwesomeIcons.angle_right,
-                            color: Colors.white),
-                        Countdown(
-                          controller: _timerController,
-                          seconds: 4,
-                          build: (_, double time) => Text(time.toString(),
-                              style: GoogleFonts.redHatDisplay(
-                                  color: Colors.white, fontSize: 8)),
-                          interval: const Duration(milliseconds: 100),
-                          onFinished: () {
-                            setState(() {
-                              _isButtonEnabled = true;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      FloatingActionButton(
-                        heroTag: "Block",
-                        backgroundColor:
-                        LAppTheme.lightTheme.primaryColor.withOpacity(0.5),
-                        onPressed: () {
-                          if (!loadAd & (_adCountdown != 0)) {
-                            _adCountdown--;
-                          }
-                          addToBlacklist(groupData[index]['Id'], true).then((_) {
-                            if (index < groupData.length - 1) {
-                              index++;
-                              setState(() {
-                                _groupDisplay = nextGroup();
-                                _showApp = false;
-                              });
-                            } else {
-                              setState(() {
-                                groupData = [];
-                              });
-                            }
-                          }).catchError((e) {
-                            throw FirebaseException(
-                              message: 'Error calling addToBlacklist: $e',
-                              plugin: 'cloud_firestore',
-                            );
-                          });
-                        },
-                        child: Column(children: [
-                          const SizedBox(height: 9),
-                          const Icon(LineAwesomeIcons.times,
-                              color: Colors.white),
-                          Text(
-                            "block".tr,
-                            style: GoogleFonts.redHatDisplay(
-                                color: Colors.white, fontSize: 8),
-                          )
-                        ]),
-                      ),
-                      FloatingActionButton(
-                        heroTag: "Next",
-                        backgroundColor:
-                        LAppTheme.lightTheme.primaryColor.withOpacity(0.5),
-                        onPressed: () {
-                          if (!loadAd & (_adCountdown != 0)) {
-                            _adCountdown--;
-                          }
-                          if (index < groupData.length - 1) {
-                            index++;
-                            setState(() {
-                              _groupDisplay = nextGroup();
-                              _showApp = false;
-                            });
-                          } else {
-                            setState(() {
-                              groupData = [];
-                            });
-                          }
-                        },
-                        child: Column(children: [
-                          const SizedBox(height: 9),
-                          const Icon(LineAwesomeIcons.angle_right,
-                              color: Colors.white),
-                          Text(
-                            "next".tr,
-                            style: GoogleFonts.redHatDisplay(
-                                color: Colors.white, fontSize: 8),
-                          )
-                        ]),
-                      ),
-                      FloatingActionButton(
-                        heroTag: "Shortlist",
-                        backgroundColor:
-                        LAppTheme.lightTheme.primaryColor.withOpacity(0.5),
-                        onPressed: () {
-                          if (!loadAd & (_adCountdown != 0)) {
-                            _adCountdown--;
-                          }
-                          addToShortList(groupData[index]['Id']).then((_) {
-                            if (index < groupData.length - 1) {
-                              index++;
-                              setState(() {
-                                _groupDisplay = nextGroup();
-                                _showApp = false;
-                              });
-                            } else {
-                              setState(() {
-                                groupData = [];
-                              });
-                            }
-                          }).catchError((e) {
-                            throw FirebaseException(
-                              message: 'Error calling addToShortlist: $e',
-                              plugin: 'cloud_firestore',
-                            );
-                          });
-                        },
-                        child: Column(children: [
-                          const SizedBox(height: 9),
-                          const Icon(LineAwesomeIcons.archive,
-                              color: Colors.white),
-                          Text(
-                            "sList".tr,
-                            style: GoogleFonts.redHatDisplay(
-                                color: Colors.white, fontSize: 8),
-                          )
-                        ]),
-                      ),
-                      FloatingActionButton(
-                        heroTag: "Apply",
-                        backgroundColor:
-                        LAppTheme.lightTheme.primaryColor.withOpacity(0.5),
-                        onPressed: () {
-                          if (!loadAd & (_adCountdown != 0)) {
-                            _adCountdown--;
-                          }
-                          addToApplicants(groupData[index]['Id']).then((result) {
-                            if(result == true){
-                            if (index < groupData.length - 1) {
-                              index++;
-                              setState(() {
-                                _groupDisplay = nextGroup();
-                                _showApp = false;
-                              });
-                            } else {
-                              setState(() {
-                                groupData = [];
-                              });
-                            }
-                          }else{
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text('max_groups_title'.tr, style: Theme.of(context).textTheme.bodyMedium,),
-                                    content: Text('max_groups_desc'.tr, style: Theme.of(context).textTheme.bodySmall),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context); // Close the dialog
-                                        },
-                                        child: Text('ok'.tr, style: GoogleFonts.redHatDisplay(color: LAppTheme.lightTheme.primaryColor, fontSize: 16.5)),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            }
-                          }).catchError((e) {
-                            throw FirebaseException(
-                              message: 'Error calling addToApplicants: $e',
-                              plugin: 'cloud_firestore',
-                            );
-                          });
-                        },
-                        child: Column(children: [
-                          const SizedBox(height: 9),
-                          const Icon(LineAwesomeIcons.check,
-                              color: Colors.white),
-                          Text(
-                            "apply".tr,
-                            style: GoogleFonts.redHatDisplay(
-                                color: Colors.white, fontSize: 8),
-                          )
-                        ]),
-                      ),
-                    ],
+              heroTag: "Skip",
+              backgroundColor: _isButtonEnabled
+                  ? LAppTheme.lightTheme.primaryColor.withOpacity(0.5)
+                  : Colors.grey.withOpacity(0.5),
+              onPressed: _isButtonEnabled
+                  ? () {
+                _loadAd();
+                _adCountdown = 2;
+                setState(() {
+                  _showApp = false;
+                });
+              }
+                  : null,
+              child: Column(
+                children: [
+                  const SizedBox(height: 9),
+                  const Icon(LineAwesomeIcons.angle_right,
+                      color: Colors.white),
+                  Countdown(
+                    controller: _timerController,
+                    seconds: 4,
+                    build: (_, double time) => Text(time.toString(),
+                        style: GoogleFonts.redHatDisplay(
+                            color: Colors.white, fontSize: 8)),
+                    interval: const Duration(milliseconds: 100),
+                    onFinished: () {
+                      setState(() {
+                        _isButtonEnabled = true;
+                      });
+                    },
                   ),
+                ],
+              ),
+            )
+                : Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                FloatingActionButton(
+                  heroTag: "Block",
+                  backgroundColor:
+                  LAppTheme.lightTheme.primaryColor.withOpacity(0.5),
+                  onPressed: () {
+                    if (!loadAd & (_adCountdown != 0)) {
+                      _adCountdown--;
+                    }
+                    addToBlacklist(groupData[index]['Id'], true).then((_) {
+                      if (index < groupData.length - 1) {
+                        index++;
+                        setState(() {
+                          _groupDisplay = nextGroup();
+                          _showApp = false;
+                        });
+                      } else {
+                        setState(() {
+                          groupData = [];
+                        });
+                      }
+                    }).catchError((e) {
+                      throw FirebaseException(
+                        message: 'Error calling addToBlacklist: $e',
+                        plugin: 'cloud_firestore',
+                      );
+                    });
+                  },
+                  child: Column(children: [
+                    const SizedBox(height: 9),
+                    const Icon(LineAwesomeIcons.times,
+                        color: Colors.white),
+                    Text(
+                      "block".tr,
+                      style: GoogleFonts.redHatDisplay(
+                          color: Colors.white, fontSize: 8),
+                    )
+                  ]),
+                ),
+                FloatingActionButton(
+                  heroTag: "Next",
+                  backgroundColor:
+                  LAppTheme.lightTheme.primaryColor.withOpacity(0.5),
+                  onPressed: () {
+                    if (!loadAd & (_adCountdown != 0)) {
+                      _adCountdown--;
+                    }
+                    if (index < groupData.length - 1) {
+                      index++;
+                      setState(() {
+                        _groupDisplay = nextGroup();
+                        _showApp = false;
+                      });
+                    } else {
+                      setState(() {
+                        groupData = [];
+                      });
+                    }
+                  },
+                  child: Column(children: [
+                    const SizedBox(height: 9),
+                    const Icon(LineAwesomeIcons.angle_right,
+                        color: Colors.white),
+                    Text(
+                      "next".tr,
+                      style: GoogleFonts.redHatDisplay(
+                          color: Colors.white, fontSize: 8),
+                    )
+                  ]),
+                ),
+                FloatingActionButton(
+                  heroTag: "Shortlist",
+                  backgroundColor:
+                  LAppTheme.lightTheme.primaryColor.withOpacity(0.5),
+                  onPressed: () {
+                    if (!loadAd & (_adCountdown != 0)) {
+                      _adCountdown--;
+                    }
+                    addToShortList(groupData[index]['Id']).then((_) {
+                      if (index < groupData.length - 1) {
+                        index++;
+                        setState(() {
+                          _groupDisplay = nextGroup();
+                          _showApp = false;
+                        });
+                      } else {
+                        setState(() {
+                          groupData = [];
+                        });
+                      }
+                    }).catchError((e) {
+                      throw FirebaseException(
+                        message: 'Error calling addToShortlist: $e',
+                        plugin: 'cloud_firestore',
+                      );
+                    });
+                  },
+                  child: Column(children: [
+                    const SizedBox(height: 9),
+                    const Icon(LineAwesomeIcons.archive,
+                        color: Colors.white),
+                    Text(
+                      "sList".tr,
+                      style: GoogleFonts.redHatDisplay(
+                          color: Colors.white, fontSize: 8),
+                    )
+                  ]),
+                ),
+                FloatingActionButton(
+                  heroTag: "Apply",
+                  backgroundColor:
+                  LAppTheme.lightTheme.primaryColor.withOpacity(0.5),
+                  onPressed: () {
+                    if (!loadAd & (_adCountdown != 0)) {
+                      _adCountdown--;
+                    }
+                    addToApplicants(groupData[index]['Id']).then((result) {
+                      if(result == true){
+                        if (index < groupData.length - 1) {
+                          index++;
+                          setState(() {
+                            _groupDisplay = nextGroup();
+                            _showApp = false;
+                          });
+                        } else {
+                          setState(() {
+                            groupData = [];
+                          });
+                        }
+                      }else{
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('max_groups_title'.tr, style: Theme.of(context).textTheme.bodyMedium,),
+                              content: Text('max_groups_desc'.tr, style: Theme.of(context).textTheme.bodySmall),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context); // Close the dialog
+                                  },
+                                  child: Text('ok'.tr, style: GoogleFonts.redHatDisplay(color: LAppTheme.lightTheme.primaryColor, fontSize: 16.5)),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    }).catchError((e) {
+                      throw FirebaseException(
+                        message: 'Error calling addToApplicants: $e',
+                        plugin: 'cloud_firestore',
+                      );
+                    });
+                  },
+                  child: Column(children: [
+                    const SizedBox(height: 9),
+                    const Icon(LineAwesomeIcons.check,
+                        color: Colors.white),
+                    Text(
+                      "apply".tr,
+                      style: GoogleFonts.redHatDisplay(
+                          color: Colors.white, fontSize: 8),
+                    )
+                  ]),
+                ),
+              ],
+            ),
           ),
           bottomNavigationBar: CustomNavbar(
             onItemSelected: (route) {
               switch (route){
                 case '/Scroller':
-                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Scroller(), duration: const Duration(milliseconds: 400)));
+                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Scroller(), duration: const Duration(milliseconds: 200)));
                   break;
 
                 case '/Friends':
-                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeftJoined, child: const Friends(), childCurrent: widget, duration: const Duration(milliseconds: 400)));
+                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeftJoined, child: const Friends(), childCurrent: widget, duration: const Duration(milliseconds: 200)));
                   break;
 
                 case '/Profile':
-                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeftJoined, child: const Profile(), childCurrent: widget, duration: const Duration(milliseconds: 400)));
+                  Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.rightToLeftJoined, child: const Profile(), childCurrent: widget, duration: const Duration(milliseconds: 200)));
               }
               navigator.pushReplacementNamed(route);
             },
@@ -585,7 +588,7 @@ class NoGroups extends StatelessWidget {
             ),
             child: ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pushReplacementNamed('/Scroller');
+                Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Scroller(), duration: const Duration(milliseconds: 200)));
               },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(

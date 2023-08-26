@@ -14,7 +14,9 @@ import 'dart:io';
 //import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:movein/UserPreferences.dart';
+import 'package:page_transition/page_transition.dart';
 
+import '../Pages/Friends.dart';
 import 'GroupFunctions.dart';
 
 
@@ -214,7 +216,7 @@ class ConfirmDel extends StatelessWidget {
                   child: ElevatedButton(
                       onPressed: () {
                         removeFriend(friendId, userId).then((_){
-                          Navigator.of(context).pushReplacementNamed('/Friends');
+                          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
                         });
 
                       },
@@ -542,7 +544,7 @@ class ConfirmGroupDel extends StatelessWidget {
                   child: ElevatedButton(
                       onPressed: () {
                         removeGroupFromUser(groupType, groupId, userId).then((_){
-                          Navigator.of(context).pushReplacementNamed('/Friends');
+                          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
                         });
 
                       },
@@ -763,7 +765,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                   ? () async {
                 if (_formKey.currentState?.validate() ?? false) {
 
-                  await _submitForm(UserPreferences.getAppsMax()).then((value) => Navigator.of(context).pushReplacementNamed('/Friends'));
+                  await _submitForm(UserPreferences.getAppsMax()).then((value) => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400))));
                 }
               }
                   : null,
@@ -870,7 +872,7 @@ class _SendFriendInviteState extends State<SendFriendInvite> {
                     onPressed: _isButtonEnabled ?  () {
                       if (formKey.currentState!.validate()) {
                         final String inviteeId = _textEditingController.text;
-                        sendFriendInvite(inviteeId, widget.userId).then((value) => Navigator.of(context).pushReplacementNamed('/Friends'));
+                        sendFriendInvite(inviteeId, widget.userId).then((value) => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400))));
                       }
                     } : null,
                     child: Text("Confirm", style: Theme.of(context).textTheme.bodyMedium),
