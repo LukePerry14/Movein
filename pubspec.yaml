@@ -65,6 +65,7 @@ dependencies:
   azstore: ^1.0.3
   file: ^6.1.4
   flutter_launcher_icons: ^0.13.1
+  url_launcher: ^6.1.12
 
 flutter_native_splash:
   android: true

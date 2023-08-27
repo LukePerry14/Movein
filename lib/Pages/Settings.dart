@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../Themes/lMode.dart';
 
@@ -32,27 +33,6 @@ class _SettingsScaffoldState extends State<SettingsScaffold> {
                   Navigator.pop(context);
                 },
               ),
-              actions: [
-                PopupMenuButton(
-                  icon: Icon(LineAwesomeIcons.vertical_ellipsis, color: Theme.of(context).primaryColor,),
-                  color: Colors.grey[200],
-                  itemBuilder: (context)=>[
-                    const PopupMenuItem<int>(
-                      value: 0,
-                      child: Text('About'),
-                    ),
-                    const PopupMenuItem<int>(
-                      value: 1,
-                      child: Text('FAQs'),
-                    ),
-                    const PopupMenuItem(
-                      value: 2,
-                      child: Text('TBC'),
-                    )
-                  ],
-                  onSelected: (item)=>chosenItem(context, item),
-                )
-              ],
             ),
             body: 
               SettingsPage()
@@ -99,8 +79,9 @@ class _SettingsPageState extends State<SettingsPage> {
           //buildChangeEmail(context, 'Change Email'),
           buildChangeLanguage(context, 'language'.tr),
           buildReviewAds(context, 'premium'.tr),
-          buildAccountOption(context, 'privacy'.tr),
-          buildAccountOption(context, 't&c'.tr),
+          // buildAccountOption(context, 'privacy'.tr),
+          // buildAccountOption(context, 't&c'.tr),
+          buildAccountOption(context)
         ],
       ),
     );
@@ -109,29 +90,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
 
 // Template for making a settings button
-GestureDetector buildAccountOption(BuildContext context, String title) {
+GestureDetector buildAccountOption(BuildContext context) {
   return GestureDetector(
     onTap: () {
-      showDialog(context: context, builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: const Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Option'),
-              Text('Option')
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Close'),
-            )
-          ],
-        );
-      });
+      _launchWebsite();
     },
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
@@ -139,7 +101,7 @@ GestureDetector buildAccountOption(BuildContext context, String title) {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            title,
+            'Website',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w500,
@@ -541,5 +503,12 @@ class AdvertisementDialog extends StatelessWidget {
             ),
           ),
     );
+  }
+}
+
+_launchWebsite() async {
+  final Uri url = Uri.parse('https://moveinwebsite.azurewebsites.net');
+  if (!await launchUrl(url)) {
+    throw Exception('Could not launch $url');
   }
 }
