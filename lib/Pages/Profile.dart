@@ -18,6 +18,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
 import 'package:azstore/azstore.dart' as AzureStorage;
+import 'package:uuid/uuid.dart';
 import 'package:page_transition/page_transition.dart';
 
 import '../Auth code/auth.dart';
@@ -88,7 +89,9 @@ class _ProfilePage extends State<Profile> {
     var x = AzureStorage.AzureStorage.parse(
         'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
     try {
-      await x.putBlob('/moveinimages/userimage.jpg',
+      var uuid = Uuid();
+      String imageName = uuid.v1();
+      await x.putBlob('/moveinimages/$imageName.jpg',
           contentType: 'image/jpg', bodyBytes: bytes);
     } catch (e) {
       print('Exception: $e');
