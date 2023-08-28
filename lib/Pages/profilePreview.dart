@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:movein/Scroller Code/swipe_card.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
-
+import 'package:movein/Pages/Sendbird.dart';
+import 'package:movein/Pages/Messages.dart' as mb;
+import 'package:sendbird_sdk/sendbird_sdk.dart' ;
+import 'package:page_transition/page_transition.dart';
 class PreviewCard extends StatefulWidget {
   final String foreName;
   final ChatUser user;
@@ -110,8 +113,15 @@ class PreviewCard extends StatefulWidget {
           Positioned(
             bottom:0,
             left:0,  
-              child:IconButton(onPressed: ()
-              {
+              child:IconButton(
+                
+                onPressed: () async 
+                {
+                  final groupChannel = await ConnectSendbird().returnChannel(widget.user.id);
+                }
+
+                            
+              //{
               /*showDialog<String>(
                                         /context: context,
                                         builder: (BuildContext context) =>
@@ -131,16 +141,47 @@ class PreviewCard extends StatefulWidget {
                                             ),
                                       );*/
 
-              }
+              //}
               
-              , icon: Icon(Icons.info)),
+              , icon: Icon(Icons.info))
+              
               
             
           ),
           Positioned(
           bottom: 0,
           right: 0,
-          child:IconButton(onPressed:(){}, icon: Icon(Icons.chat)),
+          child:IconButton(
+            onPressed:
+              () async 
+                {
+                  ChatUser current = asDashChatUser(SendbirdSdk().currentUser!);
+                  final groupChannel = await ConnectSendbird().returnChannel(widget.user.id + current.id);
+                  var usersIds = [current.id,widget.user.id];
+                  usersIds.sort();
+                  Navigator.push(context, PageTransition
+                  (
+                    curve:Curves.linear,
+                    type: PageTransitionType.topToBottom,
+                    child: const mb.Messages(),
+                    settings: RouteSettings(
+                      arguments: 
+                      {
+                        'channel':groupChannel,
+                        'members': [current,widget.user],
+                        'groupId': usersIds[0] + usersIds[1],
+                        'groupName': widget.user.firstName
+                      }
+                    )
+                  )
+                  );
+
+                }
+          
+
+            
+            , 
+            icon: Icon(Icons.chat)),
           
           ), 
           
@@ -159,7 +200,16 @@ class PreviewCard extends StatefulWidget {
       
     }
 
+ ChatUser asDashChatUser(User user)
+  {
+   return ChatUser(
+    
+        firstName: user.nickname,
+        id: user.userId,
+        profileImage: user.profileUrl,
 
+   );
+  }
   }
 
 

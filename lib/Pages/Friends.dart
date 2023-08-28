@@ -1183,6 +1183,8 @@ class _FriendsState extends State<Friends> {
                                     children: [
                                       SlidableAction(
                                         onPressed: (context) async {
+                                            
+                                            ConnectSendbird().createDM([friendSearchResults[index]["Id"],Auth().currentUser()],'Chat', '');
                                             await addFriend(friendSearchResults[index]["Id"], Auth().currentUser(),);
                                             Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
                                         },

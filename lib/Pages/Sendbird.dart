@@ -58,13 +58,14 @@ Future<GroupChannel> returnChannel(String channelUrl) async
       
   }
 
-    Future<GroupChannel> createDM(List <String> userIds, String groupName, String? groupIcon, String channelURL) async
+    Future<GroupChannel> createDM(List <String> userIds, String groupName, String? groupIcon) async
   {
       try {
 
+        userIds.sort();
         final params = GroupChannelParams()
         .. userIds = userIds
-        ..channelUrl = channelURL
+        ..channelUrl = userIds[0] + userIds[1]
         ..isDistinct = true
         ..name = groupName;
         final groupChannel = await GroupChannel.createChannel(params);
