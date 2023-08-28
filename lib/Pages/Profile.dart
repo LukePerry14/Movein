@@ -91,6 +91,7 @@ class _ProfilePage extends State<Profile> {
     try {
       var uuid = Uuid();
       String imageName = uuid.v1();
+      // THIS STRING NEEDS TO BE STORED IN FIREBASE FOR THE PROFILE IMAGE ------ LUKE?
       await x.putBlob('/moveinimages/$imageName.jpg',
           contentType: 'image/jpg', bodyBytes: bytes);
     } catch (e) {
