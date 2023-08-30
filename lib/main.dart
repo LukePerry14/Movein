@@ -59,9 +59,10 @@ class App extends StatelessWidget {
               initialRoute: !loggedIn
                   ? '/Login'
                   : '/Scroller',
-              routes: {
-                '/OnBoarding': (context) => const OnBoardingPage(),
-              },
+                routes: {
+                  '/OnBoarding': (context) => const OnBoardingPage(),
+                },
+
                 onGenerateInitialRoutes: (initialRoute) {
                   if (initialRoute == '/Scroller') {
                     return [MaterialPageRoute(builder: (context) => const Scroller())];
@@ -819,14 +820,14 @@ class _SignupScreenState extends State<SignupScreen> {
                           );
 
                           if (response == 'success') {
-
+                            print("SUCESSSSS");
                             ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), data['ForeName']);
 
                             await UserPreferences.setUni(data['UniAttended']);
                             await UserPreferences.setAppsMax(2);
                             await UserPreferences.setForeName(data['ForeName']);
 
-                            Navigator.pushNamed(context, '/OnBoarding');
+                            Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const OnBoardingPage(), duration: const Duration(milliseconds: 200)));
                             return;
                           } else {
                             setState(() {

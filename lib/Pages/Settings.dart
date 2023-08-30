@@ -3,9 +3,11 @@ import 'package:get/get.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../Themes/lMode.dart';
+import 'PremiumPage.dart';
 
 class SettingsScaffold extends StatefulWidget {
   const SettingsScaffold({Key? key}) : super(key: key);
@@ -37,12 +39,6 @@ class _SettingsScaffoldState extends State<SettingsScaffold> {
             body: 
               SettingsPage()
             ,
-            bottomNavigationBar: CustomNavbar(
-              onItemSelected: (route) {
-                navigator.pushReplacementNamed(route);
-              },
-            ),
-
           );
         }
     );
@@ -77,20 +73,25 @@ class _SettingsPageState extends State<SettingsPage> {
           const SizedBox(height: 10),
           buildChangePassword(context, 'Change Password'),
           //buildChangeEmail(context, 'Change Email'),
-          buildChangeLanguage(context, 'language'.tr),
           buildReviewAds(context, 'premium'.tr),
-          // buildAccountOption(context, 'privacy'.tr),
-          // buildAccountOption(context, 't&c'.tr),
-          buildAccountOption(context)
+          //buildDeleteAccount(context, 'delete'.tr),
+          buildChangeLanguage(context, 'language'.tr),
+          buildAccountOption(context, 'p,t,c'.tr),
+          buildAccountOption(context, 'contact'.tr),
+
         ],
       ),
     );
+  }
+
+  buildDeleteAccount(BuildContext context, String title) {
+
   }
 }
 
 
 // Template for making a settings button
-GestureDetector buildAccountOption(BuildContext context) {
+GestureDetector buildAccountOption(BuildContext context, String title) {
   return GestureDetector(
     onTap: () {
       _launchWebsite();
@@ -101,7 +102,7 @@ GestureDetector buildAccountOption(BuildContext context) {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Website',
+            title,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w500,
@@ -320,7 +321,7 @@ GestureDetector buildChangeLanguage(BuildContext context, String title) {
 GestureDetector buildReviewAds(BuildContext context, String title) {
   return GestureDetector(
     onTap: () {
-      showDialog(context: context, builder: (BuildContext context) => const AdvertisementDialog());
+      Navigator.push(context,PageTransition(curve:Curves.linear,type: PageTransitionType.bottomToTop, child:const Premium()));
     },
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
@@ -474,34 +475,6 @@ class _RadioLanguageState extends State<RadioLanguage> {
           ),
         )
       ],
-    );
-  }
-}
-
-
-class AdvertisementDialog extends StatelessWidget {
-  const AdvertisementDialog({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: [
-                  const Text('Advertisements', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-                  const SizedBox(height: 20),
-                  const Text('Information about how ads work here'),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: ElevatedButton(onPressed: () => {print('Takes them to unime website to update adveritsement')}, child: const Text('Upgrade Account', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),)),
-                  )
-                ],
-              ),
-            ),
-          ),
     );
   }
 }

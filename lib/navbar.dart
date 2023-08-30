@@ -12,6 +12,7 @@ class CustomNavbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomAppBar(
       elevation: 0,
+      color: Colors.transparent,
       child: Container(
         decoration: BoxDecoration(
             borderRadius: const BorderRadius.only(topLeft: Radius.circular(42), topRight: Radius.circular(42)),

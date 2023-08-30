@@ -25,6 +25,7 @@ import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
 import '../main.dart';
 import 'Friends.dart';
+import 'PremiumPage.dart';
 import 'Scroller.dart';
 
 class Profile extends StatefulWidget {
@@ -116,222 +117,228 @@ class _ProfilePage extends State<Profile> {
               final navigator = Navigator.of(context);
               bool isDark = App.themeNotifier.value == ThemeMode.dark;
               return Scaffold(
-                body: SingleChildScrollView(
-                  child: Container(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(height:20),
-                        GestureDetector(
-                          onTap: () async {
-                            final pickedImage = await pickImage();
-                            if (pickedImage != null) {
-                              await _uploadImageToAzure(pickedImage);
-                            }
-                          },
-                          child: Container(
-                              width: 150,
-                              // Set a fixed width for the container
-                              height: 150,
-                              // Set a fixed height for the container
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
+                body: Stack(
+                  children: [
+                    SingleChildScrollView(
+                      child: SafeArea(
+                        child: Container(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(height:10),
+                              GestureDetector(
+                                onTap: () async {
+                                  final pickedImage = await pickImage();
+                                  if (pickedImage != null) {
+                                    await _uploadImageToAzure(pickedImage);
+                                  }
+                                },
+                                child: Container(
+                                    width: 150,
+                                    // Set a fixed width for the container
+                                    height: 150,
+                                    // Set a fixed height for the container
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: ButtonWidgetShareProfile(
+                                      onClicked: () {},
+                                    )),
                               ),
-                              child: ButtonWidgetShareProfile(
-                                onClicked: () {},
-                              )),
-                        ),
-                        const SizedBox(height: 20.0),
-                        Text(name,
-                            style: Theme.of(context).textTheme.headlineMedium),
-                        const SizedBox(height: 8.0),
-                        Row(mainAxisSize: MainAxisSize.min, children: [
-                          GestureDetector(
-                            onTap: () => _copyToClipboard(context),
-                            child: Container(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                Auth().currentUser(),
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () => _copyToClipboard(context),
-                            child: const Icon(Icons.copy),
-                          ),
-                        ]),
-                        const SizedBox(height: 50.0),
-                        GestureDetector(
-                          onTap: () => showDialog(
-                              builder: (BuildContext context) =>
-                                  const AdvertisementDialog(),
-                              context: context),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(42)),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: LAppTheme.lightTheme.primaryColor
-                                        .withAlpha(200),
-                                    offset: const Offset(0, 20),
-                                    blurRadius: 30,
-                                    spreadRadius: -5,
+                              const SizedBox(height: 20.0),
+                              Text(name,
+                                  style: Theme.of(context).textTheme.headlineMedium),
+                              const SizedBox(height: 8.0),
+                              Row(mainAxisSize: MainAxisSize.min, children: [
+                                GestureDetector(
+                                  onTap: () => _copyToClipboard(context),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      Auth().currentUser(),
+                                      style: Theme.of(context).textTheme.bodySmall,
+                                    ),
                                   ),
-                                ],
-                                gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      LAppTheme.lightTheme.primaryColor
-                                          .withAlpha(150),
-                                      LAppTheme.lightTheme.primaryColor
-                                          .withAlpha(200),
-                                      LAppTheme.lightTheme.primaryColor,
-                                      LAppTheme.lightTheme.primaryColor,
-                                    ],
-                                    stops: const [
-                                      0.1,
-                                      0.3,
-                                      0.9,
-                                      1.0
-                                    ])),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 15,
-                                  horizontal:
-                                      MediaQuery.of(context).size.width *
-                                          0.125),
-                              child: Text('upgrade'.tr,
-                                  style: GoogleFonts.redHatDisplay(
-                                      color: Colors.grey[100], fontSize: 16.5)),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 35.0),
-                        Divider(
-                          height: 1,
-                          color: Colors.grey.withOpacity(0.3),
-                        ),
-                        const SizedBox(height: 35.0),
-                        ListTile(
-                          leading: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: isDark
-                                      ? Colors.white70
-                                      : Theme.of(context).primaryColor,
-                                  width: 1),
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            child: Icon(LineAwesomeIcons.user,
-                                color: isDark
-                                    ? Colors.white70
-                                    : Theme.of(context).primaryColor),
-                          ),
-                          title: Text(
-                            "edit_profile".tr,
-                            style: Theme.of(context).textTheme.headlineSmall,
-                          ),
-                          trailing: Icon(LineAwesomeIcons.angle_right,
-                              color: LAppTheme.lightTheme.primaryColor),
-                          onTap: () {
-                            Navigator.push(context, PageTransition(
-                              type: PageTransitionType.rightToLeftWithFade,
-                              alignment: Alignment.topCenter,
-                              child: const ProfileInformation(),
-                              duration: const Duration(milliseconds: 400),
-                              reverseDuration: const Duration(milliseconds: 400),
-                            ),);
-                          },
-                        ),
-                        const SizedBox(height: 30.0),
-                        ListTile(
-                            leading: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: isDark
-                                        ? Colors.white70
-                                        : Theme.of(context).primaryColor,
-                                    width: 1),
-                                borderRadius: BorderRadius.circular(100),
+                                ),
+                                GestureDetector(
+                                  onTap: () => _copyToClipboard(context),
+                                  child: const Icon(Icons.copy),
+                                ),
+                              ]),
+                              const SizedBox(height: 50.0),
+                              GestureDetector(
+                                onTap: () => Navigator.push(context,PageTransition(curve:Curves.linear,type: PageTransitionType.bottomToTop, child:const Premium())),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      borderRadius:
+                                      const BorderRadius.all(Radius.circular(42)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: LAppTheme.lightTheme.primaryColor
+                                              .withAlpha(200),
+                                          offset: const Offset(0, 20),
+                                          blurRadius: 30,
+                                          spreadRadius: -5,
+                                        ),
+                                      ],
+                                      gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            LAppTheme.lightTheme.primaryColor
+                                                .withAlpha(150),
+                                            LAppTheme.lightTheme.primaryColor
+                                                .withAlpha(200),
+                                            LAppTheme.lightTheme.primaryColor,
+                                            LAppTheme.lightTheme.primaryColor,
+                                          ],
+                                          stops: const [
+                                            0.1,
+                                            0.3,
+                                            0.9,
+                                            1.0
+                                          ])),
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 15,
+                                        horizontal:
+                                        MediaQuery.of(context).size.width *
+                                            0.125),
+                                    child: Text('upgrade'.tr,
+                                        style: GoogleFonts.redHatDisplay(
+                                            color: Colors.grey[100], fontSize: 16.5)),
+                                  ),
+                                ),
                               ),
-                              child: Icon(LineAwesomeIcons.cog,
-                                  color: isDark
-                                      ? Colors.white70
-                                      : Theme.of(context).primaryColor),
-                            ),
-                            title: Text(
-                              "settings".tr,
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                            trailing: Icon(LineAwesomeIcons.angle_right,
-                                color: LAppTheme.lightTheme.primaryColor),
-                            onTap: () {
-                              Navigator.push(context, PageTransition(
-                                type: PageTransitionType.rightToLeftWithFade,
-                                alignment: Alignment.topCenter,
-                                child: const SettingsScaffold(),
-                                duration: const Duration(milliseconds: 400),
-                                reverseDuration: const Duration(milliseconds: 400),
-                              ),);
-                            }),
-                        const SizedBox(height: 30),
-                        ListTile(
-                          leading: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.red, width: 1),
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            child: const Icon(
-                                LineAwesomeIcons.alternate_sign_out,
-                                color: Colors.red),
+                              const SizedBox(height: 35.0),
+                              Divider(
+                                height: 1,
+                                color: Colors.grey.withOpacity(0.3),
+                              ),
+                              const SizedBox(height: 35.0),
+                              ListTile(
+                                leading: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: isDark
+                                            ? Colors.white70
+                                            : Theme.of(context).primaryColor,
+                                        width: 1),
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                  child: Icon(LineAwesomeIcons.user,
+                                      color: isDark
+                                          ? Colors.white70
+                                          : Theme.of(context).primaryColor),
+                                ),
+                                title: Text(
+                                  "edit_profile".tr,
+                                  style: Theme.of(context).textTheme.headlineSmall,
+                                ),
+                                trailing: Icon(LineAwesomeIcons.angle_right,
+                                    color: LAppTheme.lightTheme.primaryColor),
+                                onTap: () {
+                                  Navigator.push(context, PageTransition(
+                                    type: PageTransitionType.rightToLeftWithFade,
+                                    alignment: Alignment.topCenter,
+                                    child: const ProfileInformation(),
+                                    duration: const Duration(milliseconds: 400),
+                                    reverseDuration: const Duration(milliseconds: 400),
+                                  ),);
+                                },
+                              ),
+                              const SizedBox(height: 30.0),
+                              ListTile(
+                                  leading: Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: isDark
+                                              ? Colors.white70
+                                              : Theme.of(context).primaryColor,
+                                          width: 1),
+                                      borderRadius: BorderRadius.circular(100),
+                                    ),
+                                    child: Icon(LineAwesomeIcons.cog,
+                                        color: isDark
+                                            ? Colors.white70
+                                            : Theme.of(context).primaryColor),
+                                  ),
+                                  title: Text(
+                                    "settings".tr,
+                                    style: Theme.of(context).textTheme.headlineSmall,
+                                  ),
+                                  trailing: Icon(LineAwesomeIcons.angle_right,
+                                      color: LAppTheme.lightTheme.primaryColor),
+                                  onTap: () {
+                                    Navigator.push(context, PageTransition(
+                                      type: PageTransitionType.rightToLeftWithFade,
+                                      alignment: Alignment.topCenter,
+                                      child: const SettingsScaffold(),
+                                      duration: const Duration(milliseconds: 400),
+                                      reverseDuration: const Duration(milliseconds: 400),
+                                    ),);
+                                  }),
+                              const SizedBox(height: 30),
+                              ListTile(
+                                leading: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.red, width: 1),
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                  child: const Icon(
+                                      LineAwesomeIcons.alternate_sign_out,
+                                      color: Colors.red),
+                                ),
+                                title: Text("log_out".tr,
+                                    style: GoogleFonts.lexend(
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 20.0)),
+                                onTap: () async {
+                                  await UserPreferences.setForeName(
+                                      "NotLoggedInError");
+                                  FirebaseAuth.instance.signOut();
+                                  Navigator.pushReplacement(
+                                    context, PageTransition(
+                                    type: PageTransitionType.fade,
+                                    child: const LoginScreen(),
+                                    duration: Duration(milliseconds: 400),
+                                  ),);
+                                },
+                              ),
+                            ],
                           ),
-                          title: Text("log_out".tr,
-                              style: GoogleFonts.lexend(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 20.0)),
-                          onTap: () async {
-                            await UserPreferences.setForeName(
-                                "NotLoggedInError");
-                            FirebaseAuth.instance.signOut();
-                            Navigator.pushReplacement(
-                                context, PageTransition(
-                              type: PageTransitionType.fade,
-                              child: const LoginScreen(),
-                              duration: Duration(milliseconds: 400),
-                            ),);
-                          },
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                bottomNavigationBar: CustomNavbar(
-                  onItemSelected: (route) {
-                    switch (route){
-                      case '/Scroller':
-                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.leftToRightJoined, child: const Scroller(), childCurrent: widget, duration: const Duration(milliseconds: 200)));
-                        break;
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: CustomNavbar(
+                        onItemSelected: (route) {
+                          switch (route){
+                            case '/Scroller':
+                              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.leftToRightJoined, child: const Scroller(), childCurrent: widget, duration: const Duration(milliseconds: 200)));
+                              break;
 
-                      case '/Friends':
-                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.leftToRightJoined, child: const Friends(), childCurrent: widget, duration: const Duration(milliseconds: 200)));
-                        break;
+                            case '/Friends':
+                              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.leftToRightJoined, child: const Friends(), childCurrent: widget, duration: const Duration(milliseconds: 200)));
+                              break;
 
-                      case '/Profile':
-                        Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Profile(), duration: const Duration(milliseconds: 200)));
-                    }
-                    navigator.pushReplacementNamed(route);
-                  },
+                            case '/Profile':
+                              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Profile(), duration: const Duration(milliseconds: 200)));
+                          }
+                          navigator.pushReplacementNamed(route);
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               );
             });

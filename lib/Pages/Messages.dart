@@ -129,7 +129,7 @@ Future<void> getMessages(GroupChannel channel) async {
                 ),
               ),
               leading: IconButton(
-                icon: Icon(LineAwesomeIcons.angle_left, color: LAppTheme.lightTheme.primaryColor,),
+                icon: Icon(LineAwesomeIcons.angle_up, color: LAppTheme.lightTheme.primaryColor,),
                 color: Colors.grey[500],
                 onPressed: () {
                   Navigator.pop(context);

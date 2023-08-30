@@ -67,6 +67,7 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   url_launcher: ^6.1.12
   uuid: ^3.0.7
+  money_converter: ^2.0.2
 
 flutter_native_splash:
   android: true

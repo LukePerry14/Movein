@@ -744,6 +744,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
+  money_converter:
+    dependency: "direct main"
+    description:
+      name: money_converter
+      sha256: c99588a7e2b93004036895f4e9de282f7f371ebedc1617ab4aa7287ee0e90177
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
   nm:
     dependency: transitive
     description:

@@ -298,31 +298,31 @@ class GroupExpand extends StatelessWidget {
       ),
       backgroundColor: Theme.of(context).canvasColor,
       child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.9,
-        height: MediaQuery.of(context).size.height * 0.9,
-        //padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-        child: Stack(
-          children: [
-            SizedBox(
-              width: double.maxFinite,
-              height: MediaQuery.of(context).size.height * 0.9,
-              child: Gscroller(groupName: groupName, groupPicture: groupPicture, members: members, avgCleanliness: avgCleanliness, avgNoisiness: avgNoisiness, avgNightLife: avgNightLife, avgBedTime: avgBedTime, avgYearOfStudy: avgYearOfStudy,)
-            ),
-            Positioned(
-              top: 0,
-              right: 0,
-              child: IconButton(
-                splashRadius: 20,
-                icon: const Icon(LineAwesomeIcons.times_circle),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
+          width: MediaQuery.of(context).size.width * 0.9,
+          height: MediaQuery.of(context).size.height * 0.9,
+          //padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+          child: Stack(
+            children: [
+              SizedBox(
+                  width: double.maxFinite,
+                  height: MediaQuery.of(context).size.height * 0.9,
+                  child: SingleChildScrollView(child: Gscroller(groupName: groupName, groupPicture: groupPicture, members: members, avgCleanliness: avgCleanliness, avgNoisiness: avgNoisiness, avgNightLife: avgNightLife, avgBedTime: avgBedTime, avgYearOfStudy: avgYearOfStudy,))
+                ),
+              Positioned(
+                top: 0,
+                right: 0,
+                child: IconButton(
+                  splashRadius: 20,
+                  icon: const Icon(LineAwesomeIcons.times_circle),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
 
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
-      ),
     );
   }
 }
