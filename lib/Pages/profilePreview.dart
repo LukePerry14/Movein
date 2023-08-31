@@ -156,9 +156,10 @@ class PreviewCard extends StatefulWidget {
               () async 
                 {
                   ChatUser current = asDashChatUser(SendbirdSdk().currentUser!);
-                  final groupChannel = await ConnectSendbird().returnChannel(widget.user.id + current.id);
+                  
                   var usersIds = [current.id,widget.user.id];
                   usersIds.sort();
+                  final groupChannel = await ConnectSendbird().returnChannel(usersIds[0] + usersIds[1]);
                   Navigator.push(context, PageTransition
                   (
                     curve:Curves.linear,
