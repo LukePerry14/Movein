@@ -744,14 +744,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
-  money_converter:
-    dependency: "direct main"
+  nested:
+    dependency: transitive
     description:
-      name: money_converter
-      sha256: c99588a7e2b93004036895f4e9de282f7f371ebedc1617ab4aa7287ee0e90177
+      name: nested
+      sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2"
+    version: "1.0.0"
   nm:
     dependency: transitive
     description:
@@ -872,6 +872,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.7.3"
+  provider:
+    dependency: "direct main"
+    description:
+      name: provider
+      sha256: cdbe7530b12ecd9eb455bdaa2fcb8d4dad22e80b8afb4798b41479d5ce26847f
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.5"
   rxdart:
     dependency: transitive
     description:
@@ -884,10 +892,10 @@ packages:
     dependency: "direct main"
     description:
       name: sendbird_chat_sdk
-      sha256: "280d3d320f0b008558800788c14bbc2a5369be13046e7bf306cecdb29d08c0f8"
+      sha256: fe3c77de5382b73941e06181f41d67c88cf3d04a07dceba71a7cebe707dbf2cc
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.8"
+    version: "4.0.10"
   sendbird_sdk:
     dependency: "direct main"
     description:

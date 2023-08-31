@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:money_converter/Currency.dart';
+//import 'package:money_converter/Currency.dart';
 import 'package:movein/Themes/lMode.dart';
-import 'package:money_converter/money_converter.dart';
+//import 'package:money_converter/money_converter.dart';
 
 import '../UserPreferences.dart';
 

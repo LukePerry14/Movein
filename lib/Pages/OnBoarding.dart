@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
@@ -15,26 +16,26 @@ class OnBoardingPage extends StatelessWidget {
         child: IntroductionScreen(
           pages: [
             PageViewModel(
-              title: "Welcome to MoveIn!",
-              body: "Let's find you a house",
+              title: "welcome".tr,
+              body: "welcome-desc".tr,
               image: buildImage("assets/Pictures/ph.png"),
               decoration: getPageDecoration(context),
             ),
             PageViewModel(
-              title: "Using the group finder",
-              body: "To see the basic info about a group, simply tap on the group name.",
+              title: "page-1-title".tr,
+              body: "page-1-desc".tr,
               image: buildImage("assets/Pictures/ph.png"),
               decoration: getPageDecoration(context),
             ),
             PageViewModel(
-                title: "Looking at individuals",
-                body: "You can scroll through each group member on the main screen, and get an expanded look at their profile with a tap",
+                title: "page-2-title".tr,
+                body: "page-2-desc".tr,
                 image: buildImage("assets/Pictures/ph.png"),
                 decoration: getPageDecoration(context),
             ),
             PageViewModel(
-                title: "Interacting with the group",
-                body: "for each group you can: \n 1. Remove them from your feed \n 2. Skip to the next group \n 3. Add them to a shortlist to check out later \n 4. Apply directly to the group (to a max of 3)",
+              title: "page-3-title".tr,
+              body: "page-3-desc".tr,
                 image: buildImage("assets/Pictures/ph.png"),
                 decoration: PageDecoration(
                   pageColor: Theme.of(context).canvasColor,
@@ -43,17 +44,27 @@ class OnBoardingPage extends StatelessWidget {
                 ),
             ),
             PageViewModel(
-                title: "Simple as that",
-                body: "Happy Hunting!",
+              title: "page-4-title".tr,
+              body: "page-4-desc".tr,
+              image: buildImage("assets/Pictures/ph.png"),
+              decoration: PageDecoration(
+                pageColor: Theme.of(context).canvasColor,
+                imageFlex: 7,
+                bodyFlex: 4,
+              ),
+            ),
+            PageViewModel(
+              title: "page-5-title".tr,
+              body: "page-5-desc".tr,
                 image: buildImage("assets/Pictures/ph.png"),
                 decoration: getPageDecoration(context),
             ),
           ],
 
-          done: Text("Got it", style: Theme.of(context).textTheme.bodyMedium),
+          done: Text("got-it".tr, style: Theme.of(context).textTheme.bodyMedium),
           onDone: () => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Scroller(), duration: const Duration(milliseconds: 200))),
           showSkipButton: true,
-          skip: Text('Skip', style: Theme.of(context).textTheme.bodyMedium),
+          skip: Text('skip'.tr, style: Theme.of(context).textTheme.bodyMedium),
           onSkip: () => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Scroller(), duration: const Duration(milliseconds: 200))),
           next: const Icon(LineAwesomeIcons.arrow_right, color: Colors.black87),
           dotsDecorator: getDotDecoration(context),

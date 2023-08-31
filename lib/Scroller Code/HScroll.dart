@@ -134,7 +134,7 @@ class _GscrollerState extends State<Gscroller> {
                     alignment: Alignment.center,
                     child: Text(
                       "${"asleep".tr} $formattedTime",
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
                   const SizedBox(height: 10), // Add space between the children
@@ -142,7 +142,7 @@ class _GscrollerState extends State<Gscroller> {
                     alignment: Alignment.center,
                     child: Text(
                       "${"clean".tr}: ${widget.avgCleanliness}/5",
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
                   const SizedBox(height: 10), // Add space between the children
@@ -150,7 +150,7 @@ class _GscrollerState extends State<Gscroller> {
                     alignment: Alignment.center,
                     child: Text(
                       "${"noise".tr}: ${widget.avgNoisiness}/5",
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
                   const SizedBox(height: 10), // Add space between the children
@@ -158,7 +158,7 @@ class _GscrollerState extends State<Gscroller> {
                     alignment: Alignment.center,
                     child: Text(
                       "${"nightlife".tr}: ${widget.avgNightLife}/5",
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
                   const SizedBox(height: 10), // Add space between the children
@@ -166,7 +166,7 @@ class _GscrollerState extends State<Gscroller> {
                     alignment: Alignment.center,
                     child: Text(
                       "${"yearofstudy".tr}: ${widget.avgYearOfStudy}/7",
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
                   const SizedBox(height: 20), // Add space between the last child and the bottom of the tile

@@ -11,6 +11,7 @@ import 'package:movein/Scroller%20Code/swipe_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:movein/Pages/Scroller.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
 import '../main.dart';
@@ -338,10 +339,7 @@ class _FriendsState extends State<Friends> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    isLoading = true;
+  void reloadData(){
     fetchFriendsData().then((data) {
       setState(() {
         friends = data[0];
@@ -366,10 +364,14 @@ class _FriendsState extends State<Friends> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    isLoading = true;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Builder(
-      builder: (context) {
-        final navigator = Navigator.of(context);
+        reloadData();
         return Scaffold(
           body: Stack(
             children: [
@@ -1280,17 +1282,7 @@ class _FriendsState extends State<Friends> {
                                                 );
 
                                                 if (mounted) {
-                                                  Navigator.of(context)
-                                                      .pushReplacement(
-                                                    PageTransition(
-                                                        type: PageTransitionType
-                                                            .fade,
-                                                        child: const Friends(),
-                                                        duration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    400)),
-                                                  );
+                                                  reloadData();
                                                 }
                                               },
                                               backgroundColor: Colors.redAccent,
@@ -1693,18 +1685,7 @@ class _FriendsState extends State<Friends> {
                                                       await addToApplicants(
                                                           groupSearchResults[
                                                               index]["Id"]);
-                                                      Navigator.pushReplacement(
-                                                          context,
-                                                          PageTransition(
-                                                              type:
-                                                                  PageTransitionType
-                                                                      .fade,
-                                                              child:
-                                                                  const Friends(),
-                                                              duration:
-                                                                  const Duration(
-                                                                      milliseconds:
-                                                                          400)));
+                                                      reloadData();
                                                     },
                                                     backgroundColor:
                                                         Colors.lightGreen,
@@ -1719,18 +1700,7 @@ class _FriendsState extends State<Friends> {
                                                             index]["Id"],
                                                         Auth().currentUser(),
                                                       );
-                                                      Navigator.pushReplacement(
-                                                          context,
-                                                          PageTransition(
-                                                              type:
-                                                                  PageTransitionType
-                                                                      .fade,
-                                                              child:
-                                                                  const Friends(),
-                                                              duration:
-                                                                  const Duration(
-                                                                      milliseconds:
-                                                                          400)));
+                                                      reloadData();
                                                     },
                                                     backgroundColor:
                                                         Colors.redAccent,
@@ -1897,19 +1867,7 @@ class _FriendsState extends State<Friends> {
                                                           Auth().currentUser(),
                                                         );
                                                         if (mounted) {
-                                                          Navigator.of(context)
-                                                              .pushReplacement(
-                                                            PageTransition(
-                                                                type:
-                                                                    PageTransitionType
-                                                                        .fade,
-                                                                child:
-                                                                    const Friends(),
-                                                                duration:
-                                                                    const Duration(
-                                                                        milliseconds:
-                                                                            400)),
-                                                          );
+                                                          reloadData();
                                                         }
                                                       },
                                                       backgroundColor:
@@ -1927,16 +1885,7 @@ class _FriendsState extends State<Friends> {
                                                           Auth().currentUser(),
                                                         );
                                                         if (mounted) {
-                                                          Navigator.of(context).pushReplacement(PageTransition(
-                                                              type:
-                                                                  PageTransitionType
-                                                                      .fade,
-                                                              child:
-                                                                  const Friends(),
-                                                              duration:
-                                                                  const Duration(
-                                                                      milliseconds:
-                                                                          400)));
+                                                          reloadData();
                                                         }
                                                       },
                                                       backgroundColor:
@@ -2096,16 +2045,7 @@ class _FriendsState extends State<Friends> {
                                                               Auth()
                                                                   .currentUser(),
                                                             );
-                                                            Navigator.pushReplacement(
-                                                                context,
-                                                                PageTransition(
-                                                                    type: PageTransitionType
-                                                                        .fade,
-                                                                    child:
-                                                                        const Friends(),
-                                                                    duration: const Duration(
-                                                                        milliseconds:
-                                                                            400)));
+                                                            reloadData();
                                                           },
                                                           backgroundColor:
                                                               Colors.lightGreen,
@@ -2123,16 +2063,7 @@ class _FriendsState extends State<Friends> {
                                                               Auth()
                                                                   .currentUser(),
                                                             );
-                                                            Navigator.pushReplacement(
-                                                                context,
-                                                                PageTransition(
-                                                                    type: PageTransitionType
-                                                                        .fade,
-                                                                    child:
-                                                                        const Friends(),
-                                                                    duration: const Duration(
-                                                                        milliseconds:
-                                                                            400)));
+                                                            reloadData();
                                                           },
                                                           backgroundColor:
                                                               Colors.redAccent,
@@ -2303,15 +2234,7 @@ class _FriendsState extends State<Friends> {
                                                                         value,
                                                                         Auth()
                                                                             .currentUser());
-                                                                    Navigator.pushReplacement(
-                                                                        context,
-                                                                        PageTransition(
-                                                                            type: PageTransitionType
-                                                                                .fade,
-                                                                            child:
-                                                                                const Friends(),
-                                                                            duration:
-                                                                                const Duration(milliseconds: 400)));
+                                                                    reloadData();
                                                                   } else if (value ==
                                                                       'unblock-sList') {
                                                                     await unblock(
@@ -2321,15 +2244,7 @@ class _FriendsState extends State<Friends> {
                                                                         value,
                                                                         Auth()
                                                                             .currentUser());
-                                                                    Navigator.pushReplacement(
-                                                                        context,
-                                                                        PageTransition(
-                                                                            type: PageTransitionType
-                                                                                .fade,
-                                                                            child:
-                                                                                const Friends(),
-                                                                            duration:
-                                                                                const Duration(milliseconds: 400)));
+                                                                    reloadData();
                                                                   } else if (value ==
                                                                       'unblock-apply') {
                                                                     await unblock(
@@ -2339,15 +2254,7 @@ class _FriendsState extends State<Friends> {
                                                                         value,
                                                                         Auth()
                                                                             .currentUser());
-                                                                    Navigator.pushReplacement(
-                                                                        context,
-                                                                        PageTransition(
-                                                                            type: PageTransitionType
-                                                                                .fade,
-                                                                            child:
-                                                                                const Friends(),
-                                                                            duration:
-                                                                                const Duration(milliseconds: 400)));
+                                                                    reloadData();
                                                                   }
                                                                 },
                                                                 icon: const Icon(
@@ -2402,15 +2309,12 @@ class _FriendsState extends State<Friends> {
                                 childCurrent: widget,
                                 duration: const Duration(milliseconds: 200)));
                     }
-                    navigator.pushReplacementNamed(route);
                   },
                 ),
               ),
             ],
           ),
         );
-      },
-    );
   }
 }
 

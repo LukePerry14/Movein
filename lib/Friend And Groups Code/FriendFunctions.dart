@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:get/get.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Scroller%20Code/HScroll.dart';
@@ -120,7 +121,7 @@ class GroupInvite extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(10),
-                          child: Text("Invite to group:", style: Theme.of(context).textTheme.headlineSmall)
+                          child: Text("invite_to_group".tr, style: Theme.of(context).textTheme.headlineSmall)
                       ),
                       const Divider(),
                       Container(
@@ -198,7 +199,7 @@ class ConfirmDel extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Are you sure you want to delete friend?", style: Theme.of(context).textTheme.bodyLarge, textAlign: TextAlign.center),
+            Text("friend-del-desc".tr, style: Theme.of(context).textTheme.bodyLarge, textAlign: TextAlign.center),
             const SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -208,7 +209,7 @@ class ConfirmDel extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text("Cancel", style: Theme.of(context).textTheme.bodyMedium),
+                    child: Text("cancel".tr, style: Theme.of(context).textTheme.bodyMedium),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -220,7 +221,7 @@ class ConfirmDel extends StatelessWidget {
                         });
 
                       },
-                      child: Text("Confirm", style: Theme.of(context).textTheme.bodyMedium)
+                      child: Text("confirm".tr, style: Theme.of(context).textTheme.bodyMedium)
                   ),
                 ),
 
@@ -526,7 +527,7 @@ class ConfirmGroupDel extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("If you remove the group you can not undo this action without reapplying", style: Theme.of(context).textTheme.bodyLarge, textAlign: TextAlign.center),
+            Text("confirm-group-del".tr, style: Theme.of(context).textTheme.bodyLarge, textAlign: TextAlign.center),
             const SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -536,7 +537,7 @@ class ConfirmGroupDel extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text("Cancel", style: Theme.of(context).textTheme.bodyMedium),
+                    child: Text("cancel".tr, style: Theme.of(context).textTheme.bodyMedium),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -548,7 +549,7 @@ class ConfirmGroupDel extends StatelessWidget {
                         });
 
                       },
-                      child: Text("Confirm", style: Theme.of(context).textTheme.bodyMedium)
+                      child: Text("confirm".tr, style: Theme.of(context).textTheme.bodyMedium)
                   ),
                 ),
 
@@ -709,7 +710,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
               ),
             ),
             const SizedBox(height: 15),
-            SizedBox(width: MediaQuery.of(context).size.width,child: Text("Create Group", style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.start,),),
+            SizedBox(width: MediaQuery.of(context).size.width,child: Text('create_group'.tr, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.start,),),
             Form(
               autovalidateMode: AutovalidateMode.always,
               key: _formKey,
@@ -724,13 +725,13 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                     controller: _groupNameController,
                     maxLength: 15,
                     autocorrect: false,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       border: UnderlineInputBorder(),
-                      labelText: 'Change Groupname',
+                      labelText: 'change_groupname'.tr,
                     ),
                     validator: (value) {
                       if (value!.trim().isEmpty) {
-                        return 'Group name must exist';
+                        return 'groupname-null'.tr;
                       }
                       return null;
                     },
@@ -769,7 +770,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                 }
               }
                   : null,
-              child: const Text('Submit'),
+              child: Text('submit'.tr),
             ),
           ],
         ),
@@ -819,8 +820,8 @@ class _SendFriendInviteState extends State<SendFriendInvite> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Add friend by ID", style: Theme.of(context).textTheme.bodyLarge, textAlign: TextAlign.center),
-            Text("You can find this in the profile section", style: Theme.of(context).textTheme.bodySmall, textAlign: TextAlign.center),
+            Text('add-by-id'.tr, style: Theme.of(context).textTheme.bodyLarge, textAlign: TextAlign.center),
+            Text('find-id'.tr, style: Theme.of(context).textTheme.bodySmall, textAlign: TextAlign.center),
 
             Form(
               autovalidateMode: AutovalidateMode.always,
@@ -834,13 +835,13 @@ class _SendFriendInviteState extends State<SendFriendInvite> {
                 controller: _textEditingController,
                 maxLength: 28,
                 autocorrect: false,
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Enter Friend Id',
+                decoration: InputDecoration(
+                  border: const UnderlineInputBorder(),
+                  labelText: 'enter-friend-id'.tr,
                 ),
                 validator: (value) {
                   if (value?.length != 28) {
-                  return 'Friend Id must have exactly 28 characters';
+                  return 'friend-id-length'.tr;
                   }
                   return null;
                 },
@@ -863,7 +864,7 @@ class _SendFriendInviteState extends State<SendFriendInvite> {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text("Cancel", style: Theme.of(context).textTheme.bodyMedium),
+                    child: Text("cancel".tr, style: Theme.of(context).textTheme.bodyMedium),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -875,7 +876,7 @@ class _SendFriendInviteState extends State<SendFriendInvite> {
                         sendFriendInvite(inviteeId, widget.userId).then((value) => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400))));
                       }
                     } : null,
-                    child: Text("Confirm", style: Theme.of(context).textTheme.bodyMedium),
+                    child: Text("confirm".tr, style: Theme.of(context).textTheme.bodyMedium),
                   ),
                 ),
 

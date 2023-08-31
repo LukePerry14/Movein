@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
 import 'package:movein/Pages/Sendbird.dart';
 import 'package:movein/UserPreferences.dart';
@@ -200,7 +201,7 @@ class _EditGroupNameState extends State<EditGroupName> {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text("Cancel", style: Theme.of(context).textTheme.bodyMedium),
+                    child: Text("cancel".tr, style: Theme.of(context).textTheme.bodyMedium),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -212,7 +213,7 @@ class _EditGroupNameState extends State<EditGroupName> {
                         updateGroupName(newName, widget.groupId).then((value) => Navigator.of(context).pop());
                       }
                     } : null,
-                    child: Text("Confirm", style: Theme.of(context).textTheme.bodyMedium),
+                    child: Text("confirm".tr, style: Theme.of(context).textTheme.bodyMedium),
                   ),
                 ),
               ],
@@ -251,11 +252,11 @@ class ConfirmLeave extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-              child: Text("Are you sure you want to leave?", style: Theme.of(context).textTheme.bodyLarge,),
+              child: Text('leave_title'.tr, style: Theme.of(context).textTheme.bodyLarge,),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text("This will remove you from the group and make you unable to contact any members you aren't already friends with. You will still be able to rejoin the group.", style: Theme.of(context).textTheme.bodySmall,),
+              child: Text('leave_desc'.tr, style: Theme.of(context).textTheme.bodySmall,),
             ),
             const SizedBox(height: 30),
             Row(
@@ -266,7 +267,7 @@ class ConfirmLeave extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text("Cancel", style: Theme.of(context).textTheme.bodyMedium),
+                    child: Text("cancel".tr, style: Theme.of(context).textTheme.bodyMedium),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -278,7 +279,7 @@ class ConfirmLeave extends StatelessWidget {
                           Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
                         });
                       },
-                      child: Text("Confirm", style: Theme.of(context).textTheme.bodyMedium)
+                      child: Text("confirm".tr, style: Theme.of(context).textTheme.bodyMedium)
                   ),
                 ),
 

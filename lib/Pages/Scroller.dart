@@ -580,7 +580,7 @@ class NoGroups extends StatelessWidget {
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.7,
             child: Text(
-                "You've seen to have run out of groups for now, Consider making your own or refresh to try and have another look",
+                'scrolls-empty'.tr,
                 style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center),
           ),
@@ -753,7 +753,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                   .of(context)
                   .size
                   .width,
-              child: Text("Group Preference Filters",
+              child: Text("filt-title".tr,
                   style: Theme
                       .of(context)
                       .textTheme
@@ -764,7 +764,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                   .of(context)
                   .size
                   .width,
-              child: Text("Leave as 0 for no filter",
+              child: Text('filt-desc'.tr,
                   style: Theme
                       .of(context)
                       .textTheme
@@ -782,7 +782,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     initialValue: UserPreferences.getMemPref().toDouble(),
                     divisions: 15,
                     decoration:
-                    const InputDecoration(labelText: 'number of Members'),
+                    InputDecoration(labelText: 'mem-num'.tr),
                   ),
                   FormBuilderSlider(
                     name: 'averageCleanliness',
@@ -791,7 +791,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     initialValue: UserPreferences.getCleanPref().toDouble(),
                     divisions: 5,
                     decoration:
-                    const InputDecoration(labelText: 'Average Cleanliness'),
+                    InputDecoration(labelText: 'avg-cln'.tr),
                   ),
                   FormBuilderSlider(
                     name: 'averageNoisiness',
@@ -800,7 +800,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     initialValue: UserPreferences.getNoisePref().toDouble(),
                     divisions: 5,
                     decoration:
-                    const InputDecoration(labelText: 'Average Noisiness'),
+                    InputDecoration(labelText: 'avg-noi'.tr),
                   ),
                   FormBuilderSlider(
                     name: 'averageNightLife',
@@ -809,7 +809,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     initialValue: UserPreferences.getNightPref().toDouble(),
                     divisions: 5,
                     decoration:
-                    const InputDecoration(labelText: 'Average NightLife'),
+                    InputDecoration(labelText: 'avg-night'.tr),
                   ),
                   FormBuilderSlider(
                     name: 'averageYearOfStudy',
@@ -818,7 +818,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     initialValue: UserPreferences.getYearPref().toDouble(),
                     divisions: 7,
                     decoration:
-                    const InputDecoration(labelText: 'Average Year of Study'),
+                    InputDecoration(labelText: 'avg-yos'.tr),
                   ),
                 ],
               ),
@@ -836,7 +836,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                   _formKey.currentState?.fields['averageYearOfStudy']?.value
                       .toInt(),
                 );
-                Navigator.of(context).pushReplacementNamed('/Scroller');
+                Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Scroller(), duration: const Duration(milliseconds: 200)));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme
@@ -844,7 +844,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     .primaryColor,
               ),
               child: Text(
-                'Submit Filters',
+                'sub-filt'.tr,
                 style: GoogleFonts.redHatDisplay(
                     color: Colors.white, fontSize: 16.5),
               ),

@@ -15,6 +15,7 @@ import 'package:movein/Pages/Sendbird.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:movein/Translations.dart';
 import 'package:movein/UserPreferences.dart';
+import 'package:provider/provider.dart';
 import 'Auth code/auth.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -28,6 +29,10 @@ import 'package:page_transition/page_transition.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
+  //LinkFivePurchases.init("fae19762a8d0f160ead020291d33b644b70c69f576202d0c207d4a9153c72b7c");
+  //LinkFivePurchases.products;
+  //LinkFivePurchases.activeProducts;
+  //LinkFivePurchases.purchase(productDetails);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await UserPreferences.init();
 
@@ -41,38 +46,45 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
       _loadSavedTheme();
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-      return ValueListenableBuilder<ThemeMode>(
-          valueListenable: App.themeNotifier,
-          builder: (context, currentMode, child) {
-            final String foreName = UserPreferences.getForeName();
-            final bool loggedIn = (foreName != "NotLoggedInError");
-            if (foreName != "NotLoggedInError") {
-              ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), foreName);
-            }
-            return GetMaterialApp(
-              debugShowCheckedModeBanner: false,
-              translations: AppTranslations(),
-              locale: Get.deviceLocale,
-              theme: LAppTheme.lightTheme,
-              darkTheme: LAppTheme.darkTheme,
-              themeMode: currentMode,
-              initialRoute: !loggedIn
-                  ? '/Login'
-                  : '/Scroller',
-                routes: {
-                  '/OnBoarding': (context) => const OnBoardingPage(),
-                },
+      return MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: App.themeNotifier),
+          ChangeNotifierProvider(create: (_) => FriendsTrigger()),
+          //ChangeNotifierProvider(create: (context) => LinkFiveProvider("fae19762a8d0f160ead020291d33b644b70c69f576202d0c207d4a9153c72b7c"), lazy: false,),
+        ],
+        child: ValueListenableBuilder<ThemeMode>(
+            valueListenable: App.themeNotifier,
+            builder: (context, currentMode, child) {
+              final String foreName = UserPreferences.getForeName();
+              final bool loggedIn = (foreName != "NotLoggedInError");
+              if (foreName != "NotLoggedInError") {
+                ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), foreName);
+              }
+              return GetMaterialApp(
+                debugShowCheckedModeBanner: false,
+                translations: AppTranslations(),
+                locale: Get.deviceLocale,
+                theme: LAppTheme.lightTheme,
+                darkTheme: LAppTheme.darkTheme,
+                themeMode: currentMode,
+                initialRoute: !loggedIn
+                    ? '/Login'
+                    : '/Scroller',
+                  routes: {
+                    '/OnBoarding': (context) => const OnBoardingPage(),
+                  },
 
-                onGenerateInitialRoutes: (initialRoute) {
-                  if (initialRoute == '/Scroller') {
-                    return [MaterialPageRoute(builder: (context) => const Scroller())];
+                  onGenerateInitialRoutes: (initialRoute) {
+                    if (initialRoute == '/Scroller') {
+                      return [MaterialPageRoute(builder: (context) => const Scroller())];
+                    }
+                    else {
+                      return [MaterialPageRoute(builder: (context) => const LoginScreen())];
+                    }
                   }
-                  else {
-                    return [MaterialPageRoute(builder: (context) => const LoginScreen())];
-                  }
-                }
-            );
-          });
+              );
+            }),
+      );
   }
 // fix size of image
   void _loadSavedTheme() {
@@ -88,6 +100,16 @@ class App extends StatelessWidget {
   }
 }
 
+class FriendsTrigger with ChangeNotifier {
+  bool _friendsRebuildTrigger = false;
+
+  bool get trigger => _friendsRebuildTrigger;
+
+  void flip() {
+    _friendsRebuildTrigger = !_friendsRebuildTrigger;
+    notifyListeners();
+  }
+}
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -108,6 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
+            automaticallyImplyLeading: false,
             leading: null,
             expandedHeight: MediaQuery.of(context).size.height / 3,
             collapsedHeight: MediaQuery.of(context).size.height / 3,
@@ -184,12 +207,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 50),
                     FormBuilderTextField(
                       name: 'email',
-                      decoration: const InputDecoration(labelText: 'Email'),
+                      decoration: InputDecoration(labelText: 'email'.tr),
                       // enabled: false,
 
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
+                          return 'email_null'.tr;
                         }
                         return null;
                       },
@@ -202,11 +225,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 10),
                     FormBuilderTextField(
                       name: 'password',
-                      decoration: const InputDecoration(labelText: 'Password'),
+                      decoration: InputDecoration(labelText: 'password'.tr),
                       obscureText: true,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
+                          return 'password-null'.tr;
                         }
                         return null;
                       },
@@ -265,8 +288,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         } else {
                           setState(() {
                             var errors = {
-                              'invalid-email': 'Enter a valid email',
-                              'wrong-password': 'Incorrect password'
+                              'invalid-email': 'invalid-email'.tr,
+                              'wrong-password': 'wrong-password'.tr
                             };
                             errorMessage = errors[response] ?? response;
                           });
@@ -290,7 +313,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         );
                       },
-                      child: Text('Want to sign up instead?',
+                      child: Text('signup?'.tr,
                           style: GoogleFonts.redHatDisplay(
                               color: LAppTheme.lightTheme.primaryColor,
                               fontSize: 16.5)),
@@ -408,7 +431,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                         color: Theme.of(context).primaryColor,
                                         fontWeight: FontWeight.normal,
                                         fontSize: 23)))),
-                        title: Text("User Info",
+                        title: Text('user_info'.tr,
                             style: Theme.of(context).textTheme.headlineSmall),
                       ),
                       const SizedBox(height: 10),
@@ -418,13 +441,13 @@ class _SignupScreenState extends State<SignupScreen> {
                           children: [
                             FormBuilderTextField(
                               name: 'ForeName',
-                              decoration: const InputDecoration(
-                                  labelText: 'First Name'),
+                              decoration: InputDecoration(
+                                  labelText: 'first-name'.tr),
                               // enabled: false,
 
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter your first name';
+                                  return 'first-name-null'.tr;
                                 }
                                 return null;
                               },
@@ -433,12 +456,12 @@ class _SignupScreenState extends State<SignupScreen> {
                             FormBuilderTextField(
                               name: 'SurName',
                               decoration:
-                              const InputDecoration(labelText: 'Last Name'),
+                              InputDecoration(labelText: 'last-name'.tr),
                               // enabled: false,
 
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return 'Please enter your Surname';
+                                  return 'last-name-null'.tr;
                                 }
                                 return null;
                               },
@@ -447,18 +470,18 @@ class _SignupScreenState extends State<SignupScreen> {
                             FormBuilderTextField(
                               name: 'email',
                               controller: _emailController,
-                              decoration: const InputDecoration(
-                                  labelText: 'University Email'),
+                              decoration: InputDecoration(
+                                  labelText: 'uni-email'.tr),
                               validator: (email) {
                                 if (email == null || email.isEmpty) {
-                                  return 'Please enter your email';
+                                  return 'email_null'.tr;
                                 }
                                 if (!EmailValidator.validate(email)) {
-                                  return 'Please enter a valid email address';
+                                  return 'uni-email-invalid'.tr;
                                 }
                                 if (!domains
                                     .any((domain) => email.contains(domain))) {
-                                  return 'Email domain is not valid';
+                                  return 'uni-email-domain-invalid'.tr;
                                 }
                                 return null;
                               },
@@ -469,17 +492,17 @@ class _SignupScreenState extends State<SignupScreen> {
                                 Expanded(
                                   child: FormBuilderTextField(
                                     name: 'password',
-                                    decoration: const InputDecoration(
-                                        labelText: 'Password'),
+                                    decoration: InputDecoration(
+                                        labelText: 'password'.tr),
                                     obscureText:
                                     _passwordObscured, // Use the variable to control the obscuring
                                     controller: _passwordController,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
-                                        return 'Please enter your password';
+                                        return 'password-null'.tr;
                                       }
                                       if (value.length < 8) {
-                                        return 'Password must be at least 8 characters long';
+                                        return 'password-too-short'.tr;
                                       }
                                       return null;
                                     },
@@ -511,10 +534,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                     controller: _passwordConfController,
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
-                                        return 'Please Confirm your password';
+                                        return 'password-conf'.tr;
                                       } else if (_passwordConfController.text !=
                                           _passwordController.text) {
-                                        return "Passwords don't match";
+                                        return 'password-mismatch'.tr;
                                       }
                                       return null;
                                     },
@@ -561,7 +584,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                             : Colors.grey,
                                         fontWeight: FontWeight.normal,
                                         fontSize: 23)))),
-                        title: Text("Profile Info",
+                        title: Text('profile-info'.tr,
                             style: GoogleFonts.lexend(
                                 color: userInfoValid
                                     ? Colors.black87
@@ -579,10 +602,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                 name: 'Bio',
                                 maxLength: 200,
                                 decoration:
-                                const InputDecoration(labelText: 'Bio'),
+                                InputDecoration(labelText: 'bio'.tr),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Please enter a bio';
+                                    return 'bio-null'.tr;
                                   }
                                   return null;
                                 },
@@ -591,11 +614,11 @@ class _SignupScreenState extends State<SignupScreen> {
                               FormBuilderDateTimePicker(
                                 inputType: InputType.date,
                                 name: "DOB",
-                                decoration: const InputDecoration(
-                                    labelText: 'Date of Birth'),
+                                decoration: InputDecoration(
+                                    labelText: 'dob'.tr),
                                 validator: (value) {
                                   if (value == null) {
-                                    return 'Please select a date';
+                                    return 'dob-null'.tr;
                                   }
 
                                   final currentDate = DateTime.now();
@@ -606,7 +629,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                       currentDate.day);
 
                                   if (selectedDate.isAfter(minimumAgeDate)) {
-                                    return 'You must be at least 17 years old';
+                                    return 'too-young'.tr;
                                   }
 
                                   return null;
@@ -615,11 +638,11 @@ class _SignupScreenState extends State<SignupScreen> {
                               const SizedBox(height: 10),
                               FormBuilderTextField(
                                 name: 'Subject',
-                                decoration: const InputDecoration(
-                                    labelText: 'Subject Studied'),
+                                decoration: InputDecoration(
+                                    labelText: 'subject-studied'.tr),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Please enter your Subject';
+                                    return 'subject-null'.tr;
                                   }
                                   return null;
                                 },
@@ -627,15 +650,15 @@ class _SignupScreenState extends State<SignupScreen> {
                               const SizedBox(height: 10),
                               TypeAheadFormField(
                                 textFieldConfiguration: TextFieldConfiguration(
-                                  decoration: const InputDecoration(
-                                    labelText: 'University',
+                                  decoration: InputDecoration(
+                                    labelText: 'uni'.tr,
                                   ),
                                   controller: _universityController,
                                   focusNode: _universityFocusNode,
                                 ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Please select a university';
+                                    return 'uni-null'.tr;
                                   }
                                   final universitiesSuggestions =
                                   universitiesData
@@ -645,7 +668,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                                   if (!universitiesSuggestions
                                       .contains(value)) {
-                                    return 'Please select a valid university from the suggestions';
+                                    return 'uni-unregisterd'.tr;
                                   }
                                   String emailDomain = _emailController.text.split('@')[1];
 
@@ -655,7 +678,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   if (selectedUniversity != null) {
                                     List<String>? validDomains = selectedUniversity['domains']?.cast<String>();
                                     if (validDomains != null && !validDomains.contains(emailDomain)) {
-                                      return 'The selected university does not match the email domain';
+                                      return 'uni-unmatched'.tr;
                                     }
                                   }
                                   return null;
@@ -687,8 +710,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                 min: 1,
                                 max: 7,
                                 divisions: 6,
-                                decoration: const InputDecoration(
-                                    labelText: 'Year of Study'),
+                                decoration: InputDecoration(
+                                    labelText: 'year-of-study'.tr),
                               ),
                             ],
                           ),
@@ -718,7 +741,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                             : Colors.grey,
                                         fontWeight: FontWeight.normal,
                                         fontSize: 23)))),
-                        title: Text("Preferences",
+                        title: Text("preferences".tr,
                             style: GoogleFonts.lexend(
                                 color: (userInfoValid & profileInfoValid)
                                     ? Colors.black87
@@ -738,9 +761,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                 min: 0,
                                 max: 5,
                                 divisions: 5,
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                     labelText:
-                                    'How much does Cleanliness matter to you?'),
+                                    'cleanliness-importance'.tr),
                               ),
                               const SizedBox(height: 10),
                               FormBuilderSlider(
@@ -749,9 +772,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                 min: 0,
                                 max: 5,
                                 divisions: 5,
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                     labelText:
-                                    'How much does Noisiness matter to you?'),
+                                    'noisiness-importance'.tr),
                               ),
                               const SizedBox(height: 10),
                               FormBuilderSlider(
@@ -760,9 +783,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                 min: 0,
                                 max: 5,
                                 divisions: 5,
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                     labelText:
-                                    'How much does Nightlife matter to you?'),
+                                    'nightlife-importance'.tr),
                               ),
                               const SizedBox(height: 10),
                               FormBuilderDateTimePicker(
@@ -774,11 +797,11 @@ class _SignupScreenState extends State<SignupScreen> {
                                     23,
                                     0), // 11:00 PM
                                 inputType: InputType.time,
-                                decoration: const InputDecoration(
-                                    labelText: 'When are you normally in bed?'),
+                                decoration: InputDecoration(
+                                    labelText: 'bedtime'.tr),
                                 validator: (value) {
                                   if (value == null) {
-                                    return "Please select a time you're asleep by";
+                                    return 'bedtime-select'.tr;
                                   }
                                   return null;
                                 },
@@ -820,7 +843,6 @@ class _SignupScreenState extends State<SignupScreen> {
                           );
 
                           if (response == 'success') {
-                            print("SUCESSSSS");
                             ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), data['ForeName']);
 
                             await UserPreferences.setUni(data['UniAttended']);

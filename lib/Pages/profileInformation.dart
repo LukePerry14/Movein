@@ -140,7 +140,7 @@ class _ProfileInformationState extends State<ProfileInformation> {
                                                     .primaryColor,
                                                 fontWeight: FontWeight.normal,
                                                 fontSize: 23)))),
-                            title: Text("User Info",
+                            title: Text('user_info'.tr,
                                 style:
                                     Theme.of(context).textTheme.headlineSmall),
                             children: [
@@ -152,13 +152,13 @@ class _ProfileInformationState extends State<ProfileInformation> {
                                     FormBuilderTextField(
                                       name: 'ForeName',
                                       initialValue: userData['ForeName'],
-                                      decoration: const InputDecoration(
-                                          labelText: 'First Name'),
+                                      decoration: InputDecoration(
+                                          labelText: 'first-name'.tr),
                                       // enabled: false,
 
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
-                                          return 'Please enter your first name';
+                                          return 'first-name-null'.tr;
                                         }
                                         return null;
                                       },
@@ -167,13 +167,13 @@ class _ProfileInformationState extends State<ProfileInformation> {
                                     FormBuilderTextField(
                                       name: 'SurName',
                                       initialValue: userData['SurName'],
-                                      decoration: const InputDecoration(
-                                          labelText: 'Last Name'),
+                                      decoration: InputDecoration(
+                                          labelText: 'last-name'.tr),
                                       // enabled: false,
 
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
-                                          return 'Please enter your Surname';
+                                          return 'last-name-null'.tr;
                                         }
                                         return null;
                                       },
@@ -217,7 +217,7 @@ class _ProfileInformationState extends State<ProfileInformation> {
                                                     .primaryColor,
                                                 fontWeight: FontWeight.normal,
                                                 fontSize: 23)))),
-                            title: Text("Profile Info",
+                            title: Text('profile-info'.tr,
                                 style:
                                     Theme.of(context).textTheme.headlineSmall),
                             children: [
@@ -230,11 +230,11 @@ class _ProfileInformationState extends State<ProfileInformation> {
                                       name: 'Bio',
                                       initialValue: userData['Bio'],
                                       maxLength: 200,
-                                      decoration: const InputDecoration(
-                                          labelText: 'Bio'),
+                                      decoration: InputDecoration(
+                                          labelText: 'bio'.tr),
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
-                                          return 'Please enter a bio';
+                                          return 'bio-null'.tr;
                                         }
                                         return null;
                                       },
@@ -247,18 +247,18 @@ class _ProfileInformationState extends State<ProfileInformation> {
                                           ? null
                                           : userData['DOB'].toDate(),
                                       name: "DOB",
-                                      decoration: const InputDecoration(
-                                          labelText: 'Date of Birth'),
+                                      decoration: InputDecoration(
+                                          labelText: 'dob'.tr),
                                     ),
                                     const SizedBox(height: 10),
                                     FormBuilderTextField(
                                       name: 'Subject',
                                       initialValue: userData['Subject'],
-                                      decoration: const InputDecoration(
-                                          labelText: 'Subject Studied'),
+                                      decoration: InputDecoration(
+                                          labelText: 'subject-studied'.tr),
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
-                                          return 'Please enter your Subject';
+                                          return 'subject-null'.tr;
                                         }
                                         return null;
                                       },
@@ -276,8 +276,8 @@ class _ProfileInformationState extends State<ProfileInformation> {
                                       min: 1,
                                       max: 7,
                                       divisions: 6,
-                                      decoration: const InputDecoration(
-                                          labelText: 'Year of Study'),
+                                      decoration: InputDecoration(
+                                          labelText: 'year-of-study'.tr),
                                     ),
                                   ],
                                 ),
@@ -318,7 +318,7 @@ class _ProfileInformationState extends State<ProfileInformation> {
                                                     .primaryColor,
                                                 fontWeight: FontWeight.normal,
                                                 fontSize: 23)))),
-                            title: Text("Preferences",
+                            title: Text("preferences".tr,
                                 style:
                                     Theme.of(context).textTheme.headlineSmall),
                             children: [
@@ -334,9 +334,9 @@ class _ProfileInformationState extends State<ProfileInformation> {
                                       min: 0,
                                       max: 5,
                                       divisions: 5,
-                                      decoration: const InputDecoration(
+                                      decoration: InputDecoration(
                                           labelText:
-                                              'How much does Cleanliness matter to you?'),
+                                          'cleanliness-importance'.tr),
                                     ),
                                     const SizedBox(height: 10),
                                     FormBuilderSlider(
@@ -346,9 +346,9 @@ class _ProfileInformationState extends State<ProfileInformation> {
                                       min: 0,
                                       max: 5,
                                       divisions: 5,
-                                      decoration: const InputDecoration(
+                                      decoration: InputDecoration(
                                           labelText:
-                                              'How much does Noisiness matter to you?'),
+                                          'noisiness-importance'.tr),
                                     ),
                                     const SizedBox(height: 10),
                                     FormBuilderSlider(
@@ -358,9 +358,9 @@ class _ProfileInformationState extends State<ProfileInformation> {
                                       min: 0,
                                       max: 5,
                                       divisions: 5,
-                                      decoration: const InputDecoration(
+                                      decoration: InputDecoration(
                                           labelText:
-                                              'How much does Nightlife matter to you?'),
+                                          'nightlife-importance'.tr),
                                     ),
                                     const SizedBox(height: 10),
                                     FormBuilderDateTimePicker(
@@ -373,12 +373,12 @@ class _ProfileInformationState extends State<ProfileInformation> {
                                                   ['Lights Out']
                                               .toDate(),
                                       inputType: InputType.time,
-                                      decoration: const InputDecoration(
+                                      decoration: InputDecoration(
                                           labelText:
-                                              'When are you normally in bed?'),
+                                          'bedtime'.tr),
                                       validator: (value) {
                                         if (value == null) {
-                                          return "Please select a time you're asleep by";
+                                          return 'bedtime-select'.tr;
                                         }
                                         return null;
                                       },
@@ -412,7 +412,7 @@ class _ProfileInformationState extends State<ProfileInformation> {
                                   .pushReplacementNamed('/Profile');
                             }
                           },
-                          child: Text('Save Changes',
+                          child: Text('save'.tr,
                               style: GoogleFonts.redHatDisplay(
                                   color: Colors.white, fontSize: 16.5)),
                         ),

@@ -1,12 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../Auth code/auth.dart';
+import '../Friend And Groups Code/FriendFunctions.dart';
 import '../Themes/lMode.dart';
+import '../main.dart';
 import 'PremiumPage.dart';
 
 class SettingsScaffold extends StatefulWidget {
@@ -71,13 +77,13 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const Divider(height: 20, thickness: 1),
           const SizedBox(height: 10),
-          buildChangePassword(context, 'Change Password'),
+          buildChangePassword(context, 'change-password'.tr),
           //buildChangeEmail(context, 'Change Email'),
           buildReviewAds(context, 'premium'.tr),
-          //buildDeleteAccount(context, 'delete'.tr),
           buildChangeLanguage(context, 'language'.tr),
           buildAccountOption(context, 'p,t,c'.tr),
           buildAccountOption(context, 'contact'.tr),
+          buildDeleteAccount(context, 'delete'.tr),
 
         ],
       ),
@@ -85,7 +91,127 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   buildDeleteAccount(BuildContext context, String title) {
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              contentPadding: const EdgeInsets.all(0),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height:5),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: IconButton(
+                            icon: Icon(LineAwesomeIcons.angle_left, color: Theme.of(context).primaryColor),
+                            color: Colors.grey[500],
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                      ),
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text("delete-account-title".tr, style: GoogleFonts.lexend(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 23),),
+                        const SizedBox(height: 10),
+                        Text("delete-account-desc".tr, style: GoogleFonts.redHatDisplay(color: Colors.red[800], fontWeight: FontWeight.bold, fontSize: 16),),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text("cancel".tr, style: Theme.of(context).textTheme.bodyMedium),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: ElevatedButton(
+                                  onPressed: () async{
+                                    await deleteDocumentAndAccount().then((_) => Navigator.pushReplacement(
+                                      context, PageTransition(
+                                      type: PageTransitionType.fade,
+                                      child: const LoginScreen(),
+                                      duration: const Duration(milliseconds: 400),
+                                    ),));
+                                  },
+                                  child: Text("confirm".tr, style: Theme.of(context).textTheme.bodyMedium)
+                              ),
+                            ),
 
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.red
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, color: Colors.red)
+          ],
+        ),
+      ),
+    );
+  }
+  Future<void> deleteDocumentAndAccount() async {
+    try {
+      // Delete document from Firestore's "Users" collection
+      String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('Users').doc(currentUserId).get();
+
+      // Access "Joined" and "Applications" arrays
+      List<String> joinedGroups = List.from(userSnapshot.get('Joined'));
+      List<String> applications = List.from(userSnapshot.get('Applications'));
+
+      // Remove groups from user's Joined and Applications arrays
+      for (String groupId in joinedGroups) {
+        await removeGroupFromUser("Joined", groupId, currentUserId);
+      }
+
+      for (String groupId in applications) {
+        await removeGroupFromUser("Applications", groupId, currentUserId);
+      }
+
+      // Delete the document
+      await FirebaseFirestore.instance.collection('Users').doc(currentUserId).delete();
+
+    } catch (e) {
+      throw FirebaseException(message: 'Error deleting user document: $e', plugin: 'cloud_firestore');
+    }
+
+    try {
+      // Delete user's account from Firebase Authentication
+      await FirebaseAuth.instance.currentUser!.delete();
+    } catch (e) {
+      throw FirebaseAuthException(code: 'unknown-error', message: 'An unknown error occurred while deleting the account.');
+    }
   }
 }
 
@@ -267,12 +393,15 @@ GestureDetector buildChangeLanguage(BuildContext context, String title) {
                   children: [
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        icon: Icon(LineAwesomeIcons.angle_left, color: Theme.of(context).primaryColor),
-                        color: Colors.grey[500],
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: IconButton(
+                          icon: Icon(LineAwesomeIcons.angle_left, color: Theme.of(context).primaryColor),
+                          color: Colors.grey[500],
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
                       ),
                     ),
                     Align(
