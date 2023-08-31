@@ -12,6 +12,7 @@ import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Themes/lMode.dart';
 import 'package:movein/Pages/Settings.dart';
 import 'package:movein/Pages/Sendbird.dart';
+import 'package:movein/Pages/Notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:movein/Translations.dart';
 import 'package:movein/UserPreferences.dart';
@@ -25,6 +26,7 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'Auth code/auth.dart';
 import 'package:azblob/azblob.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:sendbird_chat_sdk/sendbird_chat_sdk.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -275,6 +277,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               await UserPreferences.setForeName(userData['ForeName']);
                               //ACCESS_TOKEN
                               ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),userData['ForeName']);
+                              if (SendbirdChat.getPendingPushToken() != null)
+                              {await Notifications.registerPushToken();}
 
                             }
                           }
