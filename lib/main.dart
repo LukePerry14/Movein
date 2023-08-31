@@ -36,6 +36,7 @@ Future<void> main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await UserPreferences.init();
 
+
   runApp(const App());
 }
 
@@ -58,6 +59,7 @@ class App extends StatelessWidget {
               final String foreName = UserPreferences.getForeName();
               final bool loggedIn = (foreName != "NotLoggedInError");
               if (foreName != "NotLoggedInError") {
+                //ACCESS_TOKEN
                 ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), foreName);
               }
               return GetMaterialApp(
@@ -271,6 +273,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               await UserPreferences.setAppsMax(subscribed? 5:2);
                               await UserPreferences.setUni(userData['UniAttended']);
                               await UserPreferences.setForeName(userData['ForeName']);
+                              //ACCESS_TOKEN
                               ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),userData['ForeName']);
 
                             }
@@ -843,6 +846,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           );
 
                           if (response == 'success') {
+                            //ACCESS_TOKEN
                             ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), data['ForeName']);
 
                             await UserPreferences.setUni(data['UniAttended']);

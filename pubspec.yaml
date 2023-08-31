@@ -74,6 +74,7 @@ dependencies:
   url_launcher: ^6.1.12
   uuid: ^3.0.7
   provider: ^6.0.5
+  firebase_messaging: ^14.6.7
   #linkfive_purchases: ^3.0.0
   #linkfive_purchases_provider: ^3.0.0
 flutter_native_splash:
