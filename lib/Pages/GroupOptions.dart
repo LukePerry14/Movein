@@ -529,26 +529,28 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 ),
                                               ),
                                               const SizedBox(width: 8),
-                                              Column(
-                                                crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    "${memberDetails[index]["ForeName"]} ${memberDetails[index]["SurName"]}",
-                                                    style: isVoteKick
-                                                        ? GoogleFonts.sourceCodePro(
-                                                      color: Colors.red,
-                                                      fontWeight:
-                                                      FontWeight.bold,
-                                                      fontSize: 20.0,
-                                                    )
-                                                        : Theme.of(context)
-                                                        .textTheme
-                                                        .headlineSmall,
-                                                  ),
-                                                ],
-                                              ),
-                                              Expanded(child: Container()),
+                                              Expanded(
+                                              child: ClipRect(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "${memberDetails[index]["ForeName"]} ${memberDetails[index]["SurName"]}",
+                                                      style: isVoteKick
+                                                          ? GoogleFonts.lexend(
+                                                        color: Colors.red,
+                                                        fontWeight:
+                                                        FontWeight.bold,
+                                                        fontSize: 20.0,
+                                                      )
+                                                          : Theme.of(context)
+                                                          .textTheme
+                                                          .headlineSmall,
+                                                    ),
+                                                  ],
+                                                ),
+                                              )),
                                               if (isVoteKick)
                                                 Padding(
                                                   padding: const EdgeInsets.only(
@@ -784,44 +786,45 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 ),
                                               ),
                                               const SizedBox(width: 8),
-                                              Column(
-                                                crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    "${applicants[index]["ForeName"]} ${applicants[index]["SurName"]}",
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .headlineSmall,
-                                                  ),
-                                                  if (appVals[applicants[index]["Id"]] != null)
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                          "${"accept".tr}: ${(appVals[applicants[index]["Id"]][0]) ?? 0}",
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .bodyMedium,
-                                                        ),
-                                                        const SizedBox(width: 3),
-                                                        SizedBox(
-                                                          width: 2,
-                                                          height: 18,
-                                                          child: Container(
-                                                              color: Colors.black87),
-                                                        ),
-                                                        const SizedBox(width: 3),
-                                                        Text(
-                                                          "${"reject".tr}: ${(appVals[applicants[index]["Id"]][1]) ?? 0}",
-                                                          style: Theme.of(context)
-                                                              .textTheme
-                                                              .bodyMedium,
-                                                        ),
-                                                      ],
+                                              Expanded(
+                                                child: ClipRect(child: Column(
+                                                  crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "${applicants[index]["ForeName"]} ${applicants[index]["SurName"]}",
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headlineSmall,
                                                     ),
-                                                ],
+                                                    if (appVals[applicants[index]["Id"]] != null)
+                                                      Row(
+                                                        children: [
+                                                          Text(
+                                                            "${"accept".tr}: ${(appVals[applicants[index]["Id"]][0]) ?? 0}",
+                                                            style: Theme.of(context)
+                                                                .textTheme
+                                                                .bodyMedium,
+                                                          ),
+                                                          const SizedBox(width: 3),
+                                                          SizedBox(
+                                                            width: 2,
+                                                            height: 18,
+                                                            child: Container(
+                                                                color: Colors.black87),
+                                                          ),
+                                                          const SizedBox(width: 3),
+                                                          Text(
+                                                            "${"reject".tr}: ${(appVals[applicants[index]["Id"]][1]) ?? 0}",
+                                                            style: Theme.of(context)
+                                                                .textTheme
+                                                                .bodyMedium,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                  ],
+                                                )),
                                               ),
-                                              Expanded(child: Container()),
                                               PopupMenuButton<String>(
                                                 itemBuilder: (context) => [
                                                   PopupMenuItem(
