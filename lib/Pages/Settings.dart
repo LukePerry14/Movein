@@ -8,7 +8,7 @@ import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import '../Pages/Profile.dart';
 import '../Auth code/auth.dart';
 import '../Friend And Groups Code/FriendFunctions.dart';
 import '../Themes/lMode.dart';
@@ -181,6 +181,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
   Future<void> deleteDocumentAndAccount() async {
+    await storageReset();
     try {
       // Delete document from Firestore's "Users" collection
       String currentUserId = FirebaseAuth.instance.currentUser!.uid;

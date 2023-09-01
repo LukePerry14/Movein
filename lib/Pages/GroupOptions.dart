@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,7 +23,6 @@ class GroupOptions extends StatefulWidget {
 class _GroupOptionsState extends State<GroupOptions> {
   var data = {};
   late String groupId;
-  late Future<List<dynamic>> _myFuture;
 
   Future<List<dynamic>> getUsers(groupId) async {
     List<Map<String, dynamic>> memberDetails = [];
@@ -178,36 +179,196 @@ class _GroupOptionsState extends State<GroupOptions> {
     ];
   }
 
-  void _refreshData() {
-    setState(() {
-      _myFuture = getUsers(groupId); // Recreate the Future to trigger the FutureBuilder.
+  Stream<List<dynamic>> getUsersStream(String groupId) async* {
+    final CollectionReference docUsers =
+    FirebaseFirestore.instance.collection("Users");
+
+    final streamController = StreamController<List<dynamic>>();
+
+    final groupDocRef = FirebaseFirestore.instance.collection("Groups").doc(groupId);
+
+    // Listen to updates in the group document using snapshots()
+    final groupStream = groupDocRef.snapshots();
+
+    final subscription = groupStream.listen((groupSnapshot) async {
+
+      try {
+        Map<String, dynamic>? groupData = groupSnapshot.data();
+
+        List<Map<String, dynamic>> memberDetails = [];
+        List<Map<String, dynamic>> applicants = [];
+        List<String> voteKicks = [];
+        Map<String, List<int>> kickVals = {};
+        Map<String, List<int>> appVals = {};
+        String groupName = '';
+        String groupPicture = '';
+        double avgCleanliness = 0.0;
+        double avgNoisiness = 0.0;
+        double avgNightLife = 0.0;
+        double avgYearOfStudy = 0.0;
+        Timestamp avgBedTime = Timestamp.now();
+        List<dynamic> allowedUnis = [];
+
+        if (groupData != null) {
+          groupName = groupData['GroupName'];
+          groupPicture = groupData['GroupPicture'];
+          avgCleanliness = (groupData['AvgCleanliness'] as num).toDouble();
+          avgNoisiness = (groupData['AvgNoisiness'] as num).toDouble();
+          avgNightLife = (groupData['AvgNightLife'] as num).toDouble();
+          avgYearOfStudy = (groupData['AvgYearOfStudy'] as num).toDouble();
+          avgBedTime = groupData['AvgBedTime'];
+          allowedUnis = groupData['AllowedUnis'];
+
+          var tempKickVals = groupData["KickVals"];
+          for (var key in tempKickVals.keys) {
+            int agree = 0;
+            int disagree = 0;
+            var innerMap = tempKickVals[key];
+
+            innerMap.forEach((innerKey, innerValue) {
+              if (innerValue == 1) {
+                agree += 1;
+              } else {
+                disagree += 1;
+              }
+            });
+
+            kickVals[key] = [agree, disagree];
+          }
+
+          var tempAppVals = groupData["AppVals"];
+          for (var key in tempAppVals.keys) {
+            int agree = 0;
+            int disagree = 0;
+            var innerMap = tempAppVals[key];
+
+            innerMap.forEach((innerKey, innerValue) {
+              if (innerValue == 1) {
+                agree += 1;
+              } else {
+                disagree += 1;
+              }
+            });
+
+            appVals[key] = [agree, disagree];
+          }
+
+          var applicantIds = groupData["Applicants"];
+          for (var aId in applicantIds) {
+            if (!(aId == "")) {
+              DocumentSnapshot docSnapshot = await docUsers.doc(aId).get();
+              Map<String, dynamic>? data =
+              docSnapshot.data() as Map<String, dynamic>?;
+
+              final dateTime = data?['DOB'].toDate();
+              final currentDate = DateTime.now();
+              final difference = currentDate.difference(dateTime);
+              final yearsAgo = difference.inDays ~/ 365;
+              applicants.add({
+                "ForeName": data?['ForeName'],
+                "SurName": data?['SurName'],
+                "Age": yearsAgo,
+                "Uni": data?['UniAttended'],
+                "Preferences": data?['Preferences'],
+                "Images": data?['Images'],
+                "Bio": data?['Bio'],
+                "Subject": data?['Subject'],
+                "YearOfStudy": data?['YearOfStudy'],
+                "Id": aId,
+              });
+            }
+          }
+
+          var members = groupData['Members'];
+          var kickIds = groupData["Kicks"];
+          for (String id in members) {
+            try {
+              DocumentSnapshot docSnapshot = await docUsers.doc(id).get();
+              Map<String, dynamic>? data =
+              docSnapshot.data() as Map<String, dynamic>?;
+
+              final dateTime = data?['DOB'].toDate();
+              final currentDate = DateTime.now();
+              final difference = currentDate.difference(dateTime);
+              final yearsAgo = difference.inDays ~/ 365;
+
+              if (kickIds.contains(id)) {
+                voteKicks.add(id);
+              }
+
+              memberDetails.add({
+                "ForeName": data?['ForeName'],
+                "SurName": data?['SurName'],
+                "Age": yearsAgo,
+                "Uni": data?['UniAttended'],
+                "Preferences": data?['Preferences'],
+                "Images": data?['Images'],
+                "Bio": data?['Bio'],
+                "Subject": data?['Subject'],
+                "YearOfStudy": data?['YearOfStudy'],
+                "Id": id,
+              });
+            } catch (e) {
+              throw FirebaseException(
+                message: 'Error fetching member data in GroupOptions: $e',
+                plugin: 'cloud_firestore',
+              );
+            }
+          }
+        }
+
+        // Emit the data once it's available.
+        streamController.add([
+          memberDetails,
+          applicants,
+          voteKicks,
+          kickVals,
+          appVals,
+          groupName,
+          groupPicture,
+          avgCleanliness,
+          avgNoisiness,
+          avgNightLife,
+          avgBedTime,
+          avgYearOfStudy,
+          allowedUnis,
+        ]);
+      } catch (e) {
+        // Handle errors and emit an error state if needed.
+        streamController.addError(e);
+      }
     });
+
+    // Add a cancel callback to close the stream when no longer needed.
+    // You can call this when you dispose of your widget or no longer need the stream.
+    streamController.onCancel = () {
+      subscription.cancel();
+    };
+
+    yield* streamController.stream;
   }
+
 
   @override
   Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
     data = ModalRoute.of(context)?.settings.arguments as Map;
     groupId = data['groupId'];
-    _myFuture = getUsers(groupId);
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<dynamic>>(
-      future: _myFuture,
+    return StreamBuilder<List<dynamic>>(
+      stream: getUsersStream(groupId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // While waiting for the data to load, you can show a loading indicator
           return Container();
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
           List data = snapshot.data!;
-          List<Map<String, dynamic>> memberDetails =
-              data[0] as List<Map<String, dynamic>>;
-          List<Map<String, dynamic>> applicants =
-              data[1] as List<Map<String, dynamic>>;
+          List<Map<String, dynamic>> memberDetails = data[0] as List<Map<String, dynamic>>;
+          List<Map<String, dynamic>> applicants = data[1] as List<Map<String, dynamic>>;
           var kicks = data[2];
           var kickVals = data[3];
           var appVals = data[4];
@@ -229,7 +390,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                         Align(
                           alignment: Alignment.topLeft,
                           child: Padding(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
                             child: IconButton(
                               icon: Icon(LineAwesomeIcons.angle_up, color: LAppTheme.lightTheme.primaryColor,),
                               color: Colors.grey[500],
@@ -244,7 +405,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                _refreshData();
+
                               },
                               child: SizedBox(
                                 width: 150,
@@ -283,7 +444,6 @@ class _GroupOptionsState extends State<GroupOptions> {
                               builder: (BuildContext context) =>
                                   EditGroupName(name: groupName, groupId: groupId),
                             );
-                            _refreshData();
                           },
                           child: Text(
                             groupName,
@@ -322,8 +482,8 @@ class _GroupOptionsState extends State<GroupOptions> {
                                   physics: const NeverScrollableScrollPhysics(),
                                   itemCount: memberDetails.length,
                                   itemBuilder: (context, index) {
-                                    bool isVoteKick =
-                                    kicks.contains(memberDetails[index]['Id']);
+                                    bool isVoteKick = kicks.contains(memberDetails[index]['Id']) & (kickVals[memberDetails[index]["Id"]] != null);
+
                                     return GestureDetector(
                                       onTap: () {
                                         showDialog<String>(
@@ -333,15 +493,13 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 id: memberDetails[index]['Id'],
                                                 foreName: memberDetails[index]
                                                 ['ForeName'],
-                                                age: memberDetails[index]['Age'],
+                                                age: memberDetails[index]['Age'].toInt(),
                                                 uni: memberDetails[index]['Uni'],
-                                                preferences: memberDetails[index]
-                                                ['Preferences'],
+                                                preferences: memberDetails[index]['Preferences'],
                                                 images: memberDetails[index]['Images'],
                                                 bio: memberDetails[index]['Bio'],
                                                 subject: memberDetails[index]['Subject'],
-                                                yearOfStudy: memberDetails[index]
-                                                ['YearOfStudy'],
+                                                yearOfStudy: memberDetails[index]['YearOfStudy'].toInt(),
                                               ),
                                         );
                                       },
@@ -442,6 +600,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                     ],
                                                   ),
                                                 ),
+                                              if (memberDetails[index]["Id"] != Auth().currentUser())
                                               PopupMenuButton<String>(
                                                 itemBuilder: (context) => [
                                                   PopupMenuItem<String>(
@@ -505,7 +664,6 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                       memberDetails[index]["Id"],
                                                       groupId,
                                                       Auth().currentUser(),);
-                                                    _refreshData();
                                                   } else if (value == 'agree') {
                                                     await updateKickVote(
                                                       groupId,
@@ -514,7 +672,6 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                       memberDetails.length,
                                                       Auth().currentUser(),
                                                     );
-                                                    _refreshData();
                                                   } else if (value == 'disagree') {
                                                     await updateKickVote(
                                                       groupId,
@@ -523,7 +680,6 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                       memberDetails.length,
                                                       Auth().currentUser(),
                                                     );
-                                                    _refreshData();
                                                   }
                                                 },
                                                 icon: const Icon(Icons.more_vert),
@@ -566,7 +722,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                     ? SizedBox(
                                   width: double.maxFinite,
                                   child: Padding(
-                                    padding: EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.all(8.0),
                                     child: Text("empty".tr,
                                         style: Theme.of(context)
                                             .textTheme
@@ -696,7 +852,6 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                       memberDetails.length,
                                                       Auth().currentUser(),
                                                     );
-                                                    _refreshData();
                                                   } else if (value ==
                                                       'decline') {
                                                     await updateApplicationVote(
@@ -706,7 +861,6 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                       memberDetails.length,
                                                       Auth().currentUser(),
                                                     );
-                                                    _refreshData();
                                                   }
                                                 },
                                                 icon:
@@ -774,7 +928,6 @@ class _GroupOptionsState extends State<GroupOptions> {
                                     builder: (BuildContext context) => EditGroupName(
                                         name: groupName, groupId: groupId),
                                   );
-                                  _refreshData();
                                 },
                                 title: Text(
                                   "edit_groupname".tr,

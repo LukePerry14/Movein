@@ -302,6 +302,7 @@ class _ProfilePage extends State<Profile> {
                                         fontWeight: FontWeight.normal,
                                         fontSize: 20.0)),
                                 onTap: () async {
+                                  await storageReset();
                                   await UserPreferences.setForeName(
                                       "NotLoggedInError");
                                   FirebaseAuth.instance.signOut();
@@ -516,4 +517,15 @@ class ButtonWidgetLogOut extends StatelessWidget {
         ),
         Text(text)
       ]));
+}
+
+Future<void> storageReset() async{
+  await UserPreferences.setForeName("NotLoggedInError");
+  await UserPreferences.setMemPref(0);
+  await UserPreferences.setCleanPref(0);
+  await UserPreferences.setNoisePref(0);
+  await UserPreferences.setNightPref(0);
+  await UserPreferences.setAppsMax(2);
+  await UserPreferences.setYearPref(0);
+  await UserPreferences.setUni("NotLoggedInError");
 }
