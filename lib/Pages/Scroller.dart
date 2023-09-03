@@ -70,12 +70,12 @@ class _ScrollerState extends State<Scroller> {
     loadFilters();
     List<Map<String, dynamic>> groups = [];
     final CollectionReference docGroups =
-        FirebaseFirestore.instance.collection("Groups");
+    FirebaseFirestore.instance.collection("Groups");
     try {
       QuerySnapshot querySnapshot = await docGroups.where('AllowedUnis', arrayContains: UserPreferences.getUni()).get();
       for (QueryDocumentSnapshot docSnapshot in querySnapshot.docs) {
         Map<String, dynamic>? data =
-            docSnapshot.data() as Map<String, dynamic>?;
+        docSnapshot.data() as Map<String, dynamic>?;
 
         if (docSnapshot.exists &&
             !data?["BlackList"].contains(Auth().currentUser())) {
@@ -110,7 +110,7 @@ class _ScrollerState extends State<Scroller> {
   @override
   void initState() {
     getGroups();
-   _loadAd();
+    _loadAd();
     super.initState();
   }
 
@@ -656,7 +656,7 @@ Future<void> addToBlacklist(String groupId, bool block) async {
 
 Future<void> addToShortList(String groupId) async {
   final CollectionReference usersCollection =
-      FirebaseFirestore.instance.collection('Users');
+  FirebaseFirestore.instance.collection('Users');
   final CollectionReference groupsCollection =
   FirebaseFirestore.instance.collection('Groups');
 
@@ -671,14 +671,14 @@ Future<void> addToShortList(String groupId) async {
 
 Future<bool> addToApplicants(String groupId) async {
   final CollectionReference groupsCollection =
-      FirebaseFirestore.instance.collection('Groups');
+  FirebaseFirestore.instance.collection('Groups');
   final DocumentReference groupDocRef = groupsCollection.doc(groupId);
 
   final DocumentSnapshot<Map<String, dynamic>> userSnapshot =
-      await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(Auth().currentUser())
-          .get();
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(Auth().currentUser())
+      .get();
 
   final int joinedGroups = userSnapshot.data()?['Joined'].length;
 

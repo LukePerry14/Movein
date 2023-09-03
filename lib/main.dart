@@ -303,7 +303,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
                         return;
                       },
-                      child: Text('Login',
+                      child: Text('login'.tr,
                           style: GoogleFonts.redHatDisplay(
                               color: Colors.white, fontSize: 16.5)),
                     ),
@@ -534,8 +534,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                 Expanded(
                                   child: FormBuilderTextField(
                                     name: 'password_conf',
-                                    decoration: const InputDecoration(
-                                        labelText: 'Confirm password'),
+                                    decoration: InputDecoration(
+                                        labelText: 'password-conf'.tr),
                                     obscureText:
                                     _passwordConfObscured, // Use the variable to control the obscuring
                                     controller: _passwordConfController,
@@ -870,7 +870,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           }
                           return;
                         },
-                        child: Text('Signup',
+                        child: Text('signup'.tr,
                             style: GoogleFonts.redHatDisplay(
                                 color: Colors.white, fontSize: 16.5)),
                       ),
