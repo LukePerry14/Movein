@@ -12,8 +12,11 @@ import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
 import 'package:movein/Scroller%20Code/swipe_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:movein/Pages/Scroller.dart';
+import 'package:movein/Pages/Messages.dart' as mb;
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
+import 'package:dash_chat_2/dash_chat_2.dart';
+import 'package:sendbird_sdk/sendbird_sdk.dart' as sb ;
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
 import '../main.dart';
@@ -1246,8 +1249,45 @@ class _FriendsState extends State<Friends> {
                                             motion: const ScrollMotion(),
                                             children: [
                                               SlidableAction(
-                                                onPressed: (context) {
+                                                onPressed: (context) async{
+                                                  String clickedOnUser = searchResults[index]["Id"];
+                                                  String userId = Auth().currentUser();
+
+                                                  var usersIds = [clickedOnUser, userId];
+                                                  usersIds.sort();
+                                                  final groupChannel = await ConnectSendbird().returnChannel(usersIds[0] + usersIds[1]);
+                                                  sb.User clicked = await ConnectSendbird().findUserViaId(clickedOnUser);
+                                                  sb.User current = await ConnectSendbird().findUserViaId(userId);
+                                                  Navigator.push(context,PageTransition
+                                                  (
+                                                    curve: Curves.linear,
+                                                    type: PageTransitionType.topToBottom,
+                                          
+                                                    child: const mb.Messages(),
+                                                    settings: RouteSettings
+                                                    (
+                                                              arguments:
+                                                              {
+                                                                'channel':groupChannel,
+                                                                'members': [mb.Messages().asDashChatUser(clicked),mb.Messages().asDashChatUser(current)],
+                                                                'groupId': usersIds[0] + usersIds[1],
+                                                                'groupName': clicked.nickname
+
+                                                              }
+                                                    )
+
+                                                    
+                                                    
+                                                    )
+
+                                                  );
+
                                                   //ToDo For Raine: add in 1-1 private messages
+
+
+                                                  //get current user and other user 
+
+
                                                 },
                                                 backgroundColor:
                                                     Colors.lightBlueAccent,
@@ -1966,6 +2006,7 @@ class _FriendsState extends State<Friends> {
                                               children: [
                                                 SlidableAction(
                                                   onPressed: (context) async {
+                                                     await ConnectSendbird().createDM([friendSearchResults[index]["Id"],Auth().currentUser()], 'Chat', '');
                                                     await addFriend(
                                                       friendSearchResults[index]
                                                           ["Id"],
@@ -2132,18 +2173,11 @@ class _FriendsState extends State<Friends> {
                                                   children: [
                                                     SlidableAction(
                                                       onPressed:
+                                                      
                                                           (context) async {
-                                                        ConnectSendbird()
-                                                            .createDM([
-                                                          friendSearchResults[
-                                                              index]["Id"],
-                                                          Auth().currentUser()
-                                                        ], 'Chat', '');
-                                                        await addFriend(
-                                                          friendSearchResults[
-                                                              index]["Id"],
-                                                          Auth().currentUser(),
-                                                        );
+                                                            
+                                                        await ConnectSendbird().createDM([friendSearchResults[index]["Id"],Auth().currentUser()], 'Chat', '');
+                                                        await addFriend(friendSearchResults[index]["Id"],Auth().currentUser());
                                                         // reloadData();
                                                       },
                                                       backgroundColor:

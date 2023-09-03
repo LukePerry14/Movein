@@ -2,7 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart';
-
+import 'package:movein/Pages/Messages.dart' as mb;
 class ConnectSendbird 
 {
    Future<User> connect(String appId, String userId, String nickname) async {
@@ -67,6 +67,7 @@ Future<GroupChannel> returnChannel(String channelUrl) async
         .. userIds = userIds
         ..channelUrl = userIds[0] + userIds[1]
         ..isDistinct = true
+        ..customType = 'DM'
         ..name = groupName;
         final groupChannel = await GroupChannel.createChannel(params);
         return groupChannel;
@@ -91,4 +92,20 @@ Future<GroupChannel> returnChannel(String channelUrl) async
       catch(e)
       {print('Error');}
     }
+
+    Future <User> findUserViaId(String userId)
+    async {
+      final query = ApplicationUserListQuery();
+      query.userIds= [userId];
+
+      try {
+
+        final user = await query.loadNext();
+        return user[0];
+
+      }
+      catch (e){throw e;}
+
+    }
+
 }

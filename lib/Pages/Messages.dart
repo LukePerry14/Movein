@@ -16,7 +16,16 @@ import 'GroupOptions.dart';
 
 class Messages extends StatefulWidget {
   //final GroupChannel groupchannel;
-  
+ ChatUser asDashChatUser(User user)
+  {
+   return ChatUser(
+    
+        firstName: user.nickname,
+        id: user.userId,
+        profileImage: user.profileUrl,
+
+   );
+  }
   const Messages({Key? key}) : super(key: key);
 
   @override
@@ -141,6 +150,10 @@ Future<void> getMessages(GroupChannel channel) async {
                   icon: Icon(Icons.more_vert, color: LAppTheme.lightTheme.primaryColor),
                   //Icon not showing
                   onPressed: () {
+                    if (data["groupChannel"].customType == "DM")
+                    {}
+                    else
+                    {
                     Navigator.push(context, PageTransition(
                         curve: Curves.linear,
                         type: PageTransitionType.topToBottom,
@@ -154,6 +167,7 @@ Future<void> getMessages(GroupChannel channel) async {
                             }
                         )),
                     );
+                    }
                   },
                 ),
               ],
@@ -168,13 +182,18 @@ Future<void> getMessages(GroupChannel channel) async {
                 (
                       showCurrentUserAvatar: false,
                       onPressAvatar: (ChatUser user)
-                      
                       {
+                     if (data["groupChannel"].customType == "DM")
+                     {}
+                     else
+                     {
+                     
                           showDialog<String> 
                           (
                             context:context,
                             builder: (BuildContext context) => PreviewCard(foreName: 'placeholder', user: user)
                           );
+                     }
                       },
 
 
