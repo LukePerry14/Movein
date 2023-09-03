@@ -20,6 +20,7 @@ import 'package:http/http.dart' as http;
 import 'package:azstore/azstore.dart' as AzureStorage;
 import 'package:uuid/uuid.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:flutter_profile_picture/flutter_profile_picture.dart';
 
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
@@ -37,6 +38,7 @@ class Profile extends StatefulWidget {
 
 class _ProfilePage extends State<Profile> {
   var data;
+  File? _profileImage;
   final TextEditingController _copyController = TextEditingController();
 
   void _copyToClipboard(BuildContext context) {
@@ -92,9 +94,22 @@ class _ProfilePage extends State<Profile> {
     try {
       var uuid = Uuid();
       String imageName = uuid.v1();
-      // THIS STRING NEEDS TO BE STORED IN FIREBASE FOR THE PROFILE IMAGE ------ LUKE?
       await x.putBlob('/moveinimages/$imageName.jpg',
           contentType: 'image/jpg', bodyBytes: bytes);
+      setState(() {
+        _profileImage = imageFile;
+      });
+    } catch (e) {
+      print('Exception: $e');
+    }
+  }
+
+  Future<void> _deleteProfileImageFromAzure(String fileString) async {
+    var x = AzureStorage.AzureStorage.parse(
+      'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net'
+      );
+    try {
+      await x.deleteBlob('/moveinimages/$fileString.jpg');
     } catch (e) {
       print('Exception: $e');
     }
@@ -139,11 +154,19 @@ class _ProfilePage extends State<Profile> {
                                     // Set a fixed width for the container
                                     height: 150,
                                     // Set a fixed height for the container
-                                    decoration: const BoxDecoration(
+                                    decoration: BoxDecoration(
                                       shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                        image: _profileImage != null ? FileImage(_profileImage!) : const AssetImage('assets/Pictures/turt.png') as ImageProvider
+                                      )
                                     ),
                                     child: ButtonWidgetShareProfile(
-                                      onClicked: () {},
+                                      onClicked: () async {
+                                        final pickedImage = await pickImage();
+                                        if (pickedImage != null) {
+                                          await _uploadImageToAzure(pickedImage);
+                                        }
+                                },
                                     )),
                               ),
                               const SizedBox(height: 20.0),
