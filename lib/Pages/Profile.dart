@@ -143,11 +143,7 @@ class _ProfilePage extends State<Profile> {
                             children: [
                               const SizedBox(height:10),
                               GestureDetector(
-                                onTap: () async {
-                                  final pickedImage = await pickImage();
-                                  if (pickedImage != null) {
-                                    await _uploadImageToAzure(pickedImage);
-                                  }
+                                onTap: () {
                                 },
                                 child: Container(
                                     width: 150,
