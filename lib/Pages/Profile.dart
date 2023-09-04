@@ -39,6 +39,7 @@ class Profile extends StatefulWidget {
 class _ProfilePage extends State<Profile> {
   var data;
   File? _profileImage;
+  String? _defaultProfileImagePath = 'assets/Pictures/turn.png';
   final TextEditingController _copyController = TextEditingController();
 
   void _copyToClipboard(BuildContext context) {
@@ -92,13 +93,10 @@ class _ProfilePage extends State<Profile> {
     var x = AzureStorage.AzureStorage.parse(
         'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
     try {
-      var uuid = Uuid();
+      var uuid = const Uuid();
       String imageName = uuid.v1();
       await x.putBlob('/moveinimages/$imageName.jpg',
           contentType: 'image/jpg', bodyBytes: bytes);
-      // setState(() {
-      //   _profileImage = imageFile;
-      // });
     } catch (e) {
       print('Exception: $e');
     }
@@ -128,6 +126,7 @@ class _ProfilePage extends State<Profile> {
             data = snapshot.data;
             var name = data[0];
             var profPic = data[1];
+            var defaultProfilePicture = Image.asset('assets/Pictures/turt.png');
             return Builder(builder: (context) {
               final navigator = Navigator.of(context);
               bool isDark = App.themeNotifier.value == ThemeMode.dark;
@@ -142,48 +141,30 @@ class _ProfilePage extends State<Profile> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               const SizedBox(height:10),
-                              // COULD NOT GET THIS TO WORK
-                              // GestureDetector(
-                              //   onTap: () {S
-                              //   },
-                              //   // child: Container(
-                              //   //     width: 150,
-                              //   //     // Set a fixed width for the container
-                              //   //     height: 150,
-                              //   //     // Set a fixed height for the container
-                              //   //     decoration: BoxDecoration(
-                              //   //       shape: BoxShape.circle,
-                              //   //       image: DecorationImage(
-                              //   //         image: _profileImage != null ? FileImage(_profileImage!) : const AssetImage('assets/Pictures/turt.png') as ImageProvider
-                              //   //       )
-                              //   //     ),
-                              //   //     child: ButtonWidgetShareProfile(
-                              //   //       onClicked: () async {
-                              //   //         final pickedImage = await pickImage();
-                              //   //         if (pickedImage != null) {
-                              //   //           await _uploadImageToAzure(pickedImage);
-                              //   //         }
-                              //   // },
-                              //   //     )),
-                                
-                              // ),
-                              Container(
+                              SizedBox(
                                 width: 150, 
                                 height:150, 
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle
-                                ),
-                                child: _profileImage == null ? const Text('No Profile Image') : Image.file(_profileImage!)
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: _profileImage == null ? defaultProfilePicture : Image.file(_profileImage!)
+                                )
                               ),
-                              ElevatedButton(onPressed: () async {
-                                  final pickedImage = await pickImage();
-                                  if (pickedImage != null) {
-                                    await _uploadImageToAzure(pickedImage);
-                                    setState(() {
-                                      _profileImage = pickedImage;
-                                    });
-                                  }
-                              }, child: const Text('Change Profile Picture')),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ElevatedButton(onPressed: () async {
+                                    final pickedImage = await pickImage();
+                                    if (pickedImage != null) {
+                                      await _uploadImageToAzure(pickedImage);
+                                      setState(() {
+                                        _profileImage = pickedImage;
+                                      });
+                                    }
+                                }, child: const Icon(
+                                  Icons.edit,
+                                ),),
+                              ),
                               const SizedBox(height: 20.0),
                               Text(name,
                                   style: Theme.of(context).textTheme.headlineMedium),
