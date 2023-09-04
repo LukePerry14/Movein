@@ -818,6 +818,58 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       Text(errorMessage),
                       const SizedBox(height: 5),
+                      Align(
+                        alignment: Alignment.bottomLeft,
+                        child: TextButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('privacy-policy'.tr),
+                                  content: SingleChildScrollView(
+                                    child: Text(
+                                      '',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                  actions: <Widget>[
+                                    IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        icon: const Icon(LineAwesomeIcons.times_circle)
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          child: Text(
+                            'view-privacy'.tr,
+                            style: TextStyle(
+                              color: Theme.of(context).primaryColor, // Change the color to your desired hyperlink color
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height:10),
+                      FormBuilderCheckbox(
+                        name: 'acceptPrivacyPolicy',
+                        validator: (value) {
+                          if (value != true){
+                            return "privacy-error".tr;
+                          } else {
+                            return null;
+                          }
+
+                        },
+                        title: Text(
+                          'accept-privacy'.tr,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: (profileInfoValid &

@@ -118,6 +118,10 @@ class AppTranslations extends Translations {
           "got-it" : "Got it",
           "skip" : "Skip",
 
+          "accept-privacy" : "I have read, understand and accept the privacy policy",
+          "privacy-policy" : "Privacy Policy",
+          "view-privacy" : "View Privacy Policy",
+          "privacy-error" : "You must accept the privacy policy to continue",
 
           'mems': 'Members',
           'asleep': 'Normally asleep by',
