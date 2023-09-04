@@ -293,8 +293,13 @@ class AppTranslations extends Translations {
           "got-it" : "Entendido",
           "skip" : "Saltar",
 
+  "accept-privacy": "He leído, comprendo y acepto la política de privacidad",
+  "privacy-policy": "Política de Privacidad",
+  "view-privacy": "Ver Política de Privacidad",
+  "privacy-error": "Debes aceptar la política de privacidad para continuar",
 
-          'mems': 'Miembros',
+
+  'mems': 'Miembros',
               'asleep': 'Más dormido alrededor de ',
               'clean': 'Limpieza promedio de la casa',
               'noise': 'Nivel de ruido promedio en la casa',
@@ -464,7 +469,12 @@ class AppTranslations extends Translations {
           "got-it" : "知道了",
           "skip" : "跳过",
 
-          'mems': '成员',
+  "accept-privacy": "我已阅读、理解并接受隐私政策",
+  "privacy-policy": "隐私政策",
+  "view-privacy": "查看隐私政策",
+  "privacy-error": "您必须接受隐私政策才能继续",
+
+  'mems': '成员',
 
               'asleep': '平均就寝时间',
               'clean': '房屋的平均整洁程度',
@@ -635,6 +645,11 @@ class AppTranslations extends Translations {
   "got-it" : "J'ai compris",
   "skip" : "Passer",
 
+  "accept-privacy": "J'ai lu, compris et accepté la politique de confidentialité",
+  "privacy-policy": "Politique de confidentialité",
+  "view-privacy": "Voir la politique de confidentialité",
+  "privacy-error": "Vous devez accepter la politique de confidentialité pour continuer",
+
 
   'mems': 'Membres',
               'asleep': "La plupart s'endorment vers ",
@@ -754,7 +769,13 @@ class AppTranslations extends Translations {
           "welcome" : "मूवइन में आपका स्वागत है!",
           "welcome-desc" : "चलो, तुम्हें एक घर ढूंढ़ते हैं",
 
-          'mems': 'सदस्य',
+  "accept-privacy": "मैंने प्राइवेसी नीति को पढ़ा, समझा और स्वीकार किया है",
+  "privacy-policy": "गोपनीयता नीति",
+  "view-privacy": "गोपनीयता नीति देखें",
+  "privacy-error": "आपको जारी रखने के लिए गोपनीयता नीति को स्वीकार करना होगा",
+
+
+  'mems': 'सदस्य',
               'asleep': 'सबसे ज्यादा सोते हैं लगभग ',
               'clean': 'औसत घर की साफ-सफाई',
               'noise': 'औसत घर की शोरगुल',

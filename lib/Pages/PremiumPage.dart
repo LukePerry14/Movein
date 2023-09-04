@@ -72,7 +72,7 @@ class _PremiumState extends State<Premium> {
                         Positioned(
                           top: -60,
                             left: MediaQuery.of(context).size.width * 0.025,
-                            child: SizedBox(height: MediaQuery.of(context).size.width * 0.88, width: MediaQuery.of(context).size.width * 0.88, child: const Image(image: AssetImage("assets/Pictures/reversed.png")))
+                            child: SizedBox(height: MediaQuery.of(context).size.width * 0.88, width: MediaQuery.of(context).size.width * 0.88, child: const Image(image: AssetImage("assets/Pictures/gradient.png")))
                         ),
                         Positioned(
                           bottom: MediaQuery.of(context).size.width * 0.52,
