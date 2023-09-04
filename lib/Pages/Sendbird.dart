@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart';
 import 'package:movein/Pages/Messages.dart' as mb;
+
 class ConnectSendbird 
 {
    Future<User> connect(String appId, String userId, String nickname) async {
