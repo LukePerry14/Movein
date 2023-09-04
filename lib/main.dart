@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,6 +28,9 @@ import 'Auth code/auth.dart';
 import 'package:azblob/azblob.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:sendbird_chat_sdk/sendbird_chat_sdk.dart';
+import 'package:azstore/azstore.dart' as AzureStorage;
+import 'package:uuid/uuid.dart';
+import 'package:image_picker/image_picker.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -350,6 +354,10 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _passwordConfController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
+  File? _profilePicture1;
+  File? _profilePicture2;
+  File? _profilePicture3;
+
   bool _passwordObscured = true;
   bool _passwordConfObscured = true;
   final _universityController = TextEditingController();
@@ -379,6 +387,31 @@ class _SignupScreenState extends State<SignupScreen> {
     _timer.cancel(); // Cancel the timer when the widget is disposed
     super.dispose();
   }
+
+  Future<void> _uploadImageToAzure(File imageFile) async {
+  Uint8List bytes = imageFile.readAsBytesSync();
+    var x = AzureStorage.AzureStorage.parse(
+        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+    try {
+      var uuid = const Uuid();
+      String imageName = uuid.v1();
+      await x.putBlob('/moveinimages/$imageName.jpg',
+          contentType: 'image/jpg', bodyBytes: bytes);
+    } catch (e) {
+      print('Exception: $e');
+    }
+  }
+
+  Future<File?> pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      return File(image.path);
+    } else {
+      print('No image selected.');
+      return null;
+    }
+  }  
 
   @override
   Widget build(BuildContext context) {
@@ -617,6 +650,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                   return null;
                                 },
                               ),
+                              const SizedBox(height: 10),
+                              // This is where the profile images go
+                              
+
                               const SizedBox(height: 10),
                               FormBuilderDateTimePicker(
                                 inputType: InputType.date,

@@ -12,6 +12,8 @@ import 'package:movein/Pages/Sendbird.dart' ;
 
 
 import 'dart:io';
+import 'package:azstore/azstore.dart' as AzureStorage;
+import 'package:uuid/uuid.dart';
 //import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:movein/UserPreferences.dart';
@@ -615,18 +617,6 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
   final TextEditingController _groupNameController = TextEditingController(text: "GroupName");
   File? _selectedImage;
 
-
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    }
-  }
-
   Future<void> _submitForm(int appsMax) async {
     if (_formKey.currentState!.validate()) {
       final String groupName = _groupNameController.text;
@@ -688,6 +678,32 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
     }
   }
 
+  Future<File?> pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      return File(image.path);
+    } else {
+      print('No image selected.');
+      return null;
+    }
+  }
+
+  Future<String> _uploadImageToAzure(File imageFile) async {
+    Uint8List bytes = imageFile.readAsBytesSync();
+    var x = AzureStorage.AzureStorage.parse(
+        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+    try {
+      var uuid = const Uuid();
+      String imageName = uuid.v1();
+      await x.putBlob('/moveingroupimages/$imageName.jpg',contentType: 'image/jpg', bodyBytes: bytes);
+      return imageName;
+    } catch (e) {
+      print('Exception: $e');
+      return 'Image not uploaded: $e';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return IntrinsicHeight(
@@ -744,7 +760,18 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                     },
                   ),
                   GestureDetector(
-                    onTap: _pickImage,
+                    // Azure upload goes here - Billy
+                    onTap: () async {
+                      final pickedImage = await pickImage();
+                      if (pickedImage!= null) {
+                        String uniqueID = await _uploadImageToAzure(pickedImage);
+                        // uniqueID needs to be assigned to firebase image name for the group
+                        // THIS NEEDS TO BE DONE
+                        setState(() {
+                          _selectedImage = pickedImage;
+                        });
+                      }
+                    },
                     child: Container(
                       width: 100,
                       height: 100,
