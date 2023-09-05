@@ -358,6 +358,14 @@ class _SignupScreenState extends State<SignupScreen> {
   File? _profilePicture2;
   File? _profilePicture3;
 
+  String? _profilePicture1String;
+  String? _profilePicture2String;
+  String? _profilePicture3String;
+
+  var defaultProfilePicture = Image.asset('assets/Pictures/turt.png');
+
+  var uuid = const Uuid();
+
   bool _passwordObscured = true;
   bool _passwordConfObscured = true;
   final _universityController = TextEditingController();
@@ -652,8 +660,61 @@ class _SignupScreenState extends State<SignupScreen> {
                               ),
                               const SizedBox(height: 10),
                               // This is where the profile images go
-                              
-
+                              const Text('Profile Photo'),
+                              const SizedBox(height: 10),
+                              Container(
+                                child:  _profilePicture1 == null ? defaultProfilePicture : Image.file(_profilePicture1!),
+                              ),
+                              const SizedBox(height: 20),
+                              // Container for image
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final pickedImage = await pickImage();
+                                  if (_profilePicture1 != null) {
+                                    _profilePicture1String = uuid.v1();
+                                    setState(() {
+                                      _profilePicture1 = pickedImage;
+                                    });
+                                  }
+                                },
+                                child: const Icon(Icons.edit)
+                              ),
+                              const Text('Second Image'),
+                              const SizedBox(height: 10),
+                              Container(
+                                child:  _profilePicture2 == null ? defaultProfilePicture : Image.file(_profilePicture2!),
+                              ),
+                              const SizedBox(height: 20),
+                              // Container for second image
+                              ElevatedButton(
+                                onPressed: () async { 
+                                  final pickedImage = await pickImage();
+                                  if (_profilePicture2 != null) {
+                                    _profilePicture2String = uuid.v1();
+                                    setState(() {
+                                      _profilePicture2 = pickedImage;
+                                    });
+                                  }
+                                }, 
+                                child: const Icon(Icons.edit)
+                              ),
+                              const SizedBox(height: 10),
+                              const Text('Third Picture'),
+                              const SizedBox(height: 10),
+                              Container(
+                                child:  _profilePicture3 == null ? defaultProfilePicture : Image.file(_profilePicture3!),
+                              ),
+                              const SizedBox(height: 20),
+                              // container for third picture
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final _profilePicture3 = await pickImage();
+                                  if (_profilePicture3 != null) {
+                                    _profilePicture3String = uuid.v1();
+                                  }
+                                }, 
+                                child: const Icon(Icons.edit)
+                              ),
                               const SizedBox(height: 10),
                               FormBuilderDateTimePicker(
                                 inputType: InputType.date,

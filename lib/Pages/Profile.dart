@@ -39,7 +39,7 @@ class Profile extends StatefulWidget {
 class _ProfilePage extends State<Profile> {
   var data;
   File? _profileImage;
-  String? _defaultProfileImagePath = 'assets/Pictures/turn.png';
+  String? _defaultProfileImagePath = 'assets/Pictures/turt.png';
   final TextEditingController _copyController = TextEditingController();
 
   void _copyToClipboard(BuildContext context) {
