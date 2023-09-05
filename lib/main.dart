@@ -362,7 +362,7 @@ class _SignupScreenState extends State<SignupScreen> {
   String? _profilePicture2String;
   String? _profilePicture3String;
 
-  var defaultProfilePicture = Image.asset('assets/Pictures/turt.png');
+  var defaultProfilePicture = Image.network('https://movein.blob.core.windows.net/moveinimages/a1064ae0-4b38-11ee-ab60-dfd45d30409d.jpg');
 
   var uuid = const Uuid();
 
@@ -418,7 +418,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     // picture 2
     try {
-      await x.putBlob('/moveinimages/$imageString2.jpg', contentType: 'image/jpg', bodyBytes: bytes1);
+      await x.putBlob('/moveinimages/$imageString2.jpg', contentType: 'image/jpg', bodyBytes: bytes2);
     } catch (e) {
       state2 = 1;
       print('Exception: $e');
@@ -436,6 +436,7 @@ class _SignupScreenState extends State<SignupScreen> {
       print('Successful upload.');
     } else {
       // images that uploaded will need to be deleted as whole set couldn't have been uploaded
+      // This can done later
     }
   }
 
