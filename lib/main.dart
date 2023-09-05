@@ -396,17 +396,46 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  Future<void> _uploadImageToAzure(File imageFile) async {
-  Uint8List bytes = imageFile.readAsBytesSync();
+  Future<void> _uploadImageToAzure(File imageFile1, File imageFile2, File, imageFile3, String imageString1, String imageString2, String imageString3) async {
+    Uint8List bytes1 = imageFile1.readAsBytesSync();
+    Uint8List bytes2 = imageFile2.readAsBytesSync();
+    Uint8List bytes3 = imageFile3.readAsBytesSync();
+
+    var state1 = 0;
+    var state2 = 0;
+    var state3 = 0;
+
     var x = AzureStorage.AzureStorage.parse(
         'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+      
+    // uploads profile image
     try {
-      var uuid = const Uuid();
-      String imageName = uuid.v1();
-      await x.putBlob('/moveinimages/$imageName.jpg',
-          contentType: 'image/jpg', bodyBytes: bytes);
+      await x.putBlob('/moveinimages/$imageString1.jpg', contentType: 'image/jpg', bodyBytes: bytes1);
     } catch (e) {
+      state1 = 1;
       print('Exception: $e');
+    }
+
+    // picture 2
+    try {
+      await x.putBlob('/moveinimages/$imageString2.jpg', contentType: 'image/jpg', bodyBytes: bytes1);
+    } catch (e) {
+      state2 = 1;
+      print('Exception: $e');
+    }
+
+    // picture 3
+    try {
+      await x.putBlob('/moveinimages/$imageString3.jpg', contentType: 'image/jpg', bodyBytes: bytes3);
+    } catch (e) {
+      state3 = 1;
+      print('Exception: $e');
+    }
+
+    if (state1 == 0 && state2 == 0 && state3 == 0) {
+      print('Successful upload.');
+    } else {
+      // images that uploaded will need to be deleted as whole set couldn't have been uploaded
     }
   }
 
@@ -662,15 +691,17 @@ class _SignupScreenState extends State<SignupScreen> {
                               // This is where the profile images go
                               const Text('Profile Photo'),
                               const SizedBox(height: 10),
-                              Container(
-                                child:  _profilePicture1 == null ? defaultProfilePicture : Image.file(_profilePicture1!),
+                              SizedBox(
+                                height: 150,
+                                width: 150,
+                                child: _profilePicture1 == null ? defaultProfilePicture : Image.file(_profilePicture1!),
                               ),
                               const SizedBox(height: 20),
                               // Container for image
                               ElevatedButton(
                                 onPressed: () async {
                                   final pickedImage = await pickImage();
-                                  if (_profilePicture1 != null) {
+                                  if (pickedImage != null) {
                                     _profilePicture1String = uuid.v1();
                                     setState(() {
                                       _profilePicture1 = pickedImage;
@@ -679,9 +710,12 @@ class _SignupScreenState extends State<SignupScreen> {
                                 },
                                 child: const Icon(Icons.edit)
                               ),
+                              const SizedBox(height: 20),
                               const Text('Second Image'),
                               const SizedBox(height: 10),
-                              Container(
+                              SizedBox(
+                                height: 150,
+                                width: 150,
                                 child:  _profilePicture2 == null ? defaultProfilePicture : Image.file(_profilePicture2!),
                               ),
                               const SizedBox(height: 20),
@@ -689,7 +723,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               ElevatedButton(
                                 onPressed: () async { 
                                   final pickedImage = await pickImage();
-                                  if (_profilePicture2 != null) {
+                                  if (pickedImage != null) {
                                     _profilePicture2String = uuid.v1();
                                     setState(() {
                                       _profilePicture2 = pickedImage;
@@ -698,18 +732,20 @@ class _SignupScreenState extends State<SignupScreen> {
                                 }, 
                                 child: const Icon(Icons.edit)
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 20),
                               const Text('Third Picture'),
                               const SizedBox(height: 10),
-                              Container(
+                              SizedBox(
+                                height: 150,
+                                width: 150,
                                 child:  _profilePicture3 == null ? defaultProfilePicture : Image.file(_profilePicture3!),
                               ),
                               const SizedBox(height: 20),
                               // container for third picture
                               ElevatedButton(
                                 onPressed: () async {
-                                  final _profilePicture3 = await pickImage();
-                                  if (_profilePicture3 != null) {
+                                  final pickedImage = await pickImage();
+                                  if (pickedImage != null) {
                                     _profilePicture3String = uuid.v1();
                                   }
                                 }, 
