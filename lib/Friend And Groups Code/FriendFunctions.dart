@@ -617,7 +617,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
   final TextEditingController _groupNameController = TextEditingController(text: "GroupName");
   File? _selectedImage;
 
-  Future<void> _submitForm(int appsMax) async {
+  Future<void> _submitForm(int appsMax, String? groupImageString) async {
     if (_formKey.currentState!.validate()) {
       final String groupName = _groupNameController.text;
 
@@ -668,6 +668,9 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
       });
       var newChannel = ConnectSendbird().createChannel(widget.userId, groupName, null , newGroupDocument.id);
 
+      // uploads image to azure after successful creation of group
+      _uploadImageToAzure(_selectedImage, groupImageString);      
+
       List<dynamic> joinedGroups = userSnapshot.get('Joined');
 
       // Check if the user has joined the maximum number of groups
@@ -689,23 +692,23 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
     }
   }
 
-  Future<String> _uploadImageToAzure(File imageFile) async {
-    Uint8List bytes = imageFile.readAsBytesSync();
+  Future<void> _uploadImageToAzure(File? imageFile, String? imageName) async {
+    Uint8List bytes = imageFile!.readAsBytesSync();
     var x = AzureStorage.AzureStorage.parse(
         'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
     try {
-      var uuid = const Uuid();
-      String imageName = uuid.v1();
+      // var uuid = const Uuid();
+      // String imageName = uuid.v1();
       await x.putBlob('/moveingroupimages/$imageName.jpg',contentType: 'image/jpg', bodyBytes: bytes);
-      return imageName;
+
     } catch (e) {
       print('Exception: $e');
-      return 'Image not uploaded: $e';
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    String? currentGroupImage;
     return IntrinsicHeight(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -764,9 +767,10 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                     onTap: () async {
                       final pickedImage = await pickImage();
                       if (pickedImage!= null) {
-                        String uniqueID = await _uploadImageToAzure(pickedImage);
-                        // uniqueID needs to be assigned to firebase image name for the group
-                        // THIS NEEDS TO BE DONE
+                        // String uniqueID = await _uploadImageToAzure(pickedImage);
+                        var uuid = const Uuid();
+                        String uniqueID = uuid.v1();
+                        String currentGroupImage = '$uniqueID.jpg';
                         setState(() {
                           _selectedImage = pickedImage;
                         });
@@ -793,7 +797,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                   ? () async {
                 if (_formKey.currentState?.validate() ?? false) {
 
-                  await _submitForm(UserPreferences.getAppsMax()).then((value) => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400))));
+                  await _submitForm(UserPreferences.getAppsMax(), currentGroupImage).then((value) => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400))));
                 }
               }
                   : null,

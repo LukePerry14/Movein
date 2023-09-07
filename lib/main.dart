@@ -703,7 +703,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 onPressed: () async {
                                   final pickedImage = await pickImage();
                                   if (pickedImage != null) {
-                                    _profilePicture1String = uuid.v1();
+                                    _profilePicture1String = '${uuid.v1()}.jpg';
                                     setState(() {
                                       _profilePicture1 = pickedImage;
                                     });
@@ -725,7 +725,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 onPressed: () async { 
                                   final pickedImage = await pickImage();
                                   if (pickedImage != null) {
-                                    _profilePicture2String = uuid.v1();
+                                    _profilePicture2String = '${uuid.v1()}.jpg';
                                     setState(() {
                                       _profilePicture2 = pickedImage;
                                     });
@@ -747,7 +747,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 onPressed: () async {
                                   final pickedImage = await pickImage();
                                   if (pickedImage != null) {
-                                    _profilePicture3String = uuid.v1();
+                                    _profilePicture3String = '${uuid.v1()}.jpg';
                                   }
                                 }, 
                                 child: const Icon(Icons.edit)
@@ -976,8 +976,10 @@ class _SignupScreenState extends State<SignupScreen> {
                           // debugPrint(_formKey.currentState?.value.toString());
                           Map<String,dynamic> data = Map<String,dynamic>.from(_formKey.currentState?.value ?? {});
                           data['UniAttended'] = _universityController.text;
-                          // Add image strings here as data['Image'] = ....
-                          Map<String,dynamic> reConfigedData = reConfigData(data);
+
+                          // TEST THIS FIREBASE CODE - SHOULD WORK
+
+                          Map<String,dynamic> reConfigedData = reConfigData(data, _profilePicture1String, _profilePicture2String, _profilePicture3String);
                           String response =
                           await Auth().registerWithUserDetails(
                             _formKey.currentState?.fields['email']?.value,
@@ -1081,7 +1083,7 @@ class _SignupScreenState extends State<SignupScreen> {
     });
   }
 
-  Map<String, dynamic> reConfigData(Map<String, dynamic> data) {
+  Map<String, dynamic> reConfigData(Map<String, dynamic> data, String? imageString1, String? imageString2, String? imageString3) {
     data.remove('password');
     data.remove('password_conf');
     data.remove('email');
@@ -1099,7 +1101,7 @@ class _SignupScreenState extends State<SignupScreen> {
     data['Joined'] = [];
     data['OutgoingFriendInvites'] = [];
     data['ShortList'] = [];
-    data['Images'] = ["assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png"];
+    data['Images'] = [imageString1, imageString2, imageString3];
     data['Subscribed'] = false;
     return data;
   }
