@@ -976,6 +976,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           // debugPrint(_formKey.currentState?.value.toString());
                           Map<String,dynamic> data = Map<String,dynamic>.from(_formKey.currentState?.value ?? {});
                           data['UniAttended'] = _universityController.text;
+                          // Add image strings here as data['Image'] = ....
                           Map<String,dynamic> reConfigedData = reConfigData(data);
                           String response =
                           await Auth().registerWithUserDetails(
@@ -987,6 +988,8 @@ class _SignupScreenState extends State<SignupScreen> {
                           if (response == 'success') {
                             //ACCESS_TOKEN
                             ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), data['ForeName']);
+
+                            // Upload to azure function - 
 
                             await UserPreferences.setUni(data['UniAttended']);
                             await UserPreferences.setAppsMax(2);
