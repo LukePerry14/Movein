@@ -12,6 +12,7 @@ import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Themes/lMode.dart';
 import 'package:movein/Pages/Settings.dart';
 import 'package:movein/Pages/Sendbird.dart';
+import 'package:movein/Pages/SessionToken.dart';
 import 'package:movein/Pages/Notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:movein/Translations.dart';
@@ -62,7 +63,7 @@ class App extends StatelessWidget {
               final bool loggedIn = (foreName != "NotLoggedInError");
               if (foreName != "NotLoggedInError") {
                 //ACCESS_TOKEN
-                ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), foreName);
+                //ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), foreName);
               }
               return GetMaterialApp(
                 debugShowCheckedModeBanner: false,
@@ -276,11 +277,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               await UserPreferences.setUni(userData['UniAttended']);
                               await UserPreferences.setForeName(userData['ForeName']);
                               //ACCESS_TOKEN
-                              ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),userData['ForeName']);
-                              if (SendbirdChat.getPendingPushToken() != null)
-                              {await Notifications.registerPushToken();}
+                             ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),userData['ForeName'],userData['AccessToken']);
+                              //if (SendbirdChat.getPendingPushToken() != null)
+                              //{await Notifications.registerPushToken();}
 
-                            }
+                            //}
                           }
                         Navigator.push(
                           context,
@@ -363,6 +364,7 @@ class _SignupScreenState extends State<SignupScreen> {
   late List<dynamic> universitiesData;
   late List<dynamic> domains;
   late List<dynamic> universitiesSuggestions;
+  late String _accessToken;
 
   @override
   void initState() {
@@ -903,7 +905,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
                           if (response == 'success') {
                             //ACCESS_TOKEN
-                            ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), data['ForeName']);
+                            _accessToken = await SessionToken().generateToken(Auth().currentUser(),data['ForeName']);
+                            ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), data['ForeName'],_accessToken);
 
                             await UserPreferences.setUni(data['UniAttended']);
                             await UserPreferences.setAppsMax(2);
