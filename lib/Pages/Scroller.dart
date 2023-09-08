@@ -110,7 +110,7 @@ class _ScrollerState extends State<Scroller> {
   @override
   void initState() {
     getGroups();
-    _loadAd();
+    //_loadAd();
     super.initState();
   }
 

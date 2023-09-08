@@ -16,6 +16,14 @@ class Auth {
     return uid ?? "";
   }
 
+  addAccessToken(String accessToken, String userId)
+  {
+    FirebaseFirestore.instance.collection("Users").doc(userId).update({'AccessToken':accessToken})
+    .then((_){print('Success');})
+    .catchError((error)
+    {print('failed');});
+  }
+
   Future<String> registerWithUserDetails(
       String email, String password, Map<String, dynamic> details) async {
     try {

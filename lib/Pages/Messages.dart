@@ -3,7 +3,9 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:movein/Pages/profilePreview.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:sendbird_chat_sdk/sendbird_chat_sdk.dart' as sbc;
 import 'package:sendbird_sdk/sendbird_sdk.dart' ;
+
 
 
 import 'package:movein/Pages/Sendbird.dart';
@@ -55,7 +57,8 @@ class _MessagesState extends State<Messages> with ChannelEventHandler {
     data = ModalRoute.of(context)?.settings.arguments as Map;
     groupChannel = (data["channel"]);
     groupChannel = (data["channel"]);
-    getMessages(groupChannel!);
+    getPrevMessages();
+    //getMessages(groupChannel!);
     SendbirdSdk().addChannelEventHandler(groupChannel.channelUrl, this);
     //groupChannel = ConnectSendbird().returnChannel("testUrl");
   }
@@ -69,7 +72,8 @@ class _MessagesState extends State<Messages> with ChannelEventHandler {
     //groupChannel = (data["channel"]);
     if (groupChannel != null)
     {
-      getMessages(groupChannel);
+      getPrevMessages();
+      //getMessages(groupChannel);
       //SendbirdSdk().addChannelEventHandler(groupChannel!.channelUrl, this);
     }
   }
@@ -102,14 +106,40 @@ Future<void> readMessages(GroupChannel channel) async {
 
 Future<void> getMessages(GroupChannel channel) async {
     try {
+      //sbc.SendbirdChat.markAsRead(channelUrls: );
       List<BaseMessage> messages = await channel.getMessagesByTimestamp(
-          DateTime.now().millisecondsSinceEpoch * 1000, MessageListParams());
+          DateTime.now().millisecondsSinceEpoch * 1000, 
+          MessageListParams()
+          
+          
+          );
       setState(() {
         _messages = messages;
       });
     } catch (e) {
       print('group_channel_view.dart: getMessages: ERROR: $e');
     }
+  }
+
+  Future <void> getPrevMessages() async
+  {
+      try
+      {
+        final query = PreviousMessageListQuery(
+          channelType: ChannelType.group,
+          channelUrl: data["groupId"],
+          
+          )
+          ..limit = 50;
+          final messages = await query.loadNext();
+          setState(()
+          {
+            _messages = messages;
+          }
+          
+          );
+      }
+      catch (e) {}
   }
 
 
@@ -150,7 +180,7 @@ Future<void> getMessages(GroupChannel channel) async {
                   icon: Icon(Icons.more_vert, color: LAppTheme.lightTheme.primaryColor),
                   //Icon not showing
                   onPressed: () {
-                    if (data["groupChannel"].customType == "DM")
+                    if (data["channel"].customType == "DM")
                     {}
                     else
                     {
@@ -183,7 +213,7 @@ Future<void> getMessages(GroupChannel channel) async {
                       showCurrentUserAvatar: false,
                       onPressAvatar: (ChatUser user)
                       {
-                     if (data["groupChannel"].customType == "DM")
+                     if (data["channel"].customType == "DM")
                      {}
                      else
                      {
@@ -225,7 +255,7 @@ Future<void> getMessages(GroupChannel channel) async {
                    
                     final params = UserMessageParams(message:messagew.text)
                     //..data = 'DATA'
-                    ..customType = 'custom'
+                    //..customType = 'custom'
                     
 
                     ;
