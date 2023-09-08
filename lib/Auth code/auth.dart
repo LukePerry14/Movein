@@ -47,6 +47,13 @@ class Auth {
         password: password,
       );
 
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user != null && !user.emailVerified) {
+        await user.sendEmailVerification();
+        return "email verification";
+      }
+
       return "success";
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
