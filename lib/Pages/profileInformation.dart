@@ -46,7 +46,7 @@ class _ProfileInformationState extends State<ProfileInformation> {
   void initState() {
     super.initState();
     getUserData();
-    loadAd();
+    //loadAd();
     _timer = Timer.periodic(const Duration(milliseconds: 500), (Timer timer) {
       _validateForm(); // Call your validation function here
     });

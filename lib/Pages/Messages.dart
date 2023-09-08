@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
+<<<<<<< Updated upstream
+=======
+import 'package:movein/Pages/profilePreview.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:sendbird_chat_sdk/sendbird_chat_sdk.dart' as sbc;
+>>>>>>> Stashed changes
 import 'package:sendbird_sdk/sendbird_sdk.dart' ;
+
 
 
 import 'package:movein/Pages/Sendbird.dart';
@@ -43,7 +50,8 @@ class _MessagesState extends State<Messages> with ChannelEventHandler {
     data = ModalRoute.of(context)?.settings.arguments as Map;
     groupChannel = (data["channel"]);
     groupChannel = (data["channel"]);
-    getMessages(groupChannel!);
+    getPrevMessages();
+    //getMessages(groupChannel!);
     SendbirdSdk().addChannelEventHandler(groupChannel.channelUrl, this);
     //groupChannel = ConnectSendbird().returnChannel("testUrl");
   }
@@ -57,7 +65,8 @@ class _MessagesState extends State<Messages> with ChannelEventHandler {
     //groupChannel = (data["channel"]);
     if (groupChannel != null)
     {
-      getMessages(groupChannel);
+      getPrevMessages();
+      //getMessages(groupChannel);
       //SendbirdSdk().addChannelEventHandler(groupChannel!.channelUrl, this);
     }
   }
@@ -82,14 +91,40 @@ class _MessagesState extends State<Messages> with ChannelEventHandler {
 
 Future<void> getMessages(GroupChannel channel) async {
     try {
+      //sbc.SendbirdChat.markAsRead(channelUrls: );
       List<BaseMessage> messages = await channel.getMessagesByTimestamp(
-          DateTime.now().millisecondsSinceEpoch * 1000, MessageListParams());
+          DateTime.now().millisecondsSinceEpoch * 1000, 
+          MessageListParams()
+          
+          
+          );
       setState(() {
         _messages = messages;
       });
     } catch (e) {
       print('group_channel_view.dart: getMessages: ERROR: $e');
     }
+  }
+
+  Future <void> getPrevMessages() async
+  {
+      try
+      {
+        final query = PreviousMessageListQuery(
+          channelType: ChannelType.group,
+          channelUrl: data["groupId"],
+          
+          )
+          ..limit = 50;
+          final messages = await query.loadNext();
+          setState(()
+          {
+            _messages = messages;
+          }
+          
+          );
+      }
+      catch (e) {}
   }
 
 
@@ -130,12 +165,33 @@ Future<void> getMessages(GroupChannel channel) async {
                   icon: Icon(Icons.more_vert, color: LAppTheme.lightTheme.primaryColor),
                   //Icon not showing
                   onPressed: () {
+<<<<<<< Updated upstream
                     Navigator.pushNamed(context, '/GroupOptions', arguments: {
                       'members': data['members'],
                       'groupId': data['groupId'],
                       'groupName': data['groupName'],
                       'groupPicture' : data['groupPicture'],
                     });
+=======
+                    if (data["channel"].customType == "DM")
+                    {}
+                    else
+                    {
+                    Navigator.push(context, PageTransition(
+                        curve: Curves.linear,
+                        type: PageTransitionType.topToBottom,
+                        child: const GroupOptions(),
+                        settings: RouteSettings(
+                            arguments: {
+                              'members': data["members"],
+                              'groupId': data["groupId"],
+                              'groupName': data["groupName"],
+                              'groupPicture' : data["groupPicture"],
+                            }
+                        )),
+                    );
+                    }
+>>>>>>> Stashed changes
                   },
                 ),
               ],
@@ -149,6 +205,25 @@ Future<void> getMessages(GroupChannel channel) async {
                 messageOptions: const MessageOptions
                 (
                       showCurrentUserAvatar: false,
+<<<<<<< Updated upstream
+=======
+                      onPressAvatar: (ChatUser user)
+                      {
+                     if (data["channel"].customType == "DM")
+                     {}
+                     else
+                     {
+                     
+                          showDialog<String> 
+                          (
+                            context:context,
+                            builder: (BuildContext context) => PreviewCard(foreName: 'placeholder', user: user)
+                          );
+                     }
+                      },
+
+
+>>>>>>> Stashed changes
                 ),
                 currentUser: user,
                 onSend: (ChatMessage messagew) async
@@ -174,7 +249,7 @@ Future<void> getMessages(GroupChannel channel) async {
                    
                     final params = UserMessageParams(message:messagew.text)
                     //..data = 'DATA'
-                    ..customType = 'custom'
+                    //..customType = 'custom'
                     
 
                     ;

@@ -10,25 +10,23 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/Pages/OnBoarding.dart';
 import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Themes/lMode.dart';
-import 'package:movein/Pages/Houses.dart';
-import 'package:movein/Pages/Messages.dart';
-import 'package:movein/Pages/Profile.dart';
 import 'package:movein/Pages/Settings.dart';
-import 'package:movein/Pages/profileInformation.dart';
-import 'package:movein/Pages/GroupOptions.dart';
-import 'package:movein/Pages/Friends.dart';
-import 'package:movein/Pages/ScrollRefresh.dart';
 import 'package:movein/Pages/Sendbird.dart';
+import 'package:movein/Pages/Notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:movein/Translations.dart';
 import 'package:movein/UserPreferences.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import 'Auth code/auth.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'Auth code/auth.dart';
+import 'package:azblob/azblob.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:sendbird_chat_sdk/sendbird_chat_sdk.dart';
 
 
 Future<void> main() async {
@@ -36,8 +34,8 @@ Future<void> main() async {
   MobileAds.instance.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await UserPreferences.init();
-  // await Settings.init(cacheProvider: CustomCacheProvider());
-  // Run the app
+
+
   runApp(const App());
 }
 
@@ -48,37 +46,48 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    _loadSavedTheme();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    return ValueListenableBuilder<ThemeMode>(
-        valueListenable: App.themeNotifier,
-        builder: (context, currentMode, child) {
-          return GetMaterialApp(
-            debugShowCheckedModeBanner: false,
-            translations: AppTranslations(),
-            locale: Get.deviceLocale,
-            theme: LAppTheme.lightTheme,
-            darkTheme: LAppTheme.darkTheme,
-            themeMode: currentMode,
-            initialRoute: FirebaseAuth.instance.currentUser == null
-                ? '/Login'
-                : '/Scroller',
-            routes: {
-              '/Login': (context) => const LoginScreen(),
-              '/Signup': (context) => const SignupScreen(),
-              '/Scroller': (context) => const Scroller(),
-              '/ScrollRefresh': (context) => const RanOut(),
-              '/Messages': (context) => const Messages(),
-              '/Profile': (context) => const Profile(),
-              '/Settings': (context) => const SettingsScaffold(),
-              '/profileInformation': (context) => const ProfileInformation(),
-              '/Friends': (context) => const Friends(),
-              '/Houses': (context) => const Houses(),
-              '/GroupOptions': (context) => const GroupOptions(),
-              '/OnBoarding': (context) => const OnBoardingPage(),
-            },
-          );
-        });
+      _loadSavedTheme();
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+      return MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: App.themeNotifier),
+          ChangeNotifierProvider(create: (_) => FriendsTrigger()),
+          //ChangeNotifierProvider(create: (context) => LinkFiveProvider("fae19762a8d0f160ead020291d33b644b70c69f576202d0c207d4a9153c72b7c"), lazy: false,),
+        ],
+        child: ValueListenableBuilder<ThemeMode>(
+            valueListenable: App.themeNotifier,
+            builder: (context, currentMode, child) {
+              final String foreName = UserPreferences.getForeName();
+              final bool loggedIn = (foreName != "NotLoggedInError");
+              if (foreName != "NotLoggedInError") {
+                //ACCESS_TOKEN
+               // ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), foreName);
+              }
+              return GetMaterialApp(
+                debugShowCheckedModeBanner: false,
+                translations: AppTranslations(),
+                locale: Get.deviceLocale,
+                theme: LAppTheme.lightTheme,
+                darkTheme: LAppTheme.darkTheme,
+                themeMode: currentMode,
+                initialRoute: !loggedIn
+                    ? '/Login'
+                    : '/Scroller',
+                  routes: {
+                    '/OnBoarding': (context) => const OnBoardingPage(),
+                  },
+
+                  onGenerateInitialRoutes: (initialRoute) {
+                    if (initialRoute == '/Scroller') {
+                      return [MaterialPageRoute(builder: (context) => const Scroller())];
+                    }
+                    else {
+                      return [MaterialPageRoute(builder: (context) => const LoginScreen())];
+                    }
+                  }
+              );
+            }),
+      );
   }
 
   void _loadSavedTheme() {
@@ -250,16 +259,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
                             if (userData != null) {
                               final subscribed = userData['Subscribed'];
-                              final uniAttended = userData['UniAttended'];
-                              await UserPreferences.setAppsMax(subscribed? 5:3);
-                              await UserPreferences.setUni(uniAttended);
+                              await UserPreferences.setAppsMax(subscribed? 5:2);
+                              await UserPreferences.setUni(userData['UniAttended']);
+                              await UserPreferences.setForeName(userData['ForeName']);
+                              //ACCESS_TOKEN
+                              ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),userData['ForeName'],userData['AccessToken']);
+                              //if (SendbirdChat.getPendingPushToken() != null)
+                              //{await Notifications.registerPushToken();}
 
-  //sign in - find sendbird account
-                              ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),userData['ForeName']);
-
-                            }
+//}
                           }
-                          Navigator.pushNamed(context, '/Scroller');
+                        Navigator.push(
+                          context,
+                          PageTransition(
+                            type: PageTransitionType.fade,
+                            child: const Scroller(),
+                            isIos: true,
+                            duration: Duration(milliseconds: 400),
+                          ),
+                        );
                           return;
                         } else {
                           setState(() {
@@ -321,6 +339,7 @@ class _SignupScreenState extends State<SignupScreen> {
   bool userInfoValid = false;
   bool profileInfoValid = false;
   bool preferenceInfoValid = false;
+  late String _accessToken;
   late List<dynamic> universitiesData;
   late List<dynamic> domains;
 
@@ -800,6 +819,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           }
                           // debugPrint(_formKey.currentState?.value.toString());
                           Map<String,dynamic> data = Map<String,dynamic>.from(_formKey.currentState?.value ?? {});
+                          
                           data['UniAttended'] = _universityController.text;
                           Map<String,dynamic> reConfigedData = reConfigData(data);
                           String response =
@@ -807,10 +827,11 @@ class _SignupScreenState extends State<SignupScreen> {
                             _formKey.currentState?.fields['email']?.value,
                             _formKey.currentState?.fields['password']?.value,
                             reConfigedData,
+                            
                           );
-
+                          
                           if (response == 'success') {
-
+                            //ACCESS_TOKEN
                             ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), data['ForeName']);
 
                             await UserPreferences.setUni(data['UniAttended']);
@@ -934,6 +955,8 @@ class _SignupScreenState extends State<SignupScreen> {
     data['ShortList'] = [];
     data['Images'] = ["assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png"];
     data['Subscribed'] = false;
+    //data['AccessToken'] = _accessToken ?? '';
+    
     return data;
   }
 }

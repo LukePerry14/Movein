@@ -11,13 +11,14 @@ class UserPreferences {
   static const _keyNightPref = 'nightPref';
   static const _keyYearPref = 'yearPref';
   static const _keyUni = 'Uni';
+  static const _keyForeName = 'foreName';
 
   static Future<SharedPreferences?> init() async => _preferences = await SharedPreferences.getInstance();
 
   static Future setAppsMax(int AppsMax)  async =>
       await _preferences.setInt(_keyAppsMax, AppsMax);
 
-  static int getAppsMax() => _preferences.getInt(_keyAppsMax) ?? 3;
+  static int getAppsMax() => _preferences.getInt(_keyAppsMax) ?? 2;
 
   static Future setLocale(String locale)  async =>
       await _preferences.setString(_keyLocale, locale);
@@ -27,7 +28,12 @@ class UserPreferences {
   static Future setUni(String uni)  async =>
       await _preferences.setString(_keyUni, uni);
 
-  static String getUni() => _preferences.getString(_keyUni) ?? "error";
+  static String getUni() => _preferences.getString(_keyUni) ?? "NotLoggedInError";
+
+  static Future setForeName(String foreName)  async =>
+      await _preferences.setString(_keyForeName, foreName);
+
+  static String getForeName() => _preferences.getString(_keyForeName) ?? "NotLoggedInError";
 
   static Future setBrightness(bool brightness) async =>
       await _preferences.setBool(_keyBrightness, brightness);
@@ -60,4 +66,3 @@ class UserPreferences {
   static int getYearPref() => _preferences.getInt(_keyYearPref) ?? 0;
 
 }
-

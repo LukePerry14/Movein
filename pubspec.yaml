@@ -34,7 +34,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  http: ^0.13.5
+  http: ^0.13.0
   google_fonts: ^4.0.4
   flutter_cache_manager: ^3.3.0
   firebase_core: ^2.14.0
@@ -55,16 +55,62 @@ dependencies:
 
   sendbird_sdk: ^3.2.17
   dash_chat_2: ^0.0.17
-  sendbird_chat_sdk: ^4.0.6
-
+  sendbird_chat_sdk: ^4.0.10
+  #sendbird_chat_sdk: ^latest_version
+  #  git:
+  #    url: https://github.com/asaarnak/sendbird-chat-sdk-flutter.git
+  #    ref: patch-2
   timer_count_down: ^2.2.2
-
+  flutter_slidable: ^3.0.0
+  in_app_purchase: ^3.1.7
+  azblob: ^2.4.0
+  mime: ^1.0.4
+  azstore: ^1.0.3
+  #  git:
+  #      url : https://github.com/Zazo032/azstore
+  #      ref: patch-1
+  file: ^6.1.4
+  flutter_launcher_icons: ^0.13.1
+  url_launcher: ^6.1.12
+  uuid: ^3.0.7
+  provider: ^6.0.5
+  firebase_messaging: ^14.6.7
+  #linkfive_purchases: ^3.0.0
+  #linkfive_purchases_provider: ^3.0.0
 flutter_native_splash:
   android: true
   ios: true
   web: true
   color: '#F8AC41'
-  image: 'assets/Pictures/logo.png'
+  image: 'assets/Pictures/splashScreen.png'
+  android_12:
+  # The image parameter sets the splash screen icon image.  If this parameter is not specified,
+  # the app's launcher icon will be used instead.
+  # Please note that the splash screen will be clipped to a circle on the center of the screen.
+  # App icon with an icon background: This should be 960×960 pixels, and fit within a circle
+  # 640 pixels in diameter.
+  # App icon without an icon background: This should be 1152×1152 pixels, and fit within a circle
+  # 768 pixels in diameter.
+    image: assets/Pictures/splashScreen.png
+
+  # Splash screen background color.
+    #color: '#F8AC41'
+
+  # App icon background color.
+  #icon_background_color: "#111111"
+
+  # The branding property allows you to specify an image used as branding in the splash screen.
+  #branding: assets/Pictures/logo.png
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/Pictures/splashScreen.png"
+  image_path_android: "assets/Pictures/splashScreen.png"
+  image_path_ios: "assets/Pictures/splashScreen.png"
+  adaptive_icon_background: "#F8AC41"
+  adaptive_icon_foreground: "assets/Pictures/splashScreen.png"
 
 dev_dependencies:
   flutter_test:

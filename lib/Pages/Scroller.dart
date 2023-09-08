@@ -87,9 +87,13 @@ class _ScrollerState extends State<Scroller> {
   @override
   void initState() {
     getGroups();
+<<<<<<< Updated upstream
     
     
     _loadAd();
+=======
+   //_loadAd();
+>>>>>>> Stashed changes
     super.initState();
   }
 

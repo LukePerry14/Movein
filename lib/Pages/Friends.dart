@@ -372,8 +372,527 @@ class _FriendsState extends State<Friends> {
                             },
                             icon: const Icon(LineAwesomeIcons.user_plus),
                           ),
+<<<<<<< Updated upstream
                         ]
                       ),
+=======
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(
+                        MediaQuery.of(context).size.width * 0.04),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(42)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: LAppTheme.lightTheme.primaryColor
+                                  .withAlpha(200),
+                              offset: const Offset(0, 20),
+                              blurRadius: 30,
+                              spreadRadius: -5,
+                            ),
+                          ],
+                          gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                LAppTheme.lightTheme.primaryColor
+                                    .withAlpha(150),
+                                LAppTheme.lightTheme.primaryColor
+                                    .withAlpha(200),
+                                LAppTheme.lightTheme.primaryColor,
+                                LAppTheme.lightTheme.primaryColor,
+                              ],
+                              stops: const [
+                                0.1,
+                                0.3,
+                                0.9,
+                                1.0
+                              ])),
+                      child: isLoading
+                          ? const Text("")
+                          : (joinedResults.isEmpty &
+                                  applicationsResults.isEmpty)
+                              ? Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: Text(
+                                    "no_groups".tr,
+                                    style: GoogleFonts.redHatDisplay(
+                                        color: Colors.grey[100],
+                                        fontSize: 16.5,
+                                        fontWeight: FontWeight.bold),
+                                  ))
+                              : ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: joinedResults.length +
+                                      applicationsResults.length +
+                                      3,
+                                  itemBuilder: (context, index) {
+                                    if (index == 0) {
+                                      return joinedResults.isEmpty
+                                          ? const SizedBox(
+                                              height: 1,
+                                            )
+                                          : Column(children: [
+                                              const SizedBox(height: 15),
+                                              Row(children: [
+                                                const SizedBox(width: 20),
+                                                Text(
+                                                  "joined".tr,
+                                                  style: GoogleFonts.lexend(
+                                                      color: Colors.grey[100],
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 23),
+                                                ),
+                                                const SizedBox(width: 15),
+                                                Text(
+                                                  "${joined.length}/$appsMax",
+                                                  style:
+                                                      GoogleFonts.redHatDisplay(
+                                                          color:
+                                                              Colors.grey[100],
+                                                          fontSize: 16.5,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                ),
+                                              ]),
+                                            ]);
+                                    } else if (index <= joinedResults.length) {
+                                      int joinedIndex = index - 1;
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 4.0, horizontal: 8.0),
+                                        child: ClipRect(
+                                          child: Slidable(
+                                            endActionPane: ActionPane(
+                                              motion: const ScrollMotion(),
+                                              children: [
+                                                SlidableAction(
+                                                  onPressed: (context) async {
+                                                    final groupChannel =
+                                                        await ConnectSendbird()
+                                                            .returnChannel(
+                                                                joinedResults[
+                                                                        joinedIndex]
+                                                                    ["Id"]);
+                                                    Navigator.push(
+                                                      context,
+                                                      PageTransition(
+                                                          curve: Curves.linear,
+                                                          type:
+                                                              PageTransitionType
+                                                                  .topToBottom,
+                                                          child:
+                                                              const Messages(),
+                                                          settings:
+                                                              RouteSettings(
+                                                                  arguments: {
+                                                                'channel':
+                                                                    groupChannel,
+                                                                'members': joinedResults[
+                                                                        joinedIndex]
+                                                                    ["Members"],
+                                                                'groupId':
+                                                                    joinedResults[
+                                                                            joinedIndex]
+                                                                        ["Id"],
+                                                                'groupName':
+                                                                    joinedResults[
+                                                                            joinedIndex]
+                                                                        [
+                                                                        "GroupName"],
+                                                                'groupPicture':
+                                                                    joinedResults[
+                                                                            joinedIndex]
+                                                                        [
+                                                                        "GroupPicture"],
+                                                              })),
+                                                    );
+                                                  },
+                                                  backgroundColor: Colors.white,
+                                                  foregroundColor: LAppTheme
+                                                      .lightTheme.primaryColor,
+                                                  icon: Icons.mail,
+                                                  label: 'messages'.tr,
+                                                ),
+                                                SlidableAction(
+                                                  onPressed: (context) {
+                                                    Navigator.push(
+                                                      context,
+                                                      PageTransition(
+                                                          curve: Curves.linear,
+                                                          type:
+                                                              PageTransitionType
+                                                                  .topToBottom,
+                                                          child:
+                                                              const GroupOptions(),
+                                                          settings:
+                                                              RouteSettings(
+                                                                  arguments: {
+                                                                'members': joinedResults[
+                                                                        joinedIndex]
+                                                                    ["Members"],
+                                                                'groupId':
+                                                                    joinedResults[
+                                                                            joinedIndex]
+                                                                        ["Id"],
+                                                                'groupName':
+                                                                    joinedResults[
+                                                                            joinedIndex]
+                                                                        [
+                                                                        "GroupName"],
+                                                                'groupPicture':
+                                                                    joinedResults[
+                                                                            joinedIndex]
+                                                                        [
+                                                                        "GroupPicture"],
+                                                              })),
+                                                    );
+                                                  },
+                                                  backgroundColor: Colors.white,
+                                                  foregroundColor: LAppTheme
+                                                      .lightTheme.primaryColor,
+                                                  icon: Icons.more_vert,
+                                                  label: 'more'.tr,
+                                                ),
+                                              ],
+                                            ),
+                                            child: GestureDetector(
+                                              onTap: () async {
+                                                //ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(),'Raine');
+                                                print(joinedResults[joinedIndex]["Id"]);
+                                                final groupChannel = await ConnectSendbird().returnChannel(joinedResults[joinedIndex]["Id"]);
+                                                Navigator.push(
+                                                  context,
+                                                  PageTransition(
+                                                      curve: Curves.linear,
+                                                      type: PageTransitionType
+                                                          .topToBottom,
+                                                      child: const Messages(),
+                                                      settings: RouteSettings(
+                                                          arguments: {
+                                                            'channel':
+                                                                groupChannel,
+                                                            'members':
+                                                                joinedResults[
+                                                                        joinedIndex]
+                                                                    ["Members"],
+                                                            'groupId':
+                                                                joinedResults[
+                                                                        joinedIndex]
+                                                                    ["Id"],
+                                                            'groupName':
+                                                                joinedResults[
+                                                                        joinedIndex]
+                                                                    [
+                                                                    "GroupName"],
+                                                            'groupPicture':
+                                                                joinedResults[
+                                                                        joinedIndex]
+                                                                    [
+                                                                    "GroupPicture"],
+                                                          })),
+                                                );
+                                              },
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 8.0,
+                                                        horizontal: 12.0),
+                                                decoration: BoxDecoration(
+                                                  border: Border(
+                                                    top: BorderSide(
+                                                        width: 1,
+                                                        color: Colors.grey[100]!
+                                                            .withOpacity(0.3)),
+                                                    // Top border
+                                                    bottom: BorderSide(
+                                                        width: 1,
+                                                        color: Colors.grey[100]!
+                                                            .withOpacity(
+                                                                0.3)), // Bottom border
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    SizedBox(
+                                                      width: 40,
+                                                      height: 40,
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                        child: Image.asset(
+                                                            joinedResults[
+                                                                    joinedIndex]
+                                                                [
+                                                                "GroupPicture"]),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            joinedResults[
+                                                                    joinedIndex]
+                                                                ["GroupName"],
+                                                            style: GoogleFonts.lexend(
+                                                                color: Colors
+                                                                    .grey[100],
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                fontSize: 20.0),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    } else if (index ==
+                                        joinedResults.length + 1) {
+                                      return applicationsResults.isEmpty
+                                          ? const SizedBox(
+                                              height: 1,
+                                            )
+                                          : Row(children: [
+                                              const SizedBox(width: 20),
+                                              Text(
+                                                "applications".tr,
+                                                style: GoogleFonts.lexend(
+                                                    color: Colors.grey[100],
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 23),
+                                              ),
+                                            ]);
+                                    } else if (index ==
+                                        joinedResults.length +
+                                            applicationsResults.length +
+                                            2) {
+                                      return const SizedBox(height: 25);
+                                    } else {
+                                      int applicationIndex =
+                                          index - joinedResults.length - 2;
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 4.0, horizontal: 8.0),
+                                        child: ClipRect(
+                                          child: Slidable(
+                                            endActionPane: ActionPane(
+                                              motion: const ScrollMotion(),
+                                              children: [
+                                                SlidableAction(
+                                                  onPressed: (context) {
+                                                    showDialog<String>(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                              context) =>
+                                                          GroupExpand(
+                                                        id: applicationsResults[
+                                                                applicationIndex]
+                                                            ["Id"],
+                                                        groupName:
+                                                            applicationsResults[
+                                                                    applicationIndex]
+                                                                ["GroupName"],
+                                                        groupPicture:
+                                                            applicationsResults[
+                                                                    applicationIndex]
+                                                                [
+                                                                "GroupPicture"],
+                                                        members:
+                                                            applicationsResults[
+                                                                        applicationIndex]
+                                                                    ["Members"]
+                                                                .cast<String>()
+                                                                .toList(),
+                                                        avgCleanliness:
+                                                            applicationsResults[
+                                                                    applicationIndex]
+                                                                [
+                                                                "AvgCleanliness"],
+                                                        avgNoisiness:
+                                                            applicationsResults[
+                                                                    applicationIndex]
+                                                                [
+                                                                "AvgNoisiness"],
+                                                        avgNightLife:
+                                                            applicationsResults[
+                                                                    applicationIndex]
+                                                                [
+                                                                "AvgNightLife"],
+                                                        avgBedTime:
+                                                            applicationsResults[
+                                                                    applicationIndex]
+                                                                ["AvgBedTime"],
+                                                        avgYearOfStudy:
+                                                            applicationsResults[
+                                                                    applicationIndex]
+                                                                [
+                                                                "AvgYearOfStudy"],
+                                                      ),
+                                                    );
+                                                  },
+                                                  backgroundColor: Colors.white,
+                                                  foregroundColor: LAppTheme
+                                                      .lightTheme.primaryColor,
+                                                  icon: LineAwesomeIcons.search,
+                                                  label: 'preview'.tr,
+                                                ),
+                                                SlidableAction(
+                                                  onPressed: (context) {
+                                                    showDialog<String>(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                                context) =>
+                                                            ConfirmGroupDel(
+                                                              groupId:
+                                                                  applicationsResults[
+                                                                          applicationIndex]
+                                                                      ["Id"],
+                                                              groupType:
+                                                                  "Applications",
+                                                              userId: Auth()
+                                                                  .currentUser(),
+                                                            ));
+                                                  },
+                                                  backgroundColor: Colors.white,
+                                                  foregroundColor: LAppTheme
+                                                      .lightTheme.primaryColor,
+                                                  icon: LineAwesomeIcons
+                                                      .alternate_trash,
+                                                  label: 'remove'.tr,
+                                                ),
+                                              ],
+                                            ),
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                showDialog<String>(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) =>
+                                                          GroupExpand(
+                                                    id: applicationsResults[
+                                                        applicationIndex]["Id"],
+                                                    groupName:
+                                                        applicationsResults[
+                                                                applicationIndex]
+                                                            ["GroupName"],
+                                                    groupPicture:
+                                                        applicationsResults[
+                                                                applicationIndex]
+                                                            ["GroupPicture"],
+                                                    members: applicationsResults[
+                                                                applicationIndex]
+                                                            ["Members"]
+                                                        .cast<String>()
+                                                        .toList(),
+                                                    avgCleanliness:
+                                                        applicationsResults[
+                                                                applicationIndex]
+                                                            ["AvgCleanliness"],
+                                                    avgNoisiness:
+                                                        applicationsResults[
+                                                                applicationIndex]
+                                                            ["AvgNoisiness"],
+                                                    avgNightLife:
+                                                        applicationsResults[
+                                                                applicationIndex]
+                                                            ["AvgNightLife"],
+                                                    avgBedTime:
+                                                        applicationsResults[
+                                                                applicationIndex]
+                                                            ["AvgBedTime"],
+                                                    avgYearOfStudy:
+                                                        applicationsResults[
+                                                                applicationIndex]
+                                                            ["AvgYearOfStudy"],
+                                                  ),
+                                                );
+                                              },
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 8.0,
+                                                        horizontal: 12.0),
+                                                decoration: BoxDecoration(
+                                                  border: Border(
+                                                    top: BorderSide(
+                                                        width: 1,
+                                                        color: Colors.grey[100]!
+                                                            .withOpacity(0.3)),
+                                                    // Top border
+                                                    bottom: BorderSide(
+                                                        width: 1,
+                                                        color: Colors.grey[100]!
+                                                            .withOpacity(
+                                                                0.3)), // Bottom border
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    SizedBox(
+                                                      width: 40,
+                                                      height: 40,
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                        child: Image.asset(
+                                                            applicationsResults[
+                                                                    applicationIndex]
+                                                                [
+                                                                "GroupPicture"]),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            applicationsResults[
+                                                                    applicationIndex]
+                                                                ["GroupName"],
+                                                            style: GoogleFonts.lexend(
+                                                                color: Colors
+                                                                    .grey[100],
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal,
+                                                                fontSize: 20.0),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+>>>>>>> Stashed changes
                     ),
                   ),
                   SizedBox(
