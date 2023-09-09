@@ -39,6 +39,10 @@ class Profile extends StatefulWidget {
 class _ProfilePage extends State<Profile> {
   var data;
   File? _profileImage;
+  File? accountPicture1;
+  File? accountPicture2;
+  String? accountPicture1String;
+  String? accountPicture2String;
   String? _defaultProfileImagePath = 'assets/Pictures/turt.png';
   final TextEditingController _copyController = TextEditingController();
 
@@ -87,7 +91,6 @@ class _ProfilePage extends State<Profile> {
     }
   }
 
-  // New version
   Future<void> _uploadImageToAzure(File imageFile) async {
     Uint8List bytes = imageFile.readAsBytesSync();
     var x = AzureStorage.AzureStorage.parse(
@@ -102,6 +105,21 @@ class _ProfilePage extends State<Profile> {
     }
   }
 
+  // For returning the string name for firebase upload
+  Future<String?> _uploadImageToAzure2(File imageFile) async {
+    Uint8List bytes = imageFile.readAsBytesSync();
+    var x = AzureStorage.AzureStorage.parse(
+        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+    try {
+      var uuid = const Uuid();
+      String imageName = uuid.v1();
+      await x.putBlob('/moveinimages/$imageName.jpg', contentType: 'image/jpg', bodyBytes: bytes);
+      return '$imageName.jpg';
+    } catch (e) {
+      return ('Exception: $e');
+    }
+  }
+
   Future<void> _deleteProfileImageFromAzure(String fileString) async {
     var x = AzureStorage.AzureStorage.parse(
       'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net'
@@ -112,6 +130,78 @@ class _ProfilePage extends State<Profile> {
       print('Exception: $e');
     }
   }
+
+  GestureDetector buildChangeImages(BuildContext context) {
+  var defaultProfilePicture = Image.asset('assets/Pictures/turt.png');
+  return GestureDetector(
+    onTap: () {
+      showDialog(context: context, builder: (BuildContext context) {
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).primaryColor,
+            centerTitle: true,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.white,),
+              color: Colors.grey[500],
+              onPressed: (() {
+                Navigator.pop(context);
+              })
+            ),
+          ),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                children: [
+                  Text('change-account-images'.tr, style: Theme.of(context).textTheme.headlineMedium,),
+                  const SizedBox(height: 20),
+                  Container(
+                    decoration: const BoxDecoration(shape: BoxShape.circle),
+                    child: accountPicture1 == null ? defaultProfilePicture : Image.file(accountPicture1!),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final pickedImage = await pickImage();
+                      if (pickedImage != null) {
+                        // MUST DELETE OLD IMAGE
+                        accountPicture1String = _uploadImageToAzure2(pickedImage) as String?;
+                        // to be added to Images[1]
+                        setState(() {
+                          accountPicture1 = pickedImage;
+                        });
+                      }
+                    },
+                    child: Icon(Icons.edit),
+                  ), 
+                  const SizedBox(height: 20,),
+                  Container(
+                    decoration: const BoxDecoration(shape:  BoxShape.circle),
+                    child: accountPicture2 == null? defaultProfilePicture : Image.file(accountPicture2!),
+                  ), 
+                  ElevatedButton(
+                    onPressed: () async {
+                      final pickedImage = await pickImage();
+                      if (pickedImage != null) {
+                        // MUST DELETE OLD
+                        accountPicture1String =  _uploadImageToAzure2(pickedImage) as String?;
+                        // To be added to Images[2]
+                        setState(() {
+                          accountPicture2 = pickedImage;
+                        });
+                      }
+                    },
+                    child: Icon(Icons.edit),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      });
+    },
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -164,6 +254,10 @@ class _ProfilePage extends State<Profile> {
                                 }, child: const Icon(
                                   Icons.edit,
                                 ),),
+                              ),
+                              const SizedBox(height:10),
+                              Padding(padding: const EdgeInsets.all(8.0),
+                                child: buildChangeImages(context),
                               ),
                               const SizedBox(height: 20.0),
                               Text(name,
