@@ -29,6 +29,8 @@ import 'Friends.dart';
 import 'PremiumPage.dart';
 import 'Scroller.dart';
 
+const rootImagePath = 'https://movein.blob.core.windows.net/moveinimages/';
+
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
 
@@ -133,7 +135,7 @@ class _ProfilePage extends State<Profile> {
     }
   }
 
-  GestureDetector buildChangeImages(BuildContext context) {
+  GestureDetector buildChangeImages(BuildContext context, String image1url, String image2url) {
   var defaultProfilePicture = Image.asset('assets/Pictures/turt.png');
   return GestureDetector(
     onTap: () {
@@ -156,44 +158,56 @@ class _ProfilePage extends State<Profile> {
               padding: const EdgeInsets.all(15.0),
               child: Column(
                 children: [
-                  Text('change-account-images'.tr, style: Theme.of(context).textTheme.headlineMedium,),
+                  Text('Account Images'.tr, style: Theme.of(context).textTheme.headlineMedium,),
                   const SizedBox(height: 20),
                   Container(
                     decoration: const BoxDecoration(shape: BoxShape.circle),
-                    child: accountPicture1 == null ? defaultProfilePicture : Image.file(accountPicture1!),
+                    child: accountPicture1 == null ? defaultProfilePicture : Image.network(image1url)
                   ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      final pickedImage = await pickImage();
-                      if (pickedImage != null) {
-                        // MUST DELETE OLD IMAGE
-                        accountPicture1String = _uploadImageToAzure2(pickedImage) as String?;
-                        // to be added to Images[1]
-                        setState(() {
-                          accountPicture1 = pickedImage;
-                        });
-                      }
-                    },
-                    child: Icon(Icons.edit),
+                  SizedBox(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final pickedImage = await pickImage();
+                        if (pickedImage != null) {
+                          // MUST DELETE OLD IMAGE
+                          accountPicture1String = _uploadImageToAzure2(pickedImage) as String?;
+                          _deleteProfileImageFromAzure(image1url);
+                          // to be added to Images[1]
+                          setState(() {
+                            accountPicture1 = pickedImage;
+                          });
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Icon(Icons.edit),
+                      ),
+                    ),
                   ), 
-                  const SizedBox(height: 20,),
+                  const SizedBox(height: 40,),
                   Container(
                     decoration: const BoxDecoration(shape:  BoxShape.circle),
-                    child: accountPicture2 == null? defaultProfilePicture : Image.file(accountPicture2!),
+                    child: accountPicture2 == null? defaultProfilePicture : Image.network(image2url)
                   ), 
-                  ElevatedButton(
-                    onPressed: () async {
-                      final pickedImage = await pickImage();
-                      if (pickedImage != null) {
-                        // MUST DELETE OLD
-                        accountPicture1String =  _uploadImageToAzure2(pickedImage) as String?;
-                        // To be added to Images[2]
-                        setState(() {
-                          accountPicture2 = pickedImage;
-                        });
-                      }
-                    },
-                    child: Icon(Icons.edit),
+                  SizedBox(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final pickedImage = await pickImage();
+                        if (pickedImage != null) {
+                          // MUST DELETE OLD
+                          accountPicture1String =  _uploadImageToAzure2(pickedImage) as String?;
+                          _deleteProfileImageFromAzure(image2url);
+                          // To be added to Images[2]
+                          setState(() {
+                            accountPicture2 = pickedImage;
+                          });
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Icon(Icons.edit),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -202,6 +216,23 @@ class _ProfilePage extends State<Profile> {
         );
       });
     },
+    child: Padding(
+      padding: EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Change Account Images',
+            style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.w500,
+              color: Colors.white,
+              backgroundColor: Theme.of(context).primaryColor
+            ),
+          )
+        ],
+      ),
+    ),
   );
 }
 
@@ -221,6 +252,14 @@ class _ProfilePage extends State<Profile> {
             // Other images for the user
             var image1 = data[2];
             var image2 = data[3];
+
+            // network paths to user's images
+            var profileImagepath = '$rootImagePath$profPic';
+            var image1path = '$rootImagePath$image1';
+            var image2path = '$rootImagePath$image2';
+            
+
+            // default picture used for when an image is not present
             var defaultProfilePicture = Image.asset('assets/Pictures/turt.png');
             return Builder(builder: (context) {
               final navigator = Navigator.of(context);
@@ -243,7 +282,7 @@ class _ProfilePage extends State<Profile> {
                                   decoration: const BoxDecoration(
                                     shape: BoxShape.circle,
                                   ),
-                                  child: _profileImage == null ? defaultProfilePicture : Image.file(_profileImage!)
+                                  child: _profileImage == null ? defaultProfilePicture : Image.network(profileImagepath)
                                 )
                               ),
                               Padding(
@@ -262,7 +301,7 @@ class _ProfilePage extends State<Profile> {
                               ),
                               const SizedBox(height:10),
                               Padding(padding: const EdgeInsets.all(8.0),
-                                child: buildChangeImages(context),
+                                child: buildChangeImages(context, image1path, image2path),
                               ),
                               const SizedBox(height: 20.0),
                               Text(name,
@@ -424,11 +463,12 @@ class _ProfilePage extends State<Profile> {
                                   await UserPreferences.setForeName(
                                       "NotLoggedInError");
                                   FirebaseAuth.instance.signOut();
+                                  // ignore: use_build_context_synchronously
                                   Navigator.pushReplacement(
                                     context, PageTransition(
                                     type: PageTransitionType.fade,
                                     child: const LoginScreen(),
-                                    duration: Duration(milliseconds: 400),
+                                    duration: const Duration(milliseconds: 400),
                                   ),);
                                 },
                               ),
