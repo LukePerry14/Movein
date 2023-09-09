@@ -70,9 +70,11 @@ class _ProfilePage extends State<Profile> {
       String foreName = userDoc.get("ForeName");
       String surname = userDoc.get("SurName");
       String profPic = userDoc.get("Images")[0];
+      String picture1 = userDoc.get("Images")[1];
+      String picture2 = userDoc.get("Images")[2];
       String fullName = "$foreName $surname";
 
-      return [fullName, profPic];
+      return [fullName, profPic, picture1, picture2];
     } catch (e) {
       throw FirebaseException(
           message: 'Error retrieving name or profile picture: $e',
@@ -216,6 +218,9 @@ class _ProfilePage extends State<Profile> {
             data = snapshot.data;
             var name = data[0];
             var profPic = data[1];
+            // Other images for the user
+            var image1 = data[2];
+            var image2 = data[3];
             var defaultProfilePicture = Image.asset('assets/Pictures/turt.png');
             return Builder(builder: (context) {
               final navigator = Navigator.of(context);
