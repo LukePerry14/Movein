@@ -195,8 +195,8 @@ class _ProfilePage extends State<Profile> {
                           });
                         }
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.all(5.0),
+                      child: const Padding(
+                        padding: EdgeInsets.all(5.0),
                         child: Icon(Icons.edit),
                       ),
                     ),
@@ -303,8 +303,9 @@ class _ProfilePage extends State<Profile> {
                                 width: 150, 
                                 height:150, 
                                 child: Container(
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                     shape: BoxShape.circle,
+                                    // borderRadius: BorderRadius.circular(100)
                                   ),
                                   child: _profileImage == null ? defaultProfilePicture : Image.network(profileImagepath)
                                 )
@@ -322,6 +323,7 @@ class _ProfilePage extends State<Profile> {
                                     }
                                 }, child: const Icon(
                                   Icons.edit,
+                                  color: Colors.white,
                                 ),),
                               ),
                               const SizedBox(height:10),
@@ -437,6 +439,39 @@ class _ProfilePage extends State<Profile> {
                                 },
                               ),
                               const SizedBox(height: 30.0),
+                              ListTile(
+                                leading: Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: isDark
+                                      ? Colors.white70
+                                      : Theme.of(context).primaryColor,
+                                      width: 1
+                                    ),
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                  child: Icon(LineAwesomeIcons.image,
+                                  color: isDark
+                                  ? Colors.white70
+                                  : Theme.of(context).primaryColor,),
+                                ),
+                                title: Text("Account Images".tr, style: 
+                                Theme.of(context).textTheme.headlineSmall,),
+                                trailing: Icon(LineAwesomeIcons.angle_right,
+                                color: LAppTheme.lightTheme.primaryColor,),
+                                onTap: () {
+                                  Navigator.push(context, PageTransition(
+                                    type: PageTransitionType.rightToLeftWithFade,
+                                    alignment: Alignment.topCenter,
+                                    child: buildChangeImages(context, image1path, image2path),
+                                    duration: const Duration(milliseconds: 400),
+                                    reverseDuration: const Duration(milliseconds: 400),
+                                  ),);
+                                },
+                              ),
+                              const SizedBox(height: 30,),
                               ListTile(
                                   leading: Container(
                                     width: 40,
