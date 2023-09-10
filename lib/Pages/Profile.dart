@@ -43,6 +43,7 @@ class _ProfilePage extends State<Profile> {
   File? _profileImage;
   File? accountPicture1;
   File? accountPicture2;
+  String? profilePictureString;
   String? accountPicture1String;
   String? accountPicture2String;
   String? _defaultProfileImagePath = 'assets/Pictures/turt.png';
@@ -158,18 +159,34 @@ class _ProfilePage extends State<Profile> {
               padding: const EdgeInsets.all(15.0),
               child: Column(
                 children: [
-                  Text('Account Images'.tr, style: Theme.of(context).textTheme.headlineMedium,),
-                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.image,
+                        color: Theme.of(context).primaryColor,
+                        size: 50,
+                      ),
+                      const SizedBox(width: 10),
+                      Text("Account Images".tr, style: Theme.of(context).textTheme.headlineLarge,)
+                    ],
+                  ),
+                  const Divider(height: 20, thickness: 1),
+                  const SizedBox(height: 10,),
+                  Row(
+                    children: [
+                      Text('Image 1'.tr, style: Theme.of(context).textTheme.headlineMedium,),
+                    ],
+                  ),
                   Container(
                     decoration: const BoxDecoration(shape: BoxShape.circle),
                     child: accountPicture1 == null ? defaultProfilePicture : Image.network(image1url)
                   ),
+                  const SizedBox(height: 10,),
                   SizedBox(
                     child: ElevatedButton(
                       onPressed: () async {
                         final pickedImage = await pickImage();
                         if (pickedImage != null) {
-                          // MUST DELETE OLD IMAGE
                           accountPicture1String = _uploadImageToAzure2(pickedImage) as String?;
                           _deleteProfileImageFromAzure(image1url);
                           // to be added to Images[1]
@@ -185,10 +202,17 @@ class _ProfilePage extends State<Profile> {
                     ),
                   ), 
                   const SizedBox(height: 40,),
+                  Row(
+                    children: [
+                      Text('Image 2'.tr, style: Theme.of(context).textTheme.headlineMedium,),
+                    ],
+                  ),
+                  const SizedBox(height: 10,),
                   Container(
                     decoration: const BoxDecoration(shape:  BoxShape.circle),
                     child: accountPicture2 == null? defaultProfilePicture : Image.network(image2url)
                   ), 
+                  const SizedBox(height: 10,),
                   SizedBox(
                     child: ElevatedButton(
                       onPressed: () async {
@@ -203,8 +227,8 @@ class _ProfilePage extends State<Profile> {
                           });
                         }
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.all(5.0),
+                      child: const Padding(
+                        padding: EdgeInsets.all(5.0),
                         child: Icon(Icons.edit),
                       ),
                     ),
@@ -290,7 +314,8 @@ class _ProfilePage extends State<Profile> {
                                 child: ElevatedButton(onPressed: () async {
                                     final pickedImage = await pickImage();
                                     if (pickedImage != null) {
-                                      await _uploadImageToAzure(pickedImage);
+                                      profilePictureString = await _uploadImageToAzure2(pickedImage);
+                                      _deleteProfileImageFromAzure(profileImagepath);
                                       setState(() {
                                         _profileImage = pickedImage;
                                       });
@@ -300,7 +325,11 @@ class _ProfilePage extends State<Profile> {
                                 ),),
                               ),
                               const SizedBox(height:10),
-                              Padding(padding: const EdgeInsets.all(8.0),
+                              Padding(padding: EdgeInsets.symmetric(
+                                        vertical: 15,
+                                        horizontal:
+                                        MediaQuery.of(context).size.width *
+                                            0.125),
                                 child: buildChangeImages(context, image1path, image2path),
                               ),
                               const SizedBox(height: 20.0),
