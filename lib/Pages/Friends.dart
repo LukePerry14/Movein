@@ -564,7 +564,8 @@ class _FriendsState extends State<Friends> {
             applicationsResults = data[4][1];
             shortList = data[4][2];
             shortListResults = data[4][2];
-            blockedGroups = data[5];
+            blockedGroups 
+            = data[5];
             blockedSearchResults = data[5];
             return buildScaffold(context, false);
           }
