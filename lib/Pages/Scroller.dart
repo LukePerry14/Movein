@@ -19,6 +19,8 @@ import '../Themes/lMode.dart';
 import 'Friends.dart';
 import 'Profile.dart';
 
+const rootImagePath = 'https://movein.blob.core.windows.net/moveinimages/';
+
 class Scroller extends StatefulWidget {
   const Scroller({Key? key}) : super(key: key);
 

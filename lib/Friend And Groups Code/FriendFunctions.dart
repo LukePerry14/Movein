@@ -656,7 +656,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
         'AvgYearOfStudy': userSnapshot.get('YearOfStudy'),
         'BlackList': blackList,
         'GroupName': groupName,
-        'GroupPicture': "assets/Pictures/reversed.png",
+        'GroupPicture': groupImageString,
         'Invitees': invitees,
         'KickVals': kickVals,
         'Kicks': kicks,

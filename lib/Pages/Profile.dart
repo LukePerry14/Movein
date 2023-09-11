@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:movein/Pages/Settings.dart';
+import 'package:movein/Pages/accountImages.dart';
 import 'package:movein/Pages/profileInformation.dart';
 import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
@@ -30,6 +31,57 @@ import 'PremiumPage.dart';
 import 'Scroller.dart';
 
 const rootImagePath = 'https://movein.blob.core.windows.net/moveinimages/';
+
+  Future<File?> pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      return File(image.path);
+    } else {
+      print('No image selected.');
+      return null;
+    }
+  }
+
+  Future<void> _uploadImageToAzure(File imageFile) async {
+    Uint8List bytes = imageFile.readAsBytesSync();
+    var x = AzureStorage.AzureStorage.parse(
+        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+    try {
+      var uuid = const Uuid();
+      String imageName = uuid.v1();
+      await x.putBlob('/moveinimages/$imageName.jpg',
+          contentType: 'image/jpg', bodyBytes: bytes);
+    } catch (e) {
+      print('Exception: $e');
+    }
+  }
+
+  // For returning the string name for firebase upload
+  Future<String?> _uploadImageToAzure2(File imageFile) async {
+    Uint8List bytes = imageFile.readAsBytesSync();
+    var x = AzureStorage.AzureStorage.parse(
+        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+    try {
+      var uuid = const Uuid();
+      String imageName = uuid.v1();
+      await x.putBlob('/moveinimages/$imageName.jpg', contentType: 'image/jpg', bodyBytes: bytes);
+      return '$imageName.jpg';
+    } catch (e) {
+      return ('Exception: $e');
+    }
+  }
+
+  Future<void> _deleteProfileImageFromAzure(String fileString) async {
+    var x = AzureStorage.AzureStorage.parse(
+      'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net'
+      );
+    try {
+      await x.deleteBlob('/moveinimages/$fileString.jpg');
+    } catch (e) {
+      print('Exception: $e');
+    }
+  }
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -84,181 +136,6 @@ class _ProfilePage extends State<Profile> {
           plugin: 'cloud_firestore');
     }
   }
-
-  Future<File?> pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      return File(image.path);
-    } else {
-      print('No image selected.');
-      return null;
-    }
-  }
-
-  Future<void> _uploadImageToAzure(File imageFile) async {
-    Uint8List bytes = imageFile.readAsBytesSync();
-    var x = AzureStorage.AzureStorage.parse(
-        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
-    try {
-      var uuid = const Uuid();
-      String imageName = uuid.v1();
-      await x.putBlob('/moveinimages/$imageName.jpg',
-          contentType: 'image/jpg', bodyBytes: bytes);
-    } catch (e) {
-      print('Exception: $e');
-    }
-  }
-
-  // For returning the string name for firebase upload
-  Future<String?> _uploadImageToAzure2(File imageFile) async {
-    Uint8List bytes = imageFile.readAsBytesSync();
-    var x = AzureStorage.AzureStorage.parse(
-        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
-    try {
-      var uuid = const Uuid();
-      String imageName = uuid.v1();
-      await x.putBlob('/moveinimages/$imageName.jpg', contentType: 'image/jpg', bodyBytes: bytes);
-      return '$imageName.jpg';
-    } catch (e) {
-      return ('Exception: $e');
-    }
-  }
-
-  Future<void> _deleteProfileImageFromAzure(String fileString) async {
-    var x = AzureStorage.AzureStorage.parse(
-      'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net'
-      );
-    try {
-      await x.deleteBlob('/moveinimages/$fileString.jpg');
-    } catch (e) {
-      print('Exception: $e');
-    }
-  }
-
-  GestureDetector buildChangeImages(BuildContext context, String image1url, String image2url) {
-  var defaultProfilePicture = Image.asset('assets/Pictures/turt.png');
-  return GestureDetector(
-    onTap: () {
-      showDialog(context: context, builder: (BuildContext context) {
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Theme.of(context).primaryColor,
-            centerTitle: true,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.white,),
-              color: Colors.grey[500],
-              onPressed: (() {
-                Navigator.pop(context);
-              })
-            ),
-          ),
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.image,
-                        color: Theme.of(context).primaryColor,
-                        size: 50,
-                      ),
-                      const SizedBox(width: 10),
-                      Text("Account Images".tr, style: Theme.of(context).textTheme.headlineLarge,)
-                    ],
-                  ),
-                  const Divider(height: 20, thickness: 1),
-                  const SizedBox(height: 10,),
-                  Row(
-                    children: [
-                      Text('Image 1'.tr, style: Theme.of(context).textTheme.headlineMedium,),
-                    ],
-                  ),
-                  Container(
-                    decoration: const BoxDecoration(shape: BoxShape.circle),
-                    child: accountPicture1 == null ? defaultProfilePicture : Image.network(image1url)
-                  ),
-                  const SizedBox(height: 10,),
-                  SizedBox(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final pickedImage = await pickImage();
-                        if (pickedImage != null) {
-                          accountPicture1String = _uploadImageToAzure2(pickedImage) as String?;
-                          _deleteProfileImageFromAzure(image1url);
-                          // to be added to Images[1]
-                          setState(() {
-                            accountPicture1 = pickedImage;
-                          });
-                        }
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.all(5.0),
-                        child: Icon(Icons.edit),
-                      ),
-                    ),
-                  ), 
-                  const SizedBox(height: 40,),
-                  Row(
-                    children: [
-                      Text('Image 2'.tr, style: Theme.of(context).textTheme.headlineMedium,),
-                    ],
-                  ),
-                  const SizedBox(height: 10,),
-                  Container(
-                    decoration: const BoxDecoration(shape:  BoxShape.circle),
-                    child: accountPicture2 == null? defaultProfilePicture : Image.network(image2url)
-                  ), 
-                  const SizedBox(height: 10,),
-                  SizedBox(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        final pickedImage = await pickImage();
-                        if (pickedImage != null) {
-                          // MUST DELETE OLD
-                          accountPicture1String =  _uploadImageToAzure2(pickedImage) as String?;
-                          _deleteProfileImageFromAzure(image2url);
-                          // To be added to Images[2]
-                          setState(() {
-                            accountPicture2 = pickedImage;
-                          });
-                        }
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.all(5.0),
-                        child: Icon(Icons.edit),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      });
-    },
-    child: Padding(
-      padding: EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Change Account Images',
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
-              backgroundColor: Theme.of(context).primaryColor
-            ),
-          )
-        ],
-      ),
-    ),
-  );
-}
 
   @override
   Widget build(BuildContext context) {
@@ -325,14 +202,6 @@ class _ProfilePage extends State<Profile> {
                                   Icons.edit,
                                   color: Colors.white,
                                 ),),
-                              ),
-                              const SizedBox(height:10),
-                              Padding(padding: EdgeInsets.symmetric(
-                                        vertical: 15,
-                                        horizontal:
-                                        MediaQuery.of(context).size.width *
-                                            0.125),
-                                child: buildChangeImages(context, image1path, image2path),
                               ),
                               const SizedBox(height: 20.0),
                               Text(name,
@@ -465,7 +334,7 @@ class _ProfilePage extends State<Profile> {
                                   Navigator.push(context, PageTransition(
                                     type: PageTransitionType.rightToLeftWithFade,
                                     alignment: Alignment.topCenter,
-                                    child: buildChangeImages(context, image1path, image2path),
+                                    child: const accountImages(),
                                     duration: const Duration(milliseconds: 400),
                                     reverseDuration: const Duration(milliseconds: 400),
                                   ),);

@@ -8,6 +8,43 @@ import 'package:movein/Themes/lMode.dart';
 import '../Auth code/auth.dart';
 import '../main.dart';
 
+const rootImagePath = 'https://movein.blob.core.windows.net/moveinimages/';
+
+class CustomImage extends StatelessWidget {
+  final String networkUrl;
+  final String assetFallback;
+  final BoxFit fit;
+
+  const CustomImage({
+    required this.networkUrl,
+    required this.assetFallback,
+    this.fit = BoxFit.cover,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.network(
+      networkUrl,
+      fit: fit,
+      errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+        // When the network image fails to load, load the asset image
+        return Image.asset(
+          assetFallback,
+          fit: fit,
+        );
+      },
+    );
+  }
+}
+
+// CustomImage(networkUrl: 'https://example.com/image.jpg', assetFallback: 'assets/fallback.jpg')
+
+
+
+
+
+
+
 class SwipeCard extends StatelessWidget {
   final String id;
   final String foreName;
@@ -45,34 +82,41 @@ class SwipeCard extends StatelessWidget {
           onTap: () {
             showDialog<String>(
                 context: context,
-                builder: (BuildContext context) => CustomDialog(id: id,foreName: foreName,age: age, uni: uni, preferences: preferences,images: images,bio: bio, subject: subject, yearOfStudy: yearOfStudy, showFriend: showFriend)
+                builder: (BuildContext context) => CustomDialog(id: id,foreName: foreName ,age: age, uni: uni, preferences: preferences,images: images, bio: bio, subject: subject, yearOfStudy: yearOfStudy, showFriend: showFriend)
             );
           },
           child: Container(
             margin: const EdgeInsets.fromLTRB(16.0, 5.0, 16.0, 5.0),
             height: height,
-            decoration: BoxDecoration(
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(20.0),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color.fromARGB(255, 67, 67, 67),
-                  spreadRadius: 0,
-                  blurRadius: 6,
-                  offset: Offset(0, 4),
-                )
-              ],
-              image: DecorationImage(
-                image: AssetImage(images[0]),
-                fit: BoxFit.cover,
-              ),
-            ),
+            // decoration: BoxDecoration(
+            //   shape: BoxShape.rectangle,
+            //   borderRadius: BorderRadius.circular(20.0),
+            //   boxShadow: const [
+            //     BoxShadow(
+            //       color: Color.fromARGB(255, 67, 67, 67),
+            //       spreadRadius: 0,
+            //       blurRadius: 6,
+            //       offset: Offset(0, 4),
+            //     )
+            //   ],
+            //   image: DecorationImage(
+            //     image: AssetImage(images[0]),
+            //     fit: BoxFit.cover,
+            //   ),
+            // ),
             child: Container(
               margin: const EdgeInsets.all(15.0),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  // This needs to be 
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      child: Image.network('$rootImagePath/$images[0]'),
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),
                     child: Row(
@@ -80,7 +124,7 @@ class SwipeCard extends StatelessWidget {
                         Text(
                           "$foreName  $age",
                           style: const TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 36,
                               fontWeight: FontWeight.bold),
                         ),
@@ -143,10 +187,12 @@ class RoundedBox extends StatelessWidget {
             height: height,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20.0),
-              child: Image(
-                image: AssetImage(image),
-                fit: BoxFit.cover,
-              ),
+              // This needs to be remade - formatting is fucked
+              // child: Image(
+              //   image: AssetImage(image),
+              //   fit: BoxFit.cover,
+              // ),
+              child: Image.network('$rootImagePath/$image'),
             ),
           ),
         );
@@ -393,9 +439,10 @@ class _CustomDialogState extends State<CustomDialog> {
                         ),
                       );
                     }
-                    default: {
-                      return RoundedBox(image: widget.images[index-5]);
-                    }
+                    // Not needed as there are only 3 images per user
+                    // default: {
+                    //   return RoundedBox(image: widget.images[index-5]);
+                    // }
                   }
                 },
               ),
