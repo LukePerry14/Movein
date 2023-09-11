@@ -10,41 +10,6 @@ import '../main.dart';
 
 const rootImagePath = 'https://movein.blob.core.windows.net/moveinimages/';
 
-class CustomImage extends StatelessWidget {
-  final String networkUrl;
-  final String assetFallback;
-  final BoxFit fit;
-
-  const CustomImage({
-    required this.networkUrl,
-    required this.assetFallback,
-    this.fit = BoxFit.cover,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Image.network(
-      networkUrl,
-      fit: fit,
-      errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-        // When the network image fails to load, load the asset image
-        return Image.asset(
-          assetFallback,
-          fit: fit,
-        );
-      },
-    );
-  }
-}
-
-// CustomImage(networkUrl: 'https://example.com/image.jpg', assetFallback: 'assets/fallback.jpg')
-
-
-
-
-
-
-
 class SwipeCard extends StatelessWidget {
   final String id;
   final String foreName;
@@ -71,8 +36,12 @@ class SwipeCard extends StatelessWidget {
     this.showFriend = false,
 
   }) : super(key: key);
+
+
   @override
   Widget build(BuildContext context) {
+    var profileImage = images[0];
+    print(profileImage);
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double width = constraints.maxWidth;
@@ -114,7 +83,8 @@ class SwipeCard extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
-                      child: Image.network('$rootImagePath/$images[0]'),
+                      height: 300,
+                      child: Image.network('$rootImagePath$profileImage'), 
                     ),
                   ),
                   Padding(
@@ -192,7 +162,7 @@ class RoundedBox extends StatelessWidget {
               //   image: AssetImage(image),
               //   fit: BoxFit.cover,
               // ),
-              child: Image.network('$rootImagePath/$image'),
+              child: Image.network('$rootImagePath$image'),
             ),
           ),
         );

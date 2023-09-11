@@ -168,8 +168,10 @@ class _accountImages extends State<accountImages> {
                             ],
                           ),
                           Container(
+                            height: 300,
+                            width: 550,
                             decoration: const BoxDecoration(shape: BoxShape.circle),
-                            child: accountPicture1 == null ? defaultProfilePicture : Image.network(image1path)
+                            child: accountPicture1 == null ? Image.network(image1path) : defaultProfilePicture
                           ),
                           const SizedBox(height: 10,),
                           SizedBox(
@@ -200,8 +202,10 @@ class _accountImages extends State<accountImages> {
                           ),
                           const SizedBox(height: 10,),
                           Container(
+                            height: 300,
+                            width: 550,
                             decoration: const BoxDecoration(shape:  BoxShape.circle),
-                            child: accountPicture2 == null? defaultProfilePicture : Image.network(image2path)
+                            child: accountPicture2 == null? Image.network(image2path) : defaultProfilePicture
                           ), 
                           const SizedBox(height: 10,),
                           SizedBox(

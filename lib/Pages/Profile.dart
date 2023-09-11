@@ -129,6 +129,8 @@ class _ProfilePage extends State<Profile> {
       String picture2 = userDoc.get("Images")[2];
       String fullName = "$foreName $surname";
 
+      print('Profile pic path is - $profPic');
+
       return [fullName, profPic, picture1, picture2];
     } catch (e) {
       throw FirebaseException(
@@ -184,7 +186,7 @@ class _ProfilePage extends State<Profile> {
                                     shape: BoxShape.circle,
                                     // borderRadius: BorderRadius.circular(100)
                                   ),
-                                  child: _profileImage == null ? defaultProfilePicture : Image.network(profileImagepath)
+                                  child: _profileImage == null ? Image.network(profileImagepath) : defaultProfilePicture
                                 )
                               ),
                               Padding(
