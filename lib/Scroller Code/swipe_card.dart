@@ -56,71 +56,58 @@ class SwipeCard extends StatelessWidget {
           },
           child: Container(
             margin: const EdgeInsets.fromLTRB(16.0, 5.0, 16.0, 5.0),
-            height: height,
-            // decoration: BoxDecoration(
-            //   shape: BoxShape.rectangle,
-            //   borderRadius: BorderRadius.circular(20.0),
-            //   boxShadow: const [
-            //     BoxShadow(
-            //       color: Color.fromARGB(255, 67, 67, 67),
-            //       spreadRadius: 0,
-            //       blurRadius: 6,
-            //       offset: Offset(0, 4),
-            //     )
-            //   ],
-            //   image: DecorationImage(
-            //     image: AssetImage(images[0]),
-            //     fit: BoxFit.cover,
-            //   ),
-            // ),
+            // Need to do more testing to see if this is okay
+            // height: height,
             child: Container(
               margin: const EdgeInsets.all(15.0),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // This needs to be 
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      height: 300,
-                      child: Image.network('$rootImagePath$profileImage'), 
-                    ),
-                  ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          "$foreName  $age",
-                          style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold),
+                    child: Stack(
+                      alignment: Alignment.center,
+                    children: <Widget>[
+                      Positioned(
+                        child: Container(
+                          // height: 300,
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.all(Radius.circular(16))
+                          ),
+                          width: MediaQuery.of(context).size.width,
+                          child: Image.network('$rootImagePath$profileImage'), 
                         ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),
-                    child: Text(
-                      bio,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                        fontStyle: FontStyle.normal,
                       ),
-                    ),
-                  ),
-                ],
+                      Positioned(
+                        top: 0,
+                        child: Text(
+                                "$foreName  $age",
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        child: Text(
+                                  bio,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                    fontStyle: FontStyle.normal,
+                                  ),
+                              ),
+                      )
+                    ],
               ),
-            ),
+            )],
           ),
-        );
-      },
-    );
+        )),
+    );});
   }
 }
 

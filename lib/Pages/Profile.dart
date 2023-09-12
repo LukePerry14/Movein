@@ -178,16 +178,16 @@ class _ProfilePage extends State<Profile> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               const SizedBox(height:10),
-                              SizedBox(
+                              Container(
                                 width: 150, 
-                                height:150, 
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    // borderRadius: BorderRadius.circular(100)
-                                  ),
-                                  child: _profileImage == null ? Image.network(profileImagepath) : defaultProfilePicture
-                                )
+                                height: 200,
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(Radius.circular(16)),
+                                  image: DecorationImage(
+                                    image: _profileImage == null ? NetworkImage(profileImagepath) : NetworkImage(profileImagepath)
+                                  )
+                                ),
+                                
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
