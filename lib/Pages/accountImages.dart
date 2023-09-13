@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:azstore/azstore.dart';
@@ -69,6 +70,22 @@ Future<void> _deleteProfileImageFromAzure(String fileString) async {
   }
 }
 
+Future<void> updateInfo(imageArray) async {
+  try {
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(Auth().currentUser())
+        .update({
+      'Images': imageArray
+    });
+  } catch (e) {
+    throw FirebaseException(
+      message: 'Error saving user data: $e',
+      plugin: 'cloud_firestore',
+    );
+  }
+}
+
 // ignore: camel_case_types
 class accountImages extends StatefulWidget {
   const accountImages({super.key});
@@ -89,6 +106,8 @@ class _accountImages extends State<accountImages> {
   String? image2url;
   var defaultProfilePicture = Image.asset('assets/Pictures/turt.png');
 
+  late List imageArray;
+
   Future<List<String>> getNameAndPic() async {
     try {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
@@ -103,6 +122,10 @@ class _accountImages extends State<accountImages> {
       String picture2 = userDoc.get("Images")[2];
       String fullName = "$foreName $surname";
 
+      imageArray.add(profPic);
+      imageArray.add(picture1);
+      imageArray.add(picture2);
+
       return [fullName, profPic, picture1, picture2];
     } catch (e) {
       throw FirebaseException(
@@ -112,8 +135,6 @@ class _accountImages extends State<accountImages> {
   }
 
   Widget build(BuildContext context) {
-
-
     return FutureBuilder<List<String>>(
       future: getNameAndPic(),
       builder: (context, snapshot) {
@@ -181,6 +202,8 @@ class _accountImages extends State<accountImages> {
                                 if (pickedImage != null) {
                                   // Firebase edit needs to occur here
                                   accountPicture1String = _uploadImageToAzure2(pickedImage) as String?;
+                                  imageArray[1] = accountPicture1String;
+                                  updateInfo(imageArray);
                                   _deleteProfileImageFromAzure(image1url!);
                                   // to be added to Images[1]
                                   setState(() {
@@ -215,8 +238,9 @@ class _accountImages extends State<accountImages> {
                                 if (pickedImage != null) {
                                   // Firebase edit needs to occur here
                                   accountPicture1String =  _uploadImageToAzure2(pickedImage) as String?;
+                                  imageArray[2] = accountPicture2String;
+                                  updateInfo(imageArray);
                                   _deleteProfileImageFromAzure(image2url!);
-                                  // To be added to Images[2]
                                   setState(() {
                                     accountPicture2 = pickedImage;
                                   });

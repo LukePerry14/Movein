@@ -129,13 +129,28 @@ class _ProfilePage extends State<Profile> {
       String picture2 = userDoc.get("Images")[2];
       String fullName = "$foreName $surname";
 
-      print('Profile pic path is - $profPic');
-
       return [fullName, profPic, picture1, picture2];
     } catch (e) {
       throw FirebaseException(
           message: 'Error retrieving name or profile picture: $e',
           plugin: 'cloud_firestore');
+    }
+  }
+
+
+    Future<void> updateImage(imageArray) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(Auth().currentUser())
+          .update({
+        'Images': imageArray
+      });
+    } catch (e) {
+      throw FirebaseException(
+        message: 'Error saving user data: $e',
+        plugin: 'cloud_firestore',
+      );
     }
   }
 
@@ -155,6 +170,12 @@ class _ProfilePage extends State<Profile> {
             // Other images for the user
             var image1 = data[2];
             var image2 = data[3];
+
+            List imageArray = List.empty();
+
+            imageArray.add(profPic);
+            imageArray.add(image1);
+            imageArray.add(image2);
 
             // network paths to user's images
             var profileImagepath = '$rootImagePath$profPic';
@@ -195,6 +216,8 @@ class _ProfilePage extends State<Profile> {
                                     final pickedImage = await pickImage();
                                     if (pickedImage != null) {
                                       profilePictureString = await _uploadImageToAzure2(pickedImage);
+                                      imageArray[0] = profilePictureString;
+                                      updateInfo(imageArray);
                                       _deleteProfileImageFromAzure(profileImagepath);
                                       setState(() {
                                         _profileImage = pickedImage;
