@@ -991,8 +991,6 @@ class _SignupScreenState extends State<SignupScreen> {
                             //ACCESS_TOKEN
                             ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), data['ForeName']);
 
-                            // Upload to azure function - 
-
                             await UserPreferences.setUni(data['UniAttended']);
                             await UserPreferences.setAppsMax(2);
                             await UserPreferences.setForeName(data['ForeName']);

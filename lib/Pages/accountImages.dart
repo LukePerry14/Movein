@@ -106,8 +106,6 @@ class _accountImages extends State<accountImages> {
   String? image2url;
   var defaultProfilePicture = Image.asset('assets/Pictures/turt.png');
 
-  late List imageArray;
-
   Future<List<String>> getNameAndPic() async {
     try {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
@@ -121,10 +119,6 @@ class _accountImages extends State<accountImages> {
       String picture1 = userDoc.get("Images")[1];
       String picture2 = userDoc.get("Images")[2];
       String fullName = "$foreName $surname";
-
-      imageArray.add(profPic);
-      imageArray.add(picture1);
-      imageArray.add(picture2);
 
       return [fullName, profPic, picture1, picture2];
     } catch (e) {
@@ -147,6 +141,12 @@ class _accountImages extends State<accountImages> {
             // Other images for the user
             var image1 = data![2];
             var image2 = data[3];
+
+            List<String?> imageArray = [];
+
+            imageArray.add(data![1]);
+            imageArray.add(data![2]);
+            imageArray.add(data![3]);
 
             // network paths to user's images
             var image1path = '$rootImagePath$image1';

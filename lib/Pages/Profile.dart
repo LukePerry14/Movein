@@ -142,9 +142,9 @@ class _ProfilePage extends State<Profile> {
     try {
       await FirebaseFirestore.instance
           .collection('Users')
-          .doc(Auth().currentUser()).set({
-        'Images': imageArray
-      });
+          .doc(Auth().currentUser()).update({
+            'Images': imageArray
+          });
     } catch (e) {
       throw FirebaseException(
         message: 'Error saving user data: $e',
@@ -170,7 +170,7 @@ class _ProfilePage extends State<Profile> {
             var image1 = data[2];
             var image2 = data[3];
 
-            List<String?> imageArray = ['','',''];
+            List<String?> imageArray = [];
 
             imageArray.add(profPic);
             imageArray.add(image1);
@@ -180,7 +180,6 @@ class _ProfilePage extends State<Profile> {
             var profileImagepath = '$rootImagePath$profPic';
             var image1path = '$rootImagePath$image1';
             var image2path = '$rootImagePath$image2';
-            
 
             // default picture used for when an image is not present
             var defaultProfilePicture = Image.asset('assets/Pictures/turt.png');
@@ -216,7 +215,7 @@ class _ProfilePage extends State<Profile> {
                                     if (pickedImage != null) {
                                       profilePictureString = await _uploadImageToAzure2(pickedImage);
                                       imageArray[0] = profilePictureString;
-                                      updateInfo(imageArray);
+                                      updateImage(imageArray);
                                       _deleteProfileImageFromAzure(profileImagepath);
                                       setState(() {
                                         _profileImage = pickedImage;
