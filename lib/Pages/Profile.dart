@@ -142,8 +142,7 @@ class _ProfilePage extends State<Profile> {
     try {
       await FirebaseFirestore.instance
           .collection('Users')
-          .doc(Auth().currentUser())
-          .update({
+          .doc(Auth().currentUser()).set({
         'Images': imageArray
       });
     } catch (e) {
@@ -171,7 +170,7 @@ class _ProfilePage extends State<Profile> {
             var image1 = data[2];
             var image2 = data[3];
 
-            List imageArray = List.empty();
+            List<String?> imageArray = ['','',''];
 
             imageArray.add(profPic);
             imageArray.add(image1);
