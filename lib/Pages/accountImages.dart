@@ -64,13 +64,13 @@ Future<void> _deleteProfileImageFromAzure(String fileString) async {
     'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net'
     );
   try {
-    await x.deleteBlob('/moveinimages/$fileString.jpg');
+    await x.deleteBlob('/moveinimages/$fileString');
   } catch (e) {
     print('Exception: $e');
   }
 }
 
-Future<void> updateInfo(imageArray) async {
+Future<void> updateImage(imageArray) async {
   try {
     await FirebaseFirestore.instance
         .collection('Users')
@@ -144,9 +144,9 @@ class _accountImages extends State<accountImages> {
 
             List<String?> imageArray = [];
 
-            imageArray.add(data![1]);
-            imageArray.add(data![2]);
-            imageArray.add(data![3]);
+            imageArray.add(data[1]);
+            imageArray.add(data[2]);
+            imageArray.add(data[3]);
 
             // network paths to user's images
             var image1path = '$rootImagePath$image1';
@@ -168,7 +168,7 @@ class _accountImages extends State<accountImages> {
                   body: Center(
                     child: Padding(
                       padding: const EdgeInsets.all(15.0),
-                      child: Column(
+                      child: ListView(
                         children: [
                           Row(
                             children: [
@@ -183,16 +183,16 @@ class _accountImages extends State<accountImages> {
                           ),
                           const Divider(height: 20, thickness: 1),
                           const SizedBox(height: 10,),
-                          Row(
-                            children: [
-                              Text('Image 1'.tr, style: Theme.of(context).textTheme.headlineMedium,),
-                            ],
-                          ),
+                          const SizedBox(height: 10,),
                           Container(
-                            height: 300,
+                            height: 400,
                             width: 550,
-                            decoration: const BoxDecoration(shape: BoxShape.circle),
-                            child: accountPicture1 == null ? Image.network(image1path) : defaultProfilePicture
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.all(Radius.circular(40)),
+                              image: DecorationImage(
+                                image: accountPicture1 == null ? NetworkImage(image1path) : NetworkImage(image1path)
+                              )
+                            ),
                           ),
                           const SizedBox(height: 10,),
                           SizedBox(
@@ -200,12 +200,10 @@ class _accountImages extends State<accountImages> {
                               onPressed: () async {
                                 final pickedImage = await pickImage();
                                 if (pickedImage != null) {
-                                  // Firebase edit needs to occur here
-                                  accountPicture1String = _uploadImageToAzure2(pickedImage) as String?;
+                                  accountPicture1String = await _uploadImageToAzure2(pickedImage);
                                   imageArray[1] = accountPicture1String;
-                                  updateInfo(imageArray);
-                                  _deleteProfileImageFromAzure(image1url!);
-                                  // to be added to Images[1]
+                                  updateImage(imageArray);
+                                  _deleteProfileImageFromAzure(image1);
                                   setState(() {
                                     accountPicture1 = pickedImage;
                                   });
@@ -218,17 +216,16 @@ class _accountImages extends State<accountImages> {
                             ),
                           ), 
                           const SizedBox(height: 40,),
-                          Row(
-                            children: [
-                              Text('Image 2'.tr, style: Theme.of(context).textTheme.headlineMedium,),
-                            ],
-                          ),
                           const SizedBox(height: 10,),
                           Container(
-                            height: 300,
+                            height: 400,
                             width: 550,
-                            decoration: const BoxDecoration(shape:  BoxShape.circle),
-                            child: accountPicture2 == null? Image.network(image2path) : defaultProfilePicture
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.all(Radius.circular(40)),
+                              image: DecorationImage(
+                                image: accountPicture2 == null ? NetworkImage(image2path) : NetworkImage(image2path)
+                              )
+                            ),
                           ), 
                           const SizedBox(height: 10,),
                           SizedBox(
@@ -236,11 +233,10 @@ class _accountImages extends State<accountImages> {
                               onPressed: () async {
                                 final pickedImage = await pickImage();
                                 if (pickedImage != null) {
-                                  // Firebase edit needs to occur here
-                                  accountPicture1String =  _uploadImageToAzure2(pickedImage) as String?;
+                                  accountPicture1String = await _uploadImageToAzure2(pickedImage);
                                   imageArray[2] = accountPicture2String;
-                                  updateInfo(imageArray);
-                                  _deleteProfileImageFromAzure(image2url!);
+                                  updateImage(imageArray);
+                                  _deleteProfileImageFromAzure(image2);
                                   setState(() {
                                     accountPicture2 = pickedImage;
                                   });
