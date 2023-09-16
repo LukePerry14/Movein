@@ -697,10 +697,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
     var x = AzureStorage.AzureStorage.parse(
         'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
     try {
-      // var uuid = const Uuid();
-      // String imageName = uuid.v1();
       await x.putBlob('/moveingroupimages/$imageName.jpg',contentType: 'image/jpg', bodyBytes: bytes);
-
     } catch (e) {
       print('Exception: $e');
     }
@@ -767,7 +764,6 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                     onTap: () async {
                       final pickedImage = await pickImage();
                       if (pickedImage!= null) {
-                        // String uniqueID = await _uploadImageToAzure(pickedImage);
                         var uuid = const Uuid();
                         String uniqueID = uuid.v1();
                         String currentGroupImage = '$uniqueID.jpg';
