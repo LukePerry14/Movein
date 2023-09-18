@@ -125,6 +125,51 @@ class _LoginScreenState extends State<LoginScreen> {
   String errorMessage = "";
 
   @override
+  void initState() {
+    super.initState();
+    bool isFirst = UserPreferences.getFirstTime() as bool;
+    if(isFirst) {
+      // here you check
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) => WillPopScope(
+            onWillPop: () async {
+              await UserPreferences.setFirstTime(false);
+              return true;
+            },
+            child: AlertDialog(
+              content: IntrinsicHeight(
+                child: Column(
+                  children: [
+                    SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        child: Image.asset("assets/Pictures/Durham.png")
+                    ),
+                    const SizedBox(height:30),
+                    Text("Worldwide launch 1st November!", style: Theme.of(context).textTheme.headlineLarge, textAlign: TextAlign.center,),
+                    const SizedBox(height:20),
+                    Text("Thank you for downloading MoveIn! \n \n For now we're doing a localised launch in Durham, but we're excited to announce a 1st of November worldwide release date so keep the app downloaded and we'll let you know when we launch", textAlign: TextAlign.center, style: GoogleFonts.redHatDisplay(color: Colors.grey[600], fontSize: 16.5),)
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () async {
+                    await UserPreferences.setFirstTime(false);
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Close', style: GoogleFonts.redHatDisplay(color: Theme.of(context).primaryColor, fontSize: 16.5),),
+                ),
+              ],
+            ),
+          ),
+        );
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
@@ -327,6 +372,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
 }
 
 class SignupScreen extends StatefulWidget {
@@ -483,6 +529,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                 if (!domains
                                     .any((domain) => email.contains(domain))) {
                                   return 'Email domain is not valid';
+                                }
+                                if (!email.contains(RegExp(r'@(durham\.ac\.uk|dur\.ac\.uk)$'))){
+                                  return 'sorry we\'re only supporting durham until 1st Nov.';
                                 }
                                 return null;
                               },

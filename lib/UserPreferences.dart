@@ -12,8 +12,14 @@ class UserPreferences {
   static const _keyYearPref = 'yearPref';
   static const _keyUni = 'Uni';
   static const _keyForeName = 'foreName';
+  static const _keyFirstTime = 'firstTime';
 
   static Future<SharedPreferences?> init() async => _preferences = await SharedPreferences.getInstance();
+
+  static Future setFirstTime(bool brightness) async =>
+      await _preferences.setBool(_keyBrightness, brightness);
+
+  static bool? getFirstTime() => _preferences.getBool(_keyBrightness) ?? true;
 
   static Future setAppsMax(int AppsMax)  async =>
       await _preferences.setInt(_keyAppsMax, AppsMax);
