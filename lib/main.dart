@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+//import 'dart:html';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -16,24 +18,38 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:movein/Translations.dart';
 import 'package:movein/Pages/SessionToken.dart';
 import 'package:movein/UserPreferences.dart';
+import 'package:provider/provider.dart';
 import 'Auth code/auth.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'Auth code/auth.dart';
 import 'package:azblob/azblob.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:sendbird_chat_sdk/sendbird_chat_sdk.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:http/http.dart' as http;
+import '.env';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
+  Stripe.publishableKey = stripePublishableKey;
+  await Stripe.instance.applySettings();
+  //LinkFivePurchases.init("fae19762a8d0f160ead020291d33b644b70c69f576202d0c207d4a9153c72b7c");
+  //LinkFivePurchases.products;
+  //LinkFivePurchases.activeProducts;
+  //LinkFivePurchases.purchase(productDetails);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await UserPreferences.init();
   // var ABlob = AzureStorage.parse('https://movein.blob.core.windows.net/moveinimages');
 
-  runApp(const App());
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(const App());
+  });
+
 }
 
 class App extends StatelessWidget {
@@ -43,39 +59,45 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
       _loadSavedTheme();
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-      return ValueListenableBuilder<ThemeMode>(
-          valueListenable: App.themeNotifier,
-          builder: (context, currentMode, child) {
-            final String foreName = UserPreferences.getForeName();
-            final bool loggedIn = (foreName != "NotLoggedInError");
-            if (foreName != "NotLoggedInError") {
-              //ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), foreName);
-            }
-            return GetMaterialApp(
-              debugShowCheckedModeBanner: false,
-              translations: AppTranslations(),
-              locale: Get.deviceLocale,
-              theme: LAppTheme.lightTheme,
-              darkTheme: LAppTheme.darkTheme,
-              themeMode: currentMode,
-              initialRoute: !loggedIn
-                  ? '/Login'
-                  : '/Scroller',
-              routes: {
-                '/OnBoarding': (context) => const OnBoardingPage(),
-              },
-                onGenerateInitialRoutes: (initialRoute) {
-                  if (initialRoute == '/Scroller') {
-                    return [MaterialPageRoute(builder: (context) => const Scroller())];
+      return MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: App.themeNotifier),
+        ],
+        child: ValueListenableBuilder<ThemeMode>(
+            valueListenable: App.themeNotifier,
+            builder: (context, currentMode, child) {
+              final String foreName = UserPreferences.getForeName();
+              final bool loggedIn = (foreName != "NotLoggedInError");
+              if (foreName != "NotLoggedInError") {
+                //ACCESS_TOKEN
+                //ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), foreName);
+              }
+              return GetMaterialApp(
+                debugShowCheckedModeBanner: false,
+                translations: AppTranslations(),
+                locale: Get.deviceLocale,
+                theme: LAppTheme.lightTheme,
+                darkTheme: LAppTheme.darkTheme,
+                themeMode: currentMode,
+                initialRoute: !loggedIn
+                    ? '/Login'
+                    : '/Scroller',
+                  routes: {
+                    '/OnBoarding': (context) => const OnBoardingPage(),
+                  },
+
+                  onGenerateInitialRoutes: (initialRoute) {
+                    if (initialRoute == '/Scroller') {
+                      return [MaterialPageRoute(builder: (context) => const Scroller())];
+                    }
+                    else {
+                      return [MaterialPageRoute(builder: (context) => const LoginScreen())];
+                    }
                   }
-                  else {
-                    return [MaterialPageRoute(builder: (context) => const LoginScreen())];
-                  }
+                );
                 }
-            );
-          });
-  }
-// fix size of image
+            ));
+          }
   void _loadSavedTheme() {
     String? locale = UserPreferences.getLocale();
 
@@ -87,7 +109,7 @@ class App extends StatelessWidget {
       App.themeNotifier.value = isDarkMode ? ThemeMode.dark : ThemeMode.light;
     }
   }
-}
+  }
 
 
 class LoginScreen extends StatefulWidget {
@@ -286,8 +308,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           PageTransition(
                             type: PageTransitionType.rightToLeft,
                             child: const SignupScreen(),
-                            duration: const Duration(seconds: 1),
-                            reverseDuration: const Duration(seconds: 1),
+                            duration: const Duration(milliseconds: 500),
+                            reverseDuration: const Duration(milliseconds: 500),
                           ),
                         );
                       },
@@ -790,6 +812,37 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       Text(errorMessage),
                       const SizedBox(height: 5),
+                      Align(
+                        alignment: Alignment.bottomLeft,
+                        child: TextButton(
+                          onPressed: () {
+                            launchWebsite();
+                          },
+                          child: Text(
+                            'view-privacy'.tr,
+                            style: TextStyle(
+                              color: Theme.of(context).primaryColor, // Change the color to your desired hyperlink color
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height:10),
+                      FormBuilderCheckbox(
+                        name: 'acceptPrivacyPolicy',
+                        validator: (value) {
+                          if (value != true){
+                            return "privacy-error".tr;
+                          } else {
+                            return null;
+                          }
+
+                        },
+                        title: Text(
+                          'accept-privacy'.tr,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: (profileInfoValid &
@@ -827,24 +880,31 @@ class _SignupScreenState extends State<SignupScreen> {
                           Auth().addAccessToken(_accessToken,Auth().currentUser() );
                             
                             ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), data['ForeName'],_accessToken);
-                            
 
-                            await UserPreferences.setUni(data['UniAttended']);
-                            await UserPreferences.setAppsMax(2);
-                            await UserPreferences.setForeName(data['ForeName']);
 
-                            Navigator.pushNamed(context, '/OnBoarding');
-                            return;
-                          } else {
-                            setState(() {
-                              var errors = {
-                                'invalid-email': 'Enter a valid email',
-                                'wrong-password': 'Incorrect password'
-                              };
-                              // error_message = errors[response] ?? response;
-                            });
-                          }
-                          return;
+                                    await UserPreferences.setUni(
+                                        data['UniAttended']);
+                                    await UserPreferences.setAppsMax(2);
+                                    await UserPreferences.setForeName(
+                                        data['ForeName']);
+                                    Navigator.pushReplacement(
+                                        context,
+                                        PageTransition(
+                                            type: PageTransitionType.fade,
+                                            child: const OnBoardingPage(),
+                                            duration: const Duration(
+                                                milliseconds: 200)));
+                                  return;
+                                } else {
+                                  setState(() {
+                                    var errors = {
+                                      'invalid-email': 'Enter a valid email',
+                                      'wrong-password': 'Incorrect password'
+                                    };
+                                    // error_message = errors[response] ?? response;
+                                  });
+                                }
+                                return;
                         },
                         child: Text('Signup',
                             style: GoogleFonts.redHatDisplay(
@@ -939,24 +999,10 @@ class _SignupScreenState extends State<SignupScreen> {
     data['ShortList'] = [];
     data['Images'] = ["assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png"];
     data['Subscribed'] = false;
+    data['StripeCustomerId'] = "";
     return data;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

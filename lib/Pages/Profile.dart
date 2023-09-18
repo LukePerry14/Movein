@@ -303,8 +303,7 @@ class _ProfilePage extends State<Profile> {
                                         fontSize: 20.0)),
                                 onTap: () async {
                                   await storageReset();
-                                  await UserPreferences.setForeName(
-                                      "NotLoggedInError");
+                                  await UserPreferences.setForeName("NotLoggedInError");
                                   FirebaseAuth.instance.signOut();
                                   Navigator.pushReplacement(
                                     context, PageTransition(

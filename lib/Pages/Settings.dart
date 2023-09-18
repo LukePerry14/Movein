@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../Pages/Profile.dart';
 import '../Auth code/auth.dart';
+import 'package:http/http.dart' as http;
 import '../Friend And Groups Code/FriendFunctions.dart';
 import '../Themes/lMode.dart';
 import '../main.dart';
@@ -183,6 +186,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> deleteDocumentAndAccount() async {
     await storageReset();
     try {
+
       // Delete document from Firestore's "Users" collection
       String currentUserId = FirebaseAuth.instance.currentUser!.uid;
       DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('Users').doc(currentUserId).get();
@@ -190,7 +194,10 @@ class _SettingsPageState extends State<SettingsPage> {
       // Access "Joined" and "Applications" arrays
       List<String> joinedGroups = List.from(userSnapshot.get('Joined'));
       List<String> applications = List.from(userSnapshot.get('Applications'));
-
+      String stripeId = userSnapshot.get('Applications').toString();
+      if (stripeId != ""){
+        await deleteStripeCustomer(stripeId);
+      }
       // Remove groups from user's Joined and Applications arrays
       for (String groupId in joinedGroups) {
         await removeGroupFromUser("Joined", groupId, currentUserId);
@@ -214,6 +221,23 @@ class _SettingsPageState extends State<SettingsPage> {
       throw FirebaseAuthException(code: 'unknown-error', message: 'An unknown error occurred while deleting the account.');
     }
   }
+  Future<void> deleteStripeCustomer(String customerId) async {
+
+    final url = Uri.parse('https://europe-west2-test-7a857.cloudfunctions.net/deleteStripeCustomer'); // Replace with your Cloud Function URL
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'customerId': customerId}),
+    );
+
+    if (response.statusCode == 200) {
+      // Successful response
+      return;
+    } else {
+      throw Exception("unable to delete stripe account");
+    }
+  }
+
 }
 
 
@@ -221,7 +245,7 @@ class _SettingsPageState extends State<SettingsPage> {
 GestureDetector buildAccountOption(BuildContext context, String title) {
   return GestureDetector(
     onTap: () {
-      _launchWebsite();
+      launchWebsite();
     },
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
@@ -609,7 +633,7 @@ class _RadioLanguageState extends State<RadioLanguage> {
   }
 }
 
-_launchWebsite() async {
+launchWebsite() async {
   final Uri url = Uri.parse('https://moveinwebsite.azurewebsites.net');
   if (!await launchUrl(url)) {
     throw Exception('Could not launch $url');

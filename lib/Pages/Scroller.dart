@@ -135,21 +135,21 @@ class _ScrollerState extends State<Scroller> {
 
         return Scaffold(
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-          body: (!_loadApp & !_showApp)
-              ? Center(
-            child: SizedBox(
-              width: MediaQuery.of(context)
-                  .size
-                  .width * 0.8, // Adjust the width to control the size
-              height: MediaQuery.of(context)
-                  .size
-                  .width * 0.8, // Adjust the height to control the size
-              child: const CircularProgressIndicator(),
-            ),
-          )
-              : Stack(
+          body: Stack(
             children: [
-              SizedBox(
+              (!_loadApp & !_showApp)
+                  ? Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context)
+                      .size
+                      .width * 0.8, // Adjust the width to control the size
+                  height: MediaQuery.of(context)
+                      .size
+                      .width * 0.8, // Adjust the height to control the size
+                  child: const CircularProgressIndicator(),
+                ),
+              )
+              :SizedBox(
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
                 child: (groupData.isEmpty)

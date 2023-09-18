@@ -12,63 +12,78 @@ class OnBoardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: IntroductionScreen(
-          pages: [
-            PageViewModel(
-              title: "welcome".tr,
-              body: "welcome-desc".tr,
-              image: buildImage("assets/Pictures/ph.png"),
-              decoration: getPageDecoration(context),
-            ),
-            PageViewModel(
-              title: "page-1-title".tr,
-              body: "page-1-desc".tr,
-              image: buildImage("assets/Pictures/ph.png"),
-              decoration: getPageDecoration(context),
-            ),
-            PageViewModel(
-                title: "page-2-title".tr,
-                body: "page-2-desc".tr,
-                image: buildImage("assets/Pictures/ph.png"),
+    return Scaffold(
+      body: SafeArea(
+          child: IntroductionScreen(
+            pages: [
+              PageViewModel(
+                title: "welcome".tr,
+                body: "welcome-desc".tr,
+                image: buildImage("assets/Pictures/1.png"),
                 decoration: getPageDecoration(context),
-            ),
-            PageViewModel(
-              title: "page-3-title".tr,
-              body: "page-3-desc".tr,
-                image: buildImage("assets/Pictures/ph.png"),
+              ),
+              PageViewModel(
+                title: "page-1-title".tr,
+                body: "page-1-desc".tr,
+                image: buildImage("assets/Pictures/2.png"),
+                decoration: getPageDecoration(context),
+              ),
+              PageViewModel(
+                  title: "page-2-title".tr,
+                  body: "page-2-desc".tr,
+                  image: buildImage("assets/Pictures/3.png"),
+                  decoration: getPageDecoration(context),
+              ),
+              PageViewModel(
+                title: "page-3-title".tr,
+                body: "page-3-desc".tr,
+                  image: buildImage("assets/Pictures/4.png"),
+                  decoration: PageDecoration(
+                    pageColor: Theme.of(context).canvasColor,
+                    imageFlex: 7,
+                    bodyFlex: 4,
+                  ),
+              ),
+              PageViewModel(
+                title: "page-4-title".tr,
+                body: "page-4-desc".tr,
+                image: buildImage("assets/Pictures/5.png"),
                 decoration: PageDecoration(
                   pageColor: Theme.of(context).canvasColor,
                   imageFlex: 7,
                   bodyFlex: 4,
                 ),
-            ),
-            PageViewModel(
-              title: "page-4-title".tr,
-              body: "page-4-desc".tr,
-              image: buildImage("assets/Pictures/ph.png"),
-              decoration: PageDecoration(
-                pageColor: Theme.of(context).canvasColor,
-                imageFlex: 7,
-                bodyFlex: 4,
               ),
-            ),
-            PageViewModel(
-              title: "page-5-title".tr,
-              body: "page-5-desc".tr,
-                image: buildImage("assets/Pictures/ph.png"),
-                decoration: getPageDecoration(context),
-            ),
-          ],
+              PageViewModel(
+                title: "page-4.5-title".tr,
+                body: "page-4.5-desc".tr,
+                image: buildImage("assets/Pictures/6.png"),
+                decoration: PageDecoration(
+                  pageColor: Theme.of(context).canvasColor,
+                  imageFlex: 7,
+                  bodyFlex: 4,
+                ),
+              ),
+              PageViewModel(
+                title: "page-5-title".tr,
+                body: "page-5-desc".tr,
+                  image: buildImage("assets/Pictures/7.png"),
+                  decoration: getPageDecoration(context),
+              ),
+            ],
 
-          done: Text("got-it".tr, style: Theme.of(context).textTheme.bodyMedium),
-          onDone: () => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Scroller(), duration: const Duration(milliseconds: 200))),
-          showSkipButton: true,
-          skip: Text('skip'.tr, style: Theme.of(context).textTheme.bodyMedium),
-          onSkip: () => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Scroller(), duration: const Duration(milliseconds: 200))),
-          next: const Icon(LineAwesomeIcons.arrow_right, color: Colors.black87),
-          dotsDecorator: getDotDecoration(context),
-        )
+            done: Text("got-it".tr, style: Theme.of(context).textTheme.bodyMedium),
+            onDone: () => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Scroller(), duration: const Duration(milliseconds: 200))),
+            showSkipButton: true,
+            skip: Text('skip'.tr, style: Theme.of(context).textTheme.bodyMedium),
+            onSkip: () => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Scroller(), duration: const Duration(milliseconds: 200))),
+            next: const Icon(LineAwesomeIcons.arrow_right, color: Colors.black87),
+            dotsDecorator: getDotDecoration(context),
+            dotsFlex: 2,
+            nextFlex: 1,
+            skipOrBackFlex: 1,
+          )
+      ),
     );
   }
 
