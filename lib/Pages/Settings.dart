@@ -80,7 +80,6 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const Divider(height: 20, thickness: 1),
           const SizedBox(height: 10),
-          buildChangePassword(context, 'change-password'.tr),
           //buildChangeEmail(context, 'Change Email'),
           buildReviewAds(context, 'premium'.tr),
           buildChangeLanguage(context, 'language'.tr),
@@ -267,77 +266,6 @@ GestureDetector buildAccountOption(BuildContext context, String title) {
   );
 }
 
-// For Change password button
-GestureDetector buildChangePassword(BuildContext context, String title) {
-  return GestureDetector(
-    onTap: () {
-      showDialog(context: context, builder: (BuildContext context) {
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Theme.of(context).primaryColor,
-            centerTitle: true,
-            elevation: 0,
-            leading: IconButton(
-                icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.white),
-                color: Colors.grey[500],
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-          ),
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: [
-                  Text('change-password'.tr, style: Theme.of(context).textTheme.headlineMedium),
-                  const SizedBox(height: 20),
-                  TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
-                      labelText: 'password'.tr
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Confirm Password'
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {print('The password has changed');},
-                    child: const Text('Change Password'),
-                  )
-                ],
-              ),
-            ),
-          )
-        );
-      });
-    },
-    child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600]
-            ),
-          ),
-          const Icon(Icons.arrow_forward_ios, color: Colors.grey)
-        ],
-      ),
-    ),
-  );
-}
 
 GestureDetector buildChangeEmail(BuildContext context, String title) {
   return GestureDetector(

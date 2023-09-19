@@ -1049,6 +1049,7 @@ class _SignupScreenState extends State<SignupScreen> {
     data['Images'] = ["assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png"];
     data['Subscribed'] = false;
     data['StripeCustomerId'] = "";
+    data['EmailVerified'] = false;
     return data;
   }
 }
