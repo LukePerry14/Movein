@@ -612,6 +612,7 @@ class CreateGroupForm extends StatefulWidget {
 }
 
 class _CreateGroupFormState extends State<CreateGroupForm> {
+  String? currentGroupImage;
   final _formKey = GlobalKey<FormState>();
   bool _isButtonEnabled = false;
   final TextEditingController _groupNameController = TextEditingController(text: "GroupName");
@@ -705,7 +706,6 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
 
   @override
   Widget build(BuildContext context) {
-    String? currentGroupImage;
     return IntrinsicHeight(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -766,7 +766,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                       if (pickedImage!= null) {
                         var uuid = const Uuid();
                         String uniqueID = uuid.v1();
-                        String currentGroupImage = '$uniqueID.jpg';
+                        currentGroupImage = '$uniqueID.jpg';
                         setState(() {
                           _selectedImage = pickedImage;
                         });
