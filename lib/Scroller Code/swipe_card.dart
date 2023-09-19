@@ -73,12 +73,15 @@ class SwipeCard extends StatelessWidget {
                         child: Container(
                           // height: 300,
                           decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(Radius.circular(16))
+                            borderRadius: const BorderRadius.all(Radius.circular(16)),
+                            image: DecorationImage(
+                              image: NetworkImage('$rootImagePath$profileImage')
+                            )
+                            )
                           ),
-                          width: MediaQuery.of(context).size.width,
-                          child: Image.network('$rootImagePath$profileImage'), 
+                          // width: MediaQuery.of(context).size.width,
+                          // child: Image.network('$rootImagePath$profileImage'), 
                         ),
-                      ),
                       Positioned(
                         top: 0,
                         child: Text(
