@@ -13,6 +13,9 @@ import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
 import '../main.dart';
 
+final imageURL = 'https://movein.blob.core.windows.net/moveingroupimages/';
+final imageURL2 = 'https://movein.blob.core.windows.net/moveinimages/';
+
 class GroupOptions extends StatefulWidget {
   const GroupOptions({Key? key}) : super(key: key);
 
@@ -412,7 +415,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                 height: 150,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(100),
-                                  child: Image(image: AssetImage(groupPicture)),
+                                  child: Image(image: NetworkImage(imageURL + groupPicture + '.jpg')),
                                 ),
                               ),
                             ),
@@ -523,7 +526,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                   borderRadius:
                                                   BorderRadius.circular(100),
                                                   child: Image(
-                                                      image: AssetImage(
+                                                      image: NetworkImage(imageURL2 + 
                                                           memberDetails[index]
                                                           ["Images"][0])),
                                                 ),

@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:movein/Pages/Settings.dart';
+import 'package:movein/Pages/accountImages.dart';
 import 'package:movein/Pages/profileInformation.dart';
 import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
@@ -20,6 +21,7 @@ import 'package:http/http.dart' as http;
 import 'package:azstore/azstore.dart' as AzureStorage;
 import 'package:uuid/uuid.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:flutter_profile_picture/flutter_profile_picture.dart';
 
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
@@ -27,6 +29,59 @@ import '../main.dart';
 import 'Friends.dart';
 import 'PremiumPage.dart';
 import 'Scroller.dart';
+
+const rootImagePath = 'https://movein.blob.core.windows.net/moveinimages/';
+
+  Future<File?> pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      return File(image.path);
+    } else {
+      print('No image selected.');
+      return null;
+    }
+  }
+
+  Future<void> _uploadImageToAzure(File imageFile) async {
+    Uint8List bytes = imageFile.readAsBytesSync();
+    var x = AzureStorage.AzureStorage.parse(
+        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+    try {
+      var uuid = const Uuid();
+      String imageName = uuid.v1();
+      await x.putBlob('/moveinimages/$imageName.jpg',
+          contentType: 'image/jpg', bodyBytes: bytes);
+    } catch (e) {
+      print('Exception: $e');
+    }
+  }
+
+  // For returning the string name for firebase upload
+  Future<String?> _uploadImageToAzure2(File imageFile) async {
+    Uint8List bytes = imageFile.readAsBytesSync();
+    var x = AzureStorage.AzureStorage.parse(
+        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+    try {
+      var uuid = const Uuid();
+      String imageName = uuid.v1();
+      await x.putBlob('/moveinimages/$imageName.jpg', contentType: 'image/jpg', bodyBytes: bytes);
+      return '$imageName.jpg';
+    } catch (e) {
+      return ('Exception: $e');
+    }
+  }
+
+  Future<void> _deleteProfileImageFromAzure(String fileString) async {
+    var x = AzureStorage.AzureStorage.parse(
+      'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net'
+      );
+    try {
+      await x.deleteBlob('/moveinimages/$fileString.jpg');
+    } catch (e) {
+      print('Exception: $e');
+    }
+  }
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -37,6 +92,13 @@ class Profile extends StatefulWidget {
 
 class _ProfilePage extends State<Profile> {
   var data;
+  File? _profileImage;
+  File? accountPicture1;
+  File? accountPicture2;
+  String? profilePictureString;
+  String? accountPicture1String;
+  String? accountPicture2String;
+  String? _defaultProfileImagePath = 'assets/Pictures/turt.png';
   final TextEditingController _copyController = TextEditingController();
 
   void _copyToClipboard(BuildContext context) {
@@ -63,9 +125,11 @@ class _ProfilePage extends State<Profile> {
       String foreName = userDoc.get("ForeName");
       String surname = userDoc.get("SurName");
       String profPic = userDoc.get("Images")[0];
+      String picture1 = userDoc.get("Images")[1];
+      String picture2 = userDoc.get("Images")[2];
       String fullName = "$foreName $surname";
 
-      return [fullName, profPic];
+      return [fullName, profPic, picture1, picture2];
     } catch (e) {
       throw FirebaseException(
           message: 'Error retrieving name or profile picture: $e',
@@ -73,30 +137,19 @@ class _ProfilePage extends State<Profile> {
     }
   }
 
-  Future<File?> pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      return File(image.path);
-    } else {
-      print('No image selected.');
-      return null;
-    }
-  }
 
-  // New version
-  Future<void> _uploadImageToAzure(File imageFile) async {
-    Uint8List bytes = imageFile.readAsBytesSync();
-    var x = AzureStorage.AzureStorage.parse(
-        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+    Future<void> updateImage(imageArray) async {
     try {
-      var uuid = Uuid();
-      String imageName = uuid.v1();
-      // THIS STRING NEEDS TO BE STORED IN FIREBASE FOR THE PROFILE IMAGE ------ LUKE?
-      await x.putBlob('/moveinimages/$imageName.jpg',
-          contentType: 'image/jpg', bodyBytes: bytes);
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(Auth().currentUser()).update({
+            'Images': imageArray
+          });
     } catch (e) {
-      print('Exception: $e');
+      throw FirebaseException(
+        message: 'Error saving user data: $e',
+        plugin: 'cloud_firestore',
+      );
     }
   }
 
@@ -113,6 +166,23 @@ class _ProfilePage extends State<Profile> {
             data = snapshot.data;
             var name = data[0];
             var profPic = data[1];
+            // Other images for the user
+            var image1 = data[2];
+            var image2 = data[3];
+
+            List<String?> imageArray = [];
+
+            imageArray.add(profPic);
+            imageArray.add(image1);
+            imageArray.add(image2);
+
+            // network paths to user's images
+            var profileImagepath = '$rootImagePath$profPic';
+            var image1path = '$rootImagePath$image1';
+            var image2path = '$rootImagePath$image2';
+
+            // default picture used for when an image is not present
+            var defaultProfilePicture = Image.asset('assets/Pictures/turt.png');
             return Builder(builder: (context) {
               final navigator = Navigator.of(context);
               bool isDark = App.themeNotifier.value == ThemeMode.dark;
@@ -125,26 +195,36 @@ class _ProfilePage extends State<Profile> {
                           padding: const EdgeInsets.all(10.0),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
+                            children: <Widget>[
                               const SizedBox(height:10),
-                              GestureDetector(
-                                onTap: () async {
-                                  final pickedImage = await pickImage();
-                                  if (pickedImage != null) {
-                                    await _uploadImageToAzure(pickedImage);
-                                  }
-                                },
-                                child: Container(
-                                    width: 150,
-                                    // Set a fixed width for the container
-                                    height: 150,
-                                    // Set a fixed height for the container
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: ButtonWidgetShareProfile(
-                                      onClicked: () {},
-                                    )),
+                              Container(
+                                width: 150, 
+                                height: 200,
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(Radius.circular(16)),
+                                  image: DecorationImage(
+                                    image: _profileImage == null ? NetworkImage(profileImagepath) : NetworkImage(profileImagepath)
+                                  )
+                                ),
+                                
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ElevatedButton(onPressed: () async {
+                                    final pickedImage = await pickImage();
+                                    if (pickedImage != null) {
+                                      profilePictureString = await _uploadImageToAzure2(pickedImage);
+                                      imageArray[0] = profilePictureString;
+                                      updateImage(imageArray);
+                                      _deleteProfileImageFromAzure(profileImagepath);
+                                      setState(() {
+                                        _profileImage = pickedImage;
+                                      });
+                                    }
+                                }, child: const Icon(
+                                  Icons.edit,
+                                  color: Colors.white,
+                                ),),
                               ),
                               const SizedBox(height: 20.0),
                               Text(name,
@@ -252,6 +332,39 @@ class _ProfilePage extends State<Profile> {
                               ),
                               const SizedBox(height: 30.0),
                               ListTile(
+                                leading: Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: isDark
+                                      ? Colors.white70
+                                      : Theme.of(context).primaryColor,
+                                      width: 1
+                                    ),
+                                    borderRadius: BorderRadius.circular(100),
+                                  ),
+                                  child: Icon(LineAwesomeIcons.image,
+                                  color: isDark
+                                  ? Colors.white70
+                                  : Theme.of(context).primaryColor,),
+                                ),
+                                title: Text("Account Images".tr, style: 
+                                Theme.of(context).textTheme.headlineSmall,),
+                                trailing: Icon(LineAwesomeIcons.angle_right,
+                                color: LAppTheme.lightTheme.primaryColor,),
+                                onTap: () {
+                                  Navigator.push(context, PageTransition(
+                                    type: PageTransitionType.rightToLeftWithFade,
+                                    alignment: Alignment.topCenter,
+                                    child: const accountImages(),
+                                    duration: const Duration(milliseconds: 400),
+                                    reverseDuration: const Duration(milliseconds: 400),
+                                  ),);
+                                },
+                              ),
+                              const SizedBox(height: 30,),
+                              ListTile(
                                   leading: Container(
                                     width: 40,
                                     height: 40,
@@ -305,11 +418,12 @@ class _ProfilePage extends State<Profile> {
                                   await storageReset();
                                   await UserPreferences.setForeName("NotLoggedInError");
                                   FirebaseAuth.instance.signOut();
+                                  // ignore: use_build_context_synchronously
                                   Navigator.pushReplacement(
                                     context, PageTransition(
                                     type: PageTransitionType.fade,
                                     child: const LoginScreen(),
-                                    duration: Duration(milliseconds: 400),
+                                    duration: const Duration(milliseconds: 400),
                                   ),);
                                 },
                               ),

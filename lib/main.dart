@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 //import 'dart:html';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -31,6 +32,9 @@ import 'package:sendbird_chat_sdk/sendbird_chat_sdk.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
 import '.env';
+import 'package:azstore/azstore.dart' as AzureStorage;
+import 'package:uuid/uuid.dart';
+import 'package:image_picker/image_picker.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -389,6 +393,18 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _passwordConfController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
+  File? _profilePicture1;
+  File? _profilePicture2;
+  File? _profilePicture3;
+
+  String? _profilePicture1String;
+  String? _profilePicture2String;
+  String? _profilePicture3String;
+
+  var defaultProfilePicture = Image.network('https://movein.blob.core.windows.net/moveinimages/a1064ae0-4b38-11ee-ab60-dfd45d30409d.jpg');
+
+  var uuid = const Uuid();
+
   bool _passwordObscured = true;
   bool _passwordConfObscured = true;
   final _universityController = TextEditingController();
@@ -419,6 +435,61 @@ class _SignupScreenState extends State<SignupScreen> {
     _timer.cancel(); // Cancel the timer when the widget is disposed
     super.dispose();
   }
+
+  Future<void> _uploadImageToAzure(File imageFile1, File imageFile2, File, imageFile3, String imageString1, String imageString2, String imageString3) async {
+    Uint8List bytes1 = imageFile1.readAsBytesSync();
+    Uint8List bytes2 = imageFile2.readAsBytesSync();
+    Uint8List bytes3 = imageFile3.readAsBytesSync();
+
+    var state1 = 0;
+    var state2 = 0;
+    var state3 = 0;
+
+    var x = AzureStorage.AzureStorage.parse(
+        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+      
+    // uploads profile image
+    try {
+      await x.putBlob('/moveinimages/$imageString1.jpg', contentType: 'image/jpg', bodyBytes: bytes1);
+    } catch (e) {
+      state1 = 1;
+      print('Exception: $e');
+    }
+
+    // picture 2
+    try {
+      await x.putBlob('/moveinimages/$imageString2.jpg', contentType: 'image/jpg', bodyBytes: bytes2);
+    } catch (e) {
+      state2 = 1;
+      print('Exception: $e');
+    }
+
+    // picture 3
+    try {
+      await x.putBlob('/moveinimages/$imageString3.jpg', contentType: 'image/jpg', bodyBytes: bytes3);
+    } catch (e) {
+      state3 = 1;
+      print('Exception: $e');
+    }
+
+    if (state1 == 0 && state2 == 0 && state3 == 0) {
+      print('Successful upload.');
+    } else {
+      // images that uploaded will need to be deleted as whole set couldn't have been uploaded
+      // This can done later
+    }
+  }
+
+  Future<File?> pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      return File(image.path);
+    } else {
+      print('No image selected.');
+      return null;
+    }
+  }  
 
   @override
   Widget build(BuildContext context) {
@@ -659,6 +730,70 @@ class _SignupScreenState extends State<SignupScreen> {
                                   }
                                   return null;
                                 },
+                              ),
+                              const SizedBox(height: 10),
+                              // This is where the profile images go
+                              const Text('Profile Photo'),
+                              const SizedBox(height: 10),
+                              SizedBox(
+                                height: 150,
+                                width: 150,
+                                child: _profilePicture1 == null ? defaultProfilePicture : Image.file(_profilePicture1!),
+                              ),
+                              const SizedBox(height: 20),
+                              // Container for image
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final pickedImage = await pickImage();
+                                  if (pickedImage != null) {
+                                    _profilePicture1String = '${uuid.v1()}.jpg';
+                                    setState(() {
+                                      _profilePicture1 = pickedImage;
+                                    });
+                                  }
+                                },
+                                child: const Icon(Icons.edit)
+                              ),
+                              const SizedBox(height: 20),
+                              const Text('Second Image'),
+                              const SizedBox(height: 10),
+                              SizedBox(
+                                height: 150,
+                                width: 150,
+                                child:  _profilePicture2 == null ? defaultProfilePicture : Image.file(_profilePicture2!),
+                              ),
+                              const SizedBox(height: 20),
+                              // Container for second image
+                              ElevatedButton(
+                                onPressed: () async { 
+                                  final pickedImage = await pickImage();
+                                  if (pickedImage != null) {
+                                    _profilePicture2String = '${uuid.v1()}.jpg';
+                                    setState(() {
+                                      _profilePicture2 = pickedImage;
+                                    });
+                                  }
+                                }, 
+                                child: const Icon(Icons.edit)
+                              ),
+                              const SizedBox(height: 20),
+                              const Text('Third Picture'),
+                              const SizedBox(height: 10),
+                              SizedBox(
+                                height: 150,
+                                width: 150,
+                                child:  _profilePicture3 == null ? defaultProfilePicture : Image.file(_profilePicture3!),
+                              ),
+                              const SizedBox(height: 20),
+                              // container for third picture
+                              ElevatedButton(
+                                onPressed: () async {
+                                  final pickedImage = await pickImage();
+                                  if (pickedImage != null) {
+                                    _profilePicture3String = '${uuid.v1()}.jpg';
+                                  }
+                                }, 
+                                child: const Icon(Icons.edit)
                               ),
                               const SizedBox(height: 10),
                               FormBuilderDateTimePicker(
@@ -915,7 +1050,10 @@ class _SignupScreenState extends State<SignupScreen> {
                           // debugPrint(_formKey.currentState?.value.toString());
                           Map<String,dynamic> data = Map<String,dynamic>.from(_formKey.currentState?.value ?? {});
                           data['UniAttended'] = _universityController.text;
-                          Map<String,dynamic> reConfigedData = reConfigData(data);
+
+                          // TEST THIS FIREBASE CODE - SHOULD WORK
+
+                          Map<String,dynamic> reConfigedData = reConfigData(data, _profilePicture1String, _profilePicture2String, _profilePicture3String);
                           String response =
                           await Auth().registerWithUserDetails(
                             _formKey.currentState?.fields['email']?.value,
@@ -1028,7 +1166,7 @@ class _SignupScreenState extends State<SignupScreen> {
     });
   }
 
-  Map<String, dynamic> reConfigData(Map<String, dynamic> data) {
+  Map<String, dynamic> reConfigData(Map<String, dynamic> data, String? imageString1, String? imageString2, String? imageString3) {
     data.remove('password');
     data.remove('password_conf');
     data.remove('email');
@@ -1046,7 +1184,7 @@ class _SignupScreenState extends State<SignupScreen> {
     data['Joined'] = [];
     data['OutgoingFriendInvites'] = [];
     data['ShortList'] = [];
-    data['Images'] = ["assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png","assets/Pictures/ph.png"];
+    data['Images'] = [imageString1, imageString2, imageString3];
     data['Subscribed'] = false;
     data['StripeCustomerId'] = "";
     data['EmailVerified'] = false;

@@ -8,6 +8,8 @@ import 'package:movein/Themes/lMode.dart';
 import '../Auth code/auth.dart';
 import '../main.dart';
 
+const rootImagePath = 'https://movein.blob.core.windows.net/moveinimages/';
+
 class SwipeCard extends StatelessWidget {
   final String id;
   final String foreName;
@@ -34,8 +36,12 @@ class SwipeCard extends StatelessWidget {
     this.showFriend = false,
 
   }) : super(key: key);
+
+
   @override
   Widget build(BuildContext context) {
+    var profileImage = images[0];
+    print(profileImage);
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double width = constraints.maxWidth;
@@ -45,28 +51,13 @@ class SwipeCard extends StatelessWidget {
           onTap: () {
             showDialog<String>(
                 context: context,
-                builder: (BuildContext context) => CustomDialog(id: id,foreName: foreName,age: age, uni: uni, preferences: preferences,images: images,bio: bio, subject: subject, yearOfStudy: yearOfStudy, showFriend: showFriend)
+                builder: (BuildContext context) => CustomDialog(id: id,foreName: foreName ,age: age, uni: uni, preferences: preferences,images: images, bio: bio, subject: subject, yearOfStudy: yearOfStudy, showFriend: showFriend)
             );
           },
           child: Container(
             margin: const EdgeInsets.fromLTRB(16.0, 5.0, 16.0, 5.0),
-            height: height,
-            decoration: BoxDecoration(
-              shape: BoxShape.rectangle,
-              borderRadius: BorderRadius.circular(20.0),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color.fromARGB(255, 67, 67, 67),
-                  spreadRadius: 0,
-                  blurRadius: 6,
-                  offset: Offset(0, 4),
-                )
-              ],
-              image: DecorationImage(
-                image: AssetImage(images[0]),
-                fit: BoxFit.cover,
-              ),
-            ),
+            // Need to do more testing to see if this is okay
+            // height: height,
             child: Container(
               margin: const EdgeInsets.all(15.0),
               child: Column(
@@ -75,38 +66,51 @@ class SwipeCard extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          "$foreName  $age",
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold),
+                    child: Stack(
+                      alignment: Alignment.center,
+                    children: <Widget>[
+                      Positioned(
+                        child: Container(
+                          // height: 300,
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.all(Radius.circular(16)),
+                            image: DecorationImage(
+                              image: NetworkImage('$rootImagePath$profileImage')
+                            )
+                            )
+                          ),
+                          // width: MediaQuery.of(context).size.width,
+                          // child: Image.network('$rootImagePath$profileImage'), 
                         ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 4.0),
-                    child: Text(
-                      bio,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                        fontStyle: FontStyle.normal,
+                      Positioned(
+                        top: 0,
+                        child: Text(
+                                "$foreName  $age",
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.bold),
+                              ),
                       ),
-                    ),
-                  ),
-                ],
+                      Positioned(
+                        bottom: 0,
+                        child: Text(
+                                  bio,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                    fontStyle: FontStyle.normal,
+                                  ),
+                              ),
+                      )
+                    ],
               ),
-            ),
+            )],
           ),
-        );
-      },
-    );
+        )),
+    );});
   }
 }
 
@@ -143,10 +147,12 @@ class RoundedBox extends StatelessWidget {
             height: height,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20.0),
-              child: Image(
-                image: AssetImage(image),
-                fit: BoxFit.cover,
-              ),
+              // This needs to be remade - formatting is fucked
+              // child: Image(
+              //   image: AssetImage(image),
+              //   fit: BoxFit.cover,
+              // ),
+              child: Image.network('$rootImagePath$image'),
             ),
           ),
         );
@@ -393,9 +399,10 @@ class _CustomDialogState extends State<CustomDialog> {
                         ),
                       );
                     }
-                    default: {
-                      return RoundedBox(image: widget.images[index-5]);
-                    }
+                    // Not needed as there are only 3 images per user
+                    // default: {
+                    //   return RoundedBox(image: widget.images[index-5]);
+                    // }
                   }
                 },
               ),

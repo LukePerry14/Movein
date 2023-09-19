@@ -12,6 +12,8 @@ import 'package:movein/Pages/Sendbird.dart' ;
 
 
 import 'dart:io';
+import 'package:azstore/azstore.dart' as AzureStorage;
+import 'package:uuid/uuid.dart';
 //import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:movein/UserPreferences.dart';
@@ -610,24 +612,13 @@ class CreateGroupForm extends StatefulWidget {
 }
 
 class _CreateGroupFormState extends State<CreateGroupForm> {
+  String? currentGroupImage;
   final _formKey = GlobalKey<FormState>();
   bool _isButtonEnabled = false;
   final TextEditingController _groupNameController = TextEditingController(text: "GroupName");
   File? _selectedImage;
 
-
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<void> _submitForm(int appsMax) async {
+  Future<void> _submitForm(int appsMax, String? groupImageString) async {
     if (_formKey.currentState!.validate()) {
       final String groupName = _groupNameController.text;
 
@@ -666,7 +657,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
         'AvgYearOfStudy': userSnapshot.get('YearOfStudy'),
         'BlackList': blackList,
         'GroupName': groupName,
-        'GroupPicture': "assets/Pictures/reversed.png",
+        'GroupPicture': groupImageString,
         'Invitees': invitees,
         'KickVals': kickVals,
         'Kicks': kicks,
@@ -678,6 +669,9 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
       });
       var newChannel = ConnectSendbird().createChannel(widget.userId, groupName, null , newGroupDocument.id);
 
+      // uploads image to azure after successful creation of group
+      _uploadImageToAzure(_selectedImage, groupImageString);      
+
       List<dynamic> joinedGroups = userSnapshot.get('Joined');
 
       // Check if the user has joined the maximum number of groups
@@ -685,6 +679,28 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
         // Call maxGroupsReached if the condition is met
         await maxGroupsReached(widget.userId);
       }
+    }
+  }
+
+  Future<File?> pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      return File(image.path);
+    } else {
+      print('No image selected.');
+      return null;
+    }
+  }
+
+  Future<void> _uploadImageToAzure(File? imageFile, String? imageName) async {
+    Uint8List bytes = imageFile!.readAsBytesSync();
+    var x = AzureStorage.AzureStorage.parse(
+        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+    try {
+      await x.putBlob('/moveingroupimages/$imageName.jpg',contentType: 'image/jpg', bodyBytes: bytes);
+    } catch (e) {
+      print('Exception: $e');
     }
   }
 
@@ -744,7 +760,18 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                     },
                   ),
                   GestureDetector(
-                    onTap: _pickImage,
+                    // Azure upload goes here - Billy
+                    onTap: () async {
+                      final pickedImage = await pickImage();
+                      if (pickedImage!= null) {
+                        var uuid = const Uuid();
+                        String uniqueID = uuid.v1();
+                        currentGroupImage = '$uniqueID.jpg';
+                        setState(() {
+                          _selectedImage = pickedImage;
+                        });
+                      }
+                    },
                     child: Container(
                       width: 100,
                       height: 100,
@@ -765,8 +792,8 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
               onPressed: _isButtonEnabled
                   ? () async {
                 if (_formKey.currentState?.validate() ?? false) {
-
-                  await _submitForm(UserPreferences.getAppsMax()).then((value) => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400))));
+                  print('Current group image is - $currentGroupImage');
+                  await _submitForm(UserPreferences.getAppsMax(), currentGroupImage).then((value) => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400))));
                 }
               }
                   : null,

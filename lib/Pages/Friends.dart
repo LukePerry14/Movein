@@ -62,6 +62,8 @@ class _FriendsState extends State<Friends> {
     return yearsAgo;
   }
 
+  final imageURL = 'https://movein.blob.core.windows.net/moveingroupimages/';
+
   //
   // Future<List<List<dynamic>>> fetchFriendsData() async {
   //   List<Map<String, dynamic>> friends = [];
@@ -564,7 +566,8 @@ class _FriendsState extends State<Friends> {
             applicationsResults = data[4][1];
             shortList = data[4][2];
             shortListResults = data[4][2];
-            blockedGroups = data[5];
+            blockedGroups 
+            = data[5];
             blockedSearchResults = data[5];
             return buildScaffold(context, false);
           }
@@ -883,6 +886,7 @@ class _FriendsState extends State<Friends> {
                                                             joinedResults[
                                                                     joinedIndex]
                                                                 ["Id"]);
+                                                final groupImage = joinedResults[joinedIndex]['GroupPictre'];
                                                 Navigator.push(
                                                   context,
                                                   PageTransition(
@@ -908,7 +912,7 @@ class _FriendsState extends State<Friends> {
                                                                     [
                                                                     "GroupName"],
                                                             'groupPicture':
-                                                                joinedResults[
+                                                                imageURL + joinedResults[
                                                                         joinedIndex]
                                                                     [
                                                                     "GroupPicture"],
@@ -943,11 +947,7 @@ class _FriendsState extends State<Friends> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(100),
-                                                        child: Image.asset(
-                                                            joinedResults[
-                                                                    joinedIndex]
-                                                                [
-                                                                "GroupPicture"]),
+                                                        child: Image.network(imageURL + joinedResults[joinedIndex]['GroupPicture'] + '.jpg'),
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),
@@ -1003,6 +1003,7 @@ class _FriendsState extends State<Friends> {
                                     } else {
                                       int applicationIndex =
                                           index - joinedResults.length - 2;
+                                      String imageName = applicationsResults[applicationIndex]["GroupPicture"];
                                       return Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 4.0, horizontal: 8.0),
@@ -1168,11 +1169,13 @@ class _FriendsState extends State<Friends> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(100),
-                                                        child: Image.asset(
-                                                            applicationsResults[
-                                                                    applicationIndex]
-                                                                [
-                                                                "GroupPicture"]),
+                                                        // child: Image.asset(
+                                                        //     applicationsResults[
+                                                        //             applicationIndex]
+                                                        //         [
+                                                        //         "GroupPicture"])
+                                                        // ,
+                                                        child: Image.network('$imageURL$imageName'),
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),
