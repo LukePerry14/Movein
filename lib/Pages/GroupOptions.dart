@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:azstore/azstore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,12 +12,35 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
 import 'package:movein/Scroller%20Code/swipe_card.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/GroupFunctions.dart';
+import 'package:uuid/uuid.dart';
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
 import '../main.dart';
 
 final imageURL = 'https://movein.blob.core.windows.net/moveingroupimages/';
 final imageURL2 = 'https://movein.blob.core.windows.net/moveinimages/';
+
+Future<File?> pickImage() async {
+  final ImagePicker _picker = ImagePicker();
+  final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+  if (image != null) {
+    return File(image.path);
+  } else {
+    return null;
+  }
+}
+
+Future<void> _uploadGroupImageToAzure(File imageFile) async {
+  Uint8List bytes = imageFile.readAsBytesSync();
+  var x = AzureStorage.parse('DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+  try {
+    var uuid = const Uuid();
+    String imageName = uuid.v1();
+    await x.putBlob('/moveingroupimages/$imageName.jpg', contentType: 'image/jpg', bodyBytes: bytes);
+  } catch (e) {
+    print('Exception $e');
+  }
+}
 
 class GroupOptions extends StatefulWidget {
   const GroupOptions({Key? key}) : super(key: key);
@@ -408,14 +434,14 @@ class _GroupOptionsState extends State<GroupOptions> {
                           children: [
                             GestureDetector(
                               onTap: () {
-
+                                
                               },
                               child: SizedBox(
                                 width: 150,
                                 height: 150,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(100),
-                                  child: Image(image: NetworkImage(imageURL + groupPicture + '.jpg')),
+                                  child: Image(image: NetworkImage('${imageURL + groupPicture}.jpg')),
                                 ),
                               ),
                             ),
