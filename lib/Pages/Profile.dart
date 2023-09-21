@@ -203,7 +203,7 @@ class _ProfilePage extends State<Profile> {
                                 decoration: BoxDecoration(
                                   borderRadius: const BorderRadius.all(Radius.circular(16)),
                                   image: DecorationImage(
-                                    image: _profileImage == null ? NetworkImage(profileImagepath) : NetworkImage(profileImagepath)
+                                    image: _profileImage == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(profileImagepath)
                                   )
                                 ),
                                 
