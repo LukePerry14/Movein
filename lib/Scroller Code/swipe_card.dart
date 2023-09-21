@@ -153,7 +153,7 @@ class RoundedBox extends StatelessWidget {
               //   image: AssetImage(image),
               //   fit: BoxFit.cover,
               // ),
-              child: Image.network('$rootImagePath$image'),
+              // child: Image.network('$rootImagePath$image'),
             ),
           ),
         );
