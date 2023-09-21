@@ -979,6 +979,12 @@ class _SignupScreenState extends State<SignupScreen> {
 
                           // TEST THIS FIREBASE CODE - SHOULD WORK
 
+                          // Checks if pictures were uploaded in form as it isn't mandatory
+                          _profilePicture1String ??= '';
+                          _profilePicture2String ??= '';
+                          _profilePicture3String ??= '';
+
+
                           Map<String,dynamic> reConfigedData = reConfigData(data, _profilePicture1String, _profilePicture2String, _profilePicture3String);
                           String response =
                           await Auth().registerWithUserDetails(

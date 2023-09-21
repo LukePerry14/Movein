@@ -75,7 +75,8 @@ class SwipeCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             borderRadius: const BorderRadius.all(Radius.circular(16)),
                             image: DecorationImage(
-                              image: NetworkImage('$rootImagePath$profileImage')
+                              // image: NetworkImage('$rootImagePath$profileImage')
+                              image: profileImage == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('$rootImagePath$profileImage')
                             )
                             )
                           ),
