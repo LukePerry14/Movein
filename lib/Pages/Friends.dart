@@ -947,7 +947,7 @@ class _FriendsState extends State<Friends> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(100),
-                                                        child: Image.network(imageURL + joinedResults[joinedIndex]['GroupPicture'] + '.jpg'),
+                                                        child: joinedResults[joinedIndex]['GroupPicture'] == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network('${imageURL + joinedResults[joinedIndex]['GroupPicture']}.jpg'),
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),

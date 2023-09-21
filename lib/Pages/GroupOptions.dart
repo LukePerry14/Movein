@@ -415,7 +415,8 @@ class _GroupOptionsState extends State<GroupOptions> {
                                 height: 150,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(100),
-                                  child: Image(image: NetworkImage(imageURL + groupPicture + '.jpg')),
+                                  // child: Image(image: NetworkImage(imageURL + groupPicture + '.jpg')),
+                                  child: groupPicture == '' ? const Image(image: NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png')) : Image(image: NetworkImage('$imageURL$groupPicture.jpg'))
                                 ),
                               ),
                             ),
