@@ -397,6 +397,8 @@ class _GroupOptionsState extends State<GroupOptions> {
     groupId = data['groupId'];
   }
 
+  var groupImageString;
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<dynamic>>(

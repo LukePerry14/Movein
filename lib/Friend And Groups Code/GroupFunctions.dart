@@ -26,6 +26,22 @@ Future<void> updateGroupName(String newName, String groupId) async {
   }
 }
 
+Future<void> updateGroupImage(String newImageName, String groupID) async {
+  try {
+    final collectionRef = FirebaseFirestore.instance.collection('Groups');
+    final documentRef = collectionRef.doc(groupID);
+
+    await documentRef.update({
+      'GroupPicture': newImageName
+    });
+  } catch (e) {
+    throw FirebaseException(
+      message: 'Error updating group Name: $e',
+      plugin: 'cloud_firestore',
+    );
+  }
+}
+
 Future<void> removeFromGroupAndUser(String groupId, String userId) async {
 
   try {
