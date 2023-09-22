@@ -188,6 +188,9 @@ class AppTranslations extends Translations {
           'log_out': 'Log Out',
           'language': 'Language',
           'premium': 'Premium',
+
+          'pp' : "Profile Picture",
+          'p-images' : "Profile Images",
         },
         'es': {
           'invite_sent': 'Invitación de amigo enviada',
@@ -375,6 +378,9 @@ class AppTranslations extends Translations {
               'log_out': 'Cerrar sesión',
               'language': 'Idioma',
               'premium': 'Premium',
+
+          'pp' : 'Foto de perfil',
+          'p-images' : 'Imágenes de perfil',
         },
         'zh': {
           'invite_sent': '好友邀请已发送',
@@ -564,6 +570,9 @@ class AppTranslations extends Translations {
               'log_out': '登出',
               'language': '语言',
               'premium': '高级版',
+
+          'pp' : '个人资料图片',
+          'p-images' : '个人资料图片',
         },
         'fr': {
   'invite_sent': "Invitation d'ami envoyée",
@@ -752,6 +761,9 @@ class AppTranslations extends Translations {
               'log_out': 'Déconnexion',
               'language': 'Langue',
               'premium': 'Premium',
+
+          'pp' : 'Image de profil',
+          'p-images' : 'Images de profil',
         },
         'hi': {
           'invite_sent': 'मित्र निमंत्रण भेजा गया',
@@ -889,6 +901,9 @@ class AppTranslations extends Translations {
               'log_out': 'लॉग आउट',
               'language': 'भाषा',
               'premium': 'प्रीमियम',
+
+          'pp' : 'प्रोफ़ाइल फोटो',
+          'p-images' : 'प्रोफ़ाइल छवियाँ',
         }
       };
 }

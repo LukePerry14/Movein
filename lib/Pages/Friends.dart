@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -16,6 +17,7 @@ import 'package:movein/Pages/Messages.dart' as mb;
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
+import 'package:http/http.dart' as http;
 import 'package:sendbird_sdk/sendbird_sdk.dart' as sb ;
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
@@ -63,192 +65,6 @@ class _FriendsState extends State<Friends> {
   }
 
   final imageURL = 'https://movein.blob.core.windows.net/moveingroupimages/';
-
-  //
-  // Future<List<List<dynamic>>> fetchFriendsData() async {
-  //   List<Map<String, dynamic>> friends = [];
-  //   List<Map<String, dynamic>> groupInvites = [];
-  //   List<Map<String, dynamic>> blockedGroups = [];
-  //   List<Map<String, dynamic>> friendInvites = [];
-  //   List<dynamic> blockIgnores = [];
-  //   List<Map<String, dynamic>> outgoingFriendInvites = [];
-  //   List<dynamic> allGroups = [];
-  //
-  //   try {
-  //     final CollectionReference docGroups =
-  //         FirebaseFirestore.instance.collection("Groups");
-  //     final CollectionReference docUsers =
-  //         FirebaseFirestore.instance.collection("Users");
-  //     DocumentSnapshot docSnapshot =
-  //         await docUsers.doc(Auth().currentUser()).get();
-  //     Map<String, dynamic>? data = docSnapshot.data() as Map<String, dynamic>?;
-  //     for (String type in ["Joined", "Applications", "ShortList"]) {
-  //       List<Map<String, dynamic>> groups = [];
-  //       List<String> tGroups = [];
-  //
-  //       tGroups = List<String>.from(data?[type] ?? []);
-  //
-  //       for (var group in tGroups) {
-  //         if (group.isNotEmpty) {
-  //           DocumentSnapshot groupSnapshot = await docGroups.doc(group).get();
-  //           Map<String, dynamic>? groupData =
-  //               groupSnapshot.data() as Map<String, dynamic>?;
-  //           if (groupData != null) {
-  //             blockIgnores.add(group);
-  //             groups.add({
-  //               "Id": group,
-  //               "GroupName": groupData["GroupName"],
-  //               "GroupPicture": groupData["GroupPicture"],
-  //               "Members": groupData["Members"],
-  //               "AvgCleanliness":
-  //                   (groupData["AvgCleanliness"] as num).toDouble(),
-  //               "AvgNoisiness": (groupData["AvgNoisiness"] as num).toDouble(),
-  //               "AvgNightLife": (groupData["AvgNightLife"] as num).toDouble(),
-  //               'AvgYearOfStudy':
-  //                   (groupData["AvgYearOfStudy"] as num).toDouble(),
-  //               "AvgBedTime": groupData["AvgBedTime"],
-  //             });
-  //           }
-  //         }
-  //       }
-  //
-  //       allGroups.add(groups);
-  //     }
-  //     final groupIds = List<String>.from(data?['GroupInvites'] ?? []);
-  //     for (String groupId in groupIds) {
-  //       final friendSnapshot = await FirebaseFirestore.instance
-  //           .collection('Groups')
-  //           .doc(groupId)
-  //           .get();
-  //       final groupData = friendSnapshot.data();
-  //       if (groupData != null) {
-  //         groupInvites.add({
-  //           "Id": groupId,
-  //           "GroupName": groupData['GroupName'],
-  //           "GroupPicture": groupData['GroupPicture'],
-  //           "Members": groupData['Members'],
-  //           "AvgCleanliness": (groupData['AvgCleanliness'] as num).toDouble(),
-  //           "AvgNoisiness": (groupData['AvgNoisiness'] as num).toDouble(),
-  //           "AvgNightLife": (groupData['AvgNightLife'] as num).toDouble(),
-  //           'AvgYearOfStudy': (groupData["AvgYearOfStudy"] as num).toDouble(),
-  //           "AvgBedTime": groupData['AvgBedTime'],
-  //         });
-  //       }
-  //     }
-  //     final blockedIds = List<String>.from(data?['BlockedGroups'] ?? []);
-  //     blockedIds.removeWhere((element) => blockIgnores.contains(element));
-  //     for (String groupId in blockedIds) {
-  //       final friendSnapshot = await FirebaseFirestore.instance
-  //           .collection('Groups')
-  //           .doc(groupId)
-  //           .get();
-  //       final groupData = friendSnapshot.data();
-  //       if (groupData != null) {
-  //         blockedGroups.add({
-  //           "Id": groupId,
-  //           "GroupName": groupData['GroupName'],
-  //           "GroupPicture": groupData['GroupPicture'],
-  //           "Members": groupData['Members'],
-  //           "AvgCleanliness": (groupData['AvgCleanliness'] as num).toDouble(),
-  //           "AvgNoisiness": (groupData['AvgNoisiness'] as num).toDouble(),
-  //           "AvgNightLife": (groupData['AvgNightLife'] as num).toDouble(),
-  //           "AvgBedTime": groupData['AvgBedTime'],
-  //           "AvgYearOfStudy": groupData['AvgYearOfStudy'],
-  //         });
-  //       }
-  //     }
-  //
-  //     final inviteIds = List<String>.from(data?['FriendInvites'] ?? []);
-  //     final friendsIds = List<String>.from(data?['Friends'] ?? []);
-  //     final outgoingIds =
-  //         List<String>.from(data?['OutgoingFriendInvites'] ?? []);
-  //
-  //     for (String inviteId in inviteIds) {
-  //       final friendSnapshot = await FirebaseFirestore.instance
-  //           .collection('Users')
-  //           .doc(inviteId)
-  //           .get();
-  //       final friendData = friendSnapshot.data();
-  //
-  //       if (friendData != null) {
-  //         int yearsAgo = stampToYear(friendData['DOB'].toDate());
-  //         friendInvites.add({
-  //           "ForeName": friendData['ForeName'],
-  //           "SurName": friendData['SurName'],
-  //           "Age": yearsAgo,
-  //           "Uni": friendData['UniAttended'],
-  //           "Preferences": friendData['Preferences'],
-  //           "Images": friendData['Images'],
-  //           "Bio": friendData['Bio'],
-  //           "Subject": friendData['Subject'],
-  //           "YearOfStudy": friendData['YearOfStudy'],
-  //           "Id": inviteId,
-  //         });
-  //       }
-  //     }
-  //
-  //     for (String friendId in friendsIds) {
-  //       final friendSnapshot = await FirebaseFirestore.instance
-  //           .collection('Users')
-  //           .doc(friendId)
-  //           .get();
-  //       final friendData = friendSnapshot.data();
-  //
-  //       if (friendData != null) {
-  //         int yearsAgo = stampToYear(friendData['DOB'].toDate());
-  //         friends.add({
-  //           "ForeName": friendData['ForeName'],
-  //           "SurName": friendData['SurName'],
-  //           "Age": yearsAgo,
-  //           "Uni": friendData['UniAttended'],
-  //           "Preferences": friendData['Preferences'],
-  //           "Images": friendData['Images'],
-  //           "Bio": friendData['Bio'],
-  //           "Subject": friendData['Subject'],
-  //           "YearOfStudy": friendData['YearOfStudy'],
-  //           "Id": friendId,
-  //         });
-  //       }
-  //     }
-  //
-  //     for (String outgoingId in outgoingIds) {
-  //       final friendSnapshot = await FirebaseFirestore.instance
-  //           .collection('Users')
-  //           .doc(outgoingId)
-  //           .get();
-  //       final friendData = friendSnapshot.data();
-  //
-  //       if (friendData != null) {
-  //         int yearsAgo = stampToYear(friendData['DOB'].toDate());
-  //         outgoingFriendInvites.add({
-  //           "ForeName": friendData['ForeName'],
-  //           "SurName": friendData['SurName'],
-  //           "Age": yearsAgo,
-  //           "Uni": friendData['UniAttended'],
-  //           "Preferences": friendData['Preferences'],
-  //           "Images": friendData['Images'],
-  //           "Bio": friendData['Bio'],
-  //           "Subject": friendData['Subject'],
-  //           "YearOfStudy": friendData['YearOfStudy'],
-  //           "Id": outgoingId,
-  //         });
-  //       }
-  //     }
-  //   } catch (e) {
-  //     throw FirebaseException(
-  //       message: 'Error fetching friends data: $e',
-  //       plugin: 'cloud_firestore',
-  //     );
-  //   }
-  //   return [
-  //     friends,
-  //     friendInvites,
-  //     groupInvites,
-  //     outgoingFriendInvites,
-  //     allGroups,
-  //     blockedGroups
-  //   ];
-  // }
 
   Future<List<Friend>> searchUsers(String searchQuery) async {
     List<Friend> retlist = [];
@@ -2015,9 +1831,17 @@ class _FriendsState extends State<Friends> {
                                                           ["Id"],
                                                       Auth().currentUser(),
                                                     );
-                                                    // if (mounted) {
-                                                    //   reloadData();
-                                                    // }
+                                                     final url = Uri.parse(
+                                                         'https://europe-west2-test-7a857.cloudfunctions.net/createStripeSetupIntent');
+                                                     await http.post(
+                                                       url,
+                                                       headers: {'Content-Type': 'application/json'},
+                                                       body: json.encode({
+                                                         "senderName" : "${friendSearchResults[index]["ForeName"]} ${friendSearchResults[index]["SurName"]}",
+                                                         "deviceId" : friendSearchResults[index]["Id"],
+                                                         "notificationType" : 'friendRequest',
+                                                       }),
+                                                     );
                                                   },
                                                   backgroundColor:
                                                       Colors.lightGreen,

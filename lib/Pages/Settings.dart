@@ -190,6 +190,7 @@ class _SettingsPageState extends State<SettingsPage> {
       String currentUserId = FirebaseAuth.instance.currentUser!.uid;
       DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('Users').doc(currentUserId).get();
 
+
       // Access "Joined" and "Applications" arrays
       List<String> joinedGroups = List.from(userSnapshot.get('Joined'));
       List<String> applications = List.from(userSnapshot.get('Applications'));

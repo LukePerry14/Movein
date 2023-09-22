@@ -103,8 +103,9 @@ class _ScrollerState extends State<Scroller> {
     }
     groupData = groups;
     sortGroupsByPreferences();
+    print("HEREHERE");
     setState(() {
-      _groupDisplay = nextGroup();
+      _groupDisplay = (!groupData.isEmpty? nextGroup(): null)!;
       _loadApp = true;
     });
   }
@@ -125,6 +126,8 @@ class _ScrollerState extends State<Scroller> {
 
   @override
   Widget build(BuildContext context) {
+    print(_loadApp);
+    print(_showApp);
     return Builder(
       builder: (context) {
         final navigator = Navigator.of(context);

@@ -85,7 +85,7 @@ class _ProfileInformationState extends State<ProfileInformation> {
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(15.0),
                   child: FormBuilder(
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     key: _formKey,

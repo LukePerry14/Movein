@@ -154,11 +154,11 @@ class _accountImages extends State<accountImages> {
 
             return Scaffold(
                   appBar: AppBar(
-                    backgroundColor: Theme.of(context).primaryColor,
+                    backgroundColor: Colors.transparent,
                     centerTitle: true,
                     elevation: 0,
                     leading: IconButton(
-                      icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.white,),
+                      icon: Icon(LineAwesomeIcons.angle_left, color: Theme.of(context).primaryColor,),
                       color: Colors.grey[500],
                       onPressed: (() {
                         Navigator.pop(context);

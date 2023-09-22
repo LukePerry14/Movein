@@ -427,6 +427,7 @@ class _ProfilePage extends State<Profile> {
                                   ),);
                                 },
                               ),
+                              const SizedBox(height: 60),
                             ],
                           ),
                         ),
