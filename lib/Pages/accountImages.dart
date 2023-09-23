@@ -242,7 +242,7 @@ class _accountImages extends State<accountImages> {
                               onPressed: () async {
                                 final pickedImage = await pickImage();
                                 if (pickedImage != null) {
-                                  accountPicture1String = await _uploadImageToAzure2(pickedImage);
+                                  accountPicture2String = await _uploadImageToAzure2(pickedImage);
                                   imageArray[2] = accountPicture2String;
                                   updateImage(imageArray);
                                   _deleteProfileImageFromAzure(image2);
