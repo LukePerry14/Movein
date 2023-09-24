@@ -178,8 +178,10 @@ class _ProfilePage extends State<Profile> {
 
             // network paths to user's images
             var profileImagepath = '$rootImagePath$profPic';
-            var image1path = '$rootImagePath$image1';
-            var image2path = '$rootImagePath$image2';
+
+            if (profPic == null) {
+              profileImagepath = '';
+            } 
 
             // default picture used for when an image is not present
             var defaultProfilePicture = Image.asset('assets/Pictures/turt.png');
@@ -203,7 +205,7 @@ class _ProfilePage extends State<Profile> {
                                 decoration: BoxDecoration(
                                   borderRadius: const BorderRadius.all(Radius.circular(16)),
                                   image: DecorationImage(
-                                    image: _profileImage == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(profileImagepath)
+                                    image: profileImagepath == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(profileImagepath)
                                   )
                                 ),
                                 
@@ -218,7 +220,7 @@ class _ProfilePage extends State<Profile> {
                                       updateImage(imageArray);
                                       _deleteProfileImageFromAzure(profileImagepath);
                                       setState(() {
-                                        _profileImage = pickedImage;
+                                        profileImagepath = '$rootImagePath$profilePictureString';
                                       });
                                     }
                                 }, child: const Icon(
