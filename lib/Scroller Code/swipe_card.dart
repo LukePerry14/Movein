@@ -41,7 +41,6 @@ class SwipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var profileImage = images[0];
-    print('Profile image for swipe card is ' + profileImage);
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double width = constraints.maxWidth;
@@ -70,17 +69,17 @@ class SwipeCard extends StatelessWidget {
                       alignment: Alignment.center,
                     children: <Widget>[
                       Positioned(
-                        child: Container(
-                          // height: 300,
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(Radius.circular(16)),
-                            image: DecorationImage(
-                              image: profileImage == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('$rootImagePath$profileImage')
-                            )
-                            )
-                          ),
-                          // width: MediaQuery.of(context).size.width,
-                          // child: Image.network('$rootImagePath$profileImage'), 
+                        // child: Container(
+                        //   // height: 300,
+                        //   decoration: BoxDecoration(
+                        //     borderRadius: const BorderRadius.all(Radius.circular(16)),
+                        //     image: DecorationImage(
+                        //       image: profileImage == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('$rootImagePath$profileImage')
+                        //     )
+                        //     )
+                        //   ),
+                          width: MediaQuery.of(context).size.width,
+                          child: Image.network('$rootImagePath$profileImage'), 
                         ),
                       Positioned(
                         top: 0,
@@ -152,7 +151,7 @@ class RoundedBox extends StatelessWidget {
               //   image: AssetImage(image),
               //   fit: BoxFit.cover,
               // ),
-              // child: Image.network('$rootImagePath$image'),
+              child: Image.network('$rootImagePath$image'),
             ),
           ),
         );
@@ -404,6 +403,7 @@ class _CustomDialogState extends State<CustomDialog> {
                     //   return RoundedBox(image: widget.images[index-5]);
                     // }
                   }
+                  return null;
                 },
               ),
             ),
