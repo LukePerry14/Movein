@@ -69,17 +69,16 @@ class SwipeCard extends StatelessWidget {
                       alignment: Alignment.center,
                     children: <Widget>[
                       Positioned(
-                        // child: Container(
-                        //   // height: 300,
-                        //   decoration: BoxDecoration(
-                        //     borderRadius: const BorderRadius.all(Radius.circular(16)),
-                        //     image: DecorationImage(
-                        //       image: profileImage == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('$rootImagePath$profileImage')
-                        //     )
-                        //     )
-                        //   ),
+                        child: Container(
+                          height: 300,
                           width: MediaQuery.of(context).size.width,
-                          child: Image.network('$rootImagePath$profileImage'), 
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.all(Radius.circular(16)),
+                            image: DecorationImage(
+                              image: profileImage == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('$rootImagePath$profileImage')
+                            )
+                            )
+                          ),
                         ),
                       Positioned(
                         top: 0,
