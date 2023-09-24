@@ -77,6 +77,7 @@ class _GscrollerState extends State<Gscroller> {
         dateTime = widget.avgBedTime.toDate();
         DateFormat timeFormat = DateFormat.jm();
         formattedTime = timeFormat.format(dateTime);
+        print('Group picture is ' + widget.groupPicture);
         return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -96,8 +97,8 @@ class _GscrollerState extends State<Gscroller> {
                     backgroundColor: Colors.transparent, // Set the background color to transparent
                     child: ClipOval(
                       child: Image(
-                        // image: AssetImage(widget.groupPicture),
-                        image: widget.groupPicture == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('https://movein.blob.core.windows.net/moveingroupimages/' + widget.groupPicture),
+                        image: widget.groupPicture == '' ? NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('https://movein.blob.core.windows.net/moveingroupimages/' + widget.groupPicture),
+                        // image: NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png'),
                         fit: BoxFit.cover, // Adjust the fit as needed
                       ),
                     ),

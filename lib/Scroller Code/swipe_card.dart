@@ -41,7 +41,7 @@ class SwipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var profileImage = images[0];
-    print(profileImage);
+    print('Profile image for swipe card is ' + profileImage);
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double width = constraints.maxWidth;
@@ -75,7 +75,6 @@ class SwipeCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             borderRadius: const BorderRadius.all(Radius.circular(16)),
                             image: DecorationImage(
-                              // image: NetworkImage('$rootImagePath$profileImage')
                               image: profileImage == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('$rootImagePath$profileImage')
                             )
                             )
