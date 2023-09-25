@@ -780,6 +780,8 @@ class _FriendsState extends State<Friends> {
                                             ]);
                                     } else if (index <= joinedResults.length) {
                                       int joinedIndex = index - 1;
+                                      String imageString;
+                                      imageString = joinedResults[joinedIndex]['GroupPicture'];
                                       return Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 4.0, horizontal: 8.0),
@@ -886,7 +888,6 @@ class _FriendsState extends State<Friends> {
                                                             joinedResults[
                                                                     joinedIndex]
                                                                 ["Id"]);
-                                                final groupImage = joinedResults[joinedIndex]['GroupPictre'];
                                                 Navigator.push(
                                                   context,
                                                   PageTransition(
@@ -947,7 +948,7 @@ class _FriendsState extends State<Friends> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(100),
-                                                        child: joinedResults[joinedIndex]['GroupPicture'] == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network('${imageURL + joinedResults[joinedIndex]['GroupPicture']}.jpg'),
+                                                        child: imageString == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network('$imageURL$imageString.jpg'),
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),

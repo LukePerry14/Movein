@@ -184,7 +184,6 @@ class _ProfilePage extends State<Profile> {
             } 
 
             // default picture used for when an image is not present
-            var defaultProfilePicture = Image.asset('assets/Pictures/turt.png');
             return Builder(builder: (context) {
               final navigator = Navigator.of(context);
               bool isDark = App.themeNotifier.value == ThemeMode.dark;
