@@ -41,7 +41,6 @@ class SwipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var profileImage = images[0];
-    print(profileImage);
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double width = constraints.maxWidth;
@@ -71,23 +70,22 @@ class SwipeCard extends StatelessWidget {
                     children: <Widget>[
                       Positioned(
                         child: Container(
-                          // height: 300,
+                          height: 400,
                           decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(Radius.circular(16)),
+                            borderRadius: const BorderRadius.all(Radius.circular(40)),
                             image: DecorationImage(
-                              image: NetworkImage('$rootImagePath$profileImage')
+                              image: profileImage == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('$rootImagePath$profileImage'),
+                              fit: BoxFit.fill
                             )
                             )
                           ),
-                          // width: MediaQuery.of(context).size.width,
-                          // child: Image.network('$rootImagePath$profileImage'), 
                         ),
                       Positioned(
                         top: 0,
                         child: Text(
-                                "$foreName  $age",
+                                "$foreName - $age",
                                 style: const TextStyle(
-                                    color: Colors.black,
+                                    color: Colors.white,
                                     fontSize: 36,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -98,7 +96,7 @@ class SwipeCard extends StatelessWidget {
                                   bio,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
-                                    color: Colors.black,
+                                    color: Colors.white,
                                     fontSize: 20,
                                     fontWeight: FontWeight.w500,
                                     fontStyle: FontStyle.normal,
@@ -298,7 +296,18 @@ class _CustomDialogState extends State<CustomDialog> {
                       );
                     }
                     case 2: {
-                      return RoundedBox(image: widget.images[index-2]);
+                      // print(widget.images[index-2]);
+                      // return RoundedBox(image: widget.images[index-2]);
+                      return Container(
+                        height: 400,
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.all(Radius.circular(16)),
+                          image: DecorationImage(
+                            image: NetworkImage(rootImagePath + widget.images[index-2]),
+                            fit: BoxFit.fill
+                          )
+                        ),
+                      );
                     }
                     case 3: {
                       return Padding(
@@ -330,7 +339,17 @@ class _CustomDialogState extends State<CustomDialog> {
                       );
                     }
                     case 4: {
-                      return RoundedBox(image: widget.images[index-3]);
+                      // return RoundedBox(image: widget.images[index-3]);
+                      return Container(
+                        height: 400,
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.all(Radius.circular(16)),
+                          image: DecorationImage(
+                            image: NetworkImage(rootImagePath + widget.images[index-3]),
+                            fit: BoxFit.fill
+                          )
+                        ),
+                      );
                     }
                     case 5: {
                       return Padding(
@@ -361,7 +380,17 @@ class _CustomDialogState extends State<CustomDialog> {
                       );
                     }
                     case 6: {
-                      return RoundedBox(image: widget.images[index-4]);
+                      // return RoundedBox(image: widget.images[index-4]);
+                      return Container(
+                        height: 400,
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.all(Radius.circular(16)),
+                          image: DecorationImage(
+                            image: NetworkImage(rootImagePath + widget.images[index-4]),
+                            fit: BoxFit.fill
+                          )
+                        ),
+                      );
                     }
                     case 7: {
                       return Padding(
@@ -404,6 +433,7 @@ class _CustomDialogState extends State<CustomDialog> {
                     //   return RoundedBox(image: widget.images[index-5]);
                     // }
                   }
+                  return null;
                 },
               ),
             ),

@@ -26,7 +26,6 @@ Future<void> updateGroupName(String newName, String groupId) async {
   }
 }
 
-// Needs to be tested
 Future<void> updateGroupImage(String newImageName, String groupID) async {
   try {
     final collectionRef = FirebaseFirestore.instance.collection('Groups');

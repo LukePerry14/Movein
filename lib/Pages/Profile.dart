@@ -178,11 +178,12 @@ class _ProfilePage extends State<Profile> {
 
             // network paths to user's images
             var profileImagepath = '$rootImagePath$profPic';
-            var image1path = '$rootImagePath$image1';
-            var image2path = '$rootImagePath$image2';
+
+            if (profPic == null) {
+              profileImagepath = '';
+            } 
 
             // default picture used for when an image is not present
-            var defaultProfilePicture = Image.asset('assets/Pictures/turt.png');
             return Builder(builder: (context) {
               final navigator = Navigator.of(context);
               bool isDark = App.themeNotifier.value == ThemeMode.dark;
@@ -203,7 +204,7 @@ class _ProfilePage extends State<Profile> {
                                 decoration: BoxDecoration(
                                   borderRadius: const BorderRadius.all(Radius.circular(16)),
                                   image: DecorationImage(
-                                    image: _profileImage == null ? NetworkImage(profileImagepath) : NetworkImage(profileImagepath)
+                                    image: profileImagepath == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(profileImagepath)
                                   )
                                 ),
                                 
@@ -218,7 +219,7 @@ class _ProfilePage extends State<Profile> {
                                       updateImage(imageArray);
                                       _deleteProfileImageFromAzure(profileImagepath);
                                       setState(() {
-                                        _profileImage = pickedImage;
+                                        profileImagepath = '$rootImagePath$profilePictureString';
                                       });
                                     }
                                 }, child: const Icon(
@@ -427,7 +428,7 @@ class _ProfilePage extends State<Profile> {
                                   ),);
                                 },
                               ),
-                              const SizedBox(height: 60),
+                              const SizedBox(height: 60,)
                             ],
                           ),
                         ),

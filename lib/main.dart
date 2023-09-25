@@ -2438,6 +2438,16 @@ class _SignupScreenState extends State<SignupScreen> {
                           
                           data['UniAttended'] = _universityController.text;
                           Map<String,dynamic> reConfigedData = reConfigData(data);
+
+                          // TEST THIS FIREBASE CODE - SHOULD WORK
+
+                          // Checks if pictures were uploaded in form as it isn't mandatory
+                          _profilePicture1String ??= '';
+                          _profilePicture2String ??= '';
+                          _profilePicture3String ??= '';
+
+
+                          Map<String,dynamic> reConfigedData = reConfigData(data, _profilePicture1String, _profilePicture2String, _profilePicture3String);
                           String response =
                           await Auth().registerWithUserDetails(
                             _formKey.currentState?.fields['email']?.value,

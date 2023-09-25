@@ -152,6 +152,15 @@ class _accountImages extends State<accountImages> {
             var image1path = '$rootImagePath$image1';
             var image2path = '$rootImagePath$image2';
 
+            if (image1 == null) {
+              image1path = '';
+            }
+
+            if (image2 == null) {
+              image2path = '';
+            }
+            
+
             return Scaffold(
                   appBar: AppBar(
                     backgroundColor: Colors.transparent,
@@ -190,7 +199,7 @@ class _accountImages extends State<accountImages> {
                             decoration: BoxDecoration(
                               borderRadius: const BorderRadius.all(Radius.circular(40)),
                               image: DecorationImage(
-                                image: accountPicture1 == null ? NetworkImage(image1path) : NetworkImage(image1path)
+                                image: image1path == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(image1path)
                               )
                             ),
                           ),
@@ -205,7 +214,7 @@ class _accountImages extends State<accountImages> {
                                   updateImage(imageArray);
                                   _deleteProfileImageFromAzure(image1);
                                   setState(() {
-                                    accountPicture1 = pickedImage;
+                                    image1path = '$rootImagePath$accountPicture1String';
                                   });
                                 }
                               },
@@ -223,7 +232,7 @@ class _accountImages extends State<accountImages> {
                             decoration: BoxDecoration(
                               borderRadius: const BorderRadius.all(Radius.circular(40)),
                               image: DecorationImage(
-                                image: accountPicture2 == null ? NetworkImage(image2path) : NetworkImage(image2path)
+                                image: image2path == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(image2path)
                               )
                             ),
                           ), 
@@ -233,12 +242,12 @@ class _accountImages extends State<accountImages> {
                               onPressed: () async {
                                 final pickedImage = await pickImage();
                                 if (pickedImage != null) {
-                                  accountPicture1String = await _uploadImageToAzure2(pickedImage);
+                                  accountPicture2String = await _uploadImageToAzure2(pickedImage);
                                   imageArray[2] = accountPicture2String;
                                   updateImage(imageArray);
                                   _deleteProfileImageFromAzure(image2);
                                   setState(() {
-                                    accountPicture2 = pickedImage;
+                                    image2path = '$rootImagePath$accountPicture2String';
                                   });
                                 }
                               },
