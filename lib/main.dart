@@ -907,7 +907,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                             final pickedImage = await pickImage();
                                             if (pickedImage != null) {
                                               _profilePicture1String =
-                                              '${uuid.v1()}.jpg';
+                                              '${uuid.v1()}';
                                               setState(() {
                                                 _profilePicture1 = pickedImage;
                                               });
@@ -955,7 +955,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                             final pickedImage = await pickImage();
                                             if (pickedImage != null) {
                                               _profilePicture2String =
-                                              '${uuid.v1()}.jpg';
+                                              '${uuid.v1()}';
                                               setState(() {
                                                 _profilePicture2 = pickedImage;
                                               });
@@ -992,7 +992,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                             final pickedImage = await pickImage();
                                             if (pickedImage != null) {
                                               _profilePicture3String =
-                                              '${uuid.v1()}.jpg';
+                                              '${uuid.v1()}';
                                               setState(() {
                                                 _profilePicture3 = pickedImage;
                                               });

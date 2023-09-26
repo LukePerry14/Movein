@@ -149,8 +149,8 @@ class _accountImages extends State<accountImages> {
             imageArray.add(data[3]);
 
             // network paths to user's images
-            var image1path = '$rootImagePath$image1';
-            var image2path = '$rootImagePath$image2';
+            var image1path = '$rootImagePath$image1.jpg';
+            var image2path = '$rootImagePath$image2.jpg';
 
             if (image1 == null) {
               image1path = '';

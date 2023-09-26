@@ -176,7 +176,7 @@ class _ProfilePage extends State<Profile> {
             imageArray.add(image2);
 
             // network paths to user's images
-            var profileImagepath = '$rootImagePath$profPic';
+            var profileImagepath = '$rootImagePath$profPic.jpg';
 
             if (profPic == null) {
               profileImagepath = '';
