@@ -792,7 +792,6 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
               onPressed: _isButtonEnabled
                   ? () async {
                 if (_formKey.currentState?.validate() ?? false) {
-                  print('Current group image is - $currentGroupImage');
                   await _submitForm(UserPreferences.getAppsMax(), currentGroupImage).then((value) => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400))));
                 }
               }

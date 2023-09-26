@@ -86,18 +86,28 @@ class _GscrollerState extends State<Gscroller> {
               return Column(
                 children: [
                   const SizedBox(height: 5),
-                  Text(
-                    widget.groupName,
-                    style: Theme.of(context).textTheme.headlineLarge,
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Text(
+                      widget.groupName,
+                      // style: Theme.of(context).textTheme.headlineLarge,
+                      style: const TextStyle(
+                        fontSize: 35,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                  const SizedBox(height:5),
+                  Divider(
+                    height: 1,
+                    color: Colors.grey.withOpacity(0.9),
+                  ),
+                  const SizedBox(height:20),
                   CircleAvatar(
                     radius: 75, // Adjust the size as needed
                     backgroundColor: Colors.transparent, // Set the background color to transparent
                     child: ClipOval(
                       child: Image(
-                        image: widget.groupPicture == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('https://movein.blob.core.windows.net/moveingroupimages/${widget.groupPicture}'),
-                        // image: NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png'),
+                        image: widget.groupPicture == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('https://movein.blob.core.windows.net/moveingroupimages/${widget.groupPicture}.jpg'),
                         fit: BoxFit.cover, // Adjust the fit as needed
                       ),
                     ),
@@ -105,7 +115,6 @@ class _GscrollerState extends State<Gscroller> {
                 ]
               );
             }
-
             else if(index == 1){
               return ExpansionTile(
                 trailing: null,
