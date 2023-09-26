@@ -550,7 +550,6 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _passwordObscured = true;
   bool _passwordConfObscured = true;
   final _universityController = TextEditingController();
-  final _universityFocusNode = FocusNode();
   bool _universityValid = true;
   bool _loadApp = false;
   String errorMessage = "";
@@ -561,6 +560,7 @@ class _SignupScreenState extends State<SignupScreen> {
   late List<dynamic> domains;
   late List<dynamic> universitiesSuggestions;
   late String _accessToken;
+
 
   @override
   void initState() {
@@ -756,8 +756,16 @@ class _SignupScreenState extends State<SignupScreen> {
                                           (domain) => email.contains(domain))) {
                                         return 'Email domain is not valid';
                                       }
+                                      findUni(email);
                                       return null;
                                     },
+                                  ),
+                                  FormBuilderTextField(
+                                    enabled: false,
+                                    name: 'uni',
+                                    maxLength: 200,
+                                    decoration: const InputDecoration(labelText: 'University'),
+                                    controller: _universityController,
                                   ),
                                   const SizedBox(height: 10),
                                   Row(
@@ -1052,75 +1060,6 @@ class _SignupScreenState extends State<SignupScreen> {
                                           return 'Please enter your Subject';
                                         }
                                         return null;
-                                      },
-                                    ),
-                                    const SizedBox(height: 10),
-                                    TypeAheadFormField(
-                                      textFieldConfiguration:
-                                          TextFieldConfiguration(
-                                        decoration: const InputDecoration(
-                                          labelText: 'University',
-                                        ),
-                                        controller: _universityController,
-                                        focusNode: _universityFocusNode,
-                                      ),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please select a university';
-                                        }
-                                        final universitiesSuggestions =
-                                            universitiesData
-                                                .map((university) =>
-                                                    university['name'])
-                                                .toList();
-
-                                        if (!universitiesSuggestions
-                                            .contains(value)) {
-                                          return 'Please select a valid university from the suggestions';
-                                        }
-                                        String emailDomain =
-                                            _emailController.text.split('@')[1];
-
-                                        // Check if the email domain is valid for the selected university
-                                        Map<String, dynamic>?
-                                            selectedUniversity =
-                                            universitiesData.firstWhere(
-                                                (university) =>
-                                                    university['name'] == value,
-                                                orElse: () => null);
-                                        if (selectedUniversity != null) {
-                                          List<String>? validDomains =
-                                              selectedUniversity['domains']
-                                                  ?.cast<String>();
-                                          if (validDomains != null &&
-                                              !validDomains
-                                                  .contains(emailDomain)) {
-                                            return 'The selected university does not match the email domain';
-                                          }
-                                        }
-                                        return null;
-                                      },
-                                      suggestionsCallback: (pattern) {
-                                        // Return filtered universities based on the pattern
-                                        return universitiesData
-                                            .where((university) =>
-                                                university['name']
-                                                    .toLowerCase()
-                                                    .contains(
-                                                        pattern.toLowerCase()))
-                                            .map((university) =>
-                                                university['name'])
-                                            .toList();
-                                      },
-                                      itemBuilder: (context, suggestion) {
-                                        return ListTile(
-                                          title: Text(suggestion),
-                                        );
-                                      },
-                                      onSuggestionSelected: (value) {
-                                        _universityController.text = value;
-                                        _universityFocusNode.unfocus();
-                                        _validateUniversity(value);
                                       },
                                     ),
                                     const SizedBox(height: 10),
@@ -1551,6 +1490,24 @@ class _SignupScreenState extends State<SignupScreen> {
       throw Exception("failed to create notification Token: $e");
     }
   }
+  void findUni(String email) {
+    String emailDomain = email.split('@')[1];
+
+    // Check if the email domain is valid for the selected university
+    Map<String, dynamic>? selectedUniversity = universitiesData.firstWhere(
+          (university) => university['domains'].contains(emailDomain),
+      orElse: () => null,
+    );
+
+    if (selectedUniversity != null) {
+      // Update _universityController with the name of the selected university
+      _universityController.text = selectedUniversity['name'];
+    } else {
+      // Handle the case when no matching university is found
+      _universityController.text = 'Unknown University';
+    }
+  }
+
 }
 
 //--------------------------------------------------------------------------------------------------
