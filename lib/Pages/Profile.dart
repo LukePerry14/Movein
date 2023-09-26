@@ -98,7 +98,6 @@ class _ProfilePage extends State<Profile> {
   String? profilePictureString;
   String? accountPicture1String;
   String? accountPicture2String;
-  String? _defaultProfileImagePath = 'assets/Pictures/turt.png';
   final TextEditingController _copyController = TextEditingController();
 
   void _copyToClipboard(BuildContext context) {

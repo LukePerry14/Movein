@@ -766,7 +766,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                       if (pickedImage!= null) {
                         var uuid = const Uuid();
                         String uniqueID = uuid.v1();
-                        currentGroupImage = '$uniqueID.jpg';
+                        currentGroupImage = uniqueID;
                         setState(() {
                           _selectedImage = pickedImage;
                         });

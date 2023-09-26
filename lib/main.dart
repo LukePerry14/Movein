@@ -578,11 +578,10 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  Future<void> _uploadImageToAzure(
+  Future<bool> _uploadImageToAzure(
       File imageFile1,
       File imageFile2,
-      File ,
-      imageFile3,
+      File imageFile3,
       String imageString1,
       String imageString2,
       String imageString3) async {
@@ -625,10 +624,9 @@ class _SignupScreenState extends State<SignupScreen> {
     }
 
     if (state1 == 0 && state2 == 0 && state3 == 0) {
-      print('Successful upload.');
+      return true;
     } else {
-      // images that uploaded will need to be deleted as whole set couldn't have been uploaded
-      // This can done later
+      return false;
     }
   }
 
@@ -643,19 +641,6 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-    Future<void> _uploadImageToAzure(File imageFile) async {
-    Uint8List bytes = imageFile.readAsBytesSync();
-    var x = AzureStorage.AzureStorage.parse(
-        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
-    try {
-      var uuid = const Uuid();
-      String imageName = uuid.v1();
-      await x.putBlob('/moveinimages/$imageName.jpg',
-          contentType: 'image/jpg', bodyBytes: bytes);
-    } catch (e) {
-      print('Exception: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -1251,16 +1236,17 @@ class _SignupScreenState extends State<SignupScreen> {
 
                                 // TEST THIS FIREBASE CODE - SHOULD WORK
 
+                                _uploadImageToAzure(_profilePicture1!, _profilePicture2!, _profilePicture3!, _profilePicture1String!, _profilePicture2String!, _profilePicture3String!);
+
+
                                 Map<String, dynamic> reConfigedData =
-                                    reConfigData(
-                                        data,
-                                        _profilePicture1String,
-                                        _profilePicture2String,
-                                        _profilePicture3String,
-                                        _profilePicture1,
-                                        _profilePicture2,
-                                        _profilePicture3
-                                        );
+                                reConfigData(
+                                    data,
+                                    _profilePicture1String,
+                                    _profilePicture2String,
+                                    _profilePicture3String,
+                                    );
+
                                 String response =
                                     await Auth().registerWithUserDetails(
                                   _formKey.currentState?.fields['email']?.value,
@@ -1459,7 +1445,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Map<String, dynamic> reConfigData(Map<String, dynamic> data,
-      String? imageString1, String? imageString2, String? imageString3, File? picture1, File? picture2, File? picture3) {
+      String? imageString1, String? imageString2, String? imageString3) {
     data.remove('password');
     data.remove('password_conf');
     data.remove('email');
