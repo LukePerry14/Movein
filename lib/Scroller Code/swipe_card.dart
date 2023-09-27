@@ -303,7 +303,7 @@ class _CustomDialogState extends State<CustomDialog> {
                         decoration: BoxDecoration(
                           borderRadius: const BorderRadius.all(Radius.circular(16)),
                           image: DecorationImage(
-                            image: NetworkImage(rootImagePath + widget.images[index-2] + '.jpg'),
+                            image: NetworkImage('${rootImagePath + widget.images[index-2]}.jpg'),
                             fit: BoxFit.fill
                           )
                         ),
@@ -345,7 +345,7 @@ class _CustomDialogState extends State<CustomDialog> {
                         decoration: BoxDecoration(
                           borderRadius: const BorderRadius.all(Radius.circular(16)),
                           image: DecorationImage(
-                            image: NetworkImage(rootImagePath + widget.images[index-3] + '.jpg'),
+                            image: NetworkImage('${rootImagePath + widget.images[index-3]}.jpg'),
                             fit: BoxFit.fill
                           )
                         ),
@@ -386,7 +386,7 @@ class _CustomDialogState extends State<CustomDialog> {
                         decoration: BoxDecoration(
                           borderRadius: const BorderRadius.all(Radius.circular(16)),
                           image: DecorationImage(
-                            image: NetworkImage(rootImagePath + widget.images[index-4] + '.jpg'),
+                            image: NetworkImage('${rootImagePath + widget.images[index-4]}.jpg'),
                             fit: BoxFit.fill
                           )
                         ),
