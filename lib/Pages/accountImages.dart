@@ -53,7 +53,7 @@ Future<String?> _uploadImageToAzure2(File imageFile) async {
     var uuid = const Uuid();
     String imageName = uuid.v1();
     await x.putBlob('/moveinimages/$imageName.jpg', contentType: 'image/jpg', bodyBytes: bytes);
-    return '$imageName.jpg';
+    return imageName;
   } catch (e) {
     return ('Exception: $e');
   }

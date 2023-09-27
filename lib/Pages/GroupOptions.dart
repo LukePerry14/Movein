@@ -571,9 +571,9 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                   borderRadius:
                                                   BorderRadius.circular(100),
                                                   child: Image(
-                                                      image: NetworkImage(imageURL2 + 
+                                                      image: NetworkImage('${imageURL2 + 
                                                           memberDetails[index]
-                                                          ["Images"][0])),
+                                                          ["Images"][0]}.jpg')),
                                                 ),
                                               ),
                                               const SizedBox(width: 8),

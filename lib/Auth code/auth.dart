@@ -57,10 +57,10 @@ class Auth {
 
       User? user = FirebaseAuth.instance.currentUser;
 
-      if (user != null && !user.emailVerified) {
-        await user.sendEmailVerification();
-        return "email verification";
-      }
+      // if (user != null && !user.emailVerified) {
+      //   await user.sendEmailVerification();
+      //   return "email verification";
+      // }
 
       return "success";
     } on FirebaseAuthException catch (e) {
