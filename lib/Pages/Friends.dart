@@ -986,13 +986,7 @@ class _FriendsState extends State<Friends> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(100),
-                                                        // child: Image.asset(
-                                                        //     applicationsResults[
-                                                        //             applicationIndex]
-                                                        //         [
-                                                        //         "GroupPicture"])
-                                                        // ,
-                                                        child: Image.network('$imageURL$imageName'),
+                                                        child: Image.network('$imageURL$imageName.jpg'),
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),
