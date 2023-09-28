@@ -17,7 +17,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:http/http.dart' as http;
-import 'package:sendbird_sdk/sendbird_sdk.dart' as sb ;
+import 'package:sendbird_sdk/sendbird_sdk.dart' as sb;
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
 import '../main.dart';
@@ -164,16 +164,13 @@ class _FriendsState extends State<Friends> {
 
   Stream<List<List<dynamic>>> friendsDataStream() async* {
     final CollectionReference docGroups =
-    FirebaseFirestore.instance.collection("Groups");
+        FirebaseFirestore.instance.collection("Groups");
     final CollectionReference docUsers =
-    FirebaseFirestore.instance.collection("Users");
+        FirebaseFirestore.instance.collection("Users");
 
     final streamController = StreamController<List<List<dynamic>>>();
 
-    docUsers
-        .doc(Auth().currentUser())
-        .snapshots()
-        .listen((docSnapshot) async {
+    docUsers.doc(Auth().currentUser()).snapshots().listen((docSnapshot) async {
       List<Map<String, dynamic>> friends = [];
       List<Map<String, dynamic>> groupInvites = [];
       List<Map<String, dynamic>> blockedGroups = [];
@@ -184,7 +181,7 @@ class _FriendsState extends State<Friends> {
 
       try {
         Map<String, dynamic>? data =
-        docSnapshot.data() as Map<String, dynamic>?;
+            docSnapshot.data() as Map<String, dynamic>?;
         for (String type in ["Joined", "Applications", "ShortList"]) {
           List<Map<String, dynamic>> groups = [];
           List<String> tGroups = [];
@@ -195,7 +192,7 @@ class _FriendsState extends State<Friends> {
             if (group.isNotEmpty) {
               DocumentSnapshot groupSnapshot = await docGroups.doc(group).get();
               Map<String, dynamic>? groupData =
-              groupSnapshot.data() as Map<String, dynamic>?;
+                  groupSnapshot.data() as Map<String, dynamic>?;
               if (groupData != null) {
                 blockIgnores.add(group);
                 groups.add({
@@ -204,11 +201,11 @@ class _FriendsState extends State<Friends> {
                   "GroupPicture": groupData["GroupPicture"],
                   "Members": groupData["Members"],
                   "AvgCleanliness":
-                  (groupData["AvgCleanliness"] as num).toDouble(),
+                      (groupData["AvgCleanliness"] as num).toDouble(),
                   "AvgNoisiness": (groupData["AvgNoisiness"] as num).toDouble(),
                   "AvgNightLife": (groupData["AvgNightLife"] as num).toDouble(),
                   'AvgYearOfStudy':
-                  (groupData["AvgYearOfStudy"] as num).toDouble(),
+                      (groupData["AvgYearOfStudy"] as num).toDouble(),
                   "AvgBedTime": groupData["AvgBedTime"],
                 });
               }
@@ -264,7 +261,7 @@ class _FriendsState extends State<Friends> {
         final inviteIds = List<String>.from(data?['FriendInvites'] ?? []);
         final friendsIds = List<String>.from(data?['Friends'] ?? []);
         final outgoingIds =
-        List<String>.from(data?['OutgoingFriendInvites'] ?? []);
+            List<String>.from(data?['OutgoingFriendInvites'] ?? []);
 
         for (String inviteId in inviteIds) {
           final friendSnapshot = await FirebaseFirestore.instance
@@ -357,7 +354,6 @@ class _FriendsState extends State<Friends> {
     yield* streamController.stream;
   }
 
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<List<dynamic>>>(
@@ -384,8 +380,7 @@ class _FriendsState extends State<Friends> {
             applicationsResults = data[4][1];
             shortList = data[4][2];
             shortListResults = data[4][2];
-            blockedGroups 
-            = data[5];
+            blockedGroups = data[5];
             blockedSearchResults = data[5];
             return buildScaffold(context, false);
           }
@@ -599,7 +594,8 @@ class _FriendsState extends State<Friends> {
                                     } else if (index <= joinedResults.length) {
                                       int joinedIndex = index - 1;
                                       String imageString;
-                                      imageString = joinedResults[joinedIndex]['GroupPicture'];
+                                      imageString = joinedResults[joinedIndex]
+                                          ['GroupPicture'];
                                       return Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 4.0, horizontal: 8.0),
@@ -714,8 +710,8 @@ class _FriendsState extends State<Friends> {
                                                                         joinedIndex]
                                                                     [
                                                                     "GroupName"],
-                                                            'groupPicture':
-                                                                imageURL + joinedResults[
+                                                            'groupPicture': imageURL +
+                                                                joinedResults[
                                                                         joinedIndex]
                                                                     [
                                                                     "GroupPicture"],
@@ -750,7 +746,11 @@ class _FriendsState extends State<Friends> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(100),
-                                                        child: imageString == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network('$imageURL$imageString.jpg'),
+                                                        child: imageString == ''
+                                                            ? Image.network(
+                                                                'https://movein.blob.core.windows.net/moveinimages/noimagefound.png')
+                                                            : Image.network(
+                                                                '$imageURL$imageString.jpg'),
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),
@@ -806,7 +806,9 @@ class _FriendsState extends State<Friends> {
                                     } else {
                                       int applicationIndex =
                                           index - joinedResults.length - 2;
-                                      String imageName = applicationsResults[applicationIndex]["GroupPicture"];
+                                      String imageName =
+                                          applicationsResults[applicationIndex]
+                                              ["GroupPicture"];
                                       return Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 4.0, horizontal: 8.0),
@@ -972,7 +974,8 @@ class _FriendsState extends State<Friends> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(100),
-                                                        child: Image.network('$imageURL$imageName.jpg'),
+                                                        child: Image.network(
+                                                            '$imageURL$imageName.jpg'),
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),
@@ -1049,11 +1052,17 @@ class _FriendsState extends State<Friends> {
                                             motion: const ScrollMotion(),
                                             children: [
                                               SlidableAction(
-                                                onPressed: (context) async{
-                                                  String clickedOnUser = searchResults[index]["Id"];
-                                                  String userId = Auth().currentUser();
+                                                onPressed: (context) async {
+                                                  String clickedOnUser =
+                                                      searchResults[index]
+                                                          ["Id"];
+                                                  String userId =
+                                                      Auth().currentUser();
 
-                                                  var usersIds = [clickedOnUser, userId];
+                                                  var usersIds = [
+                                                    clickedOnUser,
+                                                    userId
+                                                  ];
                                                   usersIds.sort();
                                                   Navigator.push(context,PageTransition
                                                   (
@@ -1073,10 +1082,9 @@ class _FriendsState extends State<Friends> {
                                                     )
                                                   );
                                                 },
-                                                backgroundColor:
-                                                    Colors.lightBlueAccent,
+                                                backgroundColor: Colors.blue,
                                                 icon: Icons.mail,
-                                                label: 'messages'.tr,
+                                                label: 'Messages'.tr,
                                               ),
                                               SlidableAction(
                                                 onPressed: (context) {
@@ -1799,17 +1807,24 @@ class _FriendsState extends State<Friends> {
                                                           ["Id"],
                                                       Auth().currentUser(),
                                                     );
-                                                     final url = Uri.parse(
-                                                         'https://europe-west2-test-7a857.cloudfunctions.net/createStripeSetupIntent');
-                                                     await http.post(
-                                                       url,
-                                                       headers: {'Content-Type': 'application/json'},
-                                                       body: json.encode({
-                                                         "senderName" : "${friendSearchResults[index]["ForeName"]} ${friendSearchResults[index]["SurName"]}",
-                                                         "deviceId" : friendSearchResults[index]["Id"],
-                                                         "notificationType" : 'friendRequest',
-                                                       }),
-                                                     );
+                                                    final url = Uri.parse(
+                                                        'https://europe-west2-test-7a857.cloudfunctions.net/createStripeSetupIntent');
+                                                    await http.post(
+                                                      url,
+                                                      headers: {
+                                                        'Content-Type':
+                                                            'application/json'
+                                                      },
+                                                      body: json.encode({
+                                                        "senderName":
+                                                            "${friendSearchResults[index]["ForeName"]} ${friendSearchResults[index]["SurName"]}",
+                                                        "deviceId":
+                                                            friendSearchResults[
+                                                                index]["Id"],
+                                                        "notificationType":
+                                                            'friendRequest',
+                                                      }),
+                                                    );
                                                   },
                                                   backgroundColor:
                                                       Colors.lightGreen,
@@ -1972,10 +1987,9 @@ class _FriendsState extends State<Friends> {
                                                   children: [
                                                     SlidableAction(
                                                       onPressed:
-                                                      
                                                           (context) async {
-                                                            
                                                         await addFriend(friendSearchResults[index]["Id"],Auth().currentUser());
+
                                                         // reloadData();
                                                       },
                                                       backgroundColor:
