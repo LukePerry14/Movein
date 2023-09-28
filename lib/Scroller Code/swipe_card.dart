@@ -21,6 +21,7 @@ class SwipeCard extends StatelessWidget {
   final int yearOfStudy;
   final List<String> images;
   final bool showFriend;
+  final bool isVerified;
 
   const SwipeCard({
     Key? key,
@@ -33,6 +34,7 @@ class SwipeCard extends StatelessWidget {
     required this.bio,
     required this.subject,
     required this.yearOfStudy,
+    required this.isVerified,
     this.showFriend = false,
 
   }) : super(key: key);
@@ -50,7 +52,7 @@ class SwipeCard extends StatelessWidget {
           onTap: () {
             showDialog<String>(
                 context: context,
-                builder: (BuildContext context) => CustomDialog(id: id,foreName: foreName ,age: age, uni: uni, preferences: preferences,images: images, bio: bio, subject: subject, yearOfStudy: yearOfStudy, showFriend: showFriend)
+                builder: (BuildContext context) => CustomDialog(id: id,foreName: foreName ,age: age, uni: uni, preferences: preferences,images: images, bio: bio, subject: subject, yearOfStudy: yearOfStudy, showFriend: showFriend, isVerified: isVerified)
             );
           },
           child: Container(
@@ -102,6 +104,25 @@ class SwipeCard extends StatelessWidget {
                                     fontStyle: FontStyle.normal,
                                   ),
                               ),
+                      ),
+                      if (isVerified)
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: Container(
+                          width: 15, // Adjust the width and height as needed
+                          height: 15,
+                          decoration: const BoxDecoration(
+                            color: Colors.blue,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 10,
+                            ),
+                          ),
+                        ),
                       )
                     ],
               ),
@@ -170,6 +191,7 @@ class CustomDialog extends StatefulWidget {
   final String subject;
   final int yearOfStudy;
   final bool showFriend;
+  final bool isVerified;
   const CustomDialog({
     Key? key,
     required this.id,
@@ -181,6 +203,7 @@ class CustomDialog extends StatefulWidget {
     required this.bio,
     required this.subject,
     required this.yearOfStudy,
+    required this.isVerified,
     this.showFriend = false,
   }) : super(key: key);
 
@@ -288,7 +311,24 @@ class _CustomDialogState extends State<CustomDialog> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("${widget.foreName} (${widget.age})", style: Theme.of(context).textTheme.headlineMedium,),
+                              Row(children: [
+                                Text("${widget.foreName} (${widget.age})", style: Theme.of(context).textTheme.headlineMedium,),
+                                Container(
+                                  width: 15, // Adjust the width and height as needed
+                                  height: 15,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.blue,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.check,
+                                      color: Colors.white,
+                                      size: 10,
+                                    ),
+                                  ),
+                                ),
+                              ]),
                               Text(widget.id, style: Theme.of(context).textTheme.bodySmall),
                             ],
                           ),

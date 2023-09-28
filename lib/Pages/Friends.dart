@@ -6,7 +6,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:movein/Pages/Sendbird.dart';
 import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
@@ -287,6 +286,7 @@ class _FriendsState extends State<Friends> {
               "Subject": friendData['Subject'],
               "YearOfStudy": friendData['YearOfStudy'],
               "Id": inviteId,
+              "verified" : friendData['EmailVerified'],
             });
           }
         }
@@ -311,6 +311,7 @@ class _FriendsState extends State<Friends> {
               "Subject": friendData['Subject'],
               "YearOfStudy": friendData['YearOfStudy'],
               "Id": friendId,
+              "verified" : friendData['EmailVerified'],
             });
           }
         }
@@ -335,6 +336,7 @@ class _FriendsState extends State<Friends> {
               "Subject": friendData['Subject'],
               "YearOfStudy": friendData['YearOfStudy'],
               "Id": outgoingId,
+              "verified" : friendData['EmailVerified'],
             });
           }
         }
@@ -608,12 +610,6 @@ class _FriendsState extends State<Friends> {
                                               children: [
                                                 SlidableAction(
                                                   onPressed: (context) async {
-                                                    final groupChannel =
-                                                        await ConnectSendbird()
-                                                            .returnChannel(
-                                                                joinedResults[
-                                                                        joinedIndex]
-                                                                    ["Id"]);
                                                     Navigator.push(
                                                       context,
                                                       PageTransition(
@@ -626,8 +622,6 @@ class _FriendsState extends State<Friends> {
                                                           settings:
                                                               RouteSettings(
                                                                   arguments: {
-                                                                'channel':
-                                                                    groupChannel,
                                                                 'members': joinedResults[
                                                                         joinedIndex]
                                                                     ["Members"],
@@ -698,12 +692,6 @@ class _FriendsState extends State<Friends> {
                                             ),
                                             child: GestureDetector(
                                               onTap: () async {
-                                                final groupChannel =
-                                                    await ConnectSendbird()
-                                                        .returnChannel(
-                                                            joinedResults[
-                                                                    joinedIndex]
-                                                                ["Id"]);
                                                 Navigator.push(
                                                   context,
                                                   PageTransition(
@@ -713,8 +701,6 @@ class _FriendsState extends State<Friends> {
                                                       child: const Messages(),
                                                       settings: RouteSettings(
                                                           arguments: {
-                                                            'channel':
-                                                                groupChannel,
                                                             'members':
                                                                 joinedResults[
                                                                         joinedIndex]
@@ -1069,9 +1055,6 @@ class _FriendsState extends State<Friends> {
 
                                                   var usersIds = [clickedOnUser, userId];
                                                   usersIds.sort();
-                                                  final groupChannel = await ConnectSendbird().returnChannel(usersIds[0] + usersIds[1]);
-                                                  sb.User clicked = await ConnectSendbird().findUserViaId(clickedOnUser);
-                                                  sb.User current = await ConnectSendbird().findUserViaId(userId);
                                                   Navigator.push(context,PageTransition
                                                   (
                                                     curve: Curves.linear,
@@ -1082,26 +1065,13 @@ class _FriendsState extends State<Friends> {
                                                     (
                                                               arguments:
                                                               {
-                                                                'channel':groupChannel,
-                                                                'members': [mb.Messages().asDashChatUser(clicked),mb.Messages().asDashChatUser(current)],
                                                                 'groupId': usersIds[0] + usersIds[1],
-                                                                'groupName': clicked.nickname
+                                                                'groupName': searchResults[index]["GroupName"]
 
                                                               }
                                                     )
-
-                                                    
-                                                    
                                                     )
-
                                                   );
-
-                                                  //ToDo For Raine: add in 1-1 private messages
-
-
-                                                  //get current user and other user 
-
-
                                                 },
                                                 backgroundColor:
                                                     Colors.lightBlueAccent,
@@ -1165,7 +1135,7 @@ class _FriendsState extends State<Friends> {
                                                                 ["ForeName"],
                                                         age:
                                                             searchResults[index]
-                                                                ["Age"],
+                                                                ["Age"].toInt(),
                                                         uni:
                                                             searchResults[index]
                                                                 ["Uni"],
@@ -1183,8 +1153,10 @@ class _FriendsState extends State<Friends> {
                                                                 ["Subject"],
                                                         yearOfStudy:
                                                             searchResults[index]
-                                                                ["YearOfStudy"],
+                                                                ["YearOfStudy"].toInt(),
                                                         showFriend: true,
+                                                        isVerified: searchResults[index]
+                                                        ["verified"],
                                                       ));
                                             },
                                             child: Padding(
@@ -1299,7 +1271,7 @@ class _FriendsState extends State<Friends> {
                                                           index]["ForeName"],
                                                   age:
                                                       outgoingFriendInvitesResults[
-                                                          index]["Age"],
+                                                          index]["Age"].toInt(),
                                                   uni:
                                                       outgoingFriendInvitesResults[
                                                           index]["Uni"],
@@ -1317,7 +1289,9 @@ class _FriendsState extends State<Friends> {
                                                           index]["Subject"],
                                                   yearOfStudy:
                                                       outgoingFriendInvitesResults[
-                                                          index]["YearOfStudy"],
+                                                          index]["YearOfStudy"].toInt(),
+                                                  isVerified: outgoingFriendInvitesResults[index]
+                                                  ["verified"],
                                                 ));
                                       },
                                       child: Padding(
@@ -1820,7 +1794,6 @@ class _FriendsState extends State<Friends> {
                                               children: [
                                                 SlidableAction(
                                                   onPressed: (context) async {
-                                                     await ConnectSendbird().createDM([friendSearchResults[index]["Id"],Auth().currentUser()], 'Chat', '');
                                                     await addFriend(
                                                       friendSearchResults[index]
                                                           ["Id"],
@@ -1874,7 +1847,7 @@ class _FriendsState extends State<Friends> {
                                                             friendSearchResults[index]
                                                                 ["ForeName"],
                                                         age: friendSearchResults[index]
-                                                            ["Age"],
+                                                            ["Age"].toInt(),
                                                         uni: friendSearchResults[index]
                                                             ["Uni"],
                                                         preferences:
@@ -1890,7 +1863,11 @@ class _FriendsState extends State<Friends> {
                                                                 ["Subject"],
                                                         yearOfStudy:
                                                             friendSearchResults[index]
-                                                                ["YearOfStudy"]));
+                                                                ["YearOfStudy"].toInt(),
+                                                      isVerified: friendSearchResults[index]
+                                                      ["verified"],
+
+                                                    ));
                                               },
                                               child: Padding(
                                                 padding:
@@ -1998,7 +1975,6 @@ class _FriendsState extends State<Friends> {
                                                       
                                                           (context) async {
                                                             
-                                                        await ConnectSendbird().createDM([friendSearchResults[index]["Id"],Auth().currentUser()], 'Chat', '');
                                                         await addFriend(friendSearchResults[index]["Id"],Auth().currentUser());
                                                         // reloadData();
                                                       },

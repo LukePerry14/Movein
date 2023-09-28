@@ -194,6 +194,7 @@ class _GscrollerState extends State<Gscroller> {
                 subject: profiles[index-2].subject,
                 yearOfStudy: profiles[index-2].yearOfStudy,
                 showFriend: widget.showFriend,
+                isVerified: profiles[index-2].isVerified,
               );
             } else {
               return const SizedBox(

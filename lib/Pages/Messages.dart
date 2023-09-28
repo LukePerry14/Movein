@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
-import 'package:movein/Pages/profilePreview.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:sendbird_chat_sdk/sendbird_chat_sdk.dart' as sbc;
 import 'package:sendbird_sdk/sendbird_sdk.dart' ;
-
-
-
-import 'package:movein/Pages/Sendbird.dart';
 import '../Themes/lMode.dart';
 import '../Auth code/auth.dart';
 import 'GroupOptions.dart';
@@ -217,12 +212,7 @@ Future<void> getMessages(GroupChannel channel) async {
                      {}
                      else
                      {
-                     
-                          showDialog<String> 
-                          (
-                            context:context,
-                            builder: (BuildContext context) => PreviewCard(foreName: 'placeholder', user: user)
-                          );
+
                      }
                       },
 
