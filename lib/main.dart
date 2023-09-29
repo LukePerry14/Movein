@@ -17,10 +17,8 @@ import 'package:movein/Pages/OnBoarding.dart';
 import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Themes/lMode.dart';
 import 'package:movein/Pages/Settings.dart';
-import 'package:movein/Pages/Sendbird.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:movein/Translations.dart';
-import 'package:movein/Pages/SessionToken.dart';
 import 'package:movein/UserPreferences.dart';
 import 'package:provider/provider.dart';
 import 'Auth code/auth.dart';
@@ -28,10 +26,8 @@ import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:azblob/azblob.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:sendbird_chat_sdk/sendbird_chat_sdk.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
 import '.env';
@@ -550,7 +546,6 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _passwordObscured = true;
   bool _passwordConfObscured = true;
   final _universityController = TextEditingController();
-  bool _universityValid = true;
   bool _loadApp = false;
   String errorMessage = "";
   bool userInfoValid = false;
@@ -1331,18 +1326,6 @@ class _SignupScreenState extends State<SignupScreen> {
                                       ),
                                     );
                                   } else {
-                                    _accessToken = await SessionToken()
-                                        .generateToken(Auth().currentUser(),
-                                            data['ForeName']);
-
-                                    Auth().addAccessToken(
-                                        _accessToken, Auth().currentUser());
-
-                                    ConnectSendbird().connect(
-                                        "33BDBE40-0D0C-4529-BA3B-74C0916D2682",
-                                        Auth().currentUser(),
-                                        data['ForeName'],
-                                        _accessToken);
 
                                     await UserPreferences.setUni(
                                         data['UniAttended']);
@@ -1402,7 +1385,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _validateForm() {
     if (_loadApp) {
-      _validateUniversity(_universityController.text);
       final userInfoComplete =
           (_formKey.currentState?.fields['ForeName']?.isValid ?? false) &
               (_formKey.currentState?.fields['SurName']?.isValid ?? false) &
@@ -1416,7 +1398,6 @@ class _SignupScreenState extends State<SignupScreen> {
           (_formKey.currentState?.fields['Bio']?.isValid ?? false) &
               (_formKey.currentState?.fields['DOB']?.isValid ?? false) &
               (_formKey.currentState?.fields['Subject']?.isValid ?? false) &
-              (_universityValid) &
               (_formKey.currentState?.fields['YearOfStudy']?.isValid ?? false);
 
       final preferenceInfoComplete =
@@ -1431,17 +1412,6 @@ class _SignupScreenState extends State<SignupScreen> {
         preferenceInfoValid = preferenceInfoComplete;
       });
     }
-  }
-
-  void _validateUniversity(selectedUniversity) {
-    bool temp = true;
-
-    if (!universitiesSuggestions.contains(selectedUniversity)) {
-      temp = false;
-    }
-    setState(() {
-      _universityValid = temp;
-    });
   }
 
   Map<String, dynamic> reConfigData(Map<String, dynamic> data,
@@ -1541,8 +1511,6 @@ import 'package:movein/Pages/Friends.dart';
 //import 'package:movein/Pages/ScrollRefresh.dart';
 import 'package:movein/Pages/Sendbird.dart';
 import 'package:movein/Pages/Notifications.dart';
-import 'package:movein/Pages/SessionToken.dart';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:movein/Translations.dart';
 import 'package:movein/UserPreferences.dart';

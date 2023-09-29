@@ -65,160 +65,160 @@ class _GroupOptionsState extends State<GroupOptions> {
   var data = {};
   late String groupId;
 
-  Future<List<dynamic>> getUsers(groupId) async {
-    List<Map<String, dynamic>> memberDetails = [];
-    List<Map<String, dynamic>> applicants = [];
-    List<String> voteKicks = [];
-    Map<String, List<int>> kickVals = {};
-    Map<String, List<int>> appVals = {};
-    String groupName;
-    String groupPicture;
-    double avgCleanliness;
-    double avgNoisiness ;
-    double avgNightLife;
-    double avgYearOfStudy;
-    List<dynamic> allowedUnis;
-    Timestamp avgBedTime;
-
-    final CollectionReference docUsers =
-        FirebaseFirestore.instance.collection("Users");
-
-    try {
-      DocumentSnapshot groupSnapshot = await FirebaseFirestore.instance
-          .collection("Groups")
-          .doc(groupId)
-          .get();
-
-      Map<String, dynamic>? groupData =
-          groupSnapshot.data() as Map<String, dynamic>?;
-
-        groupName = groupData?['GroupName'];
-        groupPicture = groupData?['GroupPicture'];
-        avgCleanliness = (groupData?['AvgCleanliness'] as num).toDouble();
-        avgNoisiness = (groupData?['AvgNoisiness'] as num).toDouble();
-        avgNightLife = (groupData?['AvgNightLife']as num).toDouble();
-        avgYearOfStudy = (groupData?['AvgYearOfStudy']as num).toDouble();
-        avgBedTime = groupData?['AvgBedTime'];
-        allowedUnis = groupData?['AllowedUnis'];
-
-        var tempKickVals = groupData?["KickVals"];
-        for (var key in tempKickVals.keys) {
-          int agree = 0;
-          int disagree = 0;
-          var innerMap = tempKickVals[key];
-
-          innerMap.forEach((innerKey, innerValue) {
-            if (innerValue == 1) {
-              agree += 1;
-            } else {
-              disagree += 1;
-            }
-          });
-
-          kickVals[key] = [agree, disagree];
-        }
-
-        var tempAppVals = groupData?["AppVals"];
-        for (var key in tempAppVals.keys) {
-          int agree = 0;
-          int disagree = 0;
-          var innerMap = tempAppVals[key];
-
-          innerMap.forEach((innerKey, innerValue) {
-            if (innerValue == 1) {
-              agree += 1;
-            } else {
-              disagree += 1;
-            }
-          });
-
-          appVals[key] = [agree, disagree];
-        }
-
-        var applicantIds = groupData?["Applicants"];
-        for (var aId in applicantIds) {
-          if (!(aId == "")) {
-            DocumentSnapshot docSnapshot = await docUsers.doc(aId).get();
-            Map<String, dynamic>? data =
-                docSnapshot.data() as Map<String, dynamic>?;
-
-            final dateTime = data?['DOB'].toDate();
-            final currentDate = DateTime.now();
-            final difference = currentDate.difference(dateTime);
-            final yearsAgo = difference.inDays ~/ 365;
-            applicants.add({
-              "ForeName": data?['ForeName'],
-              "SurName": data?['SurName'],
-              "Age": yearsAgo,
-              "Uni": data?['UniAttended'],
-              "Preferences": data?['Preferences'],
-              "Images": data?['Images'],
-              "Bio": data?['Bio'],
-              "Subject": data?['Subject'],
-              "YearOfStudy": data?['YearOfStudy'],
-              "Id": aId,
-            });
-          }
-        }
-
-        var members = groupData?['Members'];
-        var kickIds = groupData?["Kicks"];
-        for (String id in members) {
-          try {
-            DocumentSnapshot docSnapshot = await docUsers.doc(id).get();
-            Map<String, dynamic>? data =
-                docSnapshot.data() as Map<String, dynamic>?;
-
-            final dateTime = data?['DOB'].toDate();
-            final currentDate = DateTime.now();
-            final difference = currentDate.difference(dateTime);
-            final yearsAgo = difference.inDays ~/ 365;
-
-            if (kickIds.contains(id)) {
-              voteKicks.add(id);
-            }
-
-            memberDetails.add({
-              "ForeName": data?['ForeName'],
-              "SurName": data?['SurName'],
-              "Age": yearsAgo,
-              "Uni": data?['UniAttended'],
-              "Preferences": data?['Preferences'],
-              "Images": data?['Images'],
-              "Bio": data?['Bio'],
-              "Subject": data?['Subject'],
-              "YearOfStudy": data?['YearOfStudy'],
-              "Id": id,
-            });
-          } catch (e) {
-            throw FirebaseException(
-              message: 'Error fetching member data in GroupOptions: $e',
-              plugin: 'cloud_firestore',
-            );
-          }
-        }
-    } catch (e) {
-      throw FirebaseException(
-        message: 'Error fetching group data in GroupOptions: $e',
-        plugin: 'cloud_firestore',
-      );
-    }
-    return [
-      memberDetails,
-      applicants,
-      voteKicks,
-      kickVals,
-      appVals,
-      groupName,
-      groupPicture,
-      avgCleanliness,
-      avgNoisiness,
-      avgNightLife,
-      avgBedTime,
-      avgYearOfStudy,
-      allowedUnis
-    ];
-  }
+  // Future<List<dynamic>> getUsers(groupId) async {
+  //   List<Map<String, dynamic>> memberDetails = [];
+  //   List<Map<String, dynamic>> applicants = [];
+  //   List<String> voteKicks = [];
+  //   Map<String, List<int>> kickVals = {};
+  //   Map<String, List<int>> appVals = {};
+  //   String groupName;
+  //   String groupPicture;
+  //   double avgCleanliness;
+  //   double avgNoisiness ;
+  //   double avgNightLife;
+  //   double avgYearOfStudy;
+  //   List<dynamic> allowedUnis;
+  //   Timestamp avgBedTime;
+  //
+  //   final CollectionReference docUsers =
+  //       FirebaseFirestore.instance.collection("Users");
+  //
+  //   try {
+  //     DocumentSnapshot groupSnapshot = await FirebaseFirestore.instance
+  //         .collection("Groups")
+  //         .doc(groupId)
+  //         .get();
+  //
+  //     Map<String, dynamic>? groupData =
+  //         groupSnapshot.data() as Map<String, dynamic>?;
+  //
+  //       groupName = groupData?['GroupName'];
+  //       groupPicture = groupData?['GroupPicture'];
+  //       avgCleanliness = (groupData?['AvgCleanliness'] as num).toDouble();
+  //       avgNoisiness = (groupData?['AvgNoisiness'] as num).toDouble();
+  //       avgNightLife = (groupData?['AvgNightLife']as num).toDouble();
+  //       avgYearOfStudy = (groupData?['AvgYearOfStudy']as num).toDouble();
+  //       avgBedTime = groupData?['AvgBedTime'];
+  //       allowedUnis = groupData?['AllowedUnis'];
+  //
+  //       var tempKickVals = groupData?["KickVals"];
+  //       for (var key in tempKickVals.keys) {
+  //         int agree = 0;
+  //         int disagree = 0;
+  //         var innerMap = tempKickVals[key];
+  //
+  //         innerMap.forEach((innerKey, innerValue) {
+  //           if (innerValue == 1) {
+  //             agree += 1;
+  //           } else {
+  //             disagree += 1;
+  //           }
+  //         });
+  //
+  //         kickVals[key] = [agree, disagree];
+  //       }
+  //
+  //       var tempAppVals = groupData?["AppVals"];
+  //       for (var key in tempAppVals.keys) {
+  //         int agree = 0;
+  //         int disagree = 0;
+  //         var innerMap = tempAppVals[key];
+  //
+  //         innerMap.forEach((innerKey, innerValue) {
+  //           if (innerValue == 1) {
+  //             agree += 1;
+  //           } else {
+  //             disagree += 1;
+  //           }
+  //         });
+  //
+  //         appVals[key] = [agree, disagree];
+  //       }
+  //
+  //       var applicantIds = groupData?["Applicants"];
+  //       for (var aId in applicantIds) {
+  //         if (!(aId == "")) {
+  //           DocumentSnapshot docSnapshot = await docUsers.doc(aId).get();
+  //           Map<String, dynamic>? data =
+  //               docSnapshot.data() as Map<String, dynamic>?;
+  //
+  //           final dateTime = data?['DOB'].toDate();
+  //           final currentDate = DateTime.now();
+  //           final difference = currentDate.difference(dateTime);
+  //           final yearsAgo = difference.inDays ~/ 365;
+  //           applicants.add({
+  //             "ForeName": data?['ForeName'],
+  //             "SurName": data?['SurName'],
+  //             "Age": yearsAgo,
+  //             "Uni": data?['UniAttended'],
+  //             "Preferences": data?['Preferences'],
+  //             "Images": data?['Images'],
+  //             "Bio": data?['Bio'],
+  //             "Subject": data?['Subject'],
+  //             "YearOfStudy": data?['YearOfStudy'],
+  //             "Id": aId,
+  //           });
+  //         }
+  //       }
+  //
+  //       var members = groupData?['Members'];
+  //       var kickIds = groupData?["Kicks"];
+  //       for (String id in members) {
+  //         try {
+  //           DocumentSnapshot docSnapshot = await docUsers.doc(id).get();
+  //           Map<String, dynamic>? data =
+  //               docSnapshot.data() as Map<String, dynamic>?;
+  //
+  //           final dateTime = data?['DOB'].toDate();
+  //           final currentDate = DateTime.now();
+  //           final difference = currentDate.difference(dateTime);
+  //           final yearsAgo = difference.inDays ~/ 365;
+  //
+  //           if (kickIds.contains(id)) {
+  //             voteKicks.add(id);
+  //           }
+  //
+  //           memberDetails.add({
+  //             "ForeName": data?['ForeName'],
+  //             "SurName": data?['SurName'],
+  //             "Age": yearsAgo,
+  //             "Uni": data?['UniAttended'],
+  //             "Preferences": data?['Preferences'],
+  //             "Images": data?['Images'],
+  //             "Bio": data?['Bio'],
+  //             "Subject": data?['Subject'],
+  //             "YearOfStudy": data?['YearOfStudy'],
+  //             "Id": id,
+  //           });
+  //         } catch (e) {
+  //           throw FirebaseException(
+  //             message: 'Error fetching member data in GroupOptions: $e',
+  //             plugin: 'cloud_firestore',
+  //           );
+  //         }
+  //       }
+  //   } catch (e) {
+  //     throw FirebaseException(
+  //       message: 'Error fetching group data in GroupOptions: $e',
+  //       plugin: 'cloud_firestore',
+  //     );
+  //   }
+  //   return [
+  //     memberDetails,
+  //     applicants,
+  //     voteKicks,
+  //     kickVals,
+  //     appVals,
+  //     groupName,
+  //     groupPicture,
+  //     avgCleanliness,
+  //     avgNoisiness,
+  //     avgNightLife,
+  //     avgBedTime,
+  //     avgYearOfStudy,
+  //     allowedUnis
+  //   ];
+  // }
 
   Stream<List<dynamic>> getUsersStream(String groupId) async* {
     final CollectionReference docUsers =
@@ -315,6 +315,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                 "Bio": data?['Bio'],
                 "Subject": data?['Subject'],
                 "YearOfStudy": data?['YearOfStudy'],
+                "verified" : data?['EmailVerified'],
                 "Id": aId,
               });
             }
@@ -347,6 +348,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                 "Bio": data?['Bio'],
                 "Subject": data?['Subject'],
                 "YearOfStudy": data?['YearOfStudy'],
+                "verified" : data?['EmailVerified'],
                 "Id": id,
               });
             } catch (e) {
@@ -548,6 +550,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 bio: memberDetails[index]['Bio'],
                                                 subject: memberDetails[index]['Subject'],
                                                 yearOfStudy: memberDetails[index]['YearOfStudy'].toInt(),
+                                                isVerified: memberDetails[index]['verified'],
                                               ),
                                         );
                                       },
@@ -567,13 +570,37 @@ class _GroupOptionsState extends State<GroupOptions> {
                                               SizedBox(
                                                 width: 50,
                                                 height: 50,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                  BorderRadius.circular(100),
-                                                  child: Image(
-                                                      image: NetworkImage('${imageURL2 + 
-                                                          memberDetails[index]
-                                                          ["Images"][0]}.jpg')),
+                                                child: Stack(
+                                                  children: [
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                      BorderRadius.circular(
+                                                          100),
+                                                      child: Image(
+                                                          image: NetworkImage('${imageURL2 + memberDetails[index]['Images'][0]}.jpg')
+                                                      ),
+                                                    ),
+                                                    if (memberDetails[index]['verified'])
+                                                      Positioned(
+                                                        bottom: -5,
+                                                        right: -5,
+                                                        child: Container(
+                                                          width: 15, // Adjust the width and height as needed
+                                                          height: 15,
+                                                          decoration: const BoxDecoration(
+                                                            color: Colors.blue,
+                                                            shape: BoxShape.circle,
+                                                          ),
+                                                          child: const Center(
+                                                            child: Icon(
+                                                              Icons.check,
+                                                              color: Colors.white,
+                                                              size: 10,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      )
+                                                  ],
                                                 ),
                                               ),
                                               const SizedBox(width: 8),
@@ -698,17 +725,18 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 onSelected: (value) async {
                                                   if (value == 'add') {
                                                     sendFriendInvite(
-                                                      memberDetails[index]["Id"], Auth().currentUser(),);
-                                                    ScaffoldMessenger.of(context)
-                                                        .showSnackBar(
-                                                      SnackBar(
-                                                        backgroundColor:
-                                                        Theme.of(context)
-                                                            .primaryColor,
-                                                        content: Text(
-                                                          'invite_sent'.tr, style: Theme.of(context).textTheme.bodySmall,),
-                                                      ),
-                                                    );
+                                                      memberDetails[index]["Id"], Auth().currentUser(),).then((value) {
+                                                      ScaffoldMessenger.of(context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                          backgroundColor:
+                                                          Theme.of(context)
+                                                              .primaryColor,
+                                                          content: Text(
+                                                            'invite_sent'.tr, style: Theme.of(context).textTheme.bodySmall,),
+                                                        ),
+                                                      );
+                                                    });
                                                   } else if (value == 'kick') {
                                                     await startKickVote(
                                                       memberDetails[index]["Id"],
@@ -803,6 +831,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 ['Subject'],
                                                 yearOfStudy: applicants[index]
                                                 ['YearOfStudy'],
+                                                isVerified: applicants[index]['verified'],
                                               ),
                                         );
                                       },
@@ -823,15 +852,37 @@ class _GroupOptionsState extends State<GroupOptions> {
                                               SizedBox(
                                                 width: 50,
                                                 height: 50,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                  BorderRadius.circular(
-                                                      100),
-                                                  child: Image(
-                                                      // image: AssetImage(
-                                                      //     applicants[index]
-                                                      //     ["Images"][0])),
-                                                      image: NetworkImage('${imageURL2 + applicants[index]['Images'][0]}.jpg')),
+                                                child: Stack(
+                                                  children: [
+                                                    ClipRRect(
+                                                      borderRadius:
+                                                      BorderRadius.circular(
+                                                          100),
+                                                      child: Image(
+                                                          image: NetworkImage('${imageURL2 + applicants[index]['Images'][0]}.jpg')
+                                                      ),
+                                                    ),
+                                                    if (applicants[index]['verified'])
+                                                    Positioned(
+                                                      bottom: -5,
+                                                      right: -5,
+                                                      child: Container(
+                                                        width: 15, // Adjust the width and height as needed
+                                                        height: 15,
+                                                        decoration: const BoxDecoration(
+                                                          color: Colors.blue,
+                                                          shape: BoxShape.circle,
+                                                        ),
+                                                        child: const Center(
+                                                          child: Icon(
+                                                            Icons.check,
+                                                            color: Colors.white,
+                                                            size: 10,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
                                                 ),
                                               ),
                                               const SizedBox(width: 8),

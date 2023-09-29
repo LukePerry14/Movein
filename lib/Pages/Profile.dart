@@ -227,8 +227,27 @@ class _ProfilePage extends State<Profile> {
                                 ),),
                               ),
                               const SizedBox(height: 20.0),
-                              Text(name,
-                                  style: Theme.of(context).textTheme.headlineMedium),
+                              Row(
+                                children: [
+                                  Text(name,
+                                      style: Theme.of(context).textTheme.headlineMedium),
+                                  Container(
+                                    width: 15, // Adjust the width and height as needed
+                                    height: 15,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.blue,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.check,
+                                        color: Colors.white,
+                                        size: 10,
+                                      ),
+                                    ),
+                                  ),
+                                ]
+                              ),
                               const SizedBox(height: 8.0),
                               Row(mainAxisSize: MainAxisSize.min, children: [
                                 GestureDetector(
