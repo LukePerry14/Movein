@@ -22,24 +22,30 @@ class Messages extends StatefulWidget {
 
 class _MessagesState extends State<Messages> {
   Map data = {};
+  var groupId = "";
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     data = ModalRoute.of(context)?.settings.arguments as Map;
-    // groupChannel = (data["channel"]);
-    // groupChannel = (data["channel"]);
-    // getPrevMessages();
-    //getMessages(groupChannel!);
-    // SendbirdSdk().addChannelEventHandler(groupChannel.channelUrl, this);
-    //groupChannel = ConnectSendbird().returnChannel("testUrl");
   }
+  // groupChannel = (data["channel"]);
+  // groupChannel = (data["channel"]);
+  // getPrevMessages();
+  //getMessages(groupChannel!);
+  // SendbirdSdk().addChannelEventHandler(groupChannel.channelUrl, this);
+  //groupChannel = ConnectSendbird().returnChannel("testUrl");
+  //}
 
-  final Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance
+  late final Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance
       .collection('Groups')
-      .doc('UY04KmP8u77Ucw6UVDh8')
+      .doc(data['groupId'])
       .collection('Messages')
+      .orderBy('sent', descending: false)
       .snapshots();
+
+  TextEditingController textController = TextEditingController();
+  final ScrollController scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -94,32 +100,173 @@ class _MessagesState extends State<Messages> {
           ),
         ],
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _usersStream,
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return const Text('Something went wrong');
-          }
+      body: Column(
+        children: <Widget>[
+          Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+            stream: _usersStream,
+            builder:
+                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (snapshot.hasError) {
+                return const Text('Something went wrong');
+              }
 
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Text("Loading");
-          }
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Text("Loading");
+              }
 
-          return ListView(
-            children: snapshot.data!.docs
-                .map((DocumentSnapshot document) {
-                  Map<String, dynamic> data =
-                      document.data()! as Map<String, dynamic>;
-                  return ListTile(
-                    title: Text(data['text']),
-                    // subtitle: Text(data['company']),
-                  );
-                })
-                .toList()
-                .cast(),
-          );
-        },
+              return ListView(
+                controller: scrollController,
+                shrinkWrap: true,
+                children: snapshot.data!.docs
+                    .map((DocumentSnapshot document) {
+                      late Map<String, dynamic> data =
+                          document.data()! as Map<String, dynamic>;
+
+                      var sentText = "";
+                      if (data['sent'] != null) {
+                        // var userDoc = await FirebaseFirestore.instance
+                        //     .collection('Users')
+                        //     .doc(data['sentBy'])
+                        //     .get();
+
+                        // print((userDoc.data() as Map<String, dynamic>)['ForeName']);
+
+                        late DateTime sent =
+                            DateTime.fromMillisecondsSinceEpoch(
+                                data['sent']?.seconds * 1000);
+
+                        // sentText =
+                        //     "${data['sentBy']} • ${sent.hour}:${sent.minute < 10 ? "0" : ""}${sent.minute}";
+
+                        sentText =
+                            "${sent.hour}:${sent.minute < 10 ? "0" : ""}${sent.minute}";
+                      }
+
+                      return Container(
+                        padding: EdgeInsets.only(
+                            left: 14, right: 14, top: 10, bottom: 10),
+                        child: Align(
+                            alignment: (Auth().currentUser() != data['sentBy']
+                                ? Alignment.topLeft
+                                : Alignment.topRight),
+                            child: Column(children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  color: (Auth().currentUser() != data['sentBy']
+                                      ? Colors.grey.shade200
+                                      : Colors.blue[200]),
+                                ),
+                                padding: EdgeInsets.all(16),
+                                child: Text(
+                                  data['text'],
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                              ),
+                              Text(
+                                sentText,
+                                textAlign: TextAlign.right,
+                              )
+                            ])),
+                      );
+                    })
+                    .toList()
+                    .cast(),
+              );
+            },
+          )),
+          Container(
+              padding: const EdgeInsets.symmetric(vertical: 2.0),
+              child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                // First child is enter comment text input
+                Expanded(
+                  child: TextFormField(
+                    autocorrect: false,
+                    controller: textController,
+                    decoration: const InputDecoration(
+                      labelText: "Message",
+                      labelStyle:
+                          TextStyle(fontSize: 20.0, color: Colors.black),
+                      fillColor: Colors.blue,
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          borderSide: BorderSide(color: Colors.purpleAccent)),
+                    ),
+                  ),
+                ),
+                // Second child is button
+                IconButton(
+                  icon: const Icon(Icons.send),
+                  iconSize: 20.0,
+                  onPressed: () {
+                    print(textController.text);
+                    FirebaseFirestore.instance
+                        .collection('Groups')
+                        .doc(data['groupId'])
+                        .collection('Messages')
+                        .add({
+                      "text": textController.text,
+                      'sent': FieldValue.serverTimestamp(),
+                      'sentBy': Auth().currentUser()
+                    });
+                    textController.clear();
+                    scrollController
+                        .jumpTo(scrollController.position.maxScrollExtent);
+                  },
+                )
+              ])),
+        ],
       ),
+
+      // Stack(
+      //   children: [
+      //     StreamBuilder<QuerySnapshot>(
+      //       stream: _usersStream,
+      //       builder: (BuildContext context,
+      //           AsyncSnapshot<QuerySnapshot> snapshot) {
+      //         if (snapshot.hasError) {
+      //           return const Text('Something went wrong');
+      //         }
+
+      //         if (snapshot.connectionState == ConnectionState.waiting) {
+      //           return const Text("Loading");
+      //         }
+
+      //         return ListView(
+      //           children: snapshot.data!.docs
+      //               .map((DocumentSnapshot document) {
+      //                 Map<String, dynamic> data =
+      //                     document.data()! as Map<String, dynamic>;
+      //                 return ListTile(
+      //                   title: Text(data['text']),
+      //                   // subtitle: Text(data['company']),
+      //                 );
+      //               })
+      //               .toList()
+      //               .cast(),
+      //         );
+      //       },
+      //     ),
+      //     TextField(
+      //       decoration: const InputDecoration(
+      //         border: OutlineInputBorder(),
+      //         hintText: 'Message',
+      //       ),
+      //       controller: textController,
+      //     ),
+      //     ElevatedButton(
+      //         onPressed: () {
+      //           print(textController.text);
+      //           FirebaseFirestore.instance
+      //               .collection('Groups')
+      //               .doc(data['groupId'])
+      //               .collection('Messages')
+      //               .add({"text": textController.text});
+      //         },
+      //         child: const Text('Send')),
+      //   ],
+      // )
     );
   }
 }
