@@ -394,6 +394,7 @@ class _FriendsState extends State<Friends> {
           SizedBox(
             height: MediaQuery.of(context).size.height,
             child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
                   const SizedBox(height: 20),

@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:dash_chat_2/dash_chat_2.dart';
+import 'package:http/http.dart' as http;
 import 'package:page_transition/page_transition.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../Themes/lMode.dart';
@@ -74,22 +78,24 @@ class _MessagesState extends State<Messages> {
                 Icon(Icons.more_vert, color: LAppTheme.lightTheme.primaryColor),
             //Icon not showing
             onPressed: () {
-              if (data["channel"].customType == "DM") {
-              } else {
                 Navigator.push(
                   context,
                   PageTransition(
                       curve: Curves.linear,
-                      type: PageTransitionType.topToBottom,
-                      child: const GroupOptions(),
-                      settings: RouteSettings(arguments: {
-                        'members': data["members"],
-                        'groupId': data["groupId"],
-                        'groupName': data["groupName"],
-                        'groupPicture': data["groupPicture"],
-                      })),
+                      type:
+                      PageTransitionType
+                          .topToBottom,
+                      child:
+                      const GroupOptions(),
+                      settings:
+                      RouteSettings(
+                          arguments: {
+                            'members': data["members"],
+                            'groupId': data["groupId"],
+                            'groupName':data["groupName"],
+                            'groupPicture':data["groupPicture"],
+                          })),
                 );
-              }
             },
           ),
         ],
@@ -110,6 +116,7 @@ class _MessagesState extends State<Messages> {
               }
 
               return ListView(
+                physics: const BouncingScrollPhysics(),
                 controller: scrollController,
                 shrinkWrap: true,
                 children: snapshot.data!.docs
@@ -150,7 +157,7 @@ class _MessagesState extends State<Messages> {
                                   borderRadius: BorderRadius.circular(20),
                                   color: (Auth().currentUser() != data['sentBy']
                                       ? Colors.grey.shade200
-                                      : Colors.blue[200]),
+                                      : LAppTheme.lightTheme.primaryColor),
                                 ),
                                 padding: EdgeInsets.all(16),
                                 child: Text(
@@ -171,21 +178,31 @@ class _MessagesState extends State<Messages> {
             },
           )),
           Container(
-              padding: const EdgeInsets.symmetric(vertical: 2.0),
-              child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            padding: const EdgeInsets.symmetric(vertical: 2.0),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(color: Colors.grey[600]!),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
                 // First child is enter comment text input
                 Expanded(
-                  child: TextFormField(
-                    autocorrect: false,
-                    controller: textController,
-                    decoration: const InputDecoration(
-                      labelText: "Message",
-                      labelStyle:
-                          TextStyle(fontSize: 20.0, color: Colors.black),
-                      fillColor: Colors.blue,
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                          borderSide: BorderSide(color: Colors.purpleAccent)),
+                  child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: TextFormField(
+                      autocorrect: false,
+                      controller: textController,
+                      decoration: InputDecoration(
+                        labelText: "message".tr,
+                        labelStyle: TextStyle(fontSize: 20.0, color: Colors.grey[400]),
+                        fillColor: Colors.blue,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          borderSide: BorderSide(color: Colors.purpleAccent),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -193,8 +210,7 @@ class _MessagesState extends State<Messages> {
                 IconButton(
                   icon: const Icon(Icons.send),
                   iconSize: 20.0,
-                  onPressed: () {
-                    print(textController.text);
+                  onPressed: () async {
                     FirebaseFirestore.instance
                         .collection('Groups')
                         .doc(data['groupId'])
@@ -204,12 +220,15 @@ class _MessagesState extends State<Messages> {
                       'sent': FieldValue.serverTimestamp(),
                       'sentBy': Auth().currentUser()
                     });
+                    _sendNoti();
                     textController.clear();
-                    scrollController
-                        .jumpTo(scrollController.position.maxScrollExtent);
+                    scrollController.jumpTo(scrollController.position.maxScrollExtent);
                   },
-                )
-              ])),
+                ),
+              ],
+            ),
+          ),
+
         ],
       ),
 
@@ -262,6 +281,40 @@ class _MessagesState extends State<Messages> {
       //   ],
       // )
     );
+  }
+
+  void _sendNoti() async {
+    final apiUrl = "https://europe-west2-test-7a857.cloudfunctions.net/sendGroupNotification";
+
+    // Prepare the request body
+    final requestBody = {
+      "recipientUserIds": data["members"],
+      "message": textController.text,
+      "groupName": data["groupName"],
+    };
+
+    try {
+      // Make the POST request to the API
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      // Check the response status code
+      if (response.statusCode == 200) {
+        // Request was successful, handle the response as needed
+        print("API call success!");
+      } else {
+        // Request failed, handle the error
+        print("API call failed with status code ${response.statusCode}");
+      }
+    } catch (error) {
+      // An error occurred during the request
+      print("API call error: $error");
+    }
   }
 }
 

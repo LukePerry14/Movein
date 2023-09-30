@@ -16,7 +16,13 @@ const secretStripeKey = defineSecret("STRIPE_SECRET_KEY");
 //const testStripeKey = defineSecret("TEST_KEY");
 //const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const admin = require("firebase-admin");
-admin.initializeApp();
+
+//const serviceAccount = require("C:\\Users\\lukep\\Documents\\uni\\movein\\serviceAccount.js");
+admin.initializeApp({
+    //credential: applicationDefault(),
+    //credential : admin.credential.cert(serviceAccount),
+    projectId: 'test-7a857',
+});
 
 exports.deleteStripeCustomer = functions.region('europe-west2').https.onRequest(async (req, res) => {
   try {
@@ -267,11 +273,9 @@ exports.pruneTokens = functions.region('europe-west2').pubsub.schedule('0 0 1,16
   staleTokensResult.forEach(function(doc) { doc.ref.delete(); });
 });
 
-exports.sendGroupNotification = functions.https.onRequest(async (req, res) => {
+exports.sendGroupNotification = functions.region('europe-west2').https.onRequest(async (req, res) => {
   // Get the list of recipient user IDs and the message from the request
-  const recipientUserIds = req.body.recipientUserIds;
-  const message = req.body.message;
-  const groupName = req.body.groupName;
+  const { recipientUserIds, message, groupName } = req.body
 
   // Look up the device tokens of all recipients in the "fcmTokens" collection
   const db = admin.firestore();
@@ -282,7 +286,7 @@ exports.sendGroupNotification = functions.https.onRequest(async (req, res) => {
       const doc = await fcmTokensRef.doc(userId).get();
       if (doc.exists) {
         const recipientData = doc.data();
-        return recipientData.token;
+        return recipientData.Token;
       } else {
         console.error(`Recipient user with ID ${userId} not found in "fcmTokens" collection`);
         return null;
@@ -321,7 +325,7 @@ exports.sendGroupNotification = functions.https.onRequest(async (req, res) => {
   }
 });
 
-exports.sendCustomNotification = functions.https.onRequest(async (req, res) => {
+exports.sendCustomNotification = functions.region('europe-west2').https.onRequest(async (req, res) => {
   try {
     const { senderName, deviceId, notificationType } = req.body;
 

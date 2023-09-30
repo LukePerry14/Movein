@@ -36,7 +36,7 @@ class _ScrollerState extends State<Scroller> {
   late NativeAd _ad;
   bool _isAdLoaded = false;
   bool _loadApp = false;
-  bool _showApp = false;
+  //bool _showApp = false;
   late int memPref;
   late int cleanPref;
   late int noisePref;
@@ -71,8 +71,7 @@ class _ScrollerState extends State<Scroller> {
   void getGroups() async {
     loadFilters();
     List<Map<String, dynamic>> groups = [];
-    final CollectionReference docGroups =
-    FirebaseFirestore.instance.collection("Groups");
+    final CollectionReference docGroups = FirebaseFirestore.instance.collection("Groups");
     try {
       QuerySnapshot querySnapshot = await docGroups.where('AllowedUnis', arrayContains: UserPreferences.getUni()).get();
       for (QueryDocumentSnapshot docSnapshot in querySnapshot.docs) {
@@ -101,11 +100,11 @@ class _ScrollerState extends State<Scroller> {
       throw FirebaseException(
           message: 'Error fetching data: $e', plugin: 'cloud_firestore');
     }
-    groupData = groups;
+    //groupData = groups;
+    groupData = [];
     sortGroupsByPreferences();
-    print("HEREHERE");
     setState(() {
-      _groupDisplay = (!groupData.isEmpty? nextGroup(): null)!;
+      _groupDisplay = (!groupData.isEmpty? nextGroup(): const NoGroups())!;
       _loadApp = true;
     });
   }
@@ -126,8 +125,6 @@ class _ScrollerState extends State<Scroller> {
 
   @override
   Widget build(BuildContext context) {
-    print(_loadApp);
-    print(_showApp);
     return Builder(
       builder: (context) {
         final navigator = Navigator.of(context);
@@ -142,7 +139,7 @@ class _ScrollerState extends State<Scroller> {
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
           body: Stack(
             children: [
-              (!_loadApp & !_showApp)
+              (!_loadApp)
                   ? Center(
                 child: SizedBox(
                   width: MediaQuery.of(context)
@@ -269,7 +266,7 @@ class _ScrollerState extends State<Scroller> {
                   _loadAd();
                   _adCountdown = 2;
                   setState(() {
-                    _showApp = false;
+                    //_showApp = false;
                   });
                 }
                     : null,
@@ -310,7 +307,7 @@ class _ScrollerState extends State<Scroller> {
                           index++;
                           setState(() {
                             _groupDisplay = nextGroup();
-                            _showApp = false;
+                            //_showApp = false;
                           });
                         } else {
                           setState(() {
@@ -347,7 +344,7 @@ class _ScrollerState extends State<Scroller> {
                         index++;
                         setState(() {
                           _groupDisplay = nextGroup();
-                          _showApp = false;
+                          //_showApp = false;
                         });
                       } else {
                         setState(() {
@@ -379,7 +376,7 @@ class _ScrollerState extends State<Scroller> {
                           index++;
                           setState(() {
                             _groupDisplay = nextGroup();
-                            _showApp = false;
+                            //_showApp = false;
                           });
                         } else {
                           setState(() {
@@ -418,7 +415,7 @@ class _ScrollerState extends State<Scroller> {
                             index++;
                             setState(() {
                               _groupDisplay = nextGroup();
-                              _showApp = false;
+                              //_showApp = false;
                             });
                           } else {
                             setState(() {
@@ -472,55 +469,55 @@ class _ScrollerState extends State<Scroller> {
   }
 
   void _loadAd() {
-    // setState(() {
-    //   _isAdLoaded = false;
-    // });
-    // _ad = NativeAd(
-    //     adUnitId: AdHelper.nativeAdUnitId,
-    //     listener: NativeAdListener(
-    //       onAdLoaded: (ad) {
-    //         setState(() {
-    //           _isAdLoaded = true;
-    //         });
-    //       },
-    //       onAdFailedToLoad: (ad, error) {
-    //         _ad.dispose();
-    //       },
-    //       onAdClicked: (ad) {},
-    //       onAdImpression: (ad) {},
-    //       onAdClosed: (ad) {
-    //         _ad.dispose();
-    //         setState(() {
-    //           _adCountdown = 2;
-    //         });
-    //       },
-    //       onAdOpened: (ad) {},
-    //       onAdWillDismissScreen: (ad) {},
-    //       onPaidEvent: (ad, valueMicros, precision, currencyCode) {},
-    //     ),
-    //     request: const AdRequest(),
-    //     nativeTemplateStyle: NativeTemplateStyle(
-    //       templateType: TemplateType.medium,
-    //       mainBackgroundColor: const Color(0xfffffbed),
-    //       callToActionTextStyle: NativeTemplateTextStyle(
-    //           textColor: Colors.white,
-    //           style: NativeTemplateFontStyle.monospace,
-    //           size: 16.0),
-    //       primaryTextStyle: NativeTemplateTextStyle(
-    //           textColor: Colors.black,
-    //           style: NativeTemplateFontStyle.bold,
-    //           size: 16.0),
-    //       secondaryTextStyle: NativeTemplateTextStyle(
-    //           textColor: Colors.black,
-    //           style: NativeTemplateFontStyle.italic,
-    //           size: 16.0),
-    //       tertiaryTextStyle: NativeTemplateTextStyle(
-    //           textColor: Colors.black,
-    //           style: NativeTemplateFontStyle.normal,
-    //           size: 16.0),
-    //       cornerRadius: 15,
-    //     ))
-    //   ..load();
+    setState(() {
+      _isAdLoaded = false;
+    });
+    _ad = NativeAd(
+        adUnitId: AdHelper.nativeAdUnitId,
+        listener: NativeAdListener(
+          onAdLoaded: (ad) {
+            setState(() {
+              _isAdLoaded = true;
+            });
+          },
+          onAdFailedToLoad: (ad, error) {
+            _ad.dispose();
+          },
+          onAdClicked: (ad) {},
+          onAdImpression: (ad) {},
+          onAdClosed: (ad) {
+            _ad.dispose();
+            setState(() {
+              _adCountdown = 2;
+            });
+          },
+          onAdOpened: (ad) {},
+          onAdWillDismissScreen: (ad) {},
+          onPaidEvent: (ad, valueMicros, precision, currencyCode) {},
+        ),
+        request: const AdRequest(),
+        nativeTemplateStyle: NativeTemplateStyle(
+          templateType: TemplateType.medium,
+          mainBackgroundColor: const Color(0xfffffbed),
+          callToActionTextStyle: NativeTemplateTextStyle(
+              textColor: Colors.white,
+              style: NativeTemplateFontStyle.monospace,
+              size: 16.0),
+          primaryTextStyle: NativeTemplateTextStyle(
+              textColor: Colors.black,
+              style: NativeTemplateFontStyle.bold,
+              size: 16.0),
+          secondaryTextStyle: NativeTemplateTextStyle(
+              textColor: Colors.black,
+              style: NativeTemplateFontStyle.italic,
+              size: 16.0),
+          tertiaryTextStyle: NativeTemplateTextStyle(
+              textColor: Colors.black,
+              style: NativeTemplateFontStyle.normal,
+              size: 16.0),
+          cornerRadius: 15,
+        ))
+      ..load();
   }
 
   void loadFilters() {

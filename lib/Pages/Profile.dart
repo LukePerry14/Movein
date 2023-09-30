@@ -190,6 +190,7 @@ class _ProfilePage extends State<Profile> {
                 body: Stack(
                   children: [
                     SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
                       child: SafeArea(
                         child: Container(
                           padding: const EdgeInsets.all(10.0),
@@ -198,39 +199,80 @@ class _ProfilePage extends State<Profile> {
                             children: <Widget>[
                               const SizedBox(height:10),
                               Container(
-                                width: 150, 
-                                height: 200,
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(Radius.circular(16)),
-                                  image: DecorationImage(
-                                    image: profileImagepath == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(profileImagepath)
-                                  )
+                                width: 180,
+                                height: 180,
+                                child: Stack(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () async {
+                                        final pickedImage = await pickImage();
+                                        if (pickedImage != null) {
+                                          profilePictureString = await _uploadImageToAzure2(pickedImage);
+                                          imageArray[0] = profilePictureString;
+                                          updateImage(imageArray);
+                                          _deleteProfileImageFromAzure(profileImagepath);
+                                          setState(() {
+                                            profileImagepath = '$rootImagePath$profilePictureString';
+                                          });
+                                        }
+                                      },
+                                      child: Container(
+                                        width: 180,
+                                        height: 180,
+                                        decoration: BoxDecoration(
+                                            borderRadius: const BorderRadius.all(Radius.circular(90)),
+                                            image: DecorationImage(
+                                                fit: BoxFit.cover,
+                                                image: profileImagepath == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(profileImagepath)
+                                            )
+                                        ),
+
+                                      ),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: IconButton(
+                                        onPressed: () async {
+                                          final pickedImage = await pickImage();
+                                          if (pickedImage != null) {
+                                            profilePictureString = await _uploadImageToAzure2(pickedImage);
+                                            imageArray[0] = profilePictureString;
+                                            updateImage(imageArray);
+                                            _deleteProfileImageFromAzure(profileImagepath);
+                                            setState(() {
+                                              profileImagepath = '$rootImagePath$profilePictureString';
+                                            });
+                                          }
+                                        },
+                                        icon: Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: LAppTheme.lightTheme.primaryColor, // Customize the border color
+                                              width: 1.0, // Customize the border width
+                                            ),
+                                          ),
+                                          child: ClipOval(
+                                            child: Icon(
+                                              LineAwesomeIcons.pen_nib,
+                                              color: LAppTheme.lightTheme.primaryColor,
+                                            ),
+                                          ),
+                                        ),
+
+
+                                      ),
+                                    )
+                                  ]
                                 ),
-                                
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: ElevatedButton(onPressed: () async {
-                                    final pickedImage = await pickImage();
-                                    if (pickedImage != null) {
-                                      profilePictureString = await _uploadImageToAzure2(pickedImage);
-                                      imageArray[0] = profilePictureString;
-                                      updateImage(imageArray);
-                                      _deleteProfileImageFromAzure(profileImagepath);
-                                      setState(() {
-                                        profileImagepath = '$rootImagePath$profilePictureString';
-                                      });
-                                    }
-                                }, child: const Icon(
-                                  Icons.edit,
-                                  color: Colors.white,
-                                ),),
                               ),
                               const SizedBox(height: 20.0),
                               Row(
+                                  mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(name,
                                       style: Theme.of(context).textTheme.headlineMedium),
+                                  const SizedBox(width: 10),
                                   Container(
                                     width: 15, // Adjust the width and height as needed
                                     height: 15,
