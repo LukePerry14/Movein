@@ -82,6 +82,7 @@ dependencies:
   flutter_dotenv: ^5.1.0
   flutter_profile_picture: ^2.0.0
   dotted_border: ^2.0.0+3
+  image_cropper: ^4.0.1
   #linkfive_purchases: ^3.0.0
   #linkfive_purchases_provider: ^3.0.0
 flutter_native_splash:

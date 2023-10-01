@@ -22,6 +22,7 @@ import 'package:azstore/azstore.dart' as AzureStorage;
 import 'package:uuid/uuid.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:flutter_profile_picture/flutter_profile_picture.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
@@ -31,17 +32,6 @@ import 'PremiumPage.dart';
 import 'Scroller.dart';
 
 const rootImagePath = 'https://movein.blob.core.windows.net/moveinimages/';
-
-  Future<File?> pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      return File(image.path);
-    } else {
-      print('No image selected.');
-      return null;
-    }
-  }
 
   Future<void> _uploadImageToAzure(File imageFile) async {
     Uint8List bytes = imageFile.readAsBytesSync();
@@ -152,6 +142,45 @@ class _ProfilePage extends State<Profile> {
     }
   }
 
+    Future<CroppedFile?> cropImage(File imageFile) async {
+      final croppedFile = await ImageCropper().cropImage(sourcePath: imageFile.path,
+      compressFormat: ImageCompressFormat.jpg,
+      maxWidth: 200,
+      maxHeight: 200,
+      compressQuality: 100,
+        aspectRatioPresets: [
+          CropAspectRatioPreset.square,
+        ],
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Image Cropper',
+            toolbarColor: Theme.of(context).primaryColor,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false
+          ),
+          IOSUiSettings(
+            title: 'Image Cropper'
+          )
+        ]
+      );
+      return croppedFile;
+    }
+
+    Future<File?> pickImage() async {
+      final ImagePicker _picker = ImagePicker();
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        // return File(image.path);
+        CroppedFile? croppedImage = await cropImage(File(image.path));
+        if (croppedImage != null) {
+          return File(croppedImage.path);
+        }
+      } else {
+        return null;
+      }
+    }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<String>>(
@@ -199,8 +228,8 @@ class _ProfilePage extends State<Profile> {
                             children: <Widget>[
                               const SizedBox(height:10),
                               Container(
-                                width: 180,
-                                height: 180,
+                                width: 250,
+                                height: 250,
                                 child: Stack(
                                   children: [
                                     GestureDetector(
@@ -217,10 +246,11 @@ class _ProfilePage extends State<Profile> {
                                         }
                                       },
                                       child: Container(
-                                        width: 180,
-                                        height: 180,
+                                        width: 250,
+                                        height: 250,
                                         decoration: BoxDecoration(
-                                            borderRadius: const BorderRadius.all(Radius.circular(90)),
+                                            borderRadius: const BorderRadius.all(Radius.circular(125)),
+                                            border: Border.all(color: Theme.of(context).primaryColor),
                                             image: DecorationImage(
                                                 fit: BoxFit.cover,
                                                 image: profileImagepath == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(profileImagepath)

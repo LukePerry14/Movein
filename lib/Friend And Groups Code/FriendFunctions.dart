@@ -18,7 +18,7 @@ import 'package:uuid/uuid.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:movein/UserPreferences.dart';
 import 'package:page_transition/page_transition.dart';
-
+import 'package:image_cropper/image_cropper.dart';
 import '../Pages/Friends.dart';
 import 'GroupFunctions.dart';
 
@@ -686,11 +686,39 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
     final ImagePicker _picker = ImagePicker();
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      return File(image.path);
+      // return File(image.path);
+      CroppedFile? croppedImage = await cropImage(File(image.path));
+      if (croppedImage != null) {
+        return File(croppedImage.path);
+      }
     } else {
-      print('No image selected.');
       return null;
     }
+  }
+
+  Future<CroppedFile?> cropImage(File imageFile) async {
+    final croppedFile = await ImageCropper().cropImage(sourcePath: imageFile.path,
+    compressFormat: ImageCompressFormat.jpg,
+    maxWidth: 200,
+    maxHeight: 200,
+    compressQuality: 100,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.square,
+      ],
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Image Cropper',
+          toolbarColor: Theme.of(context).primaryColor,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false
+        ),
+        IOSUiSettings(
+          title: 'Image Cropper'
+        )
+      ]
+    );
+      return croppedFile;
   }
 
   Future<void> _uploadImageToAzure(File? imageFile, String? imageName) async {

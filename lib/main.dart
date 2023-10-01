@@ -34,6 +34,7 @@ import '.env';
 import 'package:azstore/azstore.dart' as AzureStorage;
 import 'package:uuid/uuid.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -629,13 +630,41 @@ class _SignupScreenState extends State<SignupScreen> {
     final ImagePicker _picker = ImagePicker();
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      return File(image.path);
+      // This then crops the image for the user
+      CroppedFile? croppedImage = await cropImage(File(image.path));
+      if (croppedImage != null) {
+        return File(croppedImage.path);
+      }
     } else {
       print('No image selected.');
       return null;
     }
   }
 
+  Future<CroppedFile?> cropImage(File imageFile) async {
+    final croppedFile = await ImageCropper().cropImage(sourcePath: imageFile.path,
+    compressFormat: ImageCompressFormat.jpg,
+    maxWidth: 400,
+    maxHeight: 400,
+    compressQuality: 100,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.square,
+      ],
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Image Cropper',
+          toolbarColor: Theme.of(context).primaryColor,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false
+        ),
+        IOSUiSettings(
+          title: 'Image Cropper'
+        )
+      ]
+    );
+    return croppedFile;
+  }
 
   @override
   Widget build(BuildContext context) {

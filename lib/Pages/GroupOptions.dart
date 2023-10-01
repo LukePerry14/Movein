@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
@@ -19,16 +20,6 @@ import '../main.dart';
 
 final imageURL = 'https://movein.blob.core.windows.net/moveingroupimages/';
 final imageURL2 = 'https://movein.blob.core.windows.net/moveinimages/';
-
-Future<File?> pickImage() async {
-  final ImagePicker _picker = ImagePicker();
-  final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-  if (image != null) {
-    return File(image.path);
-  } else {
-    return null;
-  }
-}
 
 Future<String?> _uploadGroupImageToAzure(File imageFile) async {
   Uint8List bytes = imageFile.readAsBytesSync();
@@ -400,6 +391,46 @@ class _GroupOptionsState extends State<GroupOptions> {
   }
 
   var groupImageString;
+
+  Future<File?> pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      // return File(image.path);
+      CroppedFile? croppedImage = await cropImage(File(image.path));
+      if (croppedImage != null) {
+        return File(croppedImage.path);
+      }
+    } else {
+      return null;
+    }
+  }
+
+  Future<CroppedFile?> cropImage(File imageFile) async {
+    final croppedFile = await ImageCropper().cropImage(sourcePath: imageFile.path,
+    compressFormat: ImageCompressFormat.jpg,
+    maxWidth: 200,
+    maxHeight: 200,
+    compressQuality: 100,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.square,
+      ],
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Image Cropper',
+          toolbarColor: Theme.of(context).primaryColor,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false
+        ),
+        IOSUiSettings(
+          title: 'Image Cropper'
+        )
+      ]
+    );
+    return croppedFile;
+  }
+  
 
   @override
   Widget build(BuildContext context) {

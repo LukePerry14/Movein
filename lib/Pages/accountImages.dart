@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:uuid/uuid.dart';
 import '../Ad code/ad_helper.dart';
 import '../Auth code/auth.dart';
@@ -18,17 +19,6 @@ import '../Themes/lMode.dart';
 import '../main.dart';
 
 const rootImagePath = 'https://movein.blob.core.windows.net/moveinimages/';
-
-Future<File?> pickImage() async {
-  final ImagePicker _picker = ImagePicker();
-  final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-  if (image != null) {
-    return File(image.path);
-  } else {
-    print('No image selected.');
-    return null;
-  }
-}
 
 Future<void> _uploadImageToAzure(File imageFile) async {
   Uint8List bytes = imageFile.readAsBytesSync();
@@ -128,6 +118,46 @@ class _accountImages extends State<accountImages> {
     }
   }
 
+  Future<File?> pickImage() async {
+  final ImagePicker _picker = ImagePicker();
+  final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+  if (image != null) {
+    // return File(image.path);
+    CroppedFile? croppedImage = await cropImage(File(image.path));
+    if (croppedImage != null) {
+      return File(croppedImage.path);
+    }
+  } else {
+    print('No image selected.');
+    return null;
+  }
+}
+
+  Future<CroppedFile?> cropImage(File imageFile) async {
+    final croppedFile = await ImageCropper().cropImage(sourcePath: imageFile.path,
+    compressFormat: ImageCompressFormat.jpg,
+    maxWidth: 200,
+    maxHeight: 200,
+    compressQuality: 100,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.square,
+      ],
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Image Cropper',
+          toolbarColor: Theme.of(context).primaryColor,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false
+        ),
+        IOSUiSettings(
+          title: 'Image Cropper'
+        )
+      ]
+    );
+    return croppedFile;
+  }
+
   Widget build(BuildContext context) {
     return FutureBuilder<List<String>>(
       future: getNameAndPic(),
@@ -193,70 +223,184 @@ class _accountImages extends State<accountImages> {
                           const Divider(height: 20, thickness: 1),
                           const SizedBox(height: 10,),
                           const SizedBox(height: 10,),
-                          Container(
+                          Text(
+                            'Primary Image',
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                          const Divider(height: 20, thickness: 1),
+                          SizedBox(
                             height: 400,
                             width: 550,
-                            decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.all(Radius.circular(40)),
-                              image: DecorationImage(
-                                image: image1path == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(image1path)
-                              )
+                            child: Stack(
+                              children: [
+                                GestureDetector(
+                                  onTap: () async {
+                                    final pickedImage = await pickImage();
+                                    if (pickedImage != null) {
+                                      accountPicture1String = await _uploadImageToAzure2(pickedImage);
+                                      imageArray[1] = accountPicture1String;
+                                      updateImage(imageArray);
+                                      _deleteProfileImageFromAzure(image1);
+                                      setState(() {
+                                        image1path = '$rootImagePath$accountPicture1String';
+                                      });
+                                    }
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(Radius.circular(40)),
+                                    image: DecorationImage(
+                                      image: image1path == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(image1path)
+                                    )
+                                  ),
+                                  ),
+                                ),
+                                                                    Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: IconButton(
+                                        onPressed: () async {
+                                          final pickedImage = await pickImage();
+                                          if (pickedImage != null) {
+                                            profilePictureString = await _uploadImageToAzure2(pickedImage);
+                                            imageArray[0] = profilePictureString;
+                                            updateImage(imageArray);
+                                            _deleteProfileImageFromAzure(image1);
+                                            setState(() {
+                                              image1path = '$rootImagePath$accountPicture1String';
+                                            });
+                                          }
+                                        },
+                                        icon: Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: LAppTheme.lightTheme.primaryColor, // Customize the border color
+                                              width: 1.0, // Customize the border width
+                                            ),
+                                          ),
+                                          child: ClipOval(
+                                            child: Icon(
+                                              LineAwesomeIcons.pen_nib,
+                                              color: LAppTheme.lightTheme.primaryColor,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                              ],
                             ),
                           ),
                           const SizedBox(height: 10,),
-                          SizedBox(
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                final pickedImage = await pickImage();
-                                if (pickedImage != null) {
-                                  accountPicture1String = await _uploadImageToAzure2(pickedImage);
-                                  imageArray[1] = accountPicture1String;
-                                  updateImage(imageArray);
-                                  _deleteProfileImageFromAzure(image1);
-                                  setState(() {
-                                    image1path = '$rootImagePath$accountPicture1String';
-                                  });
-                                }
-                              },
-                              child: const Padding(
-                                padding: EdgeInsets.all(5.0),
-                                child: Icon(Icons.edit),
-                              ),
-                            ),
-                          ), 
-                          const SizedBox(height: 40,),
+                          // SizedBox(
+                          //   child: ElevatedButton(
+                          //     onPressed: () async {
+                          //       final pickedImage = await pickImage();
+                          //       if (pickedImage != null) {
+                          //         accountPicture1String = await _uploadImageToAzure2(pickedImage);
+                          //         imageArray[1] = accountPicture1String;
+                          //         updateImage(imageArray);
+                          //         _deleteProfileImageFromAzure(image1);
+                          //         setState(() {
+                          //           image1path = '$rootImagePath$accountPicture1String';
+                          //         });
+                          //       }
+                          //     },
+                          //     child: const Padding(
+                          //       padding: EdgeInsets.all(5.0),
+                          //       child: Icon(Icons.edit),
+                          //     ),
+                          //   ),
+                          // ), 
+                          // const SizedBox(height: 40,),
                           const SizedBox(height: 10,),
-                          Container(
+                          Text(
+                            'Secondary Image',
+                            style: Theme.of(context).textTheme.headlineSmall,
+                          ),
+                          const Divider(height: 20, thickness: 1),
+                          SizedBox(
                             height: 400,
                             width: 550,
-                            decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.all(Radius.circular(40)),
-                              image: DecorationImage(
-                                image: image2path == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(image2path)
-                              )
+                            child: Stack(
+                              children: [
+                                GestureDetector(
+                                  onTap: () async {
+                                    final pickedImage = await pickImage();
+                                    if (pickedImage != null) {
+                                      accountPicture1String = await _uploadImageToAzure2(pickedImage);
+                                      imageArray[2] = accountPicture2String;
+                                      updateImage(imageArray);
+                                      _deleteProfileImageFromAzure(image1);
+                                      setState(() {
+                                        image2path = '$rootImagePath$accountPicture2String';
+                                      });
+                                    }
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(Radius.circular(40)),
+                                    image: DecorationImage(
+                                      image: image1path == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(image1path)
+                                    )
+                                  ),
+                                  ),
+                                ),
+                                Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: IconButton(
+                                        onPressed: () async {
+                                          final pickedImage = await pickImage();
+                                          if (pickedImage != null) {
+                                            accountPicture2String = await _uploadImageToAzure2(pickedImage);
+                                            imageArray[2] = accountPicture2String;
+                                            updateImage(imageArray);
+                                            _deleteProfileImageFromAzure(image2);
+                                            setState(() {
+                                              image2path = '$rootImagePath$accountPicture2String';
+                                            });
+                                          }
+                                        },
+                                        icon: Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: LAppTheme.lightTheme.primaryColor, // Customize the border color
+                                              width: 1.0, // Customize the border width
+                                            ),
+                                          ),
+                                          child: ClipOval(
+                                            child: Icon(
+                                              LineAwesomeIcons.pen_nib,
+                                              color: LAppTheme.lightTheme.primaryColor,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                              ],
                             ),
                           ), 
                           const SizedBox(height: 10,),
-                          SizedBox(
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                final pickedImage = await pickImage();
-                                if (pickedImage != null) {
-                                  accountPicture2String = await _uploadImageToAzure2(pickedImage);
-                                  imageArray[2] = accountPicture2String;
-                                  updateImage(imageArray);
-                                  _deleteProfileImageFromAzure(image2);
-                                  setState(() {
-                                    image2path = '$rootImagePath$accountPicture2String';
-                                  });
-                                }
-                              },
-                              child: const Padding(
-                                padding: EdgeInsets.all(5.0),
-                                child: Icon(Icons.edit),
-                              ),
-                            ),
-                          ),
+                          // SizedBox(
+                          //   child: ElevatedButton(
+                          //     onPressed: () async {
+                          //       final pickedImage = await pickImage();
+                          //       if (pickedImage != null) {
+                          //         accountPicture2String = await _uploadImageToAzure2(pickedImage);
+                          //         imageArray[2] = accountPicture2String;
+                          //         updateImage(imageArray);
+                          //         _deleteProfileImageFromAzure(image2);
+                          //         setState(() {
+                          //           image2path = '$rootImagePath$accountPicture2String';
+                          //         });
+                          //       }
+                          //     },
+                          //     child: const Padding(
+                          //       padding: EdgeInsets.all(5.0),
+                          //       child: Icon(Icons.edit),
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
