@@ -798,6 +798,11 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                         setState(() {
                           _selectedImage = pickedImage;
                         });
+                      } else {
+                        currentGroupImage = '';
+                        setState(() {
+                          _selectedImage = null;
+                        });
                       }
                     },
                     child: Container(

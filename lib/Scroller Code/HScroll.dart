@@ -101,17 +101,36 @@ class _GscrollerState extends State<Gscroller> {
                     height: 1,
                     color: Colors.grey.withOpacity(0.9),
                   ),
-                  const SizedBox(height:20),
-                  CircleAvatar(
-                    radius: 75, // Adjust the size as needed
-                    backgroundColor: Colors.transparent, // Set the background color to transparent
-                    child: ClipOval(
-                      child: Image(
-                        image: widget.groupPicture == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('https://movein.blob.core.windows.net/moveingroupimages/${widget.groupPicture}.jpg'),
-                        fit: BoxFit.cover, // Adjust the fit as needed
+                  const SizedBox(height:20),// Set the background color to transparent
+                  Container(
+                    height: 200,
+                    width: 200,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(150)),
+                        border: Border.all(color: Theme.of(context).primaryColor, width: 2),
+                        boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black,
+                      offset: Offset(
+                        5.0,
+                        5.0,
+                      ),
+                      blurRadius: 10.0,
+                      spreadRadius: 2.0,
+                    ), //BoxShadow
+                    BoxShadow(
+                      color: Colors.white,
+                      offset: Offset(0.0, 0.0),
+                      blurRadius: 0.0,
+                      spreadRadius: 0.0,
+                    ), //BoxShadow
+                  ],
+                        image: DecorationImage(
+                          image: widget.groupPicture == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('https://movein.blob.core.windows.net/moveingroupimages/${widget.groupPicture}.jpg')
+                        )
                       ),
                     ),
-                  ),
+                
                 ]
               );
             }
