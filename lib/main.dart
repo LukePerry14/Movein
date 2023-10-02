@@ -935,6 +935,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                               setState(() {
                                                 _profilePicture1 = pickedImage;
                                               });
+                                            } else {
+                                              _profilePicture1String = '';
                                             }
                                           },
                                           child: Padding(
@@ -983,6 +985,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                               setState(() {
                                                 _profilePicture2 = pickedImage;
                                               });
+                                            } else {
+                                              _profilePicture2String = '';
                                             }
                                           },
                                           child: Padding(
@@ -1020,6 +1024,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                               setState(() {
                                                 _profilePicture3 = pickedImage;
                                               });
+                                            } else {
+                                              _profilePicture3String = '';
                                             }
                                           },
                                           child: Padding(
