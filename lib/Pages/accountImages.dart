@@ -182,11 +182,11 @@ class _accountImages extends State<accountImages> {
             var image1path = '$rootImagePath$image1.jpg';
             var image2path = '$rootImagePath$image2.jpg';
 
-            if (image1 == null) {
+            if (image1 == '') {
               image1path = '';
             }
 
-            if (image2 == null) {
+            if (image2 == '') {
               image2path = '';
             }
             

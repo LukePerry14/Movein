@@ -525,9 +525,11 @@ class _SignupScreenState extends State<SignupScreen> {
   File? _profilePicture2;
   File? _profilePicture3;
 
-  String? _profilePicture1String;
-  String? _profilePicture2String;
-  String? _profilePicture3String;
+  String? _profilePicture1String = '';
+  String? _profilePicture2String = '';
+  String? _profilePicture3String = '';
+
+  
 
   Widget defaultProfilePicture = Container(
     decoration: BoxDecoration(
@@ -578,15 +580,15 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<bool> _uploadImageToAzure(
-      File imageFile1,
-      File imageFile2,
-      File imageFile3,
-      String imageString1,
-      String imageString2,
-      String imageString3) async {
-    Uint8List bytes1 = imageFile1.readAsBytesSync();
-    Uint8List bytes2 = imageFile2.readAsBytesSync();
-    Uint8List bytes3 = imageFile3.readAsBytesSync();
+      File? imageFile1,
+      File? imageFile2,
+      File? imageFile3,
+      String? imageString1,
+      String? imageString2,
+      String? imageString3) async {
+    Uint8List bytes1 = imageFile1!.readAsBytesSync();
+    Uint8List bytes2 = imageFile2!.readAsBytesSync();
+    Uint8List bytes3 = imageFile3!.readAsBytesSync();
 
     var state1 = 0;
     var state2 = 0;
@@ -596,31 +598,40 @@ class _SignupScreenState extends State<SignupScreen> {
         'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
 
     // uploads profile image
-    try {
+    if (imageString1 is String) {
+      try {
       await x.putBlob('/moveinimages/$imageString1.jpg',
           contentType: 'image/jpg', bodyBytes: bytes1);
-    } catch (e) {
-      state1 = 1;
-      print('Exception: $e');
+      } catch (e) {
+        state1 = 1;
+        print('Exception: $e');
+      }
     }
+    
 
     // picture 2
-    try {
+    if (imageString2 is String) {
+      try {
       await x.putBlob('/moveinimages/$imageString2.jpg',
-          contentType: 'image/jpg', bodyBytes: bytes2);
-    } catch (e) {
-      state2 = 1;
-      print('Exception: $e');
+            contentType: 'image/jpg', bodyBytes: bytes2);
+      } catch (e) {
+        state2 = 1;
+        print('Exception: $e');
+      }
     }
+    
 
     // picture 3
-    try {
+    if (imageString3 is String) {
+      try {
       await x.putBlob('/moveinimages/$imageString3.jpg',
           contentType: 'image/jpg', bodyBytes: bytes3);
-    } catch (e) {
-      state3 = 1;
-      print('Exception: $e');
+      } catch (e) {
+        state3 = 1;
+        print('Exception: $e');
+      }
     }
+    
 
     if (state1 == 0 && state2 == 0 && state3 == 0) {
       return true;
@@ -1269,7 +1280,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                                 // TEST THIS FIREBASE CODE - SHOULD WORK
 
-                                _uploadImageToAzure(_profilePicture1!, _profilePicture2!, _profilePicture3!, _profilePicture1String!, _profilePicture2String!, _profilePicture3String!);
+                                _uploadImageToAzure(_profilePicture1, _profilePicture2, _profilePicture3, _profilePicture1String, _profilePicture2String, _profilePicture3String);
 
 
                                 Map<String, dynamic> reConfigedData =

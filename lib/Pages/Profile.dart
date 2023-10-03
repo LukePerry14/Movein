@@ -207,7 +207,7 @@ class _ProfilePage extends State<Profile> {
             // network paths to user's images
             var profileImagepath = '$rootImagePath$profPic.jpg';
 
-            if (profPic == null) {
+            if (profPic == '') {
               profileImagepath = '';
             } 
 
