@@ -1304,6 +1304,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   RegExp regex =
                                       RegExp(r"@durham\.ac\.uk$|@dur\.ac\.uk$");
                                   if (!regex.hasMatch(_formKey.currentState?.fields['email']?.value)) {
+                                    // ignore: use_build_context_synchronously
                                     await showDialog(
                                       context: context,
                                       builder: (BuildContext context) =>
@@ -1381,6 +1382,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                     await UserPreferences.setAppsMax(2);
                                     await UserPreferences.setForeName(
                                         data['ForeName']);
+                                    // ignore: use_build_context_synchronously
                                     Navigator.pushReplacement(
                                         context,
                                         PageTransition(

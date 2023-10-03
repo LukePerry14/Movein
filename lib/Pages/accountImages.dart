@@ -291,28 +291,6 @@ class _accountImages extends State<accountImages> {
                             ),
                           ),
                           const SizedBox(height: 10,),
-                          // SizedBox(
-                          //   child: ElevatedButton(
-                          //     onPressed: () async {
-                          //       final pickedImage = await pickImage();
-                          //       if (pickedImage != null) {
-                          //         accountPicture1String = await _uploadImageToAzure2(pickedImage);
-                          //         imageArray[1] = accountPicture1String;
-                          //         updateImage(imageArray);
-                          //         _deleteProfileImageFromAzure(image1);
-                          //         setState(() {
-                          //           image1path = '$rootImagePath$accountPicture1String';
-                          //         });
-                          //       }
-                          //     },
-                          //     child: const Padding(
-                          //       padding: EdgeInsets.all(5.0),
-                          //       child: Icon(Icons.edit),
-                          //     ),
-                          //   ),
-                          // ), 
-                          // const SizedBox(height: 40,),
-                          const SizedBox(height: 10,),
                           Text(
                             'Secondary Image',
                             style: Theme.of(context).textTheme.headlineSmall,
@@ -381,26 +359,6 @@ class _accountImages extends State<accountImages> {
                             ),
                           ), 
                           const SizedBox(height: 10,),
-                          // SizedBox(
-                          //   child: ElevatedButton(
-                          //     onPressed: () async {
-                          //       final pickedImage = await pickImage();
-                          //       if (pickedImage != null) {
-                          //         accountPicture2String = await _uploadImageToAzure2(pickedImage);
-                          //         imageArray[2] = accountPicture2String;
-                          //         updateImage(imageArray);
-                          //         _deleteProfileImageFromAzure(image2);
-                          //         setState(() {
-                          //           image2path = '$rootImagePath$accountPicture2String';
-                          //         });
-                          //       }
-                          //     },
-                          //     child: const Padding(
-                          //       padding: EdgeInsets.all(5.0),
-                          //       child: Icon(Icons.edit),
-                          //     ),
-                          //   ),
-                          // ),
                         ],
                       ),
                     ),
