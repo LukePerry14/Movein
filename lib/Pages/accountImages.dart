@@ -340,7 +340,7 @@ class _accountImages extends State<accountImages> {
                                     decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(Radius.circular(40)),
                                     image: DecorationImage(
-                                      image: image2path == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(image1path)
+                                      image: image2path == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(image2path)
                                     )
                                   ),
                                   ),
