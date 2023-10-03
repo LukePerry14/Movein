@@ -1582,8 +1582,15 @@ class _FriendsState extends State<Friends> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Text("invites".tr,
-                      style: Theme.of(context).textTheme.headlineMedium),
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Row(
+                      children: [
+                        Text("invites".tr,
+                            style: Theme.of(context).textTheme.headlineLarge),
+                      ],
+                    ),
+                  ),
                   const Divider(),
                   const SizedBox(height: 15),
                   SizedBox(
@@ -1948,272 +1955,272 @@ class _FriendsState extends State<Friends> {
                     ),
                   ),
                   const SizedBox(height: 15),
-                  SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      child: Text(
-                        "friend_invites".tr,
-                        style: Theme.of(context).textTheme.headlineSmall,
-                        textAlign: TextAlign.left,
-                      )),
-                  Padding(
-                    padding: EdgeInsets.all(
-                        MediaQuery.of(context).size.width * 0.04),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: (App.themeNotifier.value == ThemeMode.dark)
-                            ? Theme.of(context).primaryColor
-                            : Colors.grey[200],
-                        // Light grey background color
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        children: [
-                          isLoading
-                              ? const Center(child: CircularProgressIndicator())
-                              : friendSearchResults.isEmpty
-                                  ? const Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: SizedBox(
-                                          height: 6, width: double.maxFinite))
-                                  : ListView.builder(
-                                      shrinkWrap: true,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      itemCount: friendSearchResults.length,
-                                      itemBuilder: (context, index) {
-                                        return ClipRect(
-                                            child: Slidable(
-                                                endActionPane: ActionPane(
-                                                  motion: const ScrollMotion(),
-                                                  children: [
-                                                    SlidableAction(
-                                                      onPressed:
-                                                          (context) async {
-                                                        await addFriend(friendSearchResults[index]["Id"],Auth().currentUser());
+                  // SizedBox(
+                  //     width: MediaQuery.of(context).size.width * 0.9,
+                  //     child: Text(
+                  //       "friend_invites".tr,
+                  //       style: Theme.of(context).textTheme.headlineSmall,
+                  //       textAlign: TextAlign.left,
+                  //     )),
+                  // Padding(
+                  //   padding: EdgeInsets.all(
+                  //       MediaQuery.of(context).size.width * 0.04),
+                  //   child: Container(
+                  //     decoration: BoxDecoration(
+                  //       color: (App.themeNotifier.value == ThemeMode.dark)
+                  //           ? Theme.of(context).primaryColor
+                  //           : Colors.grey[200],
+                  //       // Light grey background color
+                  //       borderRadius: BorderRadius.circular(10),
+                  //     ),
+                  //     child: Column(
+                  //       children: [
+                  //         isLoading
+                  //             ? const Center(child: CircularProgressIndicator())
+                  //             : friendSearchResults.isEmpty
+                  //                 ? const Padding(
+                  //                     padding: EdgeInsets.all(10),
+                  //                     child: SizedBox(
+                  //                         height: 6, width: double.maxFinite))
+                  //                 : ListView.builder(
+                  //                     shrinkWrap: true,
+                  //                     physics:
+                  //                         const NeverScrollableScrollPhysics(),
+                  //                     itemCount: friendSearchResults.length,
+                  //                     itemBuilder: (context, index) {
+                  //                       return ClipRect(
+                  //                           child: Slidable(
+                  //                               endActionPane: ActionPane(
+                  //                                 motion: const ScrollMotion(),
+                  //                                 children: [
+                  //                                   SlidableAction(
+                  //                                     onPressed:
+                  //                                         (context) async {
+                  //                                       await addFriend(friendSearchResults[index]["Id"],Auth().currentUser());
 
-                                                        // reloadData();
-                                                      },
-                                                      backgroundColor:
-                                                          Colors.lightGreen,
-                                                      icon: LineAwesomeIcons
-                                                          .user_plus,
-                                                      label: 'accept_friend'.tr,
-                                                    ),
-                                                    SlidableAction(
-                                                      onPressed:
-                                                          (context) async {
-                                                        await removeFriendInvite(
-                                                          friendSearchResults[
-                                                              index]["Id"],
-                                                          Auth().currentUser(),
-                                                        );
-                                                        // reloadData();
-                                                      },
-                                                      backgroundColor:
-                                                          Colors.redAccent,
-                                                      icon: LineAwesomeIcons
-                                                          .user_minus,
-                                                      label: 'reject_friend'.tr,
-                                                    ),
-                                                  ],
-                                                ),
-                                                child: GestureDetector(
-                                                  onTap: () {
-                                                    showDialog<String>(
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                                context) =>
-                                                            GroupExpand(
-                                                              id: blockedSearchResults[
-                                                                  index]["Id"],
-                                                              groupName:
-                                                                  blockedSearchResults[
-                                                                          index]
-                                                                      [
-                                                                      "GroupName"],
-                                                              groupPicture:
-                                                                  blockedSearchResults[
-                                                                          index]
-                                                                      [
-                                                                      "GroupPicture"],
-                                                              members: blockedSearchResults[
-                                                                          index]
-                                                                      [
-                                                                      "Members"]
-                                                                  .cast<
-                                                                      String>()
-                                                                  .toList(),
-                                                              avgCleanliness:
-                                                                  blockedSearchResults[
-                                                                          index]
-                                                                      [
-                                                                      "AvgCleanliness"],
-                                                              avgNoisiness:
-                                                                  blockedSearchResults[
-                                                                          index]
-                                                                      [
-                                                                      "AvgNoisiness"],
-                                                              avgNightLife:
-                                                                  blockedSearchResults[
-                                                                          index]
-                                                                      [
-                                                                      "AvgNightLife"],
-                                                              avgBedTime:
-                                                                  blockedSearchResults[
-                                                                          index]
-                                                                      [
-                                                                      "AvgBedTime"],
-                                                              avgYearOfStudy:
-                                                                  blockedSearchResults[
-                                                                          index]
-                                                                      [
-                                                                      "AvgYearOfStudy"],
-                                                            ));
-                                                  },
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Container(
-                                                      padding: const EdgeInsets
-                                                          .fromLTRB(
-                                                          10, 0, 10, 15),
-                                                      decoration: BoxDecoration(
-                                                        border: Border(
-                                                          bottom: BorderSide(
-                                                            color: Colors
-                                                                .grey[300]!,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      child: Row(
-                                                        children: [
-                                                          SizedBox(
-                                                            width: 40,
-                                                            height: 40,
-                                                            child: ClipRRect(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          100),
-                                                              child: Image.asset(
-                                                                  blockedSearchResults[
-                                                                          index]
-                                                                      [
-                                                                      "GroupPicture"]),
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              width: 8),
-                                                          Expanded(
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  blockedSearchResults[
-                                                                          index]
-                                                                      [
-                                                                      "GroupName"],
-                                                                  style: Theme.of(
-                                                                          context)
-                                                                      .textTheme
-                                                                      .headlineSmall,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          PopupMenuButton<
-                                                              String>(
-                                                            itemBuilder:
-                                                                (context) => [
-                                                              PopupMenuItem<
-                                                                  String>(
-                                                                value:
-                                                                    'unblock',
-                                                                child: Text(
-                                                                    'unblock'
-                                                                        .tr,
-                                                                    style: Theme.of(
-                                                                            context)
-                                                                        .textTheme
-                                                                        .bodyMedium),
-                                                              ),
-                                                              PopupMenuItem<
-                                                                  String>(
-                                                                value:
-                                                                    'unblock-sList',
-                                                                child: Text(
-                                                                    'unblock-sList'
-                                                                        .tr,
-                                                                    style: Theme.of(
-                                                                            context)
-                                                                        .textTheme
-                                                                        .bodyMedium),
-                                                              ),
-                                                              PopupMenuItem<
-                                                                  String>(
-                                                                value:
-                                                                    'unblock-apply',
-                                                                child: Text(
-                                                                    'unblock-apply'
-                                                                        .tr,
-                                                                    style: Theme.of(
-                                                                            context)
-                                                                        .textTheme
-                                                                        .bodyMedium),
-                                                              ),
-                                                            ],
-                                                            onSelected:
-                                                                (value) async {
-                                                              if (value ==
-                                                                  'unblock') {
-                                                                await unblock(
-                                                                    blockedSearchResults[
-                                                                            index]
-                                                                        ["Id"],
-                                                                    value,
-                                                                    Auth()
-                                                                        .currentUser());
-                                                                // reloadData();
-                                                              } else if (value ==
-                                                                  'unblock-sList') {
-                                                                await unblock(
-                                                                    blockedSearchResults[
-                                                                            index]
-                                                                        ["Id"],
-                                                                    value,
-                                                                    Auth()
-                                                                        .currentUser());
-                                                                // reloadData();
-                                                              } else if (value ==
-                                                                  'unblock-apply') {
-                                                                await unblock(
-                                                                    blockedSearchResults[
-                                                                            index]
-                                                                        ["Id"],
-                                                                    value,
-                                                                    Auth()
-                                                                        .currentUser());
-                                                                // reloadData();
-                                                              }
-                                                            },
-                                                            icon: const Icon(
-                                                                Icons
-                                                                    .more_vert),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                )));
-                                      },
-                                    ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  //                                       // reloadData();
+                  //                                     },
+                  //                                     backgroundColor:
+                  //                                         Colors.lightGreen,
+                  //                                     icon: LineAwesomeIcons
+                  //                                         .user_plus,
+                  //                                     label: 'accept_friend'.tr,
+                  //                                   ),
+                  //                                   SlidableAction(
+                  //                                     onPressed:
+                  //                                         (context) async {
+                  //                                       await removeFriendInvite(
+                  //                                         friendSearchResults[
+                  //                                             index]["Id"],
+                  //                                         Auth().currentUser(),
+                  //                                       );
+                  //                                       // reloadData();
+                  //                                     },
+                  //                                     backgroundColor:
+                  //                                         Colors.redAccent,
+                  //                                     icon: LineAwesomeIcons
+                  //                                         .user_minus,
+                  //                                     label: 'reject_friend'.tr,
+                  //                                   ),
+                  //                                 ],
+                  //                               ),
+                  //                               child: GestureDetector(
+                  //                                 onTap: () {
+                  //                                   showDialog<String>(
+                  //                                       context: context,
+                  //                                       builder: (BuildContext
+                  //                                               context) =>
+                  //                                           GroupExpand(
+                  //                                             id: blockedSearchResults[
+                  //                                                 index]["Id"],
+                  //                                             groupName:
+                  //                                                 blockedSearchResults[
+                  //                                                         index]
+                  //                                                     [
+                  //                                                     "GroupName"],
+                  //                                             groupPicture:
+                  //                                                 blockedSearchResults[
+                  //                                                         index]
+                  //                                                     [
+                  //                                                     "GroupPicture"],
+                  //                                             members: blockedSearchResults[
+                  //                                                         index]
+                  //                                                     [
+                  //                                                     "Members"]
+                  //                                                 .cast<
+                  //                                                     String>()
+                  //                                                 .toList(),
+                  //                                             avgCleanliness:
+                  //                                                 blockedSearchResults[
+                  //                                                         index]
+                  //                                                     [
+                  //                                                     "AvgCleanliness"],
+                  //                                             avgNoisiness:
+                  //                                                 blockedSearchResults[
+                  //                                                         index]
+                  //                                                     [
+                  //                                                     "AvgNoisiness"],
+                  //                                             avgNightLife:
+                  //                                                 blockedSearchResults[
+                  //                                                         index]
+                  //                                                     [
+                  //                                                     "AvgNightLife"],
+                  //                                             avgBedTime:
+                  //                                                 blockedSearchResults[
+                  //                                                         index]
+                  //                                                     [
+                  //                                                     "AvgBedTime"],
+                  //                                             avgYearOfStudy:
+                  //                                                 blockedSearchResults[
+                  //                                                         index]
+                  //                                                     [
+                  //                                                     "AvgYearOfStudy"],
+                  //                                           ));
+                  //                                 },
+                  //                                 child: Padding(
+                  //                                   padding:
+                  //                                       const EdgeInsets.all(
+                  //                                           8.0),
+                  //                                   child: Container(
+                  //                                     padding: const EdgeInsets
+                  //                                         .fromLTRB(
+                  //                                         10, 0, 10, 15),
+                  //                                     decoration: BoxDecoration(
+                  //                                       border: Border(
+                  //                                         bottom: BorderSide(
+                  //                                           color: Colors
+                  //                                               .grey[300]!,
+                  //                                         ),
+                  //                                       ),
+                  //                                     ),
+                  //                                     child: Row(
+                  //                                       children: [
+                  //                                         SizedBox(
+                  //                                           width: 40,
+                  //                                           height: 40,
+                  //                                           child: ClipRRect(
+                  //                                             borderRadius:
+                  //                                                 BorderRadius
+                  //                                                     .circular(
+                  //                                                         100),
+                  //                                             child: Image.asset(
+                  //                                                 blockedSearchResults[
+                  //                                                         index]
+                  //                                                     [
+                  //                                                     "GroupPicture"]),
+                  //                                           ),
+                  //                                         ),
+                  //                                         const SizedBox(
+                  //                                             width: 8),
+                  //                                         Expanded(
+                  //                                           child: Column(
+                  //                                             crossAxisAlignment:
+                  //                                                 CrossAxisAlignment
+                  //                                                     .start,
+                  //                                             children: [
+                  //                                               Text(
+                  //                                                 blockedSearchResults[
+                  //                                                         index]
+                  //                                                     [
+                  //                                                     "GroupName"],
+                  //                                                 style: Theme.of(
+                  //                                                         context)
+                  //                                                     .textTheme
+                  //                                                     .headlineSmall,
+                  //                                               ),
+                  //                                             ],
+                  //                                           ),
+                  //                                         ),
+                  //                                         PopupMenuButton<
+                  //                                             String>(
+                  //                                           itemBuilder:
+                  //                                               (context) => [
+                  //                                             PopupMenuItem<
+                  //                                                 String>(
+                  //                                               value:
+                  //                                                   'unblock',
+                  //                                               child: Text(
+                  //                                                   'unblock'
+                  //                                                       .tr,
+                  //                                                   style: Theme.of(
+                  //                                                           context)
+                  //                                                       .textTheme
+                  //                                                       .bodyMedium),
+                  //                                             ),
+                  //                                             PopupMenuItem<
+                  //                                                 String>(
+                  //                                               value:
+                  //                                                   'unblock-sList',
+                  //                                               child: Text(
+                  //                                                   'unblock-sList'
+                  //                                                       .tr,
+                  //                                                   style: Theme.of(
+                  //                                                           context)
+                  //                                                       .textTheme
+                  //                                                       .bodyMedium),
+                  //                                             ),
+                  //                                             PopupMenuItem<
+                  //                                                 String>(
+                  //                                               value:
+                  //                                                   'unblock-apply',
+                  //                                               child: Text(
+                  //                                                   'unblock-apply'
+                  //                                                       .tr,
+                  //                                                   style: Theme.of(
+                  //                                                           context)
+                  //                                                       .textTheme
+                  //                                                       .bodyMedium),
+                  //                                             ),
+                  //                                           ],
+                  //                                           onSelected:
+                  //                                               (value) async {
+                  //                                             if (value ==
+                  //                                                 'unblock') {
+                  //                                               await unblock(
+                  //                                                   blockedSearchResults[
+                  //                                                           index]
+                  //                                                       ["Id"],
+                  //                                                   value,
+                  //                                                   Auth()
+                  //                                                       .currentUser());
+                  //                                               // reloadData();
+                  //                                             } else if (value ==
+                  //                                                 'unblock-sList') {
+                  //                                               await unblock(
+                  //                                                   blockedSearchResults[
+                  //                                                           index]
+                  //                                                       ["Id"],
+                  //                                                   value,
+                  //                                                   Auth()
+                  //                                                       .currentUser());
+                  //                                               // reloadData();
+                  //                                             } else if (value ==
+                  //                                                 'unblock-apply') {
+                  //                                               await unblock(
+                  //                                                   blockedSearchResults[
+                  //                                                           index]
+                  //                                                       ["Id"],
+                  //                                                   value,
+                  //                                                   Auth()
+                  //                                                       .currentUser());
+                  //                                               // reloadData();
+                  //                                             }
+                  //                                           },
+                  //                                           icon: const Icon(
+                  //                                               Icons
+                  //                                                   .more_vert),
+                  //                                         ),
+                  //                                       ],
+                  //                                     ),
+                  //                                   ),
+                  //                                 ),
+                  //                               )));
+                  //                     },
+                  //                   ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                   const SizedBox(height: 40),
                 ],
               ),
