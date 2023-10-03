@@ -64,6 +64,7 @@ class _FriendsState extends State<Friends> {
   }
 
   final imageURL = 'https://movein.blob.core.windows.net/moveingroupimages/';
+  final imageURL2 = 'https://movein.blob.core.windows.net/moveinimages/';
 
   Future<List<Friend>> searchUsers(String searchQuery) async {
     List<Friend> retlist = [];
@@ -1732,10 +1733,10 @@ class _FriendsState extends State<Friends> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(100),
-                                                        child: Image.asset(
+                                                        child: Image.network('${imageURL + 
                                                             groupSearchResults[
                                                                     index][
-                                                                "GroupPicture"]),
+                                                                "GroupPicture"]}.jpg'),
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),
@@ -1917,11 +1918,11 @@ class _FriendsState extends State<Friends> {
                                                               BorderRadius
                                                                   .circular(
                                                                       100),
-                                                          child: Image.asset(
+                                                          child: Image.network('${imageURL2 + 
                                                               friendSearchResults[
                                                                           index]
                                                                       ["Images"]
-                                                                  [0]),
+                                                                  [0]}.jpg'),
                                                         ),
                                                       ),
                                                       const SizedBox(width: 8),
