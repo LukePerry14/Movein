@@ -46,6 +46,7 @@ Future<void> main() async {
   //LinkFivePurchases.activeProducts;
   //LinkFivePurchases.purchase(productDetails);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await UserPreferences.init();
   // var ABlob = AzureStorage.parse('https://movein.blob.core.windows.net/moveinimages');
 
@@ -53,6 +54,11 @@ Future<void> main() async {
       .then((_) {
     runApp(const App());
   });
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print("Handling a background message: ${message.messageId}");
+  // Handle the background message here
 }
 
 class App extends StatelessWidget {
@@ -74,9 +80,8 @@ class App extends StatelessWidget {
             builder: (context, currentMode, child) {
               final String foreName = UserPreferences.getForeName();
               final bool loggedIn = (foreName != "NotLoggedInError");
-              if (foreName != "NotLoggedInError") {
-                //ACCESS_TOKEN
-                //ConnectSendbird().connect("33BDBE40-0D0C-4529-BA3B-74C0916D2682", Auth().currentUser(), foreName);
+              if (loggedIn){
+                updateToken();
               }
               return GetMaterialApp(
                   debugShowCheckedModeBanner: false,
@@ -466,42 +471,40 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+}
 
-  Future<void> updateToken() async {
-    try {
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser == null) {
-        throw Exception("No authenticated user found.");
-      }
-
-      final fcmToken = await FirebaseMessaging.instance.getToken();
-
-      final timestamp = Timestamp.now();
-
-      final docRef = FirebaseFirestore.instance.collection('fcmTokens').doc(currentUser.uid);
-
-      final docSnapshot = await docRef.get();
-
-      if (docSnapshot.exists) {
-        // The document exists, so update it with the new token and timestamp
-          await docRef.update({
-            'Token': fcmToken,
-            'TimeStamp': timestamp,
-          });
-      } else {
-        // The document doesn't exist, so create it with the new token and timestamp
-        await docRef.set({
-          'Token': fcmToken,
-          'TimeStamp': timestamp,
-        });
-      }
-
-    } catch (e) {
-      throw Exception('Error updating token: $e');
+Future<void> updateToken() async {
+  try {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      throw Exception("No authenticated user found.");
     }
+
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+
+    final timestamp = Timestamp.now();
+
+    final docRef = FirebaseFirestore.instance.collection('fcmTokens').doc(currentUser.uid);
+
+    final docSnapshot = await docRef.get();
+
+    if (docSnapshot.exists) {
+      // The document exists, so update it with the new token and timestamp
+      await docRef.update({
+        'Token': fcmToken,
+        'TimeStamp': timestamp,
+      });
+    } else {
+      // The document doesn't exist, so create it with the new token and timestamp
+      await docRef.set({
+        'Token': fcmToken,
+        'TimeStamp': timestamp,
+      });
+    }
+
+  } catch (e) {
+    throw Exception('Error updating token: $e');
   }
-
-
 }
 
 class SignupScreen extends StatefulWidget {

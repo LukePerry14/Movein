@@ -746,7 +746,7 @@ class _FriendsState extends State<Friends> {
                                                       child: ClipRRect(
                                                         borderRadius:
                                                             BorderRadius
-                                                                .circular(100),
+                                                                .circular(20),
                                                         child: imageString == ''
                                                             ? Image.network(
                                                                 'https://movein.blob.core.windows.net/moveinimages/noimagefound.png')
@@ -974,7 +974,7 @@ class _FriendsState extends State<Friends> {
                                                       child: ClipRRect(
                                                         borderRadius:
                                                             BorderRadius
-                                                                .circular(100),
+                                                                .circular(20),
                                                         child: Image.network(
                                                             '$imageURL$imageName.jpg'),
                                                       ),

@@ -492,8 +492,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                 height: 150,
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(100),
-                                  // child: Image(image: NetworkImage(imageURL + groupPicture + '.jpg')),
-                                  child: groupPicture == '' ? const Image(image: NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png')) : Image(image: NetworkImage('$imageURL$groupPicture.jpg'))
+                                  child: groupPicture == '' ? const Image(image: NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png'), fit: BoxFit.cover,) : Image(image: NetworkImage('$imageURL$groupPicture.jpg'), fit: BoxFit.cover,)
                                 ),
                               ),
                             ),
@@ -572,8 +571,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                           builder: (BuildContext context) =>
                                               CustomDialog(
                                                 id: memberDetails[index]['Id'],
-                                                foreName: memberDetails[index]
-                                                ['ForeName'],
+                                                foreName: memberDetails[index]['ForeName'],
                                                 age: memberDetails[index]['Age'].toInt(),
                                                 uni: memberDetails[index]['Uni'],
                                                 preferences: memberDetails[index]['Preferences'],
@@ -602,13 +600,14 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 width: 50,
                                                 height: 50,
                                                 child: Stack(
+                                                  clipBehavior: Clip.none,
                                                   children: [
                                                     ClipRRect(
                                                       borderRadius:
-                                                      BorderRadius.circular(
-                                                          100),
+                                                      BorderRadius.circular(25),
                                                       child: Image(
-                                                          image: NetworkImage('${imageURL2 + memberDetails[index]['Images'][0]}.jpg')
+                                                          image: NetworkImage('${imageURL2 + memberDetails[index]['Images'][0]}.jpg'),
+                                                        fit: BoxFit.cover,
                                                       ),
                                                     ),
                                                     if (memberDetails[index]['verified'])
@@ -852,7 +851,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 id: applicants[index]['Id'],
                                                 foreName: applicants[index]
                                                 ['ForeName'],
-                                                age: applicants[index]['Age'],
+                                                age: applicants[index]['Age'].toInt(),
                                                 uni: applicants[index]['Uni'],
                                                 preferences: applicants[index]
                                                 ['Preferences'],
@@ -861,7 +860,7 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 subject: applicants[index]
                                                 ['Subject'],
                                                 yearOfStudy: applicants[index]
-                                                ['YearOfStudy'],
+                                                ['YearOfStudy'].toInt(),
                                                 isVerified: applicants[index]['verified'],
                                               ),
                                         );
@@ -884,13 +883,15 @@ class _GroupOptionsState extends State<GroupOptions> {
                                                 width: 50,
                                                 height: 50,
                                                 child: Stack(
+                                                  clipBehavior: Clip.none,
                                                   children: [
                                                     ClipRRect(
                                                       borderRadius:
                                                       BorderRadius.circular(
-                                                          100),
+                                                          25),
                                                       child: Image(
-                                                          image: NetworkImage('${imageURL2 + applicants[index]['Images'][0]}.jpg')
+                                                          image: NetworkImage('${imageURL2 + applicants[index]['Images'][0]}.jpg'),
+                                                              fit: BoxFit.cover,
                                                       ),
                                                     ),
                                                     if (applicants[index]['verified'])

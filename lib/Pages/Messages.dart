@@ -25,8 +25,12 @@ class _MessagesState extends State<Messages> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    data = ModalRoute.of(context)?.settings.arguments as Map;
+    data = ModalRoute
+        .of(context)
+        ?.settings
+        .arguments as Map;
   }
+
   // groupChannel = (data["channel"]);
   // groupChannel = (data["channel"]);
   // getPrevMessages();
@@ -50,10 +54,15 @@ class _MessagesState extends State<Messages> {
     return Scaffold(
       appBar: AppBar(
         title: Text('${data['groupName']}',
-            style: Theme.of(context).textTheme.headlineSmall),
+            style: Theme
+                .of(context)
+                .textTheme
+                .headlineSmall),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Theme.of(context).canvasColor,
+        backgroundColor: Theme
+            .of(context)
+            .canvasColor,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
           child: Container(
@@ -75,27 +84,27 @@ class _MessagesState extends State<Messages> {
           IconButton(
             color: Colors.grey[500],
             icon:
-                Icon(Icons.more_vert, color: LAppTheme.lightTheme.primaryColor),
+            Icon(Icons.more_vert, color: LAppTheme.lightTheme.primaryColor),
             //Icon not showing
             onPressed: () {
-                Navigator.push(
-                  context,
-                  PageTransition(
-                      curve: Curves.linear,
-                      type:
-                      PageTransitionType
-                          .topToBottom,
-                      child:
-                      const GroupOptions(),
-                      settings:
-                      RouteSettings(
-                          arguments: {
-                            'members': data["members"],
-                            'groupId': data["groupId"],
-                            'groupName':data["groupName"],
-                            'groupPicture':data["groupPicture"],
-                          })),
-                );
+              Navigator.push(
+                context,
+                PageTransition(
+                    curve: Curves.linear,
+                    type:
+                    PageTransitionType
+                        .topToBottom,
+                    child:
+                    const GroupOptions(),
+                    settings:
+                    RouteSettings(
+                        arguments: {
+                          'members': data["members"],
+                          'groupId': data["groupId"],
+                          'groupName': data["groupName"],
+                          'groupPicture': data["groupPicture"],
+                        })),
+              );
             },
           ),
         ],
@@ -104,25 +113,26 @@ class _MessagesState extends State<Messages> {
         children: <Widget>[
           Expanded(
               child: StreamBuilder<QuerySnapshot>(
-            stream: _usersStream,
-            builder:
-                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (snapshot.hasError) {
-                return const Text('Something went wrong');
-              }
+                stream: _usersStream,
+                builder:
+                    (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    return const Text('Something went wrong');
+                  }
 
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Text("Loading");
-              }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Text("Loading");
+                  }
 
-              return ListView(
-                physics: const BouncingScrollPhysics(),
-                controller: scrollController,
-                shrinkWrap: true,
-                children: snapshot.data!.docs
-                    .map((DocumentSnapshot document) {
+                  return ListView(
+                    physics: const BouncingScrollPhysics(),
+                    controller: scrollController,
+                    shrinkWrap: true,
+                    children: snapshot.data!.docs
+                        .map((DocumentSnapshot document) {
                       late Map<String, dynamic> data =
-                          document.data()! as Map<String, dynamic>;
+                      document.data()! as Map<String, dynamic>;
 
                       var sentText = "";
                       if (data['sent'] != null) {
@@ -134,14 +144,15 @@ class _MessagesState extends State<Messages> {
                         // print((userDoc.data() as Map<String, dynamic>)['ForeName']);
 
                         late DateTime sent =
-                            DateTime.fromMillisecondsSinceEpoch(
-                                data['sent']?.seconds * 1000);
+                        DateTime.fromMillisecondsSinceEpoch(
+                            data['sent']?.seconds * 1000);
 
                         // sentText =
                         //     "${data['sentBy']} • ${sent.hour}:${sent.minute < 10 ? "0" : ""}${sent.minute}";
 
                         sentText =
-                            "${sent.hour}:${sent.minute < 10 ? "0" : ""}${sent.minute}";
+                        "${sent.hour}:${sent.minute < 10 ? "0" : ""}${sent
+                            .minute}";
                       }
 
                       return Container(
@@ -172,11 +183,11 @@ class _MessagesState extends State<Messages> {
                             ])),
                       );
                     })
-                    .toList()
-                    .cast(),
-              );
-            },
-          )),
+                        .toList()
+                        .cast(),
+                  );
+                },
+              )),
           Container(
             padding: const EdgeInsets.symmetric(vertical: 2.0),
             decoration: BoxDecoration(
@@ -196,7 +207,8 @@ class _MessagesState extends State<Messages> {
                       controller: textController,
                       decoration: InputDecoration(
                         labelText: "message".tr,
-                        labelStyle: TextStyle(fontSize: 20.0, color: Colors.grey[400]),
+                        labelStyle: TextStyle(
+                            fontSize: 20.0, color: Colors.grey[400]),
                         fillColor: Colors.blue,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -220,9 +232,9 @@ class _MessagesState extends State<Messages> {
                       'sent': FieldValue.serverTimestamp(),
                       'sentBy': Auth().currentUser()
                     });
-                    _sendNoti();
                     textController.clear();
-                    scrollController.jumpTo(scrollController.position.maxScrollExtent);
+                    scrollController.jumpTo(
+                        scrollController.position.maxScrollExtent);
                   },
                 ),
               ],
@@ -281,40 +293,6 @@ class _MessagesState extends State<Messages> {
       //   ],
       // )
     );
-  }
-
-  void _sendNoti() async {
-    final apiUrl = "https://europe-west2-test-7a857.cloudfunctions.net/sendGroupNotification";
-
-    // Prepare the request body
-    final requestBody = {
-      "recipientUserIds": data["members"],
-      "message": textController.text,
-      "groupName": data["groupName"],
-    };
-
-    try {
-      // Make the POST request to the API
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: jsonEncode(requestBody),
-      );
-
-      // Check the response status code
-      if (response.statusCode == 200) {
-        // Request was successful, handle the response as needed
-        print("API call success!");
-      } else {
-        // Request failed, handle the error
-        print("API call failed with status code ${response.statusCode}");
-      }
-    } catch (error) {
-      // An error occurred during the request
-      print("API call error: $error");
-    }
   }
 }
 

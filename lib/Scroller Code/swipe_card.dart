@@ -101,47 +101,66 @@ class SwipeCard extends StatelessWidget {
                         ),
                       Positioned(
                         top: 0,
-                        child: Text(
+                        left: 20,
+                        child: Row(
+                          children: [
+                            Text(
                                 "$foreName - $age",
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 36,
-                                    fontWeight: FontWeight.bold
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.bold,
+                                  shadows: <Shadow>[
+                                    Shadow(
+                                      offset: Offset(2, 2), // Adjust the values for the shadow's position
+                                      blurRadius: 6.0,     // Adjust the blur radius as needed
+                                      color: Colors.black.withOpacity(0.5), // Adjust the shadow color and opacity
+                                    ),
+                                  ],
+                                )
+
+                            ),
+                            const SizedBox(width: 10),
+                            if (isVerified)
+                              Container(
+                                width: 15, // Adjust the width and height as needed
+                                height: 15,
+                                decoration: const BoxDecoration(
+                                  color: Colors.blue,
+                                  shape: BoxShape.circle,
                                 ),
-                              ),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.check,
+                                    color: Colors.white,
+                                    size: 10,
+                                  ),
+                                ),
+                              )
+                          ]
+                        ),
                       ),
                       Positioned(
-                        bottom: 0,
+                        bottom: 30,
+                        left: 20,
                         child: Text(
                                   bio,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 20,
                                     fontWeight: FontWeight.w500,
                                     fontStyle: FontStyle.normal,
+                                    shadows: <Shadow>[
+                                      Shadow(
+                                        offset: Offset(2, 2), // Adjust the values for the shadow's position
+                                        blurRadius: 6.0,     // Adjust the blur radius as needed
+                                        color: Colors.black.withOpacity(0.5), // Adjust the shadow color and opacity
+                                      ),
+                                    ],
                                   ),
                               ),
                       ),
-                      if (isVerified)
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: Container(
-                          width: 15, // Adjust the width and height as needed
-                          height: 15,
-                          decoration: const BoxDecoration(
-                            color: Colors.blue,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.check,
-                              color: Colors.white,
-                              size: 10,
-                            ),
-                          ),
-                        ),
-                      )
                     ],
               ),
             )],
@@ -299,6 +318,7 @@ class _CustomDialogState extends State<CustomDialog> {
               width: double.maxFinite,
               height: MediaQuery.of(context).size.height,
               child: ListView.builder(
+                physics: const BouncingScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: widget.images.length+5,
                 itemBuilder: (context, index) {
