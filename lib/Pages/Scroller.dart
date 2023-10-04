@@ -72,6 +72,7 @@ class _ScrollerState extends State<Scroller> {
     loadFilters();
     List<Map<String, dynamic>> groups = [];
     final CollectionReference docGroups = FirebaseFirestore.instance.collection("Groups");
+
     try {
       QuerySnapshot querySnapshot = await docGroups.where('AllowedUnis', arrayContains: UserPreferences.getUni()).get();
       for (QueryDocumentSnapshot docSnapshot in querySnapshot.docs) {
@@ -408,44 +409,57 @@ class _ScrollerState extends State<Scroller> {
                       if (!loadAd & (_adCountdown != 0)) {
                         _adCountdown--;
                       }
-                      addToApplicants(groupData[index]['Id']).then((result) {
-                        if(result == true){
-                          if (index < groupData.length - 1) {
-                            index++;
-                            setState(() {
-                              _groupDisplay = nextGroup();
-                              //_showApp = false;
-                            });
+                        addToApplicants(groupData[index]['Id']).then((result) {
+                          if (result == true) {
+                            if (index < groupData.length - 1) {
+                              index++;
+                              setState(() {
+                                _groupDisplay = nextGroup();
+                                //_showApp = false;
+                              });
+                            } else {
+                              setState(() {
+                                groupData = [];
+                              });
+                            }
                           } else {
-                            setState(() {
-                              groupData = [];
-                            });
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text(
+                                    'max_groups_title'.tr, style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .bodyMedium,),
+                                  content: Text(
+                                      'max_groups_desc'.tr, style: Theme
+                                      .of(context)
+                                      .textTheme
+                                      .bodySmall),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(
+                                            context); // Close the dialog
+                                      },
+                                      child: Text('ok'.tr,
+                                          style: GoogleFonts.redHatDisplay(
+                                              color: LAppTheme.lightTheme
+                                                  .primaryColor,
+                                              fontSize: 16.5)),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           }
-                        }else{
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text('max_groups_title'.tr, style: Theme.of(context).textTheme.bodyMedium,),
-                                content: Text('max_groups_desc'.tr, style: Theme.of(context).textTheme.bodySmall),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context); // Close the dialog
-                                    },
-                                    child: Text('ok'.tr, style: GoogleFonts.redHatDisplay(color: LAppTheme.lightTheme.primaryColor, fontSize: 16.5)),
-                                  ),
-                                ],
-                              );
-                            },
+                        }).catchError((e) {
+                          throw FirebaseException(
+                            message: 'Error calling addToApplicants: $e',
+                            plugin: 'cloud_firestore',
                           );
-                        }
-                      }).catchError((e) {
-                        throw FirebaseException(
-                          message: 'Error calling addToApplicants: $e',
-                          plugin: 'cloud_firestore',
-                        );
-                      });
+                        });
                     },
                     child: Column(children: [
                       const SizedBox(height: 9),
@@ -681,7 +695,7 @@ Future<bool> addToApplicants(String groupId) async {
       .doc(Auth().currentUser())
       .get();
 
-  final int joinedGroups = userSnapshot.data()?['Joined'].length;
+  final int joinedGroups = userSnapshot.data()?['Joined'].length + userSnapshot.data()?['Applications'].length;
 
   if (joinedGroups == UserPreferences.getAppsMax()) {
     return false;
