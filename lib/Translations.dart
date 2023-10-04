@@ -193,6 +193,7 @@ class AppTranslations extends Translations {
           'p-images' : "Profile Images",
 
           "message" : "Message",
+          "verif": "Resend verification Email",
         },
         'es': {
           'invite_sent': 'Invitación de amigo enviada',
@@ -385,6 +386,7 @@ class AppTranslations extends Translations {
           'p-images' : 'Imágenes de perfil',
 
           "message" : "Mensaje",
+          "verif": "Reenviar correo de verificación",
         },
         'zh': {
           'invite_sent': '好友邀请已发送',
@@ -579,6 +581,8 @@ class AppTranslations extends Translations {
           'p-images' : '个人资料图片',
 
           "message" : "信息",
+          "verif": "重新发送验证电子邮件"
+
         },
         'fr': {
   'invite_sent': "Invitation d'ami envoyée",
@@ -772,6 +776,8 @@ class AppTranslations extends Translations {
           'p-images' : 'Images de profil',
 
           "message" : "Message",
+          "verif": "Renvoyer l'e-mail de vérification"
+
         },
         'hi': {
           'invite_sent': 'मित्र निमंत्रण भेजा गया',
@@ -914,6 +920,7 @@ class AppTranslations extends Translations {
           'p-images' : 'प्रोफ़ाइल छवियाँ',
 
           "message" : "संदेश",
+          "verif": "पुष्टि ईमेल पुन: भेजें।"
         }
       };
 }

@@ -101,7 +101,6 @@ class _ScrollerState extends State<Scroller> {
           message: 'Error fetching data: $e', plugin: 'cloud_firestore');
     }
     groupData = groups;
-    // groupData = [];
     sortGroupsByPreferences();
     setState(() {
       _groupDisplay = (!groupData.isEmpty? nextGroup(): const NoGroups())!;

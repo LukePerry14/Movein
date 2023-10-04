@@ -1,10 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
-import 'package:dash_chat_2/dash_chat_2.dart';
-import 'package:http/http.dart' as http;
 import 'package:page_transition/page_transition.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../Themes/lMode.dart';
@@ -30,14 +26,6 @@ class _MessagesState extends State<Messages> {
         ?.settings
         .arguments as Map;
   }
-
-  // groupChannel = (data["channel"]);
-  // groupChannel = (data["channel"]);
-  // getPrevMessages();
-  //getMessages(groupChannel!);
-  // SendbirdSdk().addChannelEventHandler(groupChannel.channelUrl, this);
-  //groupChannel = ConnectSendbird().returnChannel("testUrl");
-  //}
 
   late final Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance
       .collection('Groups')

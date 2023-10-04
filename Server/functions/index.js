@@ -245,8 +245,10 @@ exports.updateEmailVerificationStatus = functions.region('europe-west2').pubsub.
         usersQuery.forEach(async (doc) => {
             const user = doc.data();
 
-            // Check if the user has verified their email
-            if (user.emailVerified) {
+            // Check if the user's email is verified in Firebase Authentication
+            const userRecord = await admin.auth().getUser(user.uid);
+
+            if (userRecord && userRecord.emailVerified) {
                 // Update the email verification status for this user
                 batch.update(doc.ref, { emailVerified: true });
                 console.log(`Email verification status updated for user ${user.uid}`);
@@ -263,6 +265,7 @@ exports.updateEmailVerificationStatus = functions.region('europe-west2').pubsub.
     return null;
 });
 
+
 exports.pruneTokens = functions.region('europe-west2').pubsub.schedule('0 0 1,16 * *').timeZone('GMT').onRun(async (context) => {
   const EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 182;
 
@@ -273,109 +276,200 @@ exports.pruneTokens = functions.region('europe-west2').pubsub.schedule('0 0 1,16
   staleTokensResult.forEach(function(doc) { doc.ref.delete(); });
 });
 
-exports.sendGroupNotification = functions.region('europe-west2').https.onRequest(async (req, res) => {
-  // Get the list of recipient user IDs and the message from the request
-  const { recipientUserIds, message, groupName } = req.body
+exports.sendGroupNotification = functions.region('europe-west2').firestore.document('Groups/{groupId}/Messages/{message}').onCreate(async (snap, context) => {
+        const message = snap.data();
+        const groupId = context.params.groupId;
+        const sentBy = message.sentBy;
 
-  // Look up the device tokens of all recipients in the "fcmTokens" collection
-  const db = admin.firestore();
-  const fcmTokensRef = db.collection('fcmTokens');
+        // Fetch the group document to get the "Members" field
+        const groupDocRef = admin.firestore().collection('Groups').doc(groupId);
+        const groupDocSnapshot = await groupDocRef.get();
 
-  const recipientTokens = await Promise.all(
-    recipientUserIds.map(async (userId) => {
-      const doc = await fcmTokensRef.doc(userId).get();
-      if (doc.exists) {
-        const recipientData = doc.data();
-        return recipientData.Token;
-      } else {
-        console.error(`Recipient user with ID ${userId} not found in "fcmTokens" collection`);
-        return null;
-      }
-    })
-  );
+        if (groupDocSnapshot.exists) {
+            const groupName = groupDocSnapshot.data().GroupName;
+            const memberIds = groupDocSnapshot.data().Members || [];
 
-  // Filter out null tokens (users not found)
-  const validRecipientTokens = recipientTokens.filter((token) => token !== null);
+            // Fetch FCM tokens for each member
+            const tokensPromises = memberIds.map(async (memberId) => {
+                const tokenDocRef = admin.firestore().collection('fcmTokens').doc(memberId);
+                const tokenDocSnapshot = await tokenDocRef.get();
 
-  if (validRecipientTokens.length === 0) {
-    console.error('No valid recipient tokens found');
-    return res.status(404).send('No valid recipient tokens found');
-  }
+                if (tokenDocSnapshot.exists) {
+                    return tokenDocSnapshot.data().Token;
+                } else {
+                    console.error(`FCM token document for member ${memberId} does not exist.`);
+                    return null;
+                }
+            });
 
-  // Send a push notification to all valid recipient devices
-  const payload = {
-    notification: {
-      title: groupName,
-      body: message,
-    },
-  };
+            const tokens = await Promise.all(tokensPromises);
 
-  const options = {
-    priority: 'high',
-    timeToLive: 60 * 60 * 24, // 24 hours
-  };
+            // Filter out null values (in case of missing tokens)
+            const validTokens = tokens.filter((token) => token !== null);
 
-  try {
-    const response = await admin.messaging().sendToDevice(validRecipientTokens, payload, options);
-    console.log('Notification sent successfully:', response);
-    return res.status(200).send('Notification sent successfully');
-  } catch (error) {
-    console.error('Error sending notification:', error);
-    return res.status(500).send('Error sending notification');
-  }
-});
+            // Fetch sender's name from the Users collection
+            const senderDocRef = admin.firestore().collection('Users').doc(sentBy);
+            const senderDocSnapshot = await senderDocRef.get();
 
-exports.sendCustomNotification = functions.region('europe-west2').https.onRequest(async (req, res) => {
-  try {
-    const { senderName, deviceId, notificationType } = req.body;
+            if (senderDocSnapshot.exists) {
+                const senderData = senderDocSnapshot.data();
+                const senderName = `${senderData.ForeName} ${senderData.SurName}`;
 
-    const docSnapshot = await docRef.get();
-        if (docSnapshot.exists) {
-          const deviceToken = docSnapshot.data().Token;
+                // Customize the payload with the sender's name and a custom image URL
+                const payload = {
+                    notification: {
+                        title: `${groupName}: ${senderName}`,
+                        body: message.text,
+                        imageUrl: 'https://movein.blob.core.windows.net/movein/moveinlogo2.jpg',
+                    },
+                    data: {
+                        sender: senderName,
+                        time: message.sent.toDate().toString(),
+                    },
+                    tokens: validTokens,
+                };
 
-          // Respond with the retrieved token
-          response.status(200).json({ token });
+                return admin.messaging().sendMulticast(payload);
+            } else {
+                console.error(`Sender document with ID ${sentBy} does not exist.`);
+                return null;
+            }
+        } else {
+            console.error(`Group document with ID ${groupId} does not exist.`);
+            return null;
+        }
+    });
+
+exports.userDocUpdated = functions.region('europe-west2').firestore.document('Users/{userId}').onUpdate(async (change, context) => {
+    const userId = context.params.userId;
+    const newData = change.after.data();
+    const oldData = change.before.data();
+
+    if (newData && oldData) {
+        const newFriends = newData.Friends || [];
+        const oldFriends = oldData.Friends || [];
+        const newInvites = newData.FriendInvites || [];
+        const oldInvites = oldData.FriendInvites || [];
+        const newGroupInvites = newData.GroupInvites || [];
+        const oldGroupInvites = oldData.GroupInvites || [];
+        const newJoined = newData.GroupJoined || [];
+        const oldJoined = oldData.GroupJoined || [];
+
+        // Fetch the FCM token for the user once
+        const tokenDocRef = admin.firestore().collection('fcmTokens').doc(userId);
+        const tokenDocSnapshot = await tokenDocRef.get();
+        if (!tokenDocSnapshot.exists) {
+            console.error(`FCM token document for user ${userId} does not exist.`);
+            return null;
+        }
+        const token = tokenDocSnapshot.data().Token;
+
+        // Send notifications for each event
+        const notifications = [];
+
+        if (newFriends.length > oldFriends.length) {
+            notifications.push({
+                title: 'Accepted Friend Request',
+                imageUrl: 'https://movein.blob.core.windows.net/movein/moveinlogo2.jpg',
+            });
         }
 
-    // Ensure deviceToken and notificationType are provided
-    if (!deviceId || !notificationType) {
-      res.status(400).send('Bad Request: deviceToken and notificationType are required.');
-      return;
+        if (newInvites.length > oldInvites.length) {
+            notifications.push({
+                title: 'New Friend Request',
+                imageUrl: 'https://movein.blob.core.windows.net/movein/moveinlogo2.jpg',
+            });
+        }
+
+        if (newGroupInvites.length > oldGroupInvites.length) {
+            notifications.push({
+                title: 'New Group Invite',
+                imageUrl: 'https://movein.blob.core.windows.net/movein/moveinlogo2.jpg',
+            });
+        }
+
+        if (newJoined.length > oldJoined.length) {
+            notifications.push({
+                title: 'Application Accepted!',
+                imageUrl: 'https://movein.blob.core.windows.net/movein/moveinlogo2.jpg',
+            });
+        }
+
+        const payloadPromises = notifications.map((notification) => {
+            const payload = {
+                notification: notification,
+                tokens: [token], // Send to the user's token
+            };
+
+            return admin.messaging().sendMulticast(payload);
+        });
+
+        await Promise.all(payloadPromises);
     }
-    var notiTitle = "";
-      // Customize the notification based on notificationType
-      switch (notificationType) {
-        case 'friendRequest':
-          notiTitle = `$e has accepted your friend Request!`;
-          break;
-        case 'groupJoin':
-          notiTitle = `$e has accepted your group application!`;
-          break;
-        // Add more cases for other notification types as needed
-        default:
-          // Default notification
-          payload.notification.body = 'MoveIn notification!';
-          break;
-      }
 
-      const payload = {
-          notification: {
-            title: notiTitle,
-          },
-        };
+    return null; // Return a result if needed
+});
 
-        const options = {
-          priority: 'high',
-          timeToLive: 60 * 60 * 24, // 24 hours
-        };
 
-      // Send the notification to the specified device token
-      admin.messaging().sendToDevice(deviceToken, payload, options);
+exports.groupDocUpdated = functions.region('europe-west2').firestore.document('Groups/{groupId}').onUpdate(async (change, context) => {
+    const groupId = context.params.groupId;
+    const newData = change.after.data();
+    const oldData = change.before.data();
+    if (newData && oldData) {
+        const newMembers = newData.Members || [];
+        const oldMembers = oldData.Members || [];
+        const newApplicants = newData.Applicants || [];
+        const oldApplicants = oldData.Applicants || [];
 
-    // Respond with a success message
-    res.status(200).send('Notification sent successfully.');
-  } catch (error) {
-    console.error('Error sending notification:', error);
-    res.status(500).send('Internal Server Error');
-  }
+        const addedMembers = newMembers.filter(memberId => !oldMembers.includes(memberId));
+        const addedApplicants = newApplicants.filter(applicantId => !oldApplicants.includes(applicantId));
+
+        const groupDocRef = admin.firestore().collection('Groups').doc(groupId);
+        const groupDocSnapshot = await groupDocRef.get();
+        if (groupDocSnapshot.exists) {
+            const groupName = groupDocSnapshot.data().GroupName;
+            const memberIds = groupDocSnapshot.data().Members || [];
+
+            // Fetch FCM tokens for each member
+            const tokensPromises = memberIds.map(async (memberId) => {
+                const tokenDocRef = admin.firestore().collection('fcmTokens').doc(memberId);
+                const tokenDocSnapshot = await tokenDocRef.get();
+
+                if (tokenDocSnapshot.exists) {
+                    return tokenDocSnapshot.data().Token;
+                } else {
+                    console.error(`FCM token document for member ${memberId} does not exist.`);
+                    return null;
+                }
+            });
+            const tokens = await Promise.all(tokensPromises);
+            const validTokens = tokens.filter((token) => token !== null);
+            if (addedMembers.length > 0) {
+                const payload = {
+                    notification: {
+                        title: `New ${groupName} Member!`,
+                        imageUrl: 'https://movein.blob.core.windows.net/movein/moveinlogo2.jpg',
+                    },
+                    tokens: validTokens,
+                };
+                await admin.messaging().sendMulticast(payload);
+            }
+
+            if (addedApplicants.length > 0) {
+                const payload = {
+                    notification: {
+                        title: `New ${groupName} applicant`,
+                        imageUrl: 'https://movein.blob.core.windows.net/movein/moveinlogo2.jpg',
+                    },
+                    tokens: validTokens,
+                };
+
+                await admin.messaging().sendMulticast(payload);
+            }
+        } else {
+            console.error(`Group document with ID ${groupId} does not exist.`);
+        }
+    }
+
+    return null; // Return a result if needed
 });

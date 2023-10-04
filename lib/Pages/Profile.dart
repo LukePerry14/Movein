@@ -104,7 +104,7 @@ class _ProfilePage extends State<Profile> {
     );
   }
 
-  Future<List<String>> getNameAndPic() async {
+  Future<List<dynamic>> getNameAndPic() async {
     try {
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection("Users")
@@ -117,8 +117,9 @@ class _ProfilePage extends State<Profile> {
       String picture1 = userDoc.get("Images")[1];
       String picture2 = userDoc.get("Images")[2];
       String fullName = "$foreName $surname";
+      bool subscribed = userDoc.get("Subscribed");
 
-      return [fullName, profPic, picture1, picture2];
+      return [fullName, profPic, picture1, picture2, subscribed];
     } catch (e) {
       throw FirebaseException(
           message: 'Error retrieving name or profile picture: $e',
@@ -183,7 +184,7 @@ class _ProfilePage extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<String>>(
+    return FutureBuilder<List<dynamic>>(
         future: getNameAndPic(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -197,6 +198,7 @@ class _ProfilePage extends State<Profile> {
             // Other images for the user
             var image1 = data[2];
             var image2 = data[3];
+            var subscribed = data[4];
 
             List<String?> imageArray = [];
 
@@ -320,6 +322,7 @@ class _ProfilePage extends State<Profile> {
                                   Text(name,
                                       style: Theme.of(context).textTheme.headlineMedium),
                                   const SizedBox(width: 10),
+                                  if (subscribed)
                                   Container(
                                     width: 15, // Adjust the width and height as needed
                                     height: 15,
@@ -337,6 +340,27 @@ class _ProfilePage extends State<Profile> {
                                   ),
                                 ]
                               ),
+                              const SizedBox(height: 8.0),
+                              if (!subscribed)
+                                ElevatedButton(
+                                  onPressed: () {
+                                    //
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue, // Background color
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          10.0), // Rounded corners
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'verif'.tr,
+                                    style: TextStyle(
+                                      color: Colors.white, // Text color
+                                      fontSize: 16.0,
+                                    ),
+                                  ),
+                                ),
                               const SizedBox(height: 8.0),
                               Row(mainAxisSize: MainAxisSize.min, children: [
                                 GestureDetector(

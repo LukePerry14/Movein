@@ -142,24 +142,26 @@ class SwipeCard extends StatelessWidget {
                       ),
                       Positioned(
                         bottom: 30,
-                        left: 20,
-                        child: Text(
-                                  bio,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w500,
-                                    fontStyle: FontStyle.normal,
-                                    shadows: <Shadow>[
-                                      Shadow(
-                                        offset: Offset(2, 2), // Adjust the values for the shadow's position
-                                        blurRadius: 6.0,     // Adjust the blur radius as needed
-                                        color: Colors.black.withOpacity(0.5), // Adjust the shadow color and opacity
-                                      ),
-                                    ],
-                                  ),
-                              ),
+                        child: SizedBox(
+                          width: width * 0.82,
+                          child: Text(
+                                    bio,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle: FontStyle.normal,
+                                      shadows: <Shadow>[
+                                        Shadow(
+                                          offset: Offset(2, 2), // Adjust the values for the shadow's position
+                                          blurRadius: 6.0,     // Adjust the blur radius as needed
+                                          color: Colors.black.withOpacity(0.5), // Adjust the shadow color and opacity
+                                        ),
+                                      ],
+                                    ),
+                                ),
+                        ),
                       ),
                     ],
               ),
