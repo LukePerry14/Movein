@@ -49,6 +49,9 @@ class Auth {
   Future<String> signInWithEmailAndPassword(
       String email, String password) async {
     try {
+      // Removes whitespace from string in case it was entered
+      email.replaceAll(' ', '');
+
       // This will Log in the existing user in our firebase
       await _auth.signInWithEmailAndPassword(
         email: email,
