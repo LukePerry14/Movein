@@ -344,7 +344,9 @@ class _ProfilePage extends State<Profile> {
                               if (!subscribed)
                                 ElevatedButton(
                                   onPressed: () {
-                                    //
+                                    // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                    //     content: Text("Sending Message"),
+                                    // ));
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.blue, // Background color
