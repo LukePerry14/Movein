@@ -376,14 +376,12 @@ class _CustomDialogState extends State<CustomDialog> {
                       );
                     }
                     case 2: {
-                      // print(widget.images[index-2]);
-                      // return RoundedBox(image: widget.images[index-2]);
                       return Container(
                         height: 400,
                         decoration: BoxDecoration(
                           borderRadius: const BorderRadius.all(Radius.circular(16)),
                           image: DecorationImage(
-                            image: NetworkImage('${rootImagePath + widget.images[index-2]}.jpg'),
+                            image: widget.images[index-2] == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('${rootImagePath + widget.images[index-2]}.jpg'),
                             fit: BoxFit.fill
                           )
                         ),
@@ -425,7 +423,7 @@ class _CustomDialogState extends State<CustomDialog> {
                         decoration: BoxDecoration(
                           borderRadius: const BorderRadius.all(Radius.circular(16)),
                           image: DecorationImage(
-                            image: NetworkImage('${rootImagePath + widget.images[index-3]}.jpg'),
+                            image: widget.images[index-3] == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('${rootImagePath + widget.images[index-3]}.jpg'),
                             fit: BoxFit.fill
                           )
                         ),
@@ -466,7 +464,7 @@ class _CustomDialogState extends State<CustomDialog> {
                         decoration: BoxDecoration(
                           borderRadius: const BorderRadius.all(Radius.circular(16)),
                           image: DecorationImage(
-                            image: NetworkImage('${rootImagePath + widget.images[index-4]}.jpg'),
+                            image: widget.images[index-4] == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('${rootImagePath + widget.images[index-4]}.jpg'),
                             fit: BoxFit.fill
                           )
                         ),

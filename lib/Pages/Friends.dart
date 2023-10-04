@@ -976,7 +976,7 @@ class _FriendsState extends State<Friends> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(20),
-                                                        child: Image.network(
+                                                        child: imageName == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network(
                                                             '$imageURL$imageName.jpg'),
                                                       ),
                                                     ),
@@ -1192,7 +1192,7 @@ class _FriendsState extends State<Friends> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(100),
-                                                        child: Image.network('${imageURL2 + 
+                                                        child: searchResults[index]['Images'][0] == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network('${imageURL2 + 
                                                             searchResults[index]
                                                                 ["Images"][0]}.jpg'),
                                                       ),
@@ -1325,7 +1325,7 @@ class _FriendsState extends State<Friends> {
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           100),
-                                                  child: Image.network('${imageURL2 +
+                                                  child: outgoingFriendInvitesResults[index]['Images'][0] == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network('${imageURL2 +
                                                       outgoingFriendInvitesResults[
                                                           index]["Images"][0]}.jpg'),
                                                 ),
@@ -1544,7 +1544,7 @@ class _FriendsState extends State<Friends> {
                                                               BorderRadius
                                                                   .circular(
                                                                       100),
-                                                          child: Image.network('${imageURL + 
+                                                          child: shortListResults[index]['GroupPicture'] == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network('${imageURL + 
                                                               shortListResults[
                                                                       index][
                                                                   "GroupPicture"]}.jpg'),
