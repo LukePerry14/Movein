@@ -31,7 +31,7 @@ class _MessagesState extends State<Messages> {
       .collection('Groups')
       .doc(data['groupId'])
       .collection('Messages')
-      .orderBy('sent', descending: false)
+      .orderBy('sent', descending: true)
       .snapshots();
 
   TextEditingController textController = TextEditingController();
@@ -115,12 +115,17 @@ class _MessagesState extends State<Messages> {
 
                   return ListView(
                     physics: const BouncingScrollPhysics(),
+                    reverse: true,
                     controller: scrollController,
                     shrinkWrap: true,
                     children: snapshot.data!.docs
                         .map((DocumentSnapshot document) {
                       late Map<String, dynamic> data =
                       document.data()! as Map<String, dynamic>;
+
+                      print('Sent by:');
+                      print(data['sentBy']);
+                      print(Auth().currentUser());
 
                       var sentText = "";
                       if (data['sent'] != null) {
@@ -218,11 +223,9 @@ class _MessagesState extends State<Messages> {
                         .add({
                       "text": textController.text,
                       'sent': FieldValue.serverTimestamp(),
-                      'sentBy': Auth().currentUser()
+                      'sentBy': FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser())
                     });
                     textController.clear();
-                    scrollController.jumpTo(
-                        scrollController.position.maxScrollExtent);
                   },
                 ),
               ],
