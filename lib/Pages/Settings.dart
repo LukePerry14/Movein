@@ -10,6 +10,7 @@ import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import '../Pages/Profile.dart';
 import '../Auth code/auth.dart';
 import 'package:http/http.dart' as http;
@@ -266,6 +267,10 @@ GestureDetector buildAccountOption(BuildContext context, String title) {
     ),
   );
 }
+
+// GestureDetector buildContactUs(BuildContext context, String title) {
+//   return 
+// }
 
 
 GestureDetector buildChangeEmail(BuildContext context, String title) {

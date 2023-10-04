@@ -198,7 +198,6 @@ class _ScrollerState extends State<Scroller> {
                         );
                       }
                     },
-
                     child: _groupDisplay
                 ),
               ),

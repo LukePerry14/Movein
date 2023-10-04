@@ -952,7 +952,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                     ),
                                     const SizedBox(height: 25),
                                     // This is where the profile images go
-                                    Text("p-images".tr, style: GoogleFonts.redHatDisplay(color: Colors.grey[700], fontSize: 16.5),),
+                                    Text("p-images".tr, style: GoogleFonts.redHatDisplay(color: Colors.grey[700], fontSize: 20),),
                                     const SizedBox(height:20),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -992,7 +992,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                                   ),
                                                 ),
                                                 Positioned(
-                                                  bottom: -25,
+                                                  bottom: 0,
+                                                  top: 0,
                                                   left: 0,
                                                   right: 0,
                                                   child: Center(
@@ -1415,7 +1416,25 @@ class _SignupScreenState extends State<SignupScreen> {
                                       'invalid-email': 'Enter a valid email',
                                       'wrong-password': 'Incorrect password'
                                     };
-                                    // error_message = errors[response] ?? response;
+
+                                    if (response == 'email-already-in-use') {
+                                      response = 'Account already in use with email address - please sign in.';
+                                    }
+
+                                    showDialog(context: context, builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: const Text("Sign In Error"),
+                                        content: Text(response),
+                                        actions: <Widget>[
+                                          ElevatedButton(
+                                            child: const Text("Close"),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    });
                                   });
                                 }
                                 return;
