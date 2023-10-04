@@ -22,6 +22,8 @@ import 'package:image_cropper/image_cropper.dart';
 import '../Pages/Friends.dart';
 import 'GroupFunctions.dart';
 
+String rootImagepath = 'https://movein.blob.core.windows.net/moveingroupimages/';
+String rootImageProfilePath = 'https://movein.blob.core.windows.net/moveinimages/';
 
 Future<List<Map<String, dynamic>>> getUserJoinedGroups(userId) async {
   try {
@@ -146,7 +148,7 @@ class GroupInvite extends StatelessWidget {
                                     height: 40,
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(100),
-                                      child: Image.asset(data[index]["GroupPicture"] ?? "assets/Pictures/reversed.png"),
+                                      child: data[index]['GroupPicture'] == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network('${rootImagepath + data[index]["GroupPicture"]}.jpg'),
                                     ),
                                   ),
                                   title: Text(data[index]['GroupName'], style: Theme.of(context).textTheme.bodyMedium),
@@ -612,7 +614,7 @@ class CreateGroupForm extends StatefulWidget {
 }
 
 class _CreateGroupFormState extends State<CreateGroupForm> {
-  String? currentGroupImage;
+  String? currentGroupImage = '';
   final _formKey = GlobalKey<FormState>();
   bool _isButtonEnabled = false;
   final TextEditingController _groupNameController = TextEditingController(text: "GroupName");
@@ -797,11 +799,6 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
                         currentGroupImage = uniqueID;
                         setState(() {
                           _selectedImage = pickedImage;
-                        });
-                      } else {
-                        currentGroupImage = '';
-                        setState(() {
-                          _selectedImage = null;
                         });
                       }
                     },
