@@ -143,24 +143,26 @@ class SwipeCard extends StatelessWidget {
                       Positioned(
                         bottom: 30,
                         child: SizedBox(
-                          width: width * 0.82,
-                          child: Text(
-                                    bio,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                      fontStyle: FontStyle.normal,
-                                      shadows: <Shadow>[
-                                        Shadow(
-                                          offset: Offset(2, 2), // Adjust the values for the shadow's position
-                                          blurRadius: 6.0,     // Adjust the blur radius as needed
-                                          color: Colors.black.withOpacity(0.5), // Adjust the shadow color and opacity
-                                        ),
-                                      ],
-                                    ),
-                                ),
+                          width: width * 0.8,
+                          child: Center(
+                            child: Text(
+                                      bio,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        fontStyle: FontStyle.normal,
+                                        shadows: <Shadow>[
+                                          Shadow(
+                                            offset: const Offset(2, 2), // Adjust the values for the shadow's position
+                                            blurRadius: 6.0,     // Adjust the blur radius as needed
+                                            color: Colors.black.withOpacity(0.5), // Adjust the shadow color and opacity
+                                          ),
+                                        ],
+                                      ),
+                                  ),
+                          ),
                         ),
                       ),
                     ],
@@ -376,14 +378,12 @@ class _CustomDialogState extends State<CustomDialog> {
                       );
                     }
                     case 2: {
-                      // print(widget.images[index-2]);
-                      // return RoundedBox(image: widget.images[index-2]);
                       return Container(
                         height: 400,
                         decoration: BoxDecoration(
                           borderRadius: const BorderRadius.all(Radius.circular(16)),
                           image: DecorationImage(
-                            image: NetworkImage('${rootImagePath + widget.images[index-2]}.jpg'),
+                            image: widget.images[index-2] == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('${rootImagePath + widget.images[index-2]}.jpg'),
                             fit: BoxFit.fill
                           )
                         ),
@@ -425,7 +425,7 @@ class _CustomDialogState extends State<CustomDialog> {
                         decoration: BoxDecoration(
                           borderRadius: const BorderRadius.all(Radius.circular(16)),
                           image: DecorationImage(
-                            image: NetworkImage('${rootImagePath + widget.images[index-3]}.jpg'),
+                            image: widget.images[index-3] == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('${rootImagePath + widget.images[index-3]}.jpg'),
                             fit: BoxFit.fill
                           )
                         ),
@@ -466,7 +466,7 @@ class _CustomDialogState extends State<CustomDialog> {
                         decoration: BoxDecoration(
                           borderRadius: const BorderRadius.all(Radius.circular(16)),
                           image: DecorationImage(
-                            image: NetworkImage('${rootImagePath + widget.images[index-4]}.jpg'),
+                            image: widget.images[index-4] == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage('${rootImagePath + widget.images[index-4]}.jpg'),
                             fit: BoxFit.fill
                           )
                         ),

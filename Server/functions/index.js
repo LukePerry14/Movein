@@ -265,7 +265,6 @@ exports.updateEmailVerificationStatus = functions.region('europe-west2').pubsub.
     return null;
 });
 
-
 exports.pruneTokens = functions.region('europe-west2').pubsub.schedule('0 0 1,16 * *').timeZone('GMT').onRun(async (context) => {
   const EXPIRATION_TIME = 1000 * 60 * 60 * 24 * 182;
 
@@ -409,7 +408,6 @@ exports.userDocUpdated = functions.region('europe-west2').firestore.document('Us
 
     return null; // Return a result if needed
 });
-
 
 exports.groupDocUpdated = functions.region('europe-west2').firestore.document('Groups/{groupId}').onUpdate(async (change, context) => {
     const groupId = context.params.groupId;

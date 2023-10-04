@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:movein/Pages/PremiumPage.dart';
+import 'package:movein/UserPreferences.dart';
 import 'package:pay/pay.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../Auth code/auth.dart';
@@ -70,7 +71,7 @@ class _PaymentState extends State<Payment> {
   @override
   Widget build(BuildContext context) {
     if (_startSubscription){
-      //subscriptionSetup();
+      subscriptionSetup();
     }
     _ready = ( !_payReady & _card!.complete & (controller.details.complete == true))!;
     return Scaffold(
@@ -428,6 +429,7 @@ Future<void> subscriptionSetup() async {
   );
 
   if (response.statusCode == 200) {
+    await UserPreferences.setAppsMax(5);
     Navigator.of(context).pop();
   } else {
     throw Exception('Failed to setup subscription: ${response.body}');
