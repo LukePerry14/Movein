@@ -65,9 +65,9 @@ Future<void> removeFromGroupAndUser(String groupId, String userId) async {
       await groupDocRef.delete();
     } else {
 // Calculate the new average values
-      double avgCleanliness = groupSnapshot.get('AvgCleanliness');
-      double avgNightLife = groupSnapshot.get('AvgNightLife');
-      double avgNoisiness = groupSnapshot.get('AvgNoisiness');
+      double avgCleanliness = groupSnapshot.get('AvgCleanliness').toDouble();
+      double avgNightLife = groupSnapshot.get('AvgNightLife').toDouble();
+      double avgNoisiness = groupSnapshot.get('AvgNoisiness').toDouble();
       DateTime avgBedTime = groupSnapshot.get('AvgBedTime').toDate();
       double avgYearOfStudy = groupSnapshot.get('AvgYearOfStudy');
 

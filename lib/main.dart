@@ -82,6 +82,7 @@ class App extends StatelessWidget {
               final bool loggedIn = (foreName != "NotLoggedInError");
               if (loggedIn){
                 updateToken();
+                checkSubscribed();
               }
               return GetMaterialApp(
                   debugShowCheckedModeBanner: false,
@@ -120,6 +121,29 @@ class App extends StatelessWidget {
       App.themeNotifier.value = isDarkMode ? ThemeMode.dark : ThemeMode.light;
     }
   }
+
+  void checkSubscribed() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        throw Exception("No authenticated user found.");
+      }
+
+      final docRef = FirebaseFirestore.instance.collection('Users').doc(currentUser.uid);
+
+      final docSnapshot = await docRef.get();
+
+      if (docSnapshot.exists) {
+        final subscribed = docSnapshot.data()?['Subscribed'] ?? false;
+        if (subscribed) {
+          await UserPreferences.setAppsMax(5);
+        }
+      }
+    } catch (e) {
+      throw Exception('Error updating token: $e');
+    }
+  }
+
 }
 
 class LoginScreen extends StatefulWidget {

@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:movein/UserPreferences.dart';
 import '../Ad code/ad_helper.dart';
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
@@ -407,7 +408,9 @@ class _ProfileInformationState extends State<ProfileInformation> {
                           onPressed: () async {
                             if (formValid) {
                               await updateInfo();
-                              _ad?.show();
+                              if (UserPreferences.getAppsMax() == 2){
+                                _ad?.show();
+                              }
                               Navigator.of(context)
                                   .pushReplacementNamed('/Profile');
                             }

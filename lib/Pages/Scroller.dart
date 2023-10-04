@@ -128,7 +128,7 @@ class _ScrollerState extends State<Scroller> {
     return Builder(
       builder: (context) {
         final navigator = Navigator.of(context);
-        bool loadAd = ((_adCountdown == 0) & _isAdLoaded);
+        bool loadAd = ((_adCountdown == 0) & _isAdLoaded & (UserPreferences.getAppsMax() == 2));
         if (loadAd) {
           Future.delayed(const Duration(seconds: 1), () {
             _timerController.start();
