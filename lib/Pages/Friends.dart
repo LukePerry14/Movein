@@ -1192,9 +1192,9 @@ class _FriendsState extends State<Friends> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(100),
-                                                        child: Image.asset(
+                                                        child: Image.network('${imageURL2 + 
                                                             searchResults[index]
-                                                                ["Images"][0]),
+                                                                ["Images"][0]}.jpg'),
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),
@@ -1325,9 +1325,9 @@ class _FriendsState extends State<Friends> {
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           100),
-                                                  child: Image.asset(
+                                                  child: Image.network('${imageURL2 +
                                                       outgoingFriendInvitesResults[
-                                                          index]["Images"][0]),
+                                                          index]["Images"][0]}.jpg'),
                                                 ),
                                               ),
                                               const SizedBox(width: 8),
@@ -1544,10 +1544,10 @@ class _FriendsState extends State<Friends> {
                                                               BorderRadius
                                                                   .circular(
                                                                       100),
-                                                          child: Image.asset(
+                                                          child: Image.network('${imageURL + 
                                                               shortListResults[
                                                                       index][
-                                                                  "GroupPicture"]),
+                                                                  "GroupPicture"]}.jpg'),
                                                         ),
                                                       ),
                                                       const SizedBox(width: 8),
