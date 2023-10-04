@@ -1164,7 +1164,7 @@ class _FriendsState extends State<Friends> {
                                                         yearOfStudy:
                                                             searchResults[index]
                                                                 ["YearOfStudy"].toInt(),
-                                                        showFriend: true,
+                                                        showFriend: false,
                                                         isVerified: searchResults[index]
                                                         ["verified"],
                                                       ));

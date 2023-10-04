@@ -355,7 +355,7 @@ class _ProfilePage extends State<Profile> {
                                   ),
                                   child: Text(
                                     'verif'.tr,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white, // Text color
                                       fontSize: 16.0,
                                     ),

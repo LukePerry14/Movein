@@ -25,7 +25,7 @@ import 'GroupFunctions.dart';
 String rootImagepath = 'https://movein.blob.core.windows.net/moveingroupimages/';
 String rootImageProfilePath = 'https://movein.blob.core.windows.net/moveinimages/';
 
-Future<List<Map<String, dynamic>>> getUserJoinedGroups(userId) async {
+Future<List<Map<String, dynamic>>> getUserJoinedGroups(userId, inviteeId) async {
   try {
     final usersCollectionRef = FirebaseFirestore.instance.collection('Users');
     final userDocRef = usersCollectionRef.doc(userId);
@@ -34,41 +34,46 @@ Future<List<Map<String, dynamic>>> getUserJoinedGroups(userId) async {
     final joinedGroups = userSnapshot.data()?['Joined'] as List<dynamic>;
 
     final groupsCollectionRef = FirebaseFirestore.instance.collection('Groups');
-    final groupsSnapshot = await groupsCollectionRef.get();
 
     final List<Map<String, dynamic>> result = [];
-    for (var groupDoc in groupsSnapshot.docs) {
-      if (joinedGroups.contains(groupDoc.id)) {
+
+    for (var groupId in joinedGroups) {
+      final groupDoc = await groupsCollectionRef.doc(groupId).get();
+
+      if (groupDoc.exists) {
         final groupData = groupDoc.data();
-        final groupName = groupData['GroupName'] as String;
-        final memberIds = groupData['Members'] as List<dynamic>;
-        final groupPicture = groupData['GroupPicture'] as String;
+        final groupName = groupData?['GroupName'] as String;
+        final memberIds = groupData?['Members'] as List<dynamic>;
+        final groupPicture = groupData?['GroupPicture'] as String;
         final documentId = groupDoc.id;
 
-        final List<String> memberForeNames = [];
-        for (var memberId in memberIds) {
-          final memberDoc = await usersCollectionRef.doc(memberId).get();
-          final memberForeName = memberDoc.data()?['ForeName'] as String;
-          memberForeNames.add(memberForeName);
-        }
+        if (!memberIds.contains(inviteeId)) {
+          final List<String> memberForeNames = [];
+          for (var memberId in memberIds) {
+            final memberDoc = await usersCollectionRef.doc(memberId).get();
+            final memberForeName = memberDoc.data()?['ForeName'] as String;
+            memberForeNames.add(memberForeName);
+          }
 
-        result.add({
-          'GroupName': groupName,
-          "GroupPicture": groupPicture,
-          'Members': memberForeNames,
-          'Id': documentId,
-        });
+          result.add({
+            'GroupName': groupName,
+            "GroupPicture": groupPicture,
+            'Members': memberForeNames,
+            'Id': documentId,
+          });
+        }
       }
     }
 
     return result;
-  }  catch (e) {
+  } catch (e) {
     throw FirebaseException(
       message: 'Error getting groups for invite: $e',
       plugin: 'cloud_firestore',
     );
   }
 }
+
 
 class GroupInvite extends StatelessWidget {
   final String inviteeId;
@@ -83,7 +88,7 @@ class GroupInvite extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return FutureBuilder(
-      future: getUserJoinedGroups(userId),
+      future: getUserJoinedGroups(userId, inviteeId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // While waiting for the data to load, you can show a loading indicator
