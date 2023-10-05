@@ -421,6 +421,22 @@ Future<void> addFriend(String inviteId, userId) async {
   // Access the "Users" collection
   final CollectionReference usersCollection =
   FirebaseFirestore.instance.collection('Users');
+  final CollectionReference dmCollection =
+  FirebaseFirestore.instance.collection('DirectMessages');
+
+  String dmId = DMIdGen(userId, inviteId);
+
+  Map<String, dynamic> dmData = {
+    'Members': [userId, inviteId],
+  };
+
+  try {
+    // Use set with merge option to only create the document if it doesn't exist
+    await dmCollection.doc(dmId).set(dmData, SetOptions(merge: true));
+  } catch (e) {
+    throw FirebaseException(
+        plugin: 'cloud_firestore', message: "Firebase error with code: $e");
+  }
 
   // Perform array union on the "Friends" field of inviteId document
   await usersCollection
@@ -434,6 +450,7 @@ Future<void> addFriend(String inviteId, userId) async {
 
   removeFriendInvite(inviteId, userId);
 }
+
 
 Future<void> removeFriendInvite(String inviteId, userId) async {
   final CollectionReference usersCollection =

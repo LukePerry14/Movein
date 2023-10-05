@@ -14,10 +14,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Pages/Messages.dart' as mb;
 import 'package:page_transition/page_transition.dart';
-import 'package:provider/provider.dart';
-import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:http/http.dart' as http;
-import 'package:sendbird_sdk/sendbird_sdk.dart' as sb;
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
 import '../main.dart';
@@ -1054,39 +1051,46 @@ class _FriendsState extends State<Friends> {
                                             motion: const ScrollMotion(),
                                             children: [
                                               SlidableAction(
-                                                onPressed: (context) async {
-                                                  String clickedOnUser =
-                                                      searchResults[index]
-                                                          ["Id"];
-                                                  String userId =
-                                                      Auth().currentUser();
-
-                                                  var usersIds = [
-                                                    clickedOnUser,
-                                                    userId
-                                                  ];
-                                                  usersIds.sort();
-                                                  Navigator.push(context,PageTransition
-                                                  (
-                                                    curve: Curves.linear,
-                                                    type: PageTransitionType.topToBottom,
-                                          
-                                                    child: const mb.Messages(),
-                                                    settings: RouteSettings
-                                                    (
-                                                              arguments:
-                                                              {
-                                                                'groupId': usersIds[0] + usersIds[1],
-                                                                'groupName': searchResults[index]["GroupName"]
-
-                                                              }
-                                                    )
-                                                    )
-                                                  );
+                                                onPressed: (context) {
+                                                  showDialog<String>(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                      context) =>
+                                                          CustomDialog(
+                                                            id: searchResults[index]
+                                                            ["Id"],
+                                                            foreName:
+                                                            searchResults[index]
+                                                            ["ForeName"],
+                                                            age:
+                                                            searchResults[index]
+                                                            ["Age"].toInt(),
+                                                            uni:
+                                                            searchResults[index]
+                                                            ["Uni"],
+                                                            preferences:
+                                                            searchResults[index]
+                                                            ["Preferences"],
+                                                            images:
+                                                            searchResults[index]
+                                                            ["Images"],
+                                                            bio:
+                                                            searchResults[index]
+                                                            ["Bio"],
+                                                            subject:
+                                                            searchResults[index]
+                                                            ["Subject"],
+                                                            yearOfStudy:
+                                                            searchResults[index]
+                                                            ["YearOfStudy"].toInt(),
+                                                            showFriend: false,
+                                                            isVerified: searchResults[index]
+                                                            ["verified"],
+                                                          ));
                                                 },
-                                                backgroundColor: Colors.blue,
-                                                icon: Icons.mail,
-                                                label: 'Messages'.tr,
+                                                backgroundColor: LAppTheme.lightTheme.primaryColor,
+                                                icon: LineAwesomeIcons.search,
+                                                label: 'preview'.tr,
                                               ),
                                               SlidableAction(
                                                 onPressed: (context) {
@@ -1132,42 +1136,36 @@ class _FriendsState extends State<Friends> {
                                             ],
                                           ),
                                           child: GestureDetector(
-                                            onTap: () {
-                                              showDialog<String>(
-                                                  context: context,
-                                                  builder: (BuildContext
-                                                          context) =>
-                                                      CustomDialog(
-                                                        id: searchResults[index]
-                                                            ["Id"],
-                                                        foreName:
-                                                            searchResults[index]
-                                                                ["ForeName"],
-                                                        age:
-                                                            searchResults[index]
-                                                                ["Age"].toInt(),
-                                                        uni:
-                                                            searchResults[index]
-                                                                ["Uni"],
-                                                        preferences:
-                                                            searchResults[index]
-                                                                ["Preferences"],
-                                                        images:
-                                                            searchResults[index]
-                                                                ["Images"],
-                                                        bio:
-                                                            searchResults[index]
-                                                                ["Bio"],
-                                                        subject:
-                                                            searchResults[index]
-                                                                ["Subject"],
-                                                        yearOfStudy:
-                                                            searchResults[index]
-                                                                ["YearOfStudy"].toInt(),
-                                                        showFriend: false,
-                                                        isVerified: searchResults[index]
-                                                        ["verified"],
-                                                      ));
+                                            onTap: () async {
+                                              String clickedOnUser =
+                                              searchResults[index]
+                                              ["Id"];
+                                              String userId =
+                                              Auth().currentUser();
+
+                                              var usersIds = [
+                                                clickedOnUser,
+                                                userId
+                                              ];
+                                              usersIds.sort();
+                                              Navigator.push(context,PageTransition
+                                                (
+                                                  curve: Curves.linear,
+                                                  type: PageTransitionType.topToBottom,
+
+                                                  child: const mb.Messages(),
+                                                  settings: RouteSettings
+                                                    (
+                                                      arguments:
+                                                      {
+                                                        'dmId': DMIdGen(usersIds[0], usersIds[1]),
+                                                        'groupName':"${searchResults[index]["ForeName"]} ${searchResults[index]["SurName"]}",
+                                                        'groupPicture': searchResults[index]["Images"][0],
+
+                                                      }
+                                                  )
+                                              )
+                                              );
                                             },
                                             child: Padding(
                                               padding:
@@ -1999,6 +1997,16 @@ class _FriendsState extends State<Friends> {
         ],
       ),
     );
+  }
+}
+
+String DMIdGen(String userId1, String userId2) {
+  int compareResult = userId1.compareTo(userId2);
+
+  if (compareResult < 0) {
+    return '$userId1$userId2';
+  } else {
+    return '$userId2$userId1';
   }
 }
 
