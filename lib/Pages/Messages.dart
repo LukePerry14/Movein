@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -85,181 +86,226 @@ class _MessagesState extends State<Messages> {
 
   @override
   Widget build(BuildContext context) {
+    print(data);
     bool dmFlag = (data["dmId"] != null);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${data['groupName']}',
-            style: Theme.of(context).textTheme.headlineSmall),
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Theme.of(context).canvasColor,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(
-            color: LAppTheme.lightTheme.primaryColor,
-            height: 1.0,
-          ),
-        ),
-        leading: IconButton(
-          icon: Icon(
-            LineAwesomeIcons.angle_up,
-            color: LAppTheme.lightTheme.primaryColor,
-          ),
-          color: Colors.grey[500],
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          if (!dmFlag)
-          IconButton(
-            color: Colors.grey[500],
-            icon:
-                Icon(Icons.more_vert, color: LAppTheme.lightTheme.primaryColor),
-            //Icon not showing
-            onPressed: () {
-              Navigator.push(
-                context,
-                PageTransition(
-                    curve: Curves.linear,
-                    type: PageTransitionType.topToBottom,
-                    child: const GroupOptions(),
-                    settings: RouteSettings(arguments: {
-                      'members': data["members"],
-                      'groupId': data["groupId"],
-                      'groupName': data["groupName"],
-                      'groupPicture': data["groupPicture"],
-                    })),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-              child: StreamBuilder<List<dynamic>>(
-            stream: getMessagesStream(dmFlag? data["dmId"]: data['groupId']),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return const Text('Something went wrong');
-              }
-
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Text("Loading");
-              }
-
-              if (snapshot.data == null) {
-                return const Text("Error.");
-              }
-
-              return ListView(
-                physics: const BouncingScrollPhysics(),
-                reverse: true,
-                shrinkWrap: true,
-                children: snapshot.data!
-                    .map((data) {
-                      // if (data['sent'] == null) {
-                      //   return const Text('hi');
-                      // }
-
-                      // print(data);
-
-                      var sentText = "";
-
-                      // DateTime sent = DateTime.fromMillisecondsSinceEpoch(
-                      //     data['sent'].seconds * 1000);
-
-                      // sentText =
-                      //     "${data['sentBy']['ForeName']} ${data['sentBy']['SurName']} • ${sent.hour}:${sent.minute < 10 ? "0" : ""}${sent.minute}";
-
-                      return Container(
-                        padding: const EdgeInsets.only(
-                            left: 14, right: 14, top: 10, bottom: 10),
-                        child: Align(
-                            alignment:
-                                (Auth().currentUser() != data['sentByUid']
-                                    ? Alignment.topLeft
-                                    : Alignment.topRight),
-                            child: Column(children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  color:
-                                      (Auth().currentUser() != data['sentByUid']
-                                          ? Colors.grey.shade200
-                                          : LAppTheme.lightTheme.primaryColor),
-                                ),
-                                padding: EdgeInsets.all(16),
-                                child: Text(
-                                  data['text'],
-                                  style: TextStyle(fontSize: 15),
-                                ),
-                              ),
-                              Text(
-                                data['subheading'],
-                                textAlign: TextAlign.right,
-                              )
-                            ])),
-                      );
-                    })
-                    .toList()
-                    .cast(),
-              );
-            },
-          )),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 2.0),
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: Colors.grey[600]!),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            title: Row(
               children: [
-                // First child is enter comment text input
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: TextFormField(
-                      autocorrect: false,
-                      controller: textController,
-                      decoration: InputDecoration(
-                        labelText: "message".tr,
-                        labelStyle:
-                            TextStyle(fontSize: 20.0, color: Colors.grey[400]),
-                        fillColor: Colors.blue,
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(15)),
-                          borderSide: BorderSide(color: Colors.purpleAccent),
+                Container(
+                  color: Colors.white.withOpacity(0.8),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0), // Adjust the radius as needed
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Adjust the blur intensity as needed
+                      child: Container(
+                        color: Colors.transparent, // Make the background of the blurred container transparent
+                        padding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
+                        child: Text(
+                          data["groupName"],
+                          style: Theme.of(context).textTheme.headlineMedium,
                         ),
                       ),
                     ),
                   ),
                 ),
-                // Second child is button
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  iconSize: 20.0,
-                  onPressed: () async {
-                    FirebaseFirestore.instance
-                        .collection('Groups')
-                        .doc(data['groupId'])
-                        .collection('Messages')
-                        .add({
-                      "text": textController.text,
-                      'sent': FieldValue.serverTimestamp(),
-                      'sentBy': FirebaseFirestore.instance
-                          .collection('Users')
-                          .doc(Auth().currentUser())
-                    });
-                    textController.clear();
-                  },
+                if (data["dmId"] == null)
+                  Expanded(child: Container()),
+                if (data["dmId"] == null)
+      IconButton(
+      color: Colors.grey[500],
+      icon:
+      Icon(Icons.more_vert, color: LAppTheme.lightTheme.primaryColor),
+      //Icon not showing
+      onPressed: () {
+        Navigator.push(
+          context,
+          PageTransition(
+              curve: Curves.linear,
+              type: PageTransitionType.topToBottom,
+              child: const GroupOptions(),
+              settings: RouteSettings(arguments: {
+                'members': data["members"],
+                'groupId': data["groupId"],
+                'groupName': data["groupName"],
+                'groupPicture': data["groupPicture"],
+              })),
+        );
+      },
+    ),
+          ]
+            ),
+            leading: IconButton(
+              icon: Icon(
+                LineAwesomeIcons.angle_up,
+                color: LAppTheme.lightTheme.primaryColor,
+              ),
+              color: Colors.grey[500],
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            expandedHeight: MediaQuery.of(context).size.height / 4,
+            backgroundColor: Theme.of(context).canvasColor,
+            pinned: true,
+            stretch: true,
+            elevation: 0,
+            flexibleSpace: FlexibleSpaceBar(
+                background: Image.network((data['groupPicture'] == null)
+                    ? 'https://movein.blob.core.windows.net/moveinimages/noimagefound.png'
+                    : '${(data['dmId'] == null)?data['groupPicture']: imageURL2 + data['groupPicture']}.jpg',
+                fit: BoxFit.cover,
+                )
+            ),
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(1.0), // Adjust the height of the border
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Colors.orange, // Set the border color to orange
+                      width: 1.0, // Adjust the border width as needed
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SliverFillRemaining(
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                    child: StreamBuilder<List<dynamic>>(
+                      stream: getMessagesStream(dmFlag? data["dmId"]: data['groupId']),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return const Text('Something went wrong');
+                        }
+
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Text("Loading");
+                        }
+
+                        if (snapshot.data == null) {
+                          return const Text("Error.");
+                        }
+
+                        return ListView(
+                          physics: const BouncingScrollPhysics(),
+                          reverse: true,
+                          shrinkWrap: true,
+                          children: [
+                            ...snapshot.data!
+                                .map((data) {
+                              // if (data['sent'] == null) {
+                              //   return const Text('hi');
+                              // }
+
+                              // print(data);
+
+                              var sentText = "";
+
+                              // DateTime sent = DateTime.fromMillisecondsSinceEpoch(
+                              //     data['sent'].seconds * 1000);
+
+                              // sentText =
+                              //     "${data['sentBy']['ForeName']} ${data['sentBy']['SurName']} • ${sent.hour}:${sent.minute < 10 ? "0" : ""}${sent.minute}";
+
+                              return Container(
+                                padding: const EdgeInsets.only(
+                                    left: 14, right: 14, top: 10, bottom: 10),
+                                child: Align(
+                                    alignment:
+                                    (Auth().currentUser() != data['sentByUid']
+                                        ? Alignment.topLeft
+                                        : Alignment.topRight),
+                                    child: Column(children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(20),
+                                          color:
+                                          (Auth().currentUser() != data['sentByUid']
+                                              ? Colors.grey.shade200
+                                              : LAppTheme.lightTheme.primaryColor),
+                                        ),
+                                        padding: EdgeInsets.all(16),
+                                        child: Text(
+                                          data['text'],
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                      ),
+                                      Text(
+                                        data['subheading'],
+                                        textAlign: TextAlign.right,
+                                      )
+                                    ])),
+                              );
+                            })
+                                .toList()
+                                .cast(),
+                            const SizedBox(height:56),
+                          ]
+                        );
+                      },
+                    )),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(color: Colors.grey[600]!),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      // First child is enter comment text input
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: TextFormField(
+                            autocorrect: false,
+                            controller: textController,
+                            decoration: InputDecoration(
+                              labelText: "message".tr,
+                              labelStyle:
+                              TextStyle(fontSize: 20.0, color: Colors.grey[400]),
+                              fillColor: Colors.blue,
+                              border: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(15)),
+                                borderSide: BorderSide(color: Colors.purpleAccent),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Second child is button
+                      IconButton(
+                        icon: const Icon(Icons.send),
+                        iconSize: 20.0,
+                        onPressed: () async {
+                          FirebaseFirestore.instance
+                              .collection(dmFlag? 'DirectMessages': 'Groups')
+                              .doc(dmFlag? data['dmId']:data['groupId'])
+                              .collection('Messages')
+                              .add({
+                            "text": textController.text,
+                            'sent': FieldValue.serverTimestamp(),
+                            'sentBy': FirebaseFirestore.instance
+                                .collection('Users')
+                                .doc(Auth().currentUser())
+                          });
+                          textController.clear();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
+          )
         ],
       ),
     );
