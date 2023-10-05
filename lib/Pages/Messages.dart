@@ -30,7 +30,7 @@ class _MessagesState extends State<Messages> {
     final streamController = StreamController<List<dynamic>>();
 
     final subscription = FirebaseFirestore.instance
-        .collection('Groups')
+        .collection((data["dmId"] != null)? 'DirectMessages':'Groups')
         .doc(groupId)
         .collection('Messages')
         .orderBy('sent', descending: true)
@@ -85,6 +85,7 @@ class _MessagesState extends State<Messages> {
 
   @override
   Widget build(BuildContext context) {
+    bool dmFlag = (data["dmId"] != null);
     return Scaffold(
       appBar: AppBar(
         title: Text('${data['groupName']}',
@@ -110,6 +111,7 @@ class _MessagesState extends State<Messages> {
           },
         ),
         actions: [
+          if (!dmFlag)
           IconButton(
             color: Colors.grey[500],
             icon:
@@ -137,7 +139,7 @@ class _MessagesState extends State<Messages> {
         children: <Widget>[
           Expanded(
               child: StreamBuilder<List<dynamic>>(
-            stream: getMessagesStream(data['groupId']),
+            stream: getMessagesStream(dmFlag? data["dmId"]: data['groupId']),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return const Text('Something went wrong');

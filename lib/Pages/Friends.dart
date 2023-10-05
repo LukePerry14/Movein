@@ -14,10 +14,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:movein/Pages/Scroller.dart';
 import 'package:movein/Pages/Messages.dart' as mb;
 import 'package:page_transition/page_transition.dart';
-import 'package:provider/provider.dart';
-import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:http/http.dart' as http;
-import 'package:sendbird_sdk/sendbird_sdk.dart' as sb;
 import '../Auth code/auth.dart';
 import '../Themes/lMode.dart';
 import '../main.dart';
@@ -1076,8 +1073,8 @@ class _FriendsState extends State<Friends> {
                                                     (
                                                               arguments:
                                                               {
-                                                                'groupId': usersIds[0] + usersIds[1],
-                                                                'groupName': searchResults[index]["GroupName"]
+                                                                'dmId': DMIdGen(usersIds[0], usersIds[1]),
+                                                                'groupName':"${searchResults[index]["ForeName"]} ${searchResults[index]["Surname"][0]}"
 
                                                               }
                                                     )
@@ -1999,6 +1996,16 @@ class _FriendsState extends State<Friends> {
         ],
       ),
     );
+  }
+}
+
+String DMIdGen(String userId1, String userId2) {
+  int compareResult = userId1.compareTo(userId2);
+
+  if (compareResult < 0) {
+    return '$userId1$userId2';
+  } else {
+    return '$userId2$userId1';
   }
 }
 
