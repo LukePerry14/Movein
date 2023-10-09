@@ -88,6 +88,7 @@ class _MessagesState extends State<Messages> {
   Widget build(BuildContext context) {
     print(data);
     bool dmFlag = (data["dmId"] != null);
+    updateReadReceipt(dmFlag? data["dmId"]:data["groupId"]);
     return Scaffold(
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
@@ -154,7 +155,7 @@ class _MessagesState extends State<Messages> {
             stretch: true,
             elevation: 0,
             flexibleSpace: FlexibleSpaceBar(
-                background: Image.network((data['groupPicture'] == null)
+                background: Image.network((data['groupPicture'] == "https://movein.blob.core.windows.net/moveingroupimages/")
                     ? 'https://movein.blob.core.windows.net/moveinimages/noimagefound.png'
                     : '${(data['dmId'] == null)?data['groupPicture']: imageURL2 + data['groupPicture']}.jpg',
                 fit: BoxFit.cover,
@@ -297,6 +298,12 @@ class _MessagesState extends State<Messages> {
                                 .collection('Users')
                                 .doc(Auth().currentUser())
                           });
+                          FirebaseFirestore.instance
+                              .collection(dmFlag ? 'DirectMessages' : 'Groups')
+                              .doc(dmFlag ? data["dmId"] : groupId)
+                              .update({
+                            'Read': [Auth().currentUser()],
+                          });
                           textController.clear();
                         },
                       ),
@@ -310,4 +317,14 @@ class _MessagesState extends State<Messages> {
       ),
     );
   }
+
+  void updateReadReceipt(String groupId) {
+    // Get the current user ID
+    final currentUserId = Auth().currentUser();
+
+    FirebaseFirestore.instance.collection((data["dmId"]!= null)? 'DirectMessages':'Groups').doc(groupId).update({
+      'Read': FieldValue.arrayUnion([currentUserId]),
+    });
+  }
+
 }

@@ -223,6 +223,7 @@ class _ProfilePage extends State<Profile> {
                     SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
                       child: SafeArea(
+                        bottom: false,
                         child: Container(
                           padding: const EdgeInsets.all(10.0),
                           child: Column(
