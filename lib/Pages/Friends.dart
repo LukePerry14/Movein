@@ -189,8 +189,7 @@ class _FriendsState extends State<Friends> {
           for (var group in tGroups) {
             if (group.isNotEmpty) {
               DocumentSnapshot groupSnapshot = await docGroups.doc(group).get();
-              Map<String, dynamic>? groupData =
-                  groupSnapshot.data() as Map<String, dynamic>?;
+              Map<String, dynamic>? groupData = groupSnapshot.data() as Map<String, dynamic>?;
               if (groupData != null) {
                 blockIgnores.add(group);
                 groups.add({
@@ -205,7 +204,7 @@ class _FriendsState extends State<Friends> {
                   'AvgYearOfStudy':
                       (groupData["AvgYearOfStudy"] as num).toDouble(),
                   "AvgBedTime": groupData["AvgBedTime"],
-                  "Noti" : !groupData["Read"].contains(Auth().currentUser()),
+                  "Noti" : (groupData["Read"] != null) ? !(groupData["Read"].contains(Auth().currentUser())) : false
                 });
               }
             }
@@ -298,23 +297,23 @@ class _FriendsState extends State<Friends> {
               .collection('DirectMessages')
               .doc(DMIdGen(Auth().currentUser(), friendId))
               .get();
-          final friendDmData = friendSnapshot.data();
+          final friendDmData = friendDmSnapshot.data();
 
-          if (friendData != null) {
-            int yearsAgo = stampToYear(friendData['DOB'].toDate());
+          if ((friendData != null) & (friendDmData != null)) {
+            int yearsAgo = stampToYear(friendData?['DOB'].toDate());
             friends.add({
-              "ForeName": friendData['ForeName'],
-              "SurName": friendData['SurName'],
+              "ForeName": friendData?['ForeName'],
+              "SurName": friendData?['SurName'],
               "Age": yearsAgo,
-              "Uni": friendData['UniAttended'],
-              "Preferences": friendData['Preferences'],
-              "Images": friendData['Images'],
-              "Bio": friendData['Bio'],
-              "Subject": friendData['Subject'],
-              "YearOfStudy": friendData['YearOfStudy'],
+              "Uni": friendData?['UniAttended'],
+              "Preferences": friendData?['Preferences'],
+              "Images": friendData?['Images'],
+              "Bio": friendData?['Bio'],
+              "Subject": friendData?['Subject'],
+              "YearOfStudy": friendData?['YearOfStudy'],
               "Id": friendId,
-              "verified" : friendData['EmailVerified'],
-              "Noti" : friendDmData?["Read"].contains(Auth().currentUser())
+              "verified" : friendData?['EmailVerified'],
+              "Noti" : (friendDmData?["Read"] != null) ? !(friendDmData?["Read"].contains(Auth().currentUser())) : false
             });
           }
         }
@@ -372,22 +371,41 @@ class _FriendsState extends State<Friends> {
           } else {
             isLoading = false;
             final data = snapshot.data;
-            friends = data![0];
-            searchResults = data[0];
-            friendInvites = data[1];
-            friendSearchResults = data[1];
-            groupInvites = data[2];
-            groupSearchResults = data[2];
-            outgoingFriendInvites = data[3];
-            outgoingFriendInvitesResults = data[3];
-            joined = data[4][0];
-            joinedResults = data[4][0];
-            applications = data[4][1];
-            applicationsResults = data[4][1];
-            shortList = data[4][2];
-            shortListResults = data[4][2];
-            blockedGroups = data[5];
-            blockedSearchResults = data[5];
+            try{
+              friends = data![0];
+              searchResults = data[0];
+              friendInvites = data[1];
+              friendSearchResults = data[1];
+              groupInvites = data[2];
+              groupSearchResults = data[2];
+              outgoingFriendInvites = data[3];
+              outgoingFriendInvitesResults = data[3];
+              joined = data[4][0];
+              joinedResults = data[4][0];
+              applications = data[4][1];
+              applicationsResults = data[4][1];
+              shortList = data[4][2];
+              shortListResults = data[4][2];
+              blockedGroups = data[5];
+              blockedSearchResults = data[5];
+            } catch (e) {
+              friends = [];
+              searchResults = [];
+              friendInvites = [];
+              friendSearchResults = [];
+              groupInvites = [];
+              groupSearchResults = [];
+              outgoingFriendInvites = [];
+              outgoingFriendInvitesResults = [];
+              joined = [];
+              joinedResults = [];
+              applications = [];
+              applicationsResults = [];
+              shortList = [];
+              shortListResults = [];
+              blockedGroups = [];
+              blockedSearchResults = [];
+            }
             return buildScaffold(context, false);
           }
         });
@@ -653,6 +671,10 @@ class _FriendsState extends State<Friends> {
                                                 ),
                                                 SlidableAction(
                                                   onPressed: (context) {
+                                                    setState(() {
+                                                      joinedResults[joinedIndex]["Noti"] = false;
+                                                      joined[joinedIndex]["Noti"] = false;
+                                                    });
                                                     Navigator.push(
                                                       context,
                                                       PageTransition(
@@ -694,7 +716,11 @@ class _FriendsState extends State<Friends> {
                                               ],
                                             ),
                                             child: GestureDetector(
-                                              onTap: () async {
+                                              onTap: () {
+                                                setState(() {
+                                                  joinedResults[joinedIndex]["Noti"] = false;
+                                                  joined[joinedIndex]["Noti"] = false;
+                                                });
                                                 Navigator.push(
                                                   context,
                                                   PageTransition(
@@ -763,11 +789,27 @@ class _FriendsState extends State<Friends> {
                                                                 '$imageURL$imageString.jpg'),
                                                           ),
                                                           if (joinedResults[joinedIndex]["Noti"] == true)
-                                                          const Positioned(
-                                                            bottom: 0,
-                                                              right: 0,
-                                                              child: Icon(LineAwesomeIcons.bell, color: Colors.red)
-                                                          )
+                                                            Positioned(
+                                                              bottom: -5,
+                                                              right: -5,
+                                                              child: Container(
+                                                                height:20,
+                                                                width: 20,
+                                                                decoration: BoxDecoration(
+                                                                  shape: BoxShape.circle,
+                                                                  color: Colors.red, // Background color
+                                                                  boxShadow: [
+                                                                    BoxShadow(
+                                                                      color: Colors.black.withOpacity(0.3), // Shadow color and opacity
+                                                                      blurRadius: 5, // Adjust the blur radius as needed
+                                                                      offset: const Offset(0, 3), // Adjust the shadow offset
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                //padding: EdgeInsets.all(8.0), // Padding inside the container
+                                                                child: const Icon(LineAwesomeIcons.bell, color: Colors.white, size: 15,), // Adjust the icon color
+                                                              ),
+                                                            )
                                                         ],
                                                       ),
                                                     ),
@@ -1159,6 +1201,10 @@ class _FriendsState extends State<Friends> {
                                               String clickedOnUser =
                                               searchResults[index]
                                               ["Id"];
+                                              setState(() {
+                                                searchResults[index]["Noti"] = false;
+                                                friends[index]["Noti"] = false;
+                                              });
                                               String userId =
                                               Auth().currentUser();
 
@@ -1216,14 +1262,29 @@ class _FriendsState extends State<Friends> {
                                                                 searchResults[index]
                                                                 ["Images"][0]}.jpg'),
                                                           ),
-                                                          if (searchResults[index]['Noti'] == true)
-                                                          const Positioned(
-                                                              bottom: 0,
-                                                              right: 0,
-                                                              child: Icon(LineAwesomeIcons.bell, color: Colors.red)
-                                                          )
-                                                        ]
-                                                      ),
+                                                            if (searchResults[index]['Noti'] == true)
+                                                              Positioned(
+                                                                bottom: -5,
+                                                                right: -5,
+                                                                child: Container(
+                                                                  height:20,
+                                                                  width: 20,
+                                                                  decoration: BoxDecoration(
+                                                                    shape: BoxShape.circle,
+                                                                    color: Colors.red, // Background color
+                                                                    boxShadow: [
+                                                                      BoxShadow(
+                                                                        color: Colors.black.withOpacity(0.3), // Shadow color and opacity
+                                                                        blurRadius: 5, // Adjust the blur radius as needed
+                                                                        offset: const Offset(0, 3), // Adjust the shadow offset
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  //padding: EdgeInsets.all(8.0), // Padding inside the container
+                                                                  child: const Icon(LineAwesomeIcons.bell, color: Colors.white, size: 15,), // Adjust the icon color
+                                                                ),
+                                                              )
+                                                          ]),
                                                     ),
                                                     const SizedBox(width: 8),
                                                     Expanded(
