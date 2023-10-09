@@ -19,6 +19,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:movein/UserPreferences.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:image_cropper/image_cropper.dart';
+import '../Auth code/auth.dart';
 import '../Pages/Friends.dart';
 import 'GroupFunctions.dart';
 
@@ -428,6 +429,7 @@ Future<void> addFriend(String inviteId, userId) async {
 
   Map<String, dynamic> dmData = {
     'Members': [userId, inviteId],
+    'Read': [Auth().currentUser()]
   };
 
   try {
@@ -645,15 +647,6 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
   Future<void> _submitForm(int appsMax, String? groupImageString) async {
     if (_formKey.currentState!.validate()) {
       final String groupName = _groupNameController.text;
-
-      // const String dummyUrl = 'https://example.com/upload';
-      // final Uri uri = Uri.parse(dummyUrl);
-      //
-      // final request = http.MultipartRequest('POST', uri)
-      //   ..files.add(await http.MultipartFile.fromPath('image', _selectedImage!.path));
-      //
-      // final response = await request.send();
-      // final groupPicture = await response.stream.bytesToString();
       final CollectionReference groupsCollection = FirebaseFirestore.instance.collection('Groups');
       final DocumentReference userDocument = FirebaseFirestore.instance.collection('Users').doc(widget.userId);
       final DocumentSnapshot userSnapshot = await userDocument.get();
@@ -686,6 +679,7 @@ class _CreateGroupFormState extends State<CreateGroupForm> {
         'KickVals': kickVals,
         'Kicks': kicks,
         'Members': members,
+        'Read': [Auth().currentUser()],
       };
       final newGroupDocument = await groupsCollection.add(groupDoc);
       await userDocument.update({

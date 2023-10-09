@@ -205,6 +205,7 @@ class _FriendsState extends State<Friends> {
                   'AvgYearOfStudy':
                       (groupData["AvgYearOfStudy"] as num).toDouble(),
                   "AvgBedTime": groupData["AvgBedTime"],
+                  "Noti" : !groupData["Read"].contains(Auth().currentUser()),
                 });
               }
             }
@@ -293,6 +294,12 @@ class _FriendsState extends State<Friends> {
               .get();
           final friendData = friendSnapshot.data();
 
+          final friendDmSnapshot = await FirebaseFirestore.instance
+              .collection('DirectMessages')
+              .doc(DMIdGen(Auth().currentUser(), friendId))
+              .get();
+          final friendDmData = friendSnapshot.data();
+
           if (friendData != null) {
             int yearsAgo = stampToYear(friendData['DOB'].toDate());
             friends.add({
@@ -307,6 +314,7 @@ class _FriendsState extends State<Friends> {
               "YearOfStudy": friendData['YearOfStudy'],
               "Id": friendId,
               "verified" : friendData['EmailVerified'],
+              "Noti" : friendDmData?["Read"].contains(Auth().currentUser())
             });
           }
         }
@@ -741,15 +749,26 @@ class _FriendsState extends State<Friends> {
                                                     SizedBox(
                                                       width: 40,
                                                       height: 40,
-                                                      child: ClipRRect(
-                                                        borderRadius:
+                                                      child: Stack(
+                                                        clipBehavior: Clip.none,
+                                                        children: [
+                                                          ClipRRect(
+                                                            borderRadius:
                                                             BorderRadius
                                                                 .circular(20),
-                                                        child: imageString == ''
-                                                            ? Image.network(
+                                                            child: imageString == ''
+                                                                ? Image.network(
                                                                 'https://movein.blob.core.windows.net/moveinimages/noimagefound.png')
-                                                            : Image.network(
+                                                                : Image.network(
                                                                 '$imageURL$imageString.jpg'),
+                                                          ),
+                                                          if (joinedResults[joinedIndex]["Noti"] == true)
+                                                          const Positioned(
+                                                            bottom: 0,
+                                                              right: 0,
+                                                              child: Icon(LineAwesomeIcons.bell, color: Colors.red)
+                                                          )
+                                                        ],
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),
@@ -1186,13 +1205,24 @@ class _FriendsState extends State<Friends> {
                                                     SizedBox(
                                                       width: 40,
                                                       height: 40,
-                                                      child: ClipRRect(
-                                                        borderRadius:
+                                                      child: Stack(
+                                                        clipBehavior: Clip.none,
+                                                        children: [
+                                                          ClipRRect(
+                                                            borderRadius:
                                                             BorderRadius
                                                                 .circular(100),
-                                                        child: searchResults[index]['Images'][0] == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network('${imageURL2 + 
-                                                            searchResults[index]
+                                                            child: searchResults[index]['Images'][0] == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network('${imageURL2 +
+                                                                searchResults[index]
                                                                 ["Images"][0]}.jpg'),
+                                                          ),
+                                                          if (searchResults[index]['Noti'] == true)
+                                                          const Positioned(
+                                                              bottom: 0,
+                                                              right: 0,
+                                                              child: Icon(LineAwesomeIcons.bell, color: Colors.red)
+                                                          )
+                                                        ]
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),

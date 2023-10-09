@@ -27,6 +27,12 @@ class _MessagesState extends State<Messages> {
     data = ModalRoute.of(context)?.settings.arguments as Map;
   }
 
+  @override
+  void initState() {
+    super.initState();
+    updateReadReceipt(data["groupId"]);
+  }
+
   Stream<List<dynamic>> getMessagesStream(String groupId) async* {
     final streamController = StreamController<List<dynamic>>();
 
@@ -297,6 +303,12 @@ class _MessagesState extends State<Messages> {
                                 .collection('Users')
                                 .doc(Auth().currentUser())
                           });
+                          FirebaseFirestore.instance
+                              .collection(dmFlag ? 'DirectMessages' : 'Groups')
+                              .doc(dmFlag ? data["dmId"] : groupId)
+                              .update({
+                            'Read': [Auth().currentUser()],
+                          });
                           textController.clear();
                         },
                       ),
@@ -310,4 +322,14 @@ class _MessagesState extends State<Messages> {
       ),
     );
   }
+
+  void updateReadReceipt(String groupId) {
+    // Get the current user ID
+    final currentUserId = Auth().currentUser();
+
+    FirebaseFirestore.instance.collection('Groups').doc(groupId).update({
+      'Read': FieldValue.arrayUnion([currentUserId]),
+    });
+  }
+
 }
