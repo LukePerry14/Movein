@@ -339,6 +339,69 @@ exports.sendGroupNotification = functions.region('europe-west2').firestore.docum
         }
     });
 
+exports.sendDmNotification = functions.region('europe-west2').firestore.document('DirectMessages/{groupId}/Messages/{message}').onCreate(async (snap, context) => {
+        const message = snap.data();
+        const groupId = context.params.groupId;
+        const sentBy = message.sentBy;
+
+        // Fetch the group document to get the "Members" field
+        const groupDocRef = admin.firestore().collection('DirectMessages').doc(groupId);
+        const groupDocSnapshot = await groupDocRef.get();
+
+        if (groupDocSnapshot.exists) {
+            const memberIds = groupDocSnapshot.data().Members || [];
+
+            // Fetch FCM tokens for each member
+            const tokensPromises = memberIds.map(async (memberId) => {
+                const tokenDocRef = admin.firestore().collection('fcmTokens').doc(memberId);
+                const tokenDocSnapshot = await tokenDocRef.get();
+
+                if (tokenDocSnapshot.exists) {
+                    return tokenDocSnapshot.data().Token;
+                } else {
+                    console.error(`FCM token document for member ${memberId} does not exist.`);
+                    return null;
+                }
+            });
+
+            const tokens = await Promise.all(tokensPromises);
+
+            // Filter out null values (in case of missing tokens)
+            const validTokens = tokens.filter((token) => token !== null);
+
+            // Fetch sender's name from the Users collection
+            const senderDocRef = admin.firestore().collection('Users').doc(sentBy);
+            const senderDocSnapshot = await senderDocRef.get();
+
+            if (senderDocSnapshot.exists) {
+                const senderData = senderDocSnapshot.data();
+                const senderName = `${senderData.ForeName} ${senderData.SurName}`;
+
+                // Customize the payload with the sender's name and a custom image URL
+                const payload = {
+                    notification: {
+                        title: `$senderName`,
+                        body: message.text,
+                        imageUrl: 'https://movein.blob.core.windows.net/movein/moveinlogo2.jpg',
+                    },
+                    data: {
+                        sender: senderName,
+                        time: message.sent.toDate().toString(),
+                    },
+                    tokens: validTokens,
+                };
+
+                return admin.messaging().sendMulticast(payload);
+            } else {
+                console.error(`Sender document with ID ${sentBy} does not exist.`);
+                return null;
+            }
+        } else {
+            console.error(`DM document with ID ${groupId} does not exist.`);
+            return null;
+        }
+    });
+
 exports.userDocUpdated = functions.region('europe-west2').firestore.document('Users/{userId}').onUpdate(async (change, context) => {
     const userId = context.params.userId;
     const newData = change.after.data();
