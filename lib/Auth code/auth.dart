@@ -13,7 +13,7 @@ void sendEmail(to, userid) async {
   final toAddress = Address(to);
   const fromAddress = Address('feedback@move1n.co.uk');
   final content = Content('text/html',
-      '<html><h2>MoveIn Email Verification</h2><br></br><p>Hi Billy,</p><p>Please click the verification email below to verify your MoveIn account.</p><p><a href="https://move1n.co.uk/verifyuser/$userid">Verify</a></p><p>Many thanks,</p><p>The MoveIn Team</p></html>');
+      '<html><h2>MoveIn Email Verification</h2><br></br><p>Hi Billy,</p><p>Please click the verification email below to verify your MoveIn account.</p><p><a href="https://www.move1n.co.uk/verifyuser/$userid">Verify</a></p><p>Many thanks,</p><p>The MoveIn Team</p></html>');
   const subject = 'MoveIn - Email Verification';
   final personalization = Personalization([toAddress]);
 
