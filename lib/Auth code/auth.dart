@@ -7,38 +7,23 @@ import 'package:http/http.dart' as http;
 // For Sendgrid mailing
 import 'package:sendgrid_mailer/sendgrid_mailer.dart';
 
-void sendEmail(to) async {
-  const String API_KEY =
-      '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';
-  const String TEMPLATE_ID = 'd-3d2e323131ea498d9e5e58348406a380';
-  const String SGEmail = 'feedback@move1n.co.uk';
+void sendEmail(to, userid) async {
+  final mailer = Mailer(
+      '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');
+  final toAddress = Address(to);
+  const fromAddress = Address('feedback@move1n.co.uk');
+  final content = Content('text/html',
+      '<html><h2>MoveIn Email Verification</h2><br></br><p>Hi Billy,</p><p>Please click the verification email below to verify your MoveIn account.</p><p><a href="https://move1n.co.uk/verifyuser/$userid">Verify</a></p><p>Many thanks,</p><p>The MoveIn Team</p></html>');
+  const subject = 'MoveIn - Email Verification';
+  final personalization = Personalization([toAddress]);
 
-  final url = Uri.parse('https://api.sendgrid.com/v3/mail/send');
-  final headers = {
-    'Authorization': 'Bearer $API_KEY',
-    'Content-Type': 'application/json'
-  };
-
-  final body = {
-    "personalizations": [
-      {
-        'to': [
-          {'email': to}
-        ]
-      }
-    ],
-    "from": {'email': SGEmail},
-    "template_id": TEMPLATE_ID
-  };
-
-  final response =
-      await http.post(url, headers: headers, body: json.encode(body));
-
-  if (response.statusCode != 202) {
-    print('Email failed - ${response.body}');
-  } else {
-    print('email send');
-  }
+  final email =
+      Email([personalization], fromAddress, subject, content: [content]);
+  mailer.send(email).then((result) {
+    print('Email has been sent.');
+  }).catchError((err) {
+    print('Email failed to send with error - $err');
+  });
 }
 
 class Auth {
@@ -103,10 +88,10 @@ class Auth {
 
       User? user = FirebaseAuth.instance.currentUser;
 
-      // if (user != null && !user.emailVerified) {
-      //   await user.sendEmailVerification();
-      //   return "email verification";
-      // }
+      if (user != null && !user.emailVerified) {
+        sendEmail(user.email, user.uid);
+        return "email verification";
+      }
 
       return "success";
     } on FirebaseAuthException catch (e) {
