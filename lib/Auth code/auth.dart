@@ -8,6 +8,8 @@ import 'package:http/http.dart' as http;
 import 'package:sendgrid_mailer/sendgrid_mailer.dart';
 
 void sendEmail(to, userid) async {
+  print('Email is being sent to $to');
+  print('ID for user is $userid');
   final mailer = Mailer(
       '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');
   final toAddress = Address(to);
@@ -88,18 +90,17 @@ class Auth {
 
       String? uid = FirebaseAuth.instance.currentUser?.uid;
 
-      final user = FirebaseFirestore.instance
-          .collection('Users')
-          .doc(uid)
-          .get()
-          .then((x) {
-        final data = x.data() as Map<String, dynamic>;
-        if (data['EmailVerified'] == false) {
-          sendEmail(email, uid);
-          return 'email verification';
-        }
-      });
-      return "success";
+      final user =
+          await FirebaseFirestore.instance.collection('Users').doc(uid).get();
+
+      var y = user.data();
+      var emailv = y!['EmailVerified'];
+      if (emailv == true) {
+        return 'success';
+      } else {
+        sendEmail(email, uid);
+        return 'email verification';
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
