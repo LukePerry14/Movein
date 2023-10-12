@@ -86,11 +86,27 @@ class Auth {
         password: password,
       );
 
-      User? user = FirebaseAuth.instance.currentUser;
+      String? uid = FirebaseAuth.instance.currentUser?.uid;
 
-      if (user != null && !user.emailVerified) {
+      final user = FirebaseFirestore.instance
+          .collection('Users')
+          .doc(uid)
+          .get()
+          .then((x) {
+        final data = x.data() as Map<String, dynamic>;
+        if (data['EmailVerified'] == false) {
+          sendEmail(email, uid);
+        }
+      });
+
+      // if (user != null && !user.emailVerified) {
+      //   sendEmail(user.email, user.uid);
+      //   return "email verification";
+      // }
+      if (user != null && user.emailVerified == false) {
+        print('user verification state is ${user.emailVerified}');
         sendEmail(user.email, user.uid);
-        return "email verification";
+        return 'email verification';
       }
 
       return "success";
@@ -102,6 +118,7 @@ class Auth {
       }
       return e.code;
     } catch (e) {
+      print(e);
       return "Unknown error.";
     }
   }
