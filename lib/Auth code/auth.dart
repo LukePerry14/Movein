@@ -96,19 +96,9 @@ class Auth {
         final data = x.data() as Map<String, dynamic>;
         if (data['EmailVerified'] == false) {
           sendEmail(email, uid);
+          return 'email verification';
         }
       });
-
-      // if (user != null && !user.emailVerified) {
-      //   sendEmail(user.email, user.uid);
-      //   return "email verification";
-      // }
-      if (user != null && user.emailVerified == false) {
-        print('user verification state is ${user.emailVerified}');
-        sendEmail(user.email, user.uid);
-        return 'email verification';
-      }
-
       return "success";
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
