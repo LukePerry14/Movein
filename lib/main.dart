@@ -455,9 +455,26 @@ class _LoginScreenState extends State<LoginScreen> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    title: const Text("Sign In Error"),
-                                    content: const Text(
-                                        'Email verification is required. An email has been sent to your account. You might need to check junk / quarantine for this email.'),
+                                    title: const Text("Email Verification"),
+                                    // content: const Text(
+                                    //     'Email verification is required. An email has been sent to your account. You might need to check junk / quarantine for this email.'),
+                                    content: SizedBox(
+                                      height: 400,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Column(
+                                          children: [
+                                            Image.asset('assets/Pictures/5.png'), 
+                                            const SizedBox(height: 20,),
+                                            const Text('Email verification is required'),
+                                            const SizedBox(height: 20,),
+                                            const Text('Please check your inbox for an email from feedback@move1n.co.uk'),
+                                            const SizedBox(height: 10,),
+                                            const Text('You might need to check your spam or junk folder for it.')
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                     actions: <Widget>[
                                       ElevatedButton(
                                         child: const Text("Close"),
