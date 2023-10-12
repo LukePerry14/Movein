@@ -225,6 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
         slivers: [
           SliverAppBar(
             leading: null,
+            automaticallyImplyLeading: false,
             expandedHeight: MediaQuery.of(context).size.height / 3,
             collapsedHeight: MediaQuery.of(context).size.height / 3,
             backgroundColor: LAppTheme.lightTheme.primaryColor,
