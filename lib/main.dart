@@ -82,7 +82,7 @@ class App extends StatelessWidget {
             builder: (context, currentMode, child) {
               final String foreName = UserPreferences.getForeName();
               final bool loggedIn = (foreName != "NotLoggedInError");
-              if (loggedIn){
+              if (loggedIn) {
                 updateToken();
                 checkSubscribed();
               }
@@ -131,7 +131,8 @@ class App extends StatelessWidget {
         throw Exception("No authenticated user found.");
       }
 
-      final docRef = FirebaseFirestore.instance.collection('Users').doc(currentUser.uid);
+      final docRef =
+          FirebaseFirestore.instance.collection('Users').doc(currentUser.uid);
 
       final docSnapshot = await docRef.get();
 
@@ -145,7 +146,6 @@ class App extends StatelessWidget {
       throw Exception('Error updating token: $e');
     }
   }
-
 }
 
 class LoginScreen extends StatefulWidget {
@@ -432,7 +432,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                               if (userData != null) {
                                 final subscribed = userData['Subscribed'];
-                                await UserPreferences.setAppsMax(subscribed? 5:2);
+                                await UserPreferences.setAppsMax(
+                                    subscribed ? 5 : 2);
                                 await UserPreferences.setUni(
                                     userData['UniAttended']);
                                 await UserPreferences.setForeName(
@@ -450,6 +451,24 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             );
                             return;
+                          } else if (response == 'email verification') {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text("Sign In Error"),
+                                    content: const Text(
+                                        'Email verification is required. An email has been sent to your account. You might need to check junk / quarantine for this email.'),
+                                    actions: <Widget>[
+                                      ElevatedButton(
+                                        child: const Text("Close"),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                });
                           } else {
                             setState(() {
                               var errors = {
@@ -459,26 +478,29 @@ class _LoginScreenState extends State<LoginScreen> {
                               errorMessage = errors[response] ?? response;
 
                               if (errorMessage == 'user-not-found') {
-                                errorMessage = 'No account linked to that email address :(';
+                                errorMessage =
+                                    'No account linked to that email address :(';
                               }
                               if (errorMessage == 'wrong-password') {
                                 errorMessage = 'Oh no! Wrong password.';
                               }
 
-                              showDialog(context: context, builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text("Sign In Error"),
-                                  content: Text(errorMessage),
-                                  actions: <Widget>[
-                                     ElevatedButton(
-                                      child: const Text("Close"),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
-                                );
-                              });
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text("Sign In Error"),
+                                      content: Text(errorMessage),
+                                      actions: <Widget>[
+                                        ElevatedButton(
+                                          child: const Text("Close"),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  });
                             });
                           }
                         }
@@ -528,7 +550,8 @@ Future<void> updateToken() async {
 
     final timestamp = Timestamp.now();
 
-    final docRef = FirebaseFirestore.instance.collection('fcmTokens').doc(currentUser.uid);
+    final docRef =
+        FirebaseFirestore.instance.collection('fcmTokens').doc(currentUser.uid);
 
     final docSnapshot = await docRef.get();
 
@@ -545,7 +568,6 @@ Future<void> updateToken() async {
         'TimeStamp': timestamp,
       });
     }
-
   } catch (e) {
     throw Exception('Error updating token: $e');
   }
@@ -572,8 +594,6 @@ class _SignupScreenState extends State<SignupScreen> {
   String? _profilePicture1String = '';
   String? _profilePicture2String = '';
   String? _profilePicture3String = '';
-
-  
 
   Widget defaultProfilePicture = Container(
     decoration: BoxDecoration(
@@ -605,7 +625,6 @@ class _SignupScreenState extends State<SignupScreen> {
   late List<dynamic> domains;
   late List<dynamic> universitiesSuggestions;
   late String _accessToken;
-
 
   @override
   void initState() {
@@ -644,38 +663,35 @@ class _SignupScreenState extends State<SignupScreen> {
     // uploads profile image
     if (imageString1 is String) {
       try {
-      await x.putBlob('/moveinimages/$imageString1.jpg',
-          contentType: 'image/jpg', bodyBytes: bytes1);
+        await x.putBlob('/moveinimages/$imageString1.jpg',
+            contentType: 'image/jpg', bodyBytes: bytes1);
       } catch (e) {
         state1 = 1;
         print('Exception: $e');
       }
     }
-    
 
     // picture 2
     if (imageString2 is String) {
       try {
-      await x.putBlob('/moveinimages/$imageString2.jpg',
+        await x.putBlob('/moveinimages/$imageString2.jpg',
             contentType: 'image/jpg', bodyBytes: bytes2);
       } catch (e) {
         state2 = 1;
         print('Exception: $e');
       }
     }
-    
 
     // picture 3
     if (imageString3 is String) {
       try {
-      await x.putBlob('/moveinimages/$imageString3.jpg',
-          contentType: 'image/jpg', bodyBytes: bytes3);
+        await x.putBlob('/moveinimages/$imageString3.jpg',
+            contentType: 'image/jpg', bodyBytes: bytes3);
       } catch (e) {
         state3 = 1;
         print('Exception: $e');
       }
     }
-    
 
     if (state1 == 0 && state2 == 0 && state3 == 0) {
       return true;
@@ -698,27 +714,24 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<CroppedFile?> cropImage(File imageFile) async {
-    final croppedFile = await ImageCropper().cropImage(sourcePath: imageFile.path,
-    compressFormat: ImageCompressFormat.jpg,
-    maxWidth: 400,
-    maxHeight: 400,
-    compressQuality: 100,
-      aspectRatioPresets: [
-        CropAspectRatioPreset.square,
-      ],
-      uiSettings: [
-        AndroidUiSettings(
-          toolbarTitle: 'Image Cropper',
-          toolbarColor: Theme.of(context).primaryColor,
-          toolbarWidgetColor: Colors.white,
-          initAspectRatio: CropAspectRatioPreset.original,
-          lockAspectRatio: false
-        ),
-        IOSUiSettings(
-          title: 'Image Cropper'
-        )
-      ]
-    );
+    final croppedFile = await ImageCropper().cropImage(
+        sourcePath: imageFile.path,
+        compressFormat: ImageCompressFormat.jpg,
+        maxWidth: 400,
+        maxHeight: 400,
+        compressQuality: 100,
+        aspectRatioPresets: [
+          CropAspectRatioPreset.square,
+        ],
+        uiSettings: [
+          AndroidUiSettings(
+              toolbarTitle: 'Image Cropper',
+              toolbarColor: Theme.of(context).primaryColor,
+              toolbarWidgetColor: Colors.white,
+              initAspectRatio: CropAspectRatioPreset.original,
+              lockAspectRatio: false),
+          IOSUiSettings(title: 'Image Cropper')
+        ]);
     return croppedFile;
   }
 
@@ -843,7 +856,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                     enabled: false,
                                     name: 'uni',
                                     maxLength: 200,
-                                    decoration: const InputDecoration(labelText: 'University'),
+                                    decoration: const InputDecoration(
+                                        labelText: 'University'),
                                     controller: _universityController,
                                   ),
                                   const SizedBox(height: 10),
@@ -977,17 +991,24 @@ class _SignupScreenState extends State<SignupScreen> {
                                     ),
                                     const SizedBox(height: 25),
                                     // This is where the profile images go
-                                    Text("p-images".tr, style: GoogleFonts.redHatDisplay(color: Colors.grey[700], fontSize: 20),),
-                                    const SizedBox(height:20),
+                                    Text(
+                                      "p-images".tr,
+                                      style: GoogleFonts.redHatDisplay(
+                                          color: Colors.grey[700],
+                                          fontSize: 20),
+                                    ),
+                                    const SizedBox(height: 20),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
                                       children: [
                                         GestureDetector(
                                           onTap: () async {
-                                            final pickedImage = await pickImage();
+                                            final pickedImage =
+                                                await pickImage();
                                             if (pickedImage != null) {
                                               _profilePicture1String =
-                                              uuid.v1();
+                                                  uuid.v1();
                                               setState(() {
                                                 _profilePicture1 = pickedImage;
                                               });
@@ -996,49 +1017,77 @@ class _SignupScreenState extends State<SignupScreen> {
                                             }
                                           },
                                           child: Padding(
-                                            padding: const EdgeInsets.all(5),
-                                            child: Stack(
-                                              clipBehavior: Clip.none,
-                                              children: [
-                                                SizedBox(
-                                                  width: (MediaQuery.of(context).size.width - 92) / 3,
-                                                  height: (MediaQuery.of(context).size.width - 92) / 3,
-                                                  child: _profilePicture1 == null
-                                                      ? defaultProfilePicture
-                                                      : ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.file(_profilePicture1!, fit: BoxFit.cover,)),
-                                                ),
-                                                Positioned(
-                                                  top: -20,
-                                                  right: -20,
-                                                  child: SizedBox(
-                                                    width: 40, // Adjust the size as needed
-                                                    height: 40, // Adjust the size as needed
-                                                    child: Icon(LineAwesomeIcons.plus_circle, color: Theme.of(context).primaryColor)
+                                              padding: const EdgeInsets.all(5),
+                                              child: Stack(
+                                                clipBehavior: Clip.none,
+                                                children: [
+                                                  SizedBox(
+                                                    width:
+                                                        (MediaQuery.of(context)
+                                                                    .size
+                                                                    .width -
+                                                                92) /
+                                                            3,
+                                                    height:
+                                                        (MediaQuery.of(context)
+                                                                    .size
+                                                                    .width -
+                                                                92) /
+                                                            3,
+                                                    child: _profilePicture1 ==
+                                                            null
+                                                        ? defaultProfilePicture
+                                                        : ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            child: Image.file(
+                                                              _profilePicture1!,
+                                                              fit: BoxFit.cover,
+                                                            )),
                                                   ),
-                                                ),
-                                                Positioned(
-                                                  bottom: 0,
-                                                  top: 0,
-                                                  left: 0,
-                                                  right: 0,
-                                                  child: Center(
-                                                    child: Text(
-                                                      "pp".tr,
-                                                      style: GoogleFonts.redHatDisplay(color: Colors.grey[700], fontSize: 16.5),
+                                                  Positioned(
+                                                    top: -20,
+                                                    right: -20,
+                                                    child: SizedBox(
+                                                        width:
+                                                            40, // Adjust the size as needed
+                                                        height:
+                                                            40, // Adjust the size as needed
+                                                        child: Icon(
+                                                            LineAwesomeIcons
+                                                                .plus_circle,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .primaryColor)),
+                                                  ),
+                                                  Positioned(
+                                                    bottom: 0,
+                                                    top: 0,
+                                                    left: 0,
+                                                    right: 0,
+                                                    child: Center(
+                                                      child: Text(
+                                                        "pp".tr,
+                                                        style: GoogleFonts
+                                                            .redHatDisplay(
+                                                                color: Colors
+                                                                    .grey[700],
+                                                                fontSize: 16.5),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ],
-                                            )
-
-                                          ),
+                                                ],
+                                              )),
                                         ),
                                         GestureDetector(
                                           onTap: () async {
-                                            final pickedImage = await pickImage();
+                                            final pickedImage =
+                                                await pickImage();
                                             if (pickedImage != null) {
                                               _profilePicture2String =
-                                              uuid.v1();
+                                                  uuid.v1();
                                               setState(() {
                                                 _profilePicture2 = pickedImage;
                                               });
@@ -1052,32 +1101,56 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 clipBehavior: Clip.none,
                                                 children: [
                                                   SizedBox(
-                                                    width: (MediaQuery.of(context).size.width-92) / 3,
-                                                    height: (MediaQuery.of(context).size.width-92) / 3,
-                                                    child: _profilePicture2 == null
+                                                    width:
+                                                        (MediaQuery.of(context)
+                                                                    .size
+                                                                    .width -
+                                                                92) /
+                                                            3,
+                                                    height:
+                                                        (MediaQuery.of(context)
+                                                                    .size
+                                                                    .width -
+                                                                92) /
+                                                            3,
+                                                    child: _profilePicture2 ==
+                                                            null
                                                         ? defaultProfilePicture
-                                                        : ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.file(_profilePicture2!, fit: BoxFit.cover,)),
+                                                        : ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            child: Image.file(
+                                                              _profilePicture2!,
+                                                              fit: BoxFit.cover,
+                                                            )),
                                                   ),
                                                   Positioned(
                                                     top: -20,
                                                     right: -20,
                                                     child: SizedBox(
-                                                      width: 40, // Adjust the size as needed
-                                                      height: 40, // Adjust the size as needed
-                                                      child: Icon(LineAwesomeIcons.plus_circle, color: Theme.of(context).primaryColor)
-                                                    ),
+                                                        width:
+                                                            40, // Adjust the size as needed
+                                                        height:
+                                                            40, // Adjust the size as needed
+                                                        child: Icon(
+                                                            LineAwesomeIcons
+                                                                .plus_circle,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .primaryColor)),
                                                   ),
                                                 ],
-                                              )
-
-                                          ),
+                                              )),
                                         ),
                                         GestureDetector(
                                           onTap: () async {
-                                            final pickedImage = await pickImage();
+                                            final pickedImage =
+                                                await pickImage();
                                             if (pickedImage != null) {
                                               _profilePicture3String =
-                                              uuid.v1();
+                                                  uuid.v1();
                                               setState(() {
                                                 _profilePicture3 = pickedImage;
                                               });
@@ -1091,25 +1164,48 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 clipBehavior: Clip.none,
                                                 children: [
                                                   SizedBox(
-                                                    width: (MediaQuery.of(context).size.width-92) / 3,
-                                                    height: (MediaQuery.of(context).size.width -92) / 3,
-                                                    child: _profilePicture3 == null
+                                                    width:
+                                                        (MediaQuery.of(context)
+                                                                    .size
+                                                                    .width -
+                                                                92) /
+                                                            3,
+                                                    height:
+                                                        (MediaQuery.of(context)
+                                                                    .size
+                                                                    .width -
+                                                                92) /
+                                                            3,
+                                                    child: _profilePicture3 ==
+                                                            null
                                                         ? defaultProfilePicture
-                                                        : ClipRRect(borderRadius: BorderRadius.circular(10), child: Image.file(_profilePicture3!, fit: BoxFit.cover,)),
+                                                        : ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            child: Image.file(
+                                                              _profilePicture3!,
+                                                              fit: BoxFit.cover,
+                                                            )),
                                                   ),
                                                   Positioned(
                                                     top: -20,
                                                     right: -20,
                                                     child: SizedBox(
-                                                        width: 40, // Adjust the size as needed
-                                                        height: 40, // Adjust the size as needed
-                                                        child: Icon(LineAwesomeIcons.plus_circle, color: Theme.of(context).primaryColor)
-                                                    ),
+                                                        width:
+                                                            40, // Adjust the size as needed
+                                                        height:
+                                                            40, // Adjust the size as needed
+                                                        child: Icon(
+                                                            LineAwesomeIcons
+                                                                .plus_circle,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .primaryColor)),
                                                   ),
                                                 ],
-                                              )
-
-                                          ),
+                                              )),
                                         ),
                                       ],
                                     ),
@@ -1323,16 +1419,21 @@ class _SignupScreenState extends State<SignupScreen> {
 
                                 // TEST THIS FIREBASE CODE - SHOULD WORK
 
-                                _uploadImageToAzure(_profilePicture1, _profilePicture2, _profilePicture3, _profilePicture1String, _profilePicture2String, _profilePicture3String);
-
-
-                                Map<String, dynamic> reConfigedData =
-                                reConfigData(
-                                    data,
+                                _uploadImageToAzure(
+                                    _profilePicture1,
+                                    _profilePicture2,
+                                    _profilePicture3,
                                     _profilePicture1String,
                                     _profilePicture2String,
-                                    _profilePicture3String,
-                                    );
+                                    _profilePicture3String);
+
+                                Map<String, dynamic> reConfigedData =
+                                    reConfigData(
+                                  data,
+                                  _profilePicture1String,
+                                  _profilePicture2String,
+                                  _profilePicture3String,
+                                );
 
                                 String response =
                                     await Auth().registerWithUserDetails(
@@ -1346,7 +1447,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                   await createNotiToken();
                                   RegExp regex =
                                       RegExp(r"@durham\.ac\.uk$|@dur\.ac\.uk$");
-                                  if (!regex.hasMatch(_formKey.currentState?.fields['email']?.value)) {
+                                  if (!regex.hasMatch(_formKey
+                                      .currentState?.fields['email']?.value)) {
                                     // ignore: use_build_context_synchronously
                                     await showDialog(
                                       context: context,
@@ -1400,10 +1502,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 Navigator.pushReplacement(
                                                     context,
                                                     PageTransition(
-                                                        type: PageTransitionType.fade,
-                                                        child: const LoginScreen(),
-                                                        duration: const Duration(
-                                                            milliseconds: 200)));
+                                                        type: PageTransitionType
+                                                            .fade,
+                                                        child:
+                                                            const LoginScreen(),
+                                                        duration:
+                                                            const Duration(
+                                                                milliseconds:
+                                                                    200)));
                                               },
                                               child: Text(
                                                 'Close',
@@ -1419,7 +1525,6 @@ class _SignupScreenState extends State<SignupScreen> {
                                       ),
                                     );
                                   } else {
-
                                     await UserPreferences.setUni(
                                         data['UniAttended']);
                                     await UserPreferences.setAppsMax(2);
@@ -1443,23 +1548,26 @@ class _SignupScreenState extends State<SignupScreen> {
                                     };
 
                                     if (response == 'email-already-in-use') {
-                                      response = 'Account already in use with email address - please sign in.';
+                                      response =
+                                          'Account already in use with email address - please sign in.';
                                     }
 
-                                    showDialog(context: context, builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: const Text("Sign In Error"),
-                                        content: Text(response),
-                                        actions: <Widget>[
-                                          ElevatedButton(
-                                            child: const Text("Close"),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    });
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: const Text("Sign In Error"),
+                                            content: Text(response),
+                                            actions: <Widget>[
+                                              ElevatedButton(
+                                                child: const Text("Close"),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              ),
+                                            ],
+                                          );
+                                        });
                                   });
                                 }
                                 return;
@@ -1564,27 +1672,30 @@ class _SignupScreenState extends State<SignupScreen> {
         throw Exception("No authenticated user found.");
       }
 
-      final fcmToken = await FirebaseMessaging.instance.getToken(); // Replace with the actual token
+      final fcmToken = await FirebaseMessaging.instance
+          .getToken(); // Replace with the actual token
 
       final timestamp = Timestamp.now();
 
-      final docRef = FirebaseFirestore.instance.collection('fcmTokens').doc(Auth().currentUser());
+      final docRef = FirebaseFirestore.instance
+          .collection('fcmTokens')
+          .doc(Auth().currentUser());
 
       await docRef.set({
         'Token': fcmToken,
         'TimeStamp': timestamp,
       });
-
     } catch (e) {
       throw Exception("failed to create notification Token: $e");
     }
   }
+
   void findUni(String email) {
     String emailDomain = email.split('@')[1];
 
     // Check if the email domain is valid for the selected university
     Map<String, dynamic>? selectedUniversity = universitiesData.firstWhere(
-          (university) => university['domains'].contains(emailDomain),
+      (university) => university['domains'].contains(emailDomain),
       orElse: () => null,
     );
 
@@ -1596,5 +1707,4 @@ class _SignupScreenState extends State<SignupScreen> {
       _universityController.text = 'Unknown University';
     }
   }
-
 }
