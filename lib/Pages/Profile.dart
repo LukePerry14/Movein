@@ -389,7 +389,7 @@ class _ProfilePage extends State<Profile> {
                                   child: const Icon(Icons.copy),
                                 ),
                               ]),
-                              const SizedBox(height: 50.0),
+                              // const SizedBox(height: 50.0),
                               // GestureDetector(
                               //   onTap: () => Navigator.push(context,PageTransition(curve:Curves.linear,type: PageTransitionType.bottomToTop, child:const Premium())),
                               //   child: Container(
@@ -439,7 +439,7 @@ class _ProfilePage extends State<Profile> {
                                 height: 1,
                                 color: Colors.grey.withOpacity(0.3),
                               ),
-                              const SizedBox(height: 35.0),
+                              // const SizedBox(height: 35.0),
                               ListTile(
                                 leading: Container(
                                   width: 40,

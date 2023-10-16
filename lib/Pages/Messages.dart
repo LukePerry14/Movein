@@ -31,7 +31,7 @@ class _MessagesState extends State<Messages> {
     final streamController = StreamController<List<dynamic>>();
 
     final subscription = FirebaseFirestore.instance
-        .collection((data["dmId"] != null)? 'DirectMessages':'Groups')
+        .collection((data["dmId"] != null) ? 'DirectMessages' : 'Groups')
         .doc(groupId)
         .collection('Messages')
         .orderBy('sent', descending: true)
@@ -88,57 +88,64 @@ class _MessagesState extends State<Messages> {
   Widget build(BuildContext context) {
     print(data);
     bool dmFlag = (data["dmId"] != null);
-    updateReadReceipt(dmFlag? data["dmId"]:data["groupId"]);
+    updateReadReceipt(dmFlag ? data["dmId"] : data["groupId"]);
     return Scaffold(
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
-            title: Row(
-              children: [
-                Container(
-                  color: Colors.white.withOpacity(0.8),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0), // Adjust the radius as needed
+            title: Row(children: [
+              Container(
+                color: Colors.transparent,
+                child: ClipRRect(
+                  borderRadius:
+                      BorderRadius.circular(8.0), // Adjust the radius as needed
+                  child: Center(
                     child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Adjust the blur intensity as needed
+                      filter: ImageFilter.blur(
+                          sigmaX: 0.0,
+                          sigmaY: 0.0), // Adjust the blur intensity as needed
                       child: Container(
-                        color: Colors.transparent, // Make the background of the blurred container transparent
-                        padding: EdgeInsets.symmetric(horizontal: 16.0), // Adjust padding as needed
+                        color: Theme.of(context)
+                            .primaryColor, // Make the background of the blurred container transparent
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12.0,
+                            vertical: 5), // Adjust padding as needed
                         child: Text(
                           data["groupName"],
-                          style: Theme.of(context).textTheme.headlineMedium,
+                          // style: Theme.of(context).textTheme.headlineLarge,
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 30),
                         ),
                       ),
                     ),
                   ),
                 ),
-                if (data["dmId"] == null)
-                  Expanded(child: Container()),
-                if (data["dmId"] == null)
-      IconButton(
-      color: Colors.grey[500],
-      icon:
-      Icon(Icons.more_vert, color: LAppTheme.lightTheme.primaryColor),
-      //Icon not showing
-      onPressed: () {
-        Navigator.push(
-          context,
-          PageTransition(
-              curve: Curves.linear,
-              type: PageTransitionType.topToBottom,
-              child: const GroupOptions(),
-              settings: RouteSettings(arguments: {
-                'members': data["members"],
-                'groupId': data["groupId"],
-                'groupName': data["groupName"],
-                'groupPicture': data["groupPicture"],
-              })),
-        );
-      },
-    ),
-          ]
-            ),
+              ),
+              if (data["dmId"] == null) Expanded(child: Container()),
+              if (data["dmId"] == null)
+                IconButton(
+                  color: Colors.grey[500],
+                  icon: Icon(Icons.more_vert,
+                      color: LAppTheme.lightTheme.primaryColor),
+                  //Icon not showing
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      PageTransition(
+                          curve: Curves.linear,
+                          type: PageTransitionType.topToBottom,
+                          child: const GroupOptions(),
+                          settings: RouteSettings(arguments: {
+                            'members': data["members"],
+                            'groupId': data["groupId"],
+                            'groupName': data["groupName"],
+                            'groupPicture': data["groupPicture"],
+                          })),
+                    );
+                  },
+                ),
+            ]),
             leading: IconButton(
               icon: Icon(
                 LineAwesomeIcons.angle_up,
@@ -155,14 +162,16 @@ class _MessagesState extends State<Messages> {
             stretch: true,
             elevation: 0,
             flexibleSpace: FlexibleSpaceBar(
-                background: Image.network((data['groupPicture'] == "https://movein.blob.core.windows.net/moveingroupimages/")
-                    ? 'https://movein.blob.core.windows.net/moveinimages/noimagefound.png'
-                    : '${(data['dmId'] == null)?data['groupPicture']: imageURL2 + data['groupPicture']}.jpg',
-                fit: BoxFit.cover,
-                )
-            ),
+                background: Image.network(
+              (data['groupPicture'] ==
+                      "https://movein.blob.core.windows.net/moveingroupimages/")
+                  ? 'https://movein.blob.core.windows.net/moveinimages/noimagefound.png'
+                  : '${(data['dmId'] == null) ? data['groupPicture'] : imageURL2 + data['groupPicture']}.jpg',
+              fit: BoxFit.cover,
+            )),
             bottom: PreferredSize(
-              preferredSize: Size.fromHeight(1.0), // Adjust the height of the border
+              preferredSize:
+                  Size.fromHeight(1.0), // Adjust the height of the border
               child: Container(
                 decoration: BoxDecoration(
                   border: Border(
@@ -180,78 +189,80 @@ class _MessagesState extends State<Messages> {
               children: <Widget>[
                 Expanded(
                     child: StreamBuilder<List<dynamic>>(
-                      stream: getMessagesStream(dmFlag? data["dmId"]: data['groupId']),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          return const Text('Something went wrong');
-                        }
+                  stream: getMessagesStream(
+                      dmFlag ? data["dmId"] : data['groupId']),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return const Text('Something went wrong');
+                    }
 
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Text("Loading");
-                        }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Text("Loading");
+                    }
 
-                        if (snapshot.data == null) {
-                          return const Text("Error.");
-                        }
+                    if (snapshot.data == null) {
+                      return const Text("Error.");
+                    }
 
-                        return ListView(
-                          physics: const BouncingScrollPhysics(),
-                          reverse: true,
-                          shrinkWrap: true,
-                          children: [
-                            ...snapshot.data!
-                                .map((data) {
-                              // if (data['sent'] == null) {
-                              //   return const Text('hi');
-                              // }
+                    return ListView(
+                        physics: const BouncingScrollPhysics(),
+                        reverse: true,
+                        shrinkWrap: true,
+                        children: [
+                          ...snapshot.data!
+                              .map((data) {
+                                // if (data['sent'] == null) {
+                                //   return const Text('hi');
+                                // }
 
-                              // print(data);
+                                // print(data);
 
-                              var sentText = "";
+                                var sentText = "";
 
-                              // DateTime sent = DateTime.fromMillisecondsSinceEpoch(
-                              //     data['sent'].seconds * 1000);
+                                // DateTime sent = DateTime.fromMillisecondsSinceEpoch(
+                                //     data['sent'].seconds * 1000);
 
-                              // sentText =
-                              //     "${data['sentBy']['ForeName']} ${data['sentBy']['SurName']} • ${sent.hour}:${sent.minute < 10 ? "0" : ""}${sent.minute}";
+                                // sentText =
+                                //     "${data['sentBy']['ForeName']} ${data['sentBy']['SurName']} • ${sent.hour}:${sent.minute < 10 ? "0" : ""}${sent.minute}";
 
-                              return Container(
-                                padding: const EdgeInsets.only(
-                                    left: 14, right: 14, top: 10, bottom: 10),
-                                child: Align(
-                                    alignment:
-                                    (Auth().currentUser() != data['sentByUid']
-                                        ? Alignment.topLeft
-                                        : Alignment.topRight),
-                                    child: Column(children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(20),
-                                          color:
-                                          (Auth().currentUser() != data['sentByUid']
-                                              ? Colors.grey.shade200
-                                              : LAppTheme.lightTheme.primaryColor),
+                                return Container(
+                                  padding: const EdgeInsets.only(
+                                      left: 14, right: 14, top: 10, bottom: 10),
+                                  child: Align(
+                                      alignment: (Auth().currentUser() !=
+                                              data['sentByUid']
+                                          ? Alignment.topLeft
+                                          : Alignment.topRight),
+                                      child: Column(children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            color: (Auth().currentUser() !=
+                                                    data['sentByUid']
+                                                ? Colors.grey.shade200
+                                                : LAppTheme
+                                                    .lightTheme.primaryColor),
+                                          ),
+                                          padding: EdgeInsets.all(16),
+                                          child: Text(
+                                            data['text'],
+                                            style: TextStyle(fontSize: 15),
+                                          ),
                                         ),
-                                        padding: EdgeInsets.all(16),
-                                        child: Text(
-                                          data['text'],
-                                          style: TextStyle(fontSize: 15),
-                                        ),
-                                      ),
-                                      Text(
-                                        data['subheading'],
-                                        textAlign: TextAlign.right,
-                                      )
-                                    ])),
-                              );
-                            })
-                                .toList()
-                                .cast(),
-                            const SizedBox(height:56),
-                          ]
-                        );
-                      },
-                    )),
+                                        Text(
+                                          data['subheading'],
+                                          textAlign: TextAlign.right,
+                                        )
+                                      ])),
+                                );
+                              })
+                              .toList()
+                              .cast(),
+                          const SizedBox(height: 56),
+                        ]);
+                  },
+                )),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 2.0),
                   decoration: BoxDecoration(
@@ -271,12 +282,14 @@ class _MessagesState extends State<Messages> {
                             controller: textController,
                             decoration: InputDecoration(
                               labelText: "message".tr,
-                              labelStyle:
-                              TextStyle(fontSize: 20.0, color: Colors.grey[400]),
+                              labelStyle: TextStyle(
+                                  fontSize: 20.0, color: Colors.grey[400]),
                               fillColor: Colors.blue,
                               border: const OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(15)),
-                                borderSide: BorderSide(color: Colors.purpleAccent),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                                borderSide:
+                                    BorderSide(color: Colors.purpleAccent),
                               ),
                             ),
                           ),
@@ -288,8 +301,8 @@ class _MessagesState extends State<Messages> {
                         iconSize: 20.0,
                         onPressed: () async {
                           FirebaseFirestore.instance
-                              .collection(dmFlag? 'DirectMessages': 'Groups')
-                              .doc(dmFlag? data['dmId']:data['groupId'])
+                              .collection(dmFlag ? 'DirectMessages' : 'Groups')
+                              .doc(dmFlag ? data['dmId'] : data['groupId'])
                               .collection('Messages')
                               .add({
                             "text": textController.text,
@@ -322,9 +335,11 @@ class _MessagesState extends State<Messages> {
     // Get the current user ID
     final currentUserId = Auth().currentUser();
 
-    FirebaseFirestore.instance.collection((data["dmId"]!= null)? 'DirectMessages':'Groups').doc(groupId).update({
+    FirebaseFirestore.instance
+        .collection((data["dmId"] != null) ? 'DirectMessages' : 'Groups')
+        .doc(groupId)
+        .update({
       'Read': FieldValue.arrayUnion([currentUserId]),
     });
   }
-
 }
