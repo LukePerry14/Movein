@@ -465,13 +465,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                         padding: const EdgeInsets.all(10),
                                         child: Column(
                                           children: [
-                                            Image.asset('assets/Pictures/5.png'), 
-                                            const SizedBox(height: 20,),
-                                            const Text('Email verification is required'),
-                                            const SizedBox(height: 20,),
-                                            const Text('Please check your inbox for an email from feedback@move1n.co.uk'),
-                                            const SizedBox(height: 10,),
-                                            const Text('You might need to check your spam or junk folder for it.')
+                                            Image.asset(
+                                                'assets/Pictures/5.png'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            const Text(
+                                                'Email verification is required'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            const Text(
+                                                'Please check your inbox for an email from feedback@move1n.co.uk'),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            const Text(
+                                                'You might need to check your spam or junk folder for it.')
                                           ],
                                         ),
                                       ),

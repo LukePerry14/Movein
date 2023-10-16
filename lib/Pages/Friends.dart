@@ -189,7 +189,8 @@ class _FriendsState extends State<Friends> {
           for (var group in tGroups) {
             if (group.isNotEmpty) {
               DocumentSnapshot groupSnapshot = await docGroups.doc(group).get();
-              Map<String, dynamic>? groupData = groupSnapshot.data() as Map<String, dynamic>?;
+              Map<String, dynamic>? groupData =
+                  groupSnapshot.data() as Map<String, dynamic>?;
               if (groupData != null) {
                 blockIgnores.add(group);
                 groups.add({
@@ -204,7 +205,9 @@ class _FriendsState extends State<Friends> {
                   'AvgYearOfStudy':
                       (groupData["AvgYearOfStudy"] as num).toDouble(),
                   "AvgBedTime": groupData["AvgBedTime"],
-                  "Noti" : (groupData["Read"] != null) ? !(groupData["Read"].contains(Auth().currentUser())) : false
+                  "Noti": (groupData["Read"] != null)
+                      ? !(groupData["Read"].contains(Auth().currentUser()))
+                      : false
                 });
               }
             }
@@ -281,7 +284,7 @@ class _FriendsState extends State<Friends> {
               "Subject": friendData['Subject'],
               "YearOfStudy": friendData['YearOfStudy'],
               "Id": inviteId,
-              "verified" : friendData['EmailVerified'],
+              "verified": friendData['EmailVerified'],
             });
           }
         }
@@ -312,8 +315,10 @@ class _FriendsState extends State<Friends> {
               "Subject": friendData?['Subject'],
               "YearOfStudy": friendData?['YearOfStudy'],
               "Id": friendId,
-              "verified" : friendData?['EmailVerified'],
-              "Noti" : (friendDmData?["Read"] != null) ? !(friendDmData?["Read"].contains(Auth().currentUser())) : false
+              "verified": friendData?['EmailVerified'],
+              "Noti": (friendDmData?["Read"] != null)
+                  ? !(friendDmData?["Read"].contains(Auth().currentUser()))
+                  : false
             });
           }
         }
@@ -338,7 +343,7 @@ class _FriendsState extends State<Friends> {
               "Subject": friendData['Subject'],
               "YearOfStudy": friendData['YearOfStudy'],
               "Id": outgoingId,
-              "verified" : friendData['EmailVerified'],
+              "verified": friendData['EmailVerified'],
             });
           }
         }
@@ -371,7 +376,7 @@ class _FriendsState extends State<Friends> {
           } else {
             isLoading = false;
             final data = snapshot.data;
-            try{
+            try {
               friends = data![0];
               searchResults = data[0];
               friendInvites = data[1];
@@ -672,8 +677,10 @@ class _FriendsState extends State<Friends> {
                                                 SlidableAction(
                                                   onPressed: (context) {
                                                     setState(() {
-                                                      joinedResults[joinedIndex]["Noti"] = false;
-                                                      joined[joinedIndex]["Noti"] = false;
+                                                      joinedResults[joinedIndex]
+                                                          ["Noti"] = false;
+                                                      joined[joinedIndex]
+                                                          ["Noti"] = false;
                                                     });
                                                     Navigator.push(
                                                       context,
@@ -718,8 +725,10 @@ class _FriendsState extends State<Friends> {
                                             child: GestureDetector(
                                               onTap: () {
                                                 setState(() {
-                                                  joinedResults[joinedIndex]["Noti"] = false;
-                                                  joined[joinedIndex]["Noti"] = false;
+                                                  joinedResults[joinedIndex]
+                                                      ["Noti"] = false;
+                                                  joined[joinedIndex]["Noti"] =
+                                                      false;
                                                 });
                                                 Navigator.push(
                                                   context,
@@ -780,34 +789,55 @@ class _FriendsState extends State<Friends> {
                                                         children: [
                                                           ClipRRect(
                                                             borderRadius:
-                                                            BorderRadius
-                                                                .circular(20),
-                                                            child: imageString == ''
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                            child: imageString ==
+                                                                    ''
                                                                 ? Image.network(
-                                                                'https://movein.blob.core.windows.net/moveinimages/noimagefound.png')
+                                                                    'https://movein.blob.core.windows.net/moveinimages/noimagefound.png')
                                                                 : Image.network(
-                                                                '$imageURL$imageString.jpg'),
+                                                                    '$imageURL$imageString.jpg'),
                                                           ),
-                                                          if (joinedResults[joinedIndex]["Noti"] == true)
+                                                          if (joinedResults[
+                                                                      joinedIndex]
+                                                                  ["Noti"] ==
+                                                              true)
                                                             Positioned(
                                                               bottom: -5,
                                                               right: -5,
                                                               child: Container(
-                                                                height:20,
+                                                                height: 20,
                                                                 width: 20,
-                                                                decoration: BoxDecoration(
-                                                                  shape: BoxShape.circle,
-                                                                  color: Colors.red, // Background color
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  color: Colors
+                                                                      .red, // Background color
                                                                   boxShadow: [
                                                                     BoxShadow(
-                                                                      color: Colors.black.withOpacity(0.3), // Shadow color and opacity
-                                                                      blurRadius: 5, // Adjust the blur radius as needed
-                                                                      offset: const Offset(0, 3), // Adjust the shadow offset
+                                                                      color: Colors
+                                                                          .black
+                                                                          .withOpacity(
+                                                                              0.3), // Shadow color and opacity
+                                                                      blurRadius:
+                                                                          5, // Adjust the blur radius as needed
+                                                                      offset: const Offset(
+                                                                          0,
+                                                                          3), // Adjust the shadow offset
                                                                     ),
                                                                   ],
                                                                 ),
                                                                 //padding: EdgeInsets.all(8.0), // Padding inside the container
-                                                                child: const Icon(LineAwesomeIcons.bell, color: Colors.white, size: 15,), // Adjust the icon color
+                                                                child:
+                                                                    const Icon(
+                                                                  LineAwesomeIcons
+                                                                      .bell,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  size: 15,
+                                                                ), // Adjust the icon color
                                                               ),
                                                             )
                                                         ],
@@ -1034,8 +1064,11 @@ class _FriendsState extends State<Friends> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(20),
-                                                        child: imageName == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network(
-                                                            '$imageURL$imageName.jpg'),
+                                                        child: imageName == ''
+                                                            ? Image.network(
+                                                                'https://movein.blob.core.windows.net/moveinimages/noimagefound.png')
+                                                            : Image.network(
+                                                                '$imageURL$imageName.jpg'),
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),
@@ -1116,40 +1149,49 @@ class _FriendsState extends State<Friends> {
                                                   showDialog<String>(
                                                       context: context,
                                                       builder: (BuildContext
-                                                      context) =>
+                                                              context) =>
                                                           CustomDialog(
-                                                            id: searchResults[index]
-                                                            ["Id"],
+                                                            id: searchResults[
+                                                                index]["Id"],
                                                             foreName:
-                                                            searchResults[index]
-                                                            ["ForeName"],
-                                                            age:
-                                                            searchResults[index]
-                                                            ["Age"].toInt(),
-                                                            uni:
-                                                            searchResults[index]
-                                                            ["Uni"],
+                                                                searchResults[
+                                                                        index][
+                                                                    "ForeName"],
+                                                            age: searchResults[
+                                                                        index]
+                                                                    ["Age"]
+                                                                .toInt(),
+                                                            uni: searchResults[
+                                                                index]["Uni"],
                                                             preferences:
-                                                            searchResults[index]
-                                                            ["Preferences"],
+                                                                searchResults[
+                                                                        index][
+                                                                    "Preferences"],
                                                             images:
-                                                            searchResults[index]
-                                                            ["Images"],
-                                                            bio:
-                                                            searchResults[index]
-                                                            ["Bio"],
+                                                                searchResults[
+                                                                        index]
+                                                                    ["Images"],
+                                                            bio: searchResults[
+                                                                index]["Bio"],
                                                             subject:
-                                                            searchResults[index]
-                                                            ["Subject"],
+                                                                searchResults[
+                                                                        index]
+                                                                    ["Subject"],
                                                             yearOfStudy:
-                                                            searchResults[index]
-                                                            ["YearOfStudy"].toInt(),
+                                                                searchResults[
+                                                                            index]
+                                                                        [
+                                                                        "YearOfStudy"]
+                                                                    .toInt(),
                                                             showFriend: false,
-                                                            isVerified: searchResults[index]
-                                                            ["verified"],
+                                                            isVerified:
+                                                                searchResults[
+                                                                        index][
+                                                                    "verified"],
                                                           ));
                                                 },
-                                                backgroundColor: LAppTheme.lightTheme.primaryColor,
+                                                backgroundColor: LAppTheme
+                                                    .lightTheme.primaryColor,
                                                 icon: LineAwesomeIcons.search,
                                                 label: 'preview'.tr,
                                               ),
@@ -1199,38 +1241,40 @@ class _FriendsState extends State<Friends> {
                                           child: GestureDetector(
                                             onTap: () async {
                                               String clickedOnUser =
-                                              searchResults[index]
-                                              ["Id"];
+                                                  searchResults[index]["Id"];
                                               setState(() {
-                                                searchResults[index]["Noti"] = false;
+                                                searchResults[index]["Noti"] =
+                                                    false;
                                                 friends[index]["Noti"] = false;
                                               });
                                               String userId =
-                                              Auth().currentUser();
+                                                  Auth().currentUser();
 
                                               var usersIds = [
                                                 clickedOnUser,
                                                 userId
                                               ];
                                               usersIds.sort();
-                                              Navigator.push(context,PageTransition
-                                                (
-                                                  curve: Curves.linear,
-                                                  type: PageTransitionType.topToBottom,
-
-                                                  child: const mb.Messages(),
-                                                  settings: RouteSettings
-                                                    (
-                                                      arguments:
-                                                      {
-                                                        'dmId': DMIdGen(usersIds[0], usersIds[1]),
-                                                        'groupName':"${searchResults[index]["ForeName"]} ${searchResults[index]["SurName"]}",
-                                                        'groupPicture': searchResults[index]["Images"][0],
-
-                                                      }
-                                                  )
-                                              )
-                                              );
+                                              Navigator.push(
+                                                  context,
+                                                  PageTransition(
+                                                      curve: Curves.linear,
+                                                      type: PageTransitionType
+                                                          .topToBottom,
+                                                      child:
+                                                          const mb.Messages(),
+                                                      settings: RouteSettings(
+                                                          arguments: {
+                                                            'dmId': DMIdGen(
+                                                                usersIds[0],
+                                                                usersIds[1]),
+                                                            'groupName':
+                                                                "${searchResults[index]["ForeName"]} ${searchResults[index]["SurName"]}",
+                                                            'groupPicture':
+                                                                searchResults[
+                                                                        index][
+                                                                    "Images"][0],
+                                                          })));
                                             },
                                             child: Padding(
                                               padding:
@@ -1252,36 +1296,63 @@ class _FriendsState extends State<Friends> {
                                                       width: 40,
                                                       height: 40,
                                                       child: Stack(
-                                                        clipBehavior: Clip.none,
-                                                        children: [
-                                                          ClipRRect(
-                                                            borderRadius:
-                                                            BorderRadius
-                                                                .circular(100),
-                                                            child: searchResults[index]['Images'][0] == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network('${imageURL2 +
-                                                                searchResults[index]
-                                                                ["Images"][0]}.jpg'),
-                                                          ),
-                                                            if (searchResults[index]['Noti'] == true)
+                                                          clipBehavior:
+                                                              Clip.none,
+                                                          children: [
+                                                            ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          100),
+                                                              child: searchResults[index]
+                                                                              [
+                                                                              'Images']
+                                                                          [0] ==
+                                                                      ''
+                                                                  ? Image.network(
+                                                                      'https://movein.blob.core.windows.net/moveinimages/noimagefound.png')
+                                                                  : Image.network(
+                                                                      '${imageURL2 + searchResults[index]["Images"][0]}.jpg'),
+                                                            ),
+                                                            if (searchResults[
+                                                                        index]
+                                                                    ['Noti'] ==
+                                                                true)
                                                               Positioned(
                                                                 bottom: -5,
                                                                 right: -5,
-                                                                child: Container(
-                                                                  height:20,
+                                                                child:
+                                                                    Container(
+                                                                  height: 20,
                                                                   width: 20,
-                                                                  decoration: BoxDecoration(
-                                                                    shape: BoxShape.circle,
-                                                                    color: Colors.red, // Background color
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                    color: Colors
+                                                                        .red, // Background color
                                                                     boxShadow: [
                                                                       BoxShadow(
-                                                                        color: Colors.black.withOpacity(0.3), // Shadow color and opacity
-                                                                        blurRadius: 5, // Adjust the blur radius as needed
-                                                                        offset: const Offset(0, 3), // Adjust the shadow offset
+                                                                        color: Colors
+                                                                            .black
+                                                                            .withOpacity(0.3), // Shadow color and opacity
+                                                                        blurRadius:
+                                                                            5, // Adjust the blur radius as needed
+                                                                        offset: const Offset(
+                                                                            0,
+                                                                            3), // Adjust the shadow offset
                                                                       ),
                                                                     ],
                                                                   ),
                                                                   //padding: EdgeInsets.all(8.0), // Padding inside the container
-                                                                  child: const Icon(LineAwesomeIcons.bell, color: Colors.white, size: 15,), // Adjust the icon color
+                                                                  child:
+                                                                      const Icon(
+                                                                    LineAwesomeIcons
+                                                                        .bell,
+                                                                    color: Colors
+                                                                        .white,
+                                                                    size: 15,
+                                                                  ), // Adjust the icon color
                                                                 ),
                                                               )
                                                           ]),
@@ -1370,7 +1441,8 @@ class _FriendsState extends State<Friends> {
                                                           index]["ForeName"],
                                                   age:
                                                       outgoingFriendInvitesResults[
-                                                          index]["Age"].toInt(),
+                                                              index]["Age"]
+                                                          .toInt(),
                                                   uni:
                                                       outgoingFriendInvitesResults[
                                                           index]["Uni"],
@@ -1388,9 +1460,12 @@ class _FriendsState extends State<Friends> {
                                                           index]["Subject"],
                                                   yearOfStudy:
                                                       outgoingFriendInvitesResults[
-                                                          index]["YearOfStudy"].toInt(),
-                                                  isVerified: outgoingFriendInvitesResults[index]
-                                                  ["verified"],
+                                                                  index]
+                                                              ["YearOfStudy"]
+                                                          .toInt(),
+                                                  isVerified:
+                                                      outgoingFriendInvitesResults[
+                                                          index]["verified"],
                                                 ));
                                       },
                                       child: Padding(
@@ -1414,9 +1489,14 @@ class _FriendsState extends State<Friends> {
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           100),
-                                                  child: outgoingFriendInvitesResults[index]['Images'][0] == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network('${imageURL2 +
-                                                      outgoingFriendInvitesResults[
-                                                          index]["Images"][0]}.jpg'),
+                                                  child: outgoingFriendInvitesResults[
+                                                                  index]
+                                                              ['Images'][0] ==
+                                                          ''
+                                                      ? Image.network(
+                                                          'https://movein.blob.core.windows.net/moveinimages/noimagefound.png')
+                                                      : Image.network(
+                                                          '${imageURL2 + outgoingFriendInvitesResults[index]["Images"][0]}.jpg'),
                                                 ),
                                               ),
                                               const SizedBox(width: 8),
@@ -1633,10 +1713,15 @@ class _FriendsState extends State<Friends> {
                                                               BorderRadius
                                                                   .circular(
                                                                       100),
-                                                          child: shortListResults[index]['GroupPicture'] == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network('${imageURL + 
-                                                              shortListResults[
-                                                                      index][
-                                                                  "GroupPicture"]}.jpg'),
+                                                          child: shortListResults[
+                                                                          index]
+                                                                      [
+                                                                      'GroupPicture'] ==
+                                                                  ''
+                                                              ? Image.network(
+                                                                  'https://movein.blob.core.windows.net/moveinimages/noimagefound.png')
+                                                              : Image.network(
+                                                                  '${imageURL + shortListResults[index]["GroupPicture"]}.jpg'),
                                                         ),
                                                       ),
                                                       const SizedBox(width: 8),
@@ -1822,10 +1907,14 @@ class _FriendsState extends State<Friends> {
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(100),
-                                                        child: groupSearchResults[index]['GroupPicture'] == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network('${imageURL + 
-                                                            groupSearchResults[
-                                                                    index][
-                                                                "GroupPicture"]}.jpg'),
+                                                        child: groupSearchResults[
+                                                                        index][
+                                                                    'GroupPicture'] ==
+                                                                ''
+                                                            ? Image.network(
+                                                                'https://movein.blob.core.windows.net/moveinimages/noimagefound.png')
+                                                            : Image.network(
+                                                                '${imageURL + groupSearchResults[index]["GroupPicture"]}.jpg'),
                                                       ),
                                                     ),
                                                     const SizedBox(width: 8),
@@ -1953,34 +2042,49 @@ class _FriendsState extends State<Friends> {
                                               onTap: () {
                                                 showDialog<String>(
                                                     context: context,
-                                                    builder: (BuildContext context) => CustomDialog(
-                                                        id: friendSearchResults[index]
-                                                            ["Id"],
-                                                        foreName:
-                                                            friendSearchResults[index]
-                                                                ["ForeName"],
-                                                        age: friendSearchResults[index]
-                                                            ["Age"].toInt(),
-                                                        uni: friendSearchResults[index]
-                                                            ["Uni"],
-                                                        preferences:
-                                                            friendSearchResults[index]
-                                                                ["Preferences"],
-                                                        images:
-                                                            friendSearchResults[index]
-                                                                ["Images"],
-                                                        bio: friendSearchResults[index]
-                                                            ["Bio"],
-                                                        subject:
-                                                            friendSearchResults[index]
-                                                                ["Subject"],
-                                                        yearOfStudy:
-                                                            friendSearchResults[index]
-                                                                ["YearOfStudy"].toInt(),
-                                                      isVerified: friendSearchResults[index]
-                                                      ["verified"],
-
-                                                    ));
+                                                    builder: (BuildContext
+                                                            context) =>
+                                                        CustomDialog(
+                                                          id: friendSearchResults[
+                                                              index]["Id"],
+                                                          foreName:
+                                                              friendSearchResults[
+                                                                      index]
+                                                                  ["ForeName"],
+                                                          age:
+                                                              friendSearchResults[
+                                                                          index]
+                                                                      ["Age"]
+                                                                  .toInt(),
+                                                          uni:
+                                                              friendSearchResults[
+                                                                  index]["Uni"],
+                                                          preferences:
+                                                              friendSearchResults[
+                                                                      index][
+                                                                  "Preferences"],
+                                                          images:
+                                                              friendSearchResults[
+                                                                      index]
+                                                                  ["Images"],
+                                                          bio:
+                                                              friendSearchResults[
+                                                                  index]["Bio"],
+                                                          subject:
+                                                              friendSearchResults[
+                                                                      index]
+                                                                  ["Subject"],
+                                                          yearOfStudy:
+                                                              friendSearchResults[
+                                                                          index]
+                                                                      [
+                                                                      "YearOfStudy"]
+                                                                  .toInt(),
+                                                          isVerified:
+                                                              friendSearchResults[
+                                                                      index]
+                                                                  ["verified"],
+                                                        ));
                                               },
                                               child: Padding(
                                                 padding:
@@ -2007,11 +2111,16 @@ class _FriendsState extends State<Friends> {
                                                               BorderRadius
                                                                   .circular(
                                                                       100),
-                                                          child: friendSearchResults[index]['Images'][0] == '' ? Image.network('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : Image.network('${imageURL2 + 
-                                                              friendSearchResults[
-                                                                          index]
-                                                                      ["Images"]
-                                                                  [0]}.jpg'),
+                                                          child: friendSearchResults[
+                                                                              index]
+                                                                          [
+                                                                          'Images']
+                                                                      [0] ==
+                                                                  ''
+                                                              ? Image.network(
+                                                                  'https://movein.blob.core.windows.net/moveinimages/noimagefound.png')
+                                                              : Image.network(
+                                                                  '${imageURL2 + friendSearchResults[index]["Images"][0]}.jpg'),
                                                         ),
                                                       ),
                                                       const SizedBox(width: 8),
@@ -2049,43 +2158,40 @@ class _FriendsState extends State<Friends> {
               ),
             ),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: CustomNavbar(
-              onItemSelected: (route) {
-                switch (route) {
-                  case '/Scroller':
-                    Navigator.pushReplacement(
-                        context,
-                        PageTransition(
-                            type: PageTransitionType.leftToRightJoined,
-                            child: const Scroller(),
-                            childCurrent: widget,
-                            duration: const Duration(milliseconds: 200)));
-                    break;
-
-                  case '/Friends':
-                    Navigator.pushReplacement(
-                        context,
-                        PageTransition(
-                            type: PageTransitionType.fade,
-                            child: const Friends(),
-                            duration: const Duration(milliseconds: 200)));
-                    break;
-
-                  case '/Profile':
-                    Navigator.pushReplacement(
-                        context,
-                        PageTransition(
-                            type: PageTransitionType.rightToLeftJoined,
-                            child: const Profile(),
-                            childCurrent: widget,
-                            duration: const Duration(milliseconds: 200)));
-                }
-              },
-            ),
-          ),
         ],
+      ),
+      bottomNavigationBar: CustomNavbar(
+        onItemSelected: (route) {
+          switch (route) {
+            case '/Scroller':
+              Navigator.pushReplacement(
+                  context,
+                  PageTransition(
+                      type: PageTransitionType.leftToRightJoined,
+                      child: const Scroller(),
+                      childCurrent: widget,
+                      duration: const Duration(milliseconds: 200)));
+              break;
+
+            case '/Friends':
+              Navigator.pushReplacement(
+                  context,
+                  PageTransition(
+                      type: PageTransitionType.fade,
+                      child: const Friends(),
+                      duration: const Duration(milliseconds: 200)));
+              break;
+
+            case '/Profile':
+              Navigator.pushReplacement(
+                  context,
+                  PageTransition(
+                      type: PageTransitionType.rightToLeftJoined,
+                      child: const Profile(),
+                      childCurrent: widget,
+                      duration: const Duration(milliseconds: 200)));
+          }
+        },
       ),
     );
   }

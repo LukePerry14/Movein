@@ -33,45 +33,45 @@ import 'Scroller.dart';
 
 const rootImagePath = 'https://movein.blob.core.windows.net/moveinimages/';
 
-  Future<void> _uploadImageToAzure(File imageFile) async {
-    Uint8List bytes = imageFile.readAsBytesSync();
-    var x = AzureStorage.AzureStorage.parse(
-        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
-    try {
-      var uuid = const Uuid();
-      String imageName = uuid.v1();
-      await x.putBlob('/moveinimages/$imageName.jpg',
-          contentType: 'image/jpg', bodyBytes: bytes);
-    } catch (e) {
-      print('Exception: $e');
-    }
+Future<void> _uploadImageToAzure(File imageFile) async {
+  Uint8List bytes = imageFile.readAsBytesSync();
+  var x = AzureStorage.AzureStorage.parse(
+      'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+  try {
+    var uuid = const Uuid();
+    String imageName = uuid.v1();
+    await x.putBlob('/moveinimages/$imageName.jpg',
+        contentType: 'image/jpg', bodyBytes: bytes);
+  } catch (e) {
+    print('Exception: $e');
   }
+}
 
-  // For returning the string name for firebase upload
-  Future<String?> _uploadImageToAzure2(File imageFile) async {
-    Uint8List bytes = imageFile.readAsBytesSync();
-    var x = AzureStorage.AzureStorage.parse(
-        'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
-    try {
-      var uuid = const Uuid();
-      String imageName = uuid.v1();
-      await x.putBlob('/moveinimages/$imageName.jpg', contentType: 'image/jpg', bodyBytes: bytes);
-      return imageName;
-    } catch (e) {
-      return ('Exception: $e');
-    }
+// For returning the string name for firebase upload
+Future<String?> _uploadImageToAzure2(File imageFile) async {
+  Uint8List bytes = imageFile.readAsBytesSync();
+  var x = AzureStorage.AzureStorage.parse(
+      'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+  try {
+    var uuid = const Uuid();
+    String imageName = uuid.v1();
+    await x.putBlob('/moveinimages/$imageName.jpg',
+        contentType: 'image/jpg', bodyBytes: bytes);
+    return imageName;
+  } catch (e) {
+    return ('Exception: $e');
   }
+}
 
-  Future<void> _deleteProfileImageFromAzure(String fileString) async {
-    var x = AzureStorage.AzureStorage.parse(
-      'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net'
-      );
-    try {
-      await x.deleteBlob('/moveinimages/$fileString.jpg');
-    } catch (e) {
-      print('Exception: $e');
-    }
+Future<void> _deleteProfileImageFromAzure(String fileString) async {
+  var x = AzureStorage.AzureStorage.parse(
+      'DefaultEndpointsProtocol=https;AccountName=movein;AccountKey=4MaJcz+DSy+KHInVIhTmtzj3OoWtTr0E+IDAjajCliKTaS5X5j3q2Rp69Q/oDiPtzGXfWw3OJPYh+ASt9PPo9w==;EndpointSuffix=core.windows.net');
+  try {
+    await x.deleteBlob('/moveinimages/$fileString.jpg');
+  } catch (e) {
+    print('Exception: $e');
   }
+}
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -127,14 +127,12 @@ class _ProfilePage extends State<Profile> {
     }
   }
 
-
-    Future<void> updateImage(imageArray) async {
+  Future<void> updateImage(imageArray) async {
     try {
       await FirebaseFirestore.instance
           .collection('Users')
-          .doc(Auth().currentUser()).update({
-            'Images': imageArray
-          });
+          .doc(Auth().currentUser())
+          .update({'Images': imageArray});
     } catch (e) {
       throw FirebaseException(
         message: 'Error saving user data: $e',
@@ -143,44 +141,41 @@ class _ProfilePage extends State<Profile> {
     }
   }
 
-    Future<CroppedFile?> cropImage(File imageFile) async {
-      final croppedFile = await ImageCropper().cropImage(sourcePath: imageFile.path,
-      compressFormat: ImageCompressFormat.jpg,
-      maxWidth: 200,
-      maxHeight: 200,
-      compressQuality: 100,
+  Future<CroppedFile?> cropImage(File imageFile) async {
+    final croppedFile = await ImageCropper().cropImage(
+        sourcePath: imageFile.path,
+        compressFormat: ImageCompressFormat.jpg,
+        maxWidth: 200,
+        maxHeight: 200,
+        compressQuality: 100,
         aspectRatioPresets: [
           CropAspectRatioPreset.square,
         ],
         uiSettings: [
           AndroidUiSettings(
-            toolbarTitle: 'Image Cropper',
-            toolbarColor: Theme.of(context).primaryColor,
-            toolbarWidgetColor: Colors.white,
-            initAspectRatio: CropAspectRatioPreset.original,
-            lockAspectRatio: false
-          ),
-          IOSUiSettings(
-            title: 'Image Cropper'
-          )
-        ]
-      );
-      return croppedFile;
-    }
+              toolbarTitle: 'Image Cropper',
+              toolbarColor: Theme.of(context).primaryColor,
+              toolbarWidgetColor: Colors.white,
+              initAspectRatio: CropAspectRatioPreset.original,
+              lockAspectRatio: false),
+          IOSUiSettings(title: 'Image Cropper')
+        ]);
+    return croppedFile;
+  }
 
-    Future<File?> pickImage() async {
-      final ImagePicker _picker = ImagePicker();
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-      if (image != null) {
-        // return File(image.path);
-        CroppedFile? croppedImage = await cropImage(File(image.path));
-        if (croppedImage != null) {
-          return File(croppedImage.path);
-        }
-      } else {
-        return null;
+  Future<File?> pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      // return File(image.path);
+      CroppedFile? croppedImage = await cropImage(File(image.path));
+      if (croppedImage != null) {
+        return File(croppedImage.path);
       }
+    } else {
+      return null;
     }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -211,7 +206,7 @@ class _ProfilePage extends State<Profile> {
 
             if (profPic == '') {
               profileImagepath = '';
-            } 
+            }
 
             // default picture used for when an image is not present
             return Builder(builder: (context) {
@@ -229,103 +224,115 @@ class _ProfilePage extends State<Profile> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              const SizedBox(height:10),
+                              const SizedBox(height: 10),
                               Container(
                                 width: 250,
                                 height: 250,
-                                child: Stack(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () async {
+                                child: Stack(children: [
+                                  GestureDetector(
+                                    onTap: () async {
+                                      final pickedImage = await pickImage();
+                                      if (pickedImage != null) {
+                                        profilePictureString =
+                                            await _uploadImageToAzure2(
+                                                pickedImage);
+                                        imageArray[0] = profilePictureString;
+                                        updateImage(imageArray);
+                                        _deleteProfileImageFromAzure(
+                                            profileImagepath);
+                                        setState(() {
+                                          profileImagepath =
+                                              '$rootImagePath$profilePictureString';
+                                        });
+                                      }
+                                    },
+                                    child: Container(
+                                      width: 250,
+                                      height: 250,
+                                      decoration: BoxDecoration(
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(125)),
+                                          border: Border.all(
+                                              color: Theme.of(context)
+                                                  .primaryColor),
+                                          boxShadow: const [
+                                            BoxShadow(
+                                              color: Colors.black,
+                                              offset: Offset(
+                                                5.0,
+                                                5.0,
+                                              ),
+                                              blurRadius: 10.0,
+                                              spreadRadius: 2.0,
+                                            ), //BoxShadow
+                                            BoxShadow(
+                                              color: Colors.white,
+                                              offset: Offset(0.0, 0.0),
+                                              blurRadius: 0.0,
+                                              spreadRadius: 0.0,
+                                            ), //BoxShadow
+                                          ],
+                                          image: DecorationImage(
+                                              fit: BoxFit.cover,
+                                              image: profileImagepath == ''
+                                                  ? const NetworkImage(
+                                                      'https://movein.blob.core.windows.net/moveinimages/noimagefound.png')
+                                                  : NetworkImage(
+                                                      profileImagepath))),
+                                    ),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: IconButton(
+                                      onPressed: () async {
                                         final pickedImage = await pickImage();
                                         if (pickedImage != null) {
-                                          profilePictureString = await _uploadImageToAzure2(pickedImage);
+                                          profilePictureString =
+                                              await _uploadImageToAzure2(
+                                                  pickedImage);
                                           imageArray[0] = profilePictureString;
                                           updateImage(imageArray);
-                                          _deleteProfileImageFromAzure(profileImagepath);
+                                          _deleteProfileImageFromAzure(
+                                              profileImagepath);
                                           setState(() {
-                                            profileImagepath = '$rootImagePath$profilePictureString';
+                                            profileImagepath =
+                                                '$rootImagePath$profilePictureString';
                                           });
                                         }
                                       },
-                                      child: Container(
-                                        width: 250,
-                                        height: 250,
+                                      icon: Container(
                                         decoration: BoxDecoration(
-                                            borderRadius: const BorderRadius.all(Radius.circular(125)),
-                                            border: Border.all(color: Theme.of(context).primaryColor),
-                                            boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black,
-                      offset: Offset(
-                        5.0,
-                        5.0,
-                      ),
-                      blurRadius: 10.0,
-                      spreadRadius: 2.0,
-                    ), //BoxShadow
-                    BoxShadow(
-                      color: Colors.white,
-                      offset: Offset(0.0, 0.0),
-                      blurRadius: 0.0,
-                      spreadRadius: 0.0,
-                    ), //BoxShadow
-                  ],
-                                            image: DecorationImage(
-                                                fit: BoxFit.cover,
-                                                image: profileImagepath == '' ? const NetworkImage('https://movein.blob.core.windows.net/moveinimages/noimagefound.png') : NetworkImage(profileImagepath)
-                                            )
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: LAppTheme.lightTheme
+                                                .primaryColor, // Customize the border color
+                                            width:
+                                                1.0, // Customize the border width
+                                          ),
                                         ),
-
+                                        child: ClipOval(
+                                          child: Icon(
+                                            LineAwesomeIcons.pen_nib,
+                                            color: LAppTheme
+                                                .lightTheme.primaryColor,
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: IconButton(
-                                        onPressed: () async {
-                                          final pickedImage = await pickImage();
-                                          if (pickedImage != null) {
-                                            profilePictureString = await _uploadImageToAzure2(pickedImage);
-                                            imageArray[0] = profilePictureString;
-                                            updateImage(imageArray);
-                                            _deleteProfileImageFromAzure(profileImagepath);
-                                            setState(() {
-                                              profileImagepath = '$rootImagePath$profilePictureString';
-                                            });
-                                          }
-                                        },
-                                        icon: Container(
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: LAppTheme.lightTheme.primaryColor, // Customize the border color
-                                              width: 1.0, // Customize the border width
-                                            ),
-                                          ),
-                                          child: ClipOval(
-                                            child: Icon(
-                                              LineAwesomeIcons.pen_nib,
-                                              color: LAppTheme.lightTheme.primaryColor,
-                                            ),
-                                          ),
-                                        ),
-
-
-                                      ),
-                                    )
-                                  ]
-                                ),
+                                  )
+                                ]),
                               ),
                               const SizedBox(height: 20.0),
-                              Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(name,
-                                      style: Theme.of(context).textTheme.headlineMedium),
-                                  const SizedBox(width: 10),
-                                  if (subscribed)
+                              Row(mainAxisSize: MainAxisSize.min, children: [
+                                Text(name,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineMedium),
+                                const SizedBox(width: 10),
+                                if (subscribed)
                                   Container(
-                                    width: 15, // Adjust the width and height as needed
+                                    width:
+                                        15, // Adjust the width and height as needed
                                     height: 15,
                                     decoration: const BoxDecoration(
                                       color: Colors.blue,
@@ -339,8 +346,7 @@ class _ProfilePage extends State<Profile> {
                                       ),
                                     ),
                                   ),
-                                ]
-                              ),
+                              ]),
                               const SizedBox(height: 8.0),
                               if (!subscribed)
                                 ElevatedButton(
@@ -350,7 +356,8 @@ class _ProfilePage extends State<Profile> {
                                     // ));
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue, // Background color
+                                    backgroundColor:
+                                        Colors.blue, // Background color
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(
                                           10.0), // Rounded corners
@@ -372,7 +379,8 @@ class _ProfilePage extends State<Profile> {
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
                                       Auth().currentUser(),
-                                      style: Theme.of(context).textTheme.bodySmall,
+                                      style:
+                                          Theme.of(context).textTheme.bodySmall,
                                     ),
                                   ),
                                 ),
@@ -383,14 +391,20 @@ class _ProfilePage extends State<Profile> {
                               ]),
                               const SizedBox(height: 50.0),
                               GestureDetector(
-                                onTap: () => Navigator.push(context,PageTransition(curve:Curves.linear,type: PageTransitionType.bottomToTop, child:const Premium())),
+                                onTap: () => Navigator.push(
+                                    context,
+                                    PageTransition(
+                                        curve: Curves.linear,
+                                        type: PageTransitionType.bottomToTop,
+                                        child: const Premium())),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                      borderRadius:
-                                      const BorderRadius.all(Radius.circular(42)),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(42)),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: LAppTheme.lightTheme.primaryColor
+                                          color: LAppTheme
+                                              .lightTheme.primaryColor
                                               .withAlpha(200),
                                           offset: const Offset(0, 20),
                                           blurRadius: 30,
@@ -418,11 +432,12 @@ class _ProfilePage extends State<Profile> {
                                     padding: EdgeInsets.symmetric(
                                         vertical: 15,
                                         horizontal:
-                                        MediaQuery.of(context).size.width *
-                                            0.125),
+                                            MediaQuery.of(context).size.width *
+                                                0.125),
                                     child: Text('upgrade'.tr,
                                         style: GoogleFonts.redHatDisplay(
-                                            color: Colors.grey[100], fontSize: 16.5)),
+                                            color: Colors.grey[100],
+                                            fontSize: 16.5)),
                                   ),
                                 ),
                               ),
@@ -451,18 +466,25 @@ class _ProfilePage extends State<Profile> {
                                 ),
                                 title: Text(
                                   "edit_profile".tr,
-                                  style: Theme.of(context).textTheme.headlineSmall,
+                                  style:
+                                      Theme.of(context).textTheme.headlineSmall,
                                 ),
                                 trailing: Icon(LineAwesomeIcons.angle_right,
                                     color: LAppTheme.lightTheme.primaryColor),
                                 onTap: () {
-                                  Navigator.push(context, PageTransition(
-                                    type: PageTransitionType.rightToLeftWithFade,
-                                    alignment: Alignment.topCenter,
-                                    child: const ProfileInformation(),
-                                    duration: const Duration(milliseconds: 400),
-                                    reverseDuration: const Duration(milliseconds: 400),
-                                  ),);
+                                  Navigator.push(
+                                    context,
+                                    PageTransition(
+                                      type: PageTransitionType
+                                          .rightToLeftWithFade,
+                                      alignment: Alignment.topCenter,
+                                      child: const ProfileInformation(),
+                                      duration:
+                                          const Duration(milliseconds: 400),
+                                      reverseDuration:
+                                          const Duration(milliseconds: 400),
+                                    ),
+                                  );
                                 },
                               ),
                               const SizedBox(height: 30.0),
@@ -472,33 +494,47 @@ class _ProfilePage extends State<Profile> {
                                   width: 40,
                                   decoration: BoxDecoration(
                                     border: Border.all(
-                                      color: isDark
-                                      ? Colors.white70
-                                      : Theme.of(context).primaryColor,
-                                      width: 1
-                                    ),
+                                        color: isDark
+                                            ? Colors.white70
+                                            : Theme.of(context).primaryColor,
+                                        width: 1),
                                     borderRadius: BorderRadius.circular(100),
                                   ),
-                                  child: Icon(LineAwesomeIcons.image,
-                                  color: isDark
-                                  ? Colors.white70
-                                  : Theme.of(context).primaryColor,),
+                                  child: Icon(
+                                    LineAwesomeIcons.image,
+                                    color: isDark
+                                        ? Colors.white70
+                                        : Theme.of(context).primaryColor,
+                                  ),
                                 ),
-                                title: Text("Account Images".tr, style: 
-                                Theme.of(context).textTheme.headlineSmall,),
-                                trailing: Icon(LineAwesomeIcons.angle_right,
-                                color: LAppTheme.lightTheme.primaryColor,),
+                                title: Text(
+                                  "Account Images".tr,
+                                  style:
+                                      Theme.of(context).textTheme.headlineSmall,
+                                ),
+                                trailing: Icon(
+                                  LineAwesomeIcons.angle_right,
+                                  color: LAppTheme.lightTheme.primaryColor,
+                                ),
                                 onTap: () {
-                                  Navigator.push(context, PageTransition(
-                                    type: PageTransitionType.rightToLeftWithFade,
-                                    alignment: Alignment.topCenter,
-                                    child: const accountImages(),
-                                    duration: const Duration(milliseconds: 400),
-                                    reverseDuration: const Duration(milliseconds: 400),
-                                  ),);
+                                  Navigator.push(
+                                    context,
+                                    PageTransition(
+                                      type: PageTransitionType
+                                          .rightToLeftWithFade,
+                                      alignment: Alignment.topCenter,
+                                      child: const accountImages(),
+                                      duration:
+                                          const Duration(milliseconds: 400),
+                                      reverseDuration:
+                                          const Duration(milliseconds: 400),
+                                    ),
+                                  );
                                 },
                               ),
-                              const SizedBox(height: 30,),
+                              const SizedBox(
+                                height: 30,
+                              ),
                               ListTile(
                                   leading: Container(
                                     width: 40,
@@ -518,18 +554,26 @@ class _ProfilePage extends State<Profile> {
                                   ),
                                   title: Text(
                                     "settings".tr,
-                                    style: Theme.of(context).textTheme.headlineSmall,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineSmall,
                                   ),
                                   trailing: Icon(LineAwesomeIcons.angle_right,
                                       color: LAppTheme.lightTheme.primaryColor),
                                   onTap: () {
-                                    Navigator.push(context, PageTransition(
-                                      type: PageTransitionType.rightToLeftWithFade,
-                                      alignment: Alignment.topCenter,
-                                      child: const SettingsScaffold(),
-                                      duration: const Duration(milliseconds: 400),
-                                      reverseDuration: const Duration(milliseconds: 400),
-                                    ),);
+                                    Navigator.push(
+                                      context,
+                                      PageTransition(
+                                        type: PageTransitionType
+                                            .rightToLeftWithFade,
+                                        alignment: Alignment.topCenter,
+                                        child: const SettingsScaffold(),
+                                        duration:
+                                            const Duration(milliseconds: 400),
+                                        reverseDuration:
+                                            const Duration(milliseconds: 400),
+                                      ),
+                                    );
                                   }),
                               const SizedBox(height: 30),
                               ListTile(
@@ -537,7 +581,8 @@ class _ProfilePage extends State<Profile> {
                                   width: 40,
                                   height: 40,
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.red, width: 1),
+                                    border:
+                                        Border.all(color: Colors.red, width: 1),
                                     borderRadius: BorderRadius.circular(100),
                                   ),
                                   child: const Icon(
@@ -551,44 +596,64 @@ class _ProfilePage extends State<Profile> {
                                         fontSize: 20.0)),
                                 onTap: () async {
                                   await storageReset();
-                                  await UserPreferences.setForeName("NotLoggedInError");
+                                  await UserPreferences.setForeName(
+                                      "NotLoggedInError");
                                   FirebaseAuth.instance.signOut();
                                   // ignore: use_build_context_synchronously
                                   Navigator.pushReplacement(
-                                    context, PageTransition(
-                                    type: PageTransitionType.fade,
-                                    child: const LoginScreen(),
-                                    duration: const Duration(milliseconds: 400),
-                                  ),);
+                                    context,
+                                    PageTransition(
+                                      type: PageTransitionType.fade,
+                                      child: const LoginScreen(),
+                                      duration:
+                                          const Duration(milliseconds: 400),
+                                    ),
+                                  );
                                 },
                               ),
-                              const SizedBox(height: 60,)
+                              const SizedBox(
+                                height: 60,
+                              )
                             ],
                           ),
                         ),
                       ),
                     ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: CustomNavbar(
-                        onItemSelected: (route) {
-                          switch (route){
-                            case '/Scroller':
-                              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.leftToRightJoined, child: const Scroller(), childCurrent: widget, duration: const Duration(milliseconds: 200)));
-                              break;
-
-                            case '/Friends':
-                              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.leftToRightJoined, child: const Friends(), childCurrent: widget, duration: const Duration(milliseconds: 200)));
-                              break;
-
-                            case '/Profile':
-                              Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Profile(), duration: const Duration(milliseconds: 200)));
-                          }
-                          navigator.pushReplacementNamed(route);
-                        },
-                      ),
-                    ),
                   ],
+                ),
+                bottomNavigationBar: CustomNavbar(
+                  onItemSelected: (route) {
+                    switch (route) {
+                      case '/Scroller':
+                        Navigator.pushReplacement(
+                            context,
+                            PageTransition(
+                                type: PageTransitionType.leftToRightJoined,
+                                child: const Scroller(),
+                                childCurrent: widget,
+                                duration: const Duration(milliseconds: 200)));
+                        break;
+
+                      case '/Friends':
+                        Navigator.pushReplacement(
+                            context,
+                            PageTransition(
+                                type: PageTransitionType.leftToRightJoined,
+                                child: const Friends(),
+                                childCurrent: widget,
+                                duration: const Duration(milliseconds: 200)));
+                        break;
+
+                      case '/Profile':
+                        Navigator.pushReplacement(
+                            context,
+                            PageTransition(
+                                type: PageTransitionType.fade,
+                                child: const Profile(),
+                                duration: const Duration(milliseconds: 200)));
+                    }
+                    navigator.pushReplacementNamed(route);
+                  },
                 ),
               );
             });
@@ -768,7 +833,7 @@ class ButtonWidgetLogOut extends StatelessWidget {
       ]));
 }
 
-Future<void> storageReset() async{
+Future<void> storageReset() async {
   await UserPreferences.setForeName("NotLoggedInError");
   await UserPreferences.setMemPref(0);
   await UserPreferences.setCleanPref(0);

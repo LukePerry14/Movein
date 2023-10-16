@@ -4,7 +4,8 @@ import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'Themes/lMode.dart';
 
 class CustomNavbar extends StatelessWidget {
-  const CustomNavbar({Key? key, required this.onItemSelected}) : super(key: key);
+  const CustomNavbar({Key? key, required this.onItemSelected})
+      : super(key: key);
 
   final Function(String) onItemSelected;
 
@@ -12,10 +13,11 @@ class CustomNavbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomAppBar(
       elevation: 0,
-      color: Colors.transparent,
+      color: LAppTheme.lightTheme.primaryColor,
       child: Container(
         decoration: BoxDecoration(
-            borderRadius: const BorderRadius.only(topLeft: Radius.circular(42), topRight: Radius.circular(42)),
+            borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(42), topRight: Radius.circular(42)),
             gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomCenter,
@@ -61,4 +63,3 @@ class CustomNavbar extends StatelessWidget {
     );
   }
 }
-
