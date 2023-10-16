@@ -82,7 +82,7 @@ class _SettingsPageState extends State<SettingsPage> {
           const Divider(height: 20, thickness: 1),
           const SizedBox(height: 10),
           //buildChangeEmail(context, 'Change Email'),
-          buildReviewAds(context, 'premium'.tr),
+          //buildReviewAds(context, 'premium'.tr),
           buildChangeLanguage(context, 'language'.tr),
           buildAccountOption(context, 'p,t,c'.tr),
           buildAccountOption(context, 'contact'.tr),

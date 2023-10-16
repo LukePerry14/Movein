@@ -390,57 +390,50 @@ class _ProfilePage extends State<Profile> {
                                 ),
                               ]),
                               const SizedBox(height: 50.0),
-                              GestureDetector(
-                                onTap: () => Navigator.push(
-                                    context,
-                                    PageTransition(
-                                        curve: Curves.linear,
-                                        type: PageTransitionType.bottomToTop,
-                                        child: const Premium())),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(42)),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: LAppTheme
-                                              .lightTheme.primaryColor
-                                              .withAlpha(200),
-                                          offset: const Offset(0, 20),
-                                          blurRadius: 30,
-                                          spreadRadius: -5,
-                                        ),
-                                      ],
-                                      gradient: LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            LAppTheme.lightTheme.primaryColor
-                                                .withAlpha(150),
-                                            LAppTheme.lightTheme.primaryColor
-                                                .withAlpha(200),
-                                            LAppTheme.lightTheme.primaryColor,
-                                            LAppTheme.lightTheme.primaryColor,
-                                          ],
-                                          stops: const [
-                                            0.1,
-                                            0.3,
-                                            0.9,
-                                            1.0
-                                          ])),
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 15,
-                                        horizontal:
-                                            MediaQuery.of(context).size.width *
-                                                0.125),
-                                    child: Text('upgrade'.tr,
-                                        style: GoogleFonts.redHatDisplay(
-                                            color: Colors.grey[100],
-                                            fontSize: 16.5)),
-                                  ),
-                                ),
-                              ),
+                              // GestureDetector(
+                              //   onTap: () => Navigator.push(context,PageTransition(curve:Curves.linear,type: PageTransitionType.bottomToTop, child:const Premium())),
+                              //   child: Container(
+                              //     decoration: BoxDecoration(
+                              //         borderRadius:
+                              //         const BorderRadius.all(Radius.circular(42)),
+                              //         boxShadow: [
+                              //           BoxShadow(
+                              //             color: LAppTheme.lightTheme.primaryColor
+                              //                 .withAlpha(200),
+                              //             offset: const Offset(0, 20),
+                              //             blurRadius: 30,
+                              //             spreadRadius: -5,
+                              //           ),
+                              //         ],
+                              //         gradient: LinearGradient(
+                              //             begin: Alignment.topLeft,
+                              //             end: Alignment.bottomCenter,
+                              //             colors: [
+                              //               LAppTheme.lightTheme.primaryColor
+                              //                   .withAlpha(150),
+                              //               LAppTheme.lightTheme.primaryColor
+                              //                   .withAlpha(200),
+                              //               LAppTheme.lightTheme.primaryColor,
+                              //               LAppTheme.lightTheme.primaryColor,
+                              //             ],
+                              //             stops: const [
+                              //               0.1,
+                              //               0.3,
+                              //               0.9,
+                              //               1.0
+                              //             ])),
+                              //     child: Padding(
+                              //       padding: EdgeInsets.symmetric(
+                              //           vertical: 15,
+                              //           horizontal:
+                              //           MediaQuery.of(context).size.width *
+                              //               0.125),
+                              //       child: Text('upgrade'.tr,
+                              //           style: GoogleFonts.redHatDisplay(
+                              //               color: Colors.grey[100], fontSize: 16.5)),
+                              //     ),
+                              //   ),
+                              // ),
                               const SizedBox(height: 35.0),
                               Divider(
                                 height: 1,
