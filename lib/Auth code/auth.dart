@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 // For Sendgrid mailing
@@ -79,9 +80,6 @@ class Auth {
   Future<String> signInWithEmailAndPassword(
       String email, String password) async {
     try {
-      // Removes whitespace from string in case it was entered
-      email.replaceAll(' ', '');
-
       // This will Log in the existing user in our firebase
       await _auth.signInWithEmailAndPassword(
         email: email,
