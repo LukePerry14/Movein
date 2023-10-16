@@ -349,13 +349,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             horizontal: 24), // Adjust padding as needed
                       ),
                       onPressed: () async {
+                        var email =
+                            _formKey.currentState?.fields['email']?.value;
+                        email = email.trim();
                         if (_formKey.currentState?.saveAndValidate() == false) {
                           return;
                         }
                         RegExp regex =
                             RegExp(r"@durham\.ac\.uk$|@dur\.ac\.uk$");
-                        if (!regex.hasMatch(
-                            _formKey.currentState?.fields['email']?.value)) {
+                        if (!regex.hasMatch(email)) {
                           await showDialog(
                             context: context,
                             builder: (BuildContext context) => WillPopScope(
@@ -417,7 +419,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         } else {
                           String response = await Auth()
                               .signInWithEmailAndPassword(
-                                  _formKey.currentState?.fields['email']?.value,
+                                  email,
                                   _formKey
                                       .currentState?.fields['password']?.value);
                           if (response == 'success') {
@@ -465,13 +467,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                         padding: const EdgeInsets.all(10),
                                         child: Column(
                                           children: [
-                                            Image.asset('assets/Pictures/5.png'), 
-                                            const SizedBox(height: 20,),
-                                            const Text('Email verification is required'),
-                                            const SizedBox(height: 20,),
-                                            const Text('Please check your inbox for an email from feedback@move1n.co.uk'),
-                                            const SizedBox(height: 10,),
-                                            const Text('You might need to check your spam or junk folder for it.')
+                                            Image.asset(
+                                                'assets/Pictures/5.png'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            const Text(
+                                                'Email verification is required'),
+                                            const SizedBox(
+                                              height: 20,
+                                            ),
+                                            const Text(
+                                                'Please check your inbox for an email from feedback@move1n.co.uk'),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            const Text(
+                                                'You might need to check your spam or junk folder for it.')
                                           ],
                                         ),
                                       ),
