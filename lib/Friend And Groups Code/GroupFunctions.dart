@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:movein/Friend%20And%20Groups%20Code/FriendFunctions.dart';
+import 'package:movein/Pages/Sendbird.dart';
+import 'package:movein/UserPreferences.dart';
+import 'package:page_transition/page_transition.dart';
+
+import '../Pages/Friends.dart';
 
 
 Future<void> updateGroupName(String newName, String groupId) async {
@@ -19,69 +26,101 @@ Future<void> updateGroupName(String newName, String groupId) async {
   }
 }
 
+Future<void> updateGroupImage(String newImageName, String groupID) async {
+  try {
+    final collectionRef = FirebaseFirestore.instance.collection('Groups');
+    final documentRef = collectionRef.doc(groupID);
+
+    await documentRef.update({
+      'GroupPicture': newImageName
+    });
+  } catch (e) {
+    throw FirebaseException(
+      message: 'Error updating group Name: $e',
+      plugin: 'cloud_firestore',
+    );
+  }
+}
+
 Future<void> removeFromGroupAndUser(String groupId, String userId) async {
+
   try {
     final groupsCollectionRef = FirebaseFirestore.instance.collection('Groups');
     final groupDocRef = groupsCollectionRef.doc(groupId);
+    groupDocRef.update({
+      "Members" : FieldValue.arrayRemove([userId]),
+    });
+
+    final usersCollectionRef = FirebaseFirestore.instance.collection('Users');
+    final userDocRef = usersCollectionRef.doc(userId);
+    userDocRef.update({
+      "Joined": FieldValue.arrayRemove([groupId]),
+    });
+
     final DocumentSnapshot groupSnapshot = await groupDocRef.get();
     final List<dynamic> members = groupSnapshot.get('Members');
     int groupSize = members.length;
 
-    if (groupSize == 1) {
-      // If the group has only one member (current user), delete the entire group document
+    if (groupSize == 0) {
       await groupDocRef.delete();
     } else {
-
-      // Calculate the new average values
-      double avgCleanliness = groupSnapshot.get('AvgCleanliness');
-      double avgNightLife = groupSnapshot.get('AvgNightLife');
-      double avgNoisiness = groupSnapshot.get('AvgNoisiness');
+// Calculate the new average values
+      double avgCleanliness = groupSnapshot.get('AvgCleanliness').toDouble();
+      double avgNightLife = groupSnapshot.get('AvgNightLife').toDouble();
+      double avgNoisiness = groupSnapshot.get('AvgNoisiness').toDouble();
       DateTime avgBedTime = groupSnapshot.get('AvgBedTime').toDate();
+      double avgYearOfStudy = groupSnapshot.get('AvgYearOfStudy');
 
-      // Get the user document of the current user
+// Get the user document of the current user
       final usersCollectionRef = FirebaseFirestore.instance.collection('Users');
       final userDocRef = usersCollectionRef.doc(userId);
       final DocumentSnapshot userSnapshot = await userDocRef.get();
 
-      // Get the 'Preferences' map field from the user document
+// Get the 'Preferences' map field from the user document
       final Map<String, dynamic> prefs = userSnapshot.get('Preferences');
 
-      // Get the corresponding fields from the user document
+// Get the corresponding fields from the user document
       double userCleanliness = prefs['Cleanliness'];
       double userNightLife = prefs['NightLife'];
       double userNoisiness = prefs['Noisiness'];
+      int userYearOfStudy = prefs['YearOfStudy'];
 
-      // Calculate the new average values after removing the user from the group
+// Calculate the new average values after removing the user from the group
       avgCleanliness = (avgCleanliness * groupSize - userCleanliness) / (groupSize - 1);
       avgNightLife = (avgNightLife * groupSize - userNightLife) / (groupSize - 1);
       avgNoisiness = (avgNoisiness * groupSize - userNoisiness) / (groupSize - 1);
+      avgYearOfStudy = (avgYearOfStudy * groupSize - userYearOfStudy) / (groupSize - 1);
 
-      // Calculate the new average bed time after removing the user from the group
+// Calculate the new average bed time after removing the user from the group
       int totalBedTimeInMilliseconds = 0;
+      int totalYearOfStudy = 0;
+
       for (String memberId in members) {
-        if (memberId != userId) {
           final DocumentSnapshot memberSnapshot = await usersCollectionRef.doc(memberId).get();
           final Map<String, dynamic> memberPrefs = memberSnapshot.get('Preferences');
           DateTime memberBedTime = memberPrefs['Lights Out'].toDate();
           totalBedTimeInMilliseconds += memberBedTime.millisecondsSinceEpoch;
-        }
+
+          int memberYearOfStudy = memberPrefs['YearOfStudy'];
+          totalYearOfStudy += memberYearOfStudy;
       }
+
       avgBedTime = DateTime.fromMillisecondsSinceEpoch(totalBedTimeInMilliseconds ~/ (groupSize - 1));
       final Timestamp avgBedTimeTimestamp = Timestamp.fromDate(avgBedTime);
-      // Update the group document with the new average values and remove the user from the 'Members' array
+
+      avgYearOfStudy = totalYearOfStudy / (groupSize - 1);
+
+// Update the group document with the new average values and remove the user from the 'Members' array
       await groupDocRef.update({
         'AvgCleanliness': avgCleanliness,
         'AvgNightLife': avgNightLife,
         'AvgNoisiness': avgNoisiness,
         'AvgBedTime': avgBedTimeTimestamp,
+        'AvgYearOfStudy': avgYearOfStudy,
         'Members': FieldValue.arrayRemove([userId]),
         'BlackList' : FieldValue.arrayRemove([userId]),
       });
 
-      // Update the user document to remove the group from the 'Joined' array
-      await userDocRef.update({
-        'Joined': FieldValue.arrayRemove([groupId]),
-      });
     }
   } catch (e) {
     throw FirebaseException(
@@ -178,7 +217,7 @@ class _EditGroupNameState extends State<EditGroupName> {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text("Cancel", style: Theme.of(context).textTheme.bodyMedium),
+                    child: Text("cancel".tr, style: Theme.of(context).textTheme.bodyMedium),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -190,7 +229,7 @@ class _EditGroupNameState extends State<EditGroupName> {
                         updateGroupName(newName, widget.groupId).then((value) => Navigator.of(context).pop());
                       }
                     } : null,
-                    child: Text("Confirm", style: Theme.of(context).textTheme.bodyMedium),
+                    child: Text("confirm".tr, style: Theme.of(context).textTheme.bodyMedium),
                   ),
                 ),
               ],
@@ -229,11 +268,11 @@ class ConfirmLeave extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-              child: Text("Are you sure you want to leave?", style: Theme.of(context).textTheme.bodyLarge,),
+              child: Text('leave_title'.tr, style: Theme.of(context).textTheme.bodyLarge,),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text("This will remove you from the group and make you unable to contact any members you aren't already friends with. You will still be able to rejoin the group.", style: Theme.of(context).textTheme.bodySmall,),
+              child: Text('leave_desc'.tr, style: Theme.of(context).textTheme.bodySmall,),
             ),
             const SizedBox(height: 30),
             Row(
@@ -244,18 +283,19 @@ class ConfirmLeave extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text("Cancel", style: Theme.of(context).textTheme.bodyMedium),
+                    child: Text("cancel".tr, style: Theme.of(context).textTheme.bodyMedium),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
                       onPressed: () {
+                        ConnectSendbird().leaveChannel(userId, groupId);
                         removeFromGroupAndUser(groupId, userId).then((_) {
-                          Navigator.of(context).pushReplacementNamed('/Friends');
+                          Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Friends(), duration: const Duration(milliseconds: 400)));
                         });
                       },
-                      child: Text("Confirm", style: Theme.of(context).textTheme.bodyMedium)
+                      child: Text("confirm".tr, style: Theme.of(context).textTheme.bodyMedium)
                   ),
                 ),
 
@@ -327,6 +367,9 @@ Future<void> isKickVotesThresholdReached(String groupId, String kickId, int grou
         if ((posSum > groupSize / 2) | (negSum.abs() >= groupSize / 2)) {
           if (posSum > groupSize / 2) {
             await removeFromGroupAndUser(groupId, kickId);
+            await groupRef.update({
+              'BlackList': FieldValue.arrayRemove([kickId])
+            });
           }
           // Remove kickId from 'Kicks' array field
           await groupRef.update({
@@ -378,11 +421,14 @@ Future<void> updateKickVote(String groupId, bool agree, String kickId, int group
 Future<void> isAppVotesThresholdReached(String groupId, String appId, int groupSize) async {
   try {
     final DocumentReference groupRef = FirebaseFirestore.instance.collection('Groups').doc(groupId);
+    final DocumentReference userRef = FirebaseFirestore.instance.collection('Users').doc(appId);
 
     final DocumentSnapshot<Map<String, dynamic>> groupSnapshot = await FirebaseFirestore.instance.collection('Groups').doc(groupId).get();
-
     final Map<String, dynamic>? appVals = groupSnapshot.data()?['AppVals'];
 
+    final DocumentSnapshot<Map<String, dynamic>> userSnapshot = await FirebaseFirestore.instance.collection('Users').doc(appId).get();
+    final List<dynamic> joined = userSnapshot.data()?['Joined'];
+    final int length = joined.length;
     if (appVals != null && appVals.containsKey(appId)) {
       final Map<String, dynamic>? appVotes = appVals[appId] as Map<String, dynamic>?;
 
@@ -400,19 +446,34 @@ Future<void> isAppVotesThresholdReached(String groupId, String appId, int groupS
         });
 
         if ((posSum > groupSize / 2) | (negSum.abs() >= groupSize / 2)) {
+          appVals.remove(appId);
+          await groupRef.update({
+            'AppVals': appVals,
+            'Applicants': FieldValue.arrayRemove([appId]),
+          });
+          await userRef.update({
+            'Applications': FieldValue.arrayRemove([groupId]),
+          });
           if (posSum > groupSize / 2) {
             await groupRef.update({
-              'Applicants': FieldValue.arrayRemove([appId]),
               'Members': FieldValue.arrayUnion([appId]),
               'BlackList': FieldValue.arrayUnion([appId])
             });
+            await userRef.update({
+              'Joined': FieldValue.arrayUnion([groupId]),
+            });
+            if(length+1 == UserPreferences.getAppsMax()){
+              await maxGroupsReached(appId);
+            }
+          } else{
+            await groupRef.update({
+              'BlackList': FieldValue.arrayRemove([appId])
+            });
           }
-
-          appVals.remove(appId);
-          await groupRef.update({'AppVals': appVals});
         }
       }
     }
+
   } catch (e) {
     // Error occurred
     throw FirebaseException(

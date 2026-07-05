@@ -1,67 +1,95 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:page_transition/page_transition.dart';
+
+import 'Scroller.dart';
 
 class OnBoardingPage extends StatelessWidget {
   const OnBoardingPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: IntroductionScreen(
-          pages: [
-            PageViewModel(
-              title: "Welcome to MoveIn!",
-              body: "Let's find you a house",
-              image: buildImage("assets/Pictures/ph.png"),
-              decoration: getPageDecoration(context),
-            ),
-            PageViewModel(
-              title: "Using the group finder",
-              body: "To see the basic info about a group, simply tap on the group name.",
-              image: buildImage("assets/Pictures/ph.png"),
-              decoration: getPageDecoration(context),
-            ),
-            PageViewModel(
-                title: "Looking at individuals",
-                body: "You can scroll through each group member on the main screen, and get an expanded look at their profile with a tap",
-                image: buildImage("assets/Pictures/ph.png"),
+    return Scaffold(
+      body: SafeArea(
+          child: IntroductionScreen(
+            pages: [
+              PageViewModel(
+                title: "welcome".tr,
+                body: "welcome-desc".tr,
+                image: buildImage("assets/Pictures/1.png"),
                 decoration: getPageDecoration(context),
-            ),
-            PageViewModel(
-                title: "Interacting with the group",
-                body: "for each group you can: \n 1. Remove them from your feed \n 2. Skip to the next group \n 3. Add them to a shortlist to check out later \n 4. Apply directly to the group (to a max of 3)",
-                image: buildImage("assets/Pictures/ph.png"),
+              ),
+              PageViewModel(
+                title: "page-1-title".tr,
+                body: "page-1-desc".tr,
+                image: buildImage("assets/Pictures/2.png"),
+                decoration: getPageDecoration(context),
+              ),
+              PageViewModel(
+                  title: "page-2-title".tr,
+                  body: "page-2-desc".tr,
+                  image: buildImage("assets/Pictures/3.png"),
+                  decoration: getPageDecoration(context),
+              ),
+              PageViewModel(
+                title: "page-3-title".tr,
+                body: "page-3-desc".tr,
+                  image: buildImage("assets/Pictures/4.png"),
+                  decoration: PageDecoration(
+                    pageColor: Theme.of(context).canvasColor,
+                    imageFlex: 7,
+                    bodyFlex: 4,
+                  ),
+              ),
+              PageViewModel(
+                title: "page-4-title".tr,
+                body: "page-4-desc".tr,
+                image: buildImage("assets/Pictures/5.png"),
                 decoration: PageDecoration(
                   pageColor: Theme.of(context).canvasColor,
                   imageFlex: 7,
                   bodyFlex: 4,
                 ),
-            ),
-            PageViewModel(
-                title: "Simple as that",
-                body: "Happy Hunting!",
-                image: buildImage("assets/Pictures/ph.png"),
-                decoration: getPageDecoration(context),
-            ),
-          ],
+              ),
+              PageViewModel(
+                title: "page-4.5-title".tr,
+                body: "page-4.5-desc".tr,
+                image: buildImage("assets/Pictures/6.png"),
+                decoration: PageDecoration(
+                  pageColor: Theme.of(context).canvasColor,
+                  imageFlex: 7,
+                  bodyFlex: 4,
+                ),
+              ),
+              PageViewModel(
+                title: "page-5-title".tr,
+                body: "page-5-desc".tr,
+                  image: buildImage("assets/Pictures/7.png"),
+                  decoration: getPageDecoration(context),
+              ),
+            ],
 
-          done: Text("Got it", style: Theme.of(context).textTheme.bodyMedium),
-          onDone: () => goToHome(context),
-          showSkipButton: true,
-          skip: Text('Skip', style: Theme.of(context).textTheme.bodyMedium),
-          onSkip: () => goToHome(context),
-          next: const Icon(LineAwesomeIcons.arrow_right, color: Colors.black87),
-          dotsDecorator: getDotDecoration(context),
-        )
+            done: Text("got-it".tr, style: Theme.of(context).textTheme.bodyMedium),
+            onDone: () => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Scroller(), duration: const Duration(milliseconds: 200))),
+            showSkipButton: true,
+            skip: Text('skip'.tr, style: Theme.of(context).textTheme.bodyMedium),
+            onSkip: () => Navigator.pushReplacement(context, PageTransition(type: PageTransitionType.fade, child: const Scroller(), duration: const Duration(milliseconds: 200))),
+            next: const Icon(LineAwesomeIcons.arrow_right, color: Colors.black87),
+            dotsDecorator: getDotDecoration(context),
+            dotsFlex: 2,
+            nextFlex: 1,
+            skipOrBackFlex: 1,
+          )
+      ),
     );
   }
 
   Widget buildImage(String path) =>
       Center(child: Image.asset(path, width: 350));
 
-  void goToHome(context) => Navigator.of(context).pushReplacementNamed('/Scroller');
 
   PageDecoration getPageDecoration(context) => PageDecoration(
     titleTextStyle: Theme.of(context).textTheme.headlineSmall ?? GoogleFonts.lexend(color: Colors.black, fontWeight: FontWeight.normal, fontSize: 20.0),

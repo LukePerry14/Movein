@@ -11,6 +11,7 @@ class CardProfile {
   final String bio;
   final String subject;
   final int yearOfStudy;
+  final bool isVerified;
 
   CardProfile({
     required this.id,
@@ -22,6 +23,7 @@ class CardProfile {
     required this.bio,
     required this.subject,
     required this.yearOfStudy,
+    required this.isVerified,
   });
 
   factory CardProfile.fromFirestore(DocumentSnapshot document) {
@@ -55,6 +57,7 @@ class CardProfile {
       bio: data['Bio'],
       subject: data['Subject'],
       yearOfStudy: data['YearOfStudy'].toInt(),
+      isVerified: data['EmailVerified'],
     );
   }
 

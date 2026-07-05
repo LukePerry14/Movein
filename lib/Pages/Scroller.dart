@@ -1,10 +1,6 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,10 +10,16 @@ import 'package:movein/navbar.dart';
 import 'package:movein/Scroller%20Code/HScroll.dart';
 import 'package:movein/Ad%20code/ad_helper.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:timer_count_down/timer_controller.dart';
 import 'package:timer_count_down/timer_count_down.dart';
 
 import '../Auth code/auth.dart';
+import '../Themes/lMode.dart';
+import 'Friends.dart';
+import 'Profile.dart';
+
+const rootImagePath = 'https://movein.blob.core.windows.net/moveinimages/';
 
 class Scroller extends StatefulWidget {
   const Scroller({Key? key}) : super(key: key);
@@ -34,7 +36,7 @@ class _ScrollerState extends State<Scroller> {
   late NativeAd _ad;
   bool _isAdLoaded = false;
   bool _loadApp = false;
-  bool _showApp = false;
+  //bool _showApp = false;
   late int memPref;
   late int cleanPref;
   late int noisePref;
@@ -43,14 +45,45 @@ class _ScrollerState extends State<Scroller> {
   List<Map<String, dynamic>> groupData = [];
   final CountdownController _timerController = CountdownController();
   final double _adAspectRatioMedium = (370.0 / 355.0);
+  Widget _groupDisplay = const CircularProgressIndicator();
+
+  Widget nextGroup() {
+    return Center(
+        key: ValueKey(index),
+        child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            child: SingleChildScrollView(
+                child: Gscroller(
+              groupName: groupData[index]['GroupName'],
+              groupPicture: groupData[index]['GroupPicture'],
+              members: groupData[index]['Members'],
+              avgBedTime: groupData[index]['AvgBedTime'],
+              avgNoisiness: groupData[index]['AvgNoisiness'],
+              avgYearOfStudy: groupData[index]['AvgYearOfStudy'],
+              avgCleanliness: groupData[index]['AvgCleanliness'],
+              avgNightLife: groupData[index]['AvgNightLife'],
+              showFriend: true,
+            ))));
+  }
+
+  Widget initial() {
+    return SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.width,
+        child: const CircularProgressIndicator());
+  }
 
   void getGroups() async {
     loadFilters();
     List<Map<String, dynamic>> groups = [];
     final CollectionReference docGroups =
         FirebaseFirestore.instance.collection("Groups");
+
     try {
-      QuerySnapshot querySnapshot = await docGroups.where('AllowedUnis', arrayContains: UserPreferences.getUni()).get();
+      QuerySnapshot querySnapshot = await docGroups
+          .where('AllowedUnis', arrayContains: UserPreferences.getUni())
+          .get();
       for (QueryDocumentSnapshot docSnapshot in querySnapshot.docs) {
         Map<String, dynamic>? data =
             docSnapshot.data() as Map<String, dynamic>?;
@@ -63,7 +96,8 @@ class _ScrollerState extends State<Scroller> {
             'Id': docSnapshot.id,
             'GroupName': data!['GroupName'].toString(),
             'GroupPicture': data['GroupPicture'].toString(),
-            'Members': List<String>.from(data['Members'].map((member) => member.toString())),
+            'Members': List<String>.from(
+                data['Members'].map((member) => member.toString())),
             'AvgYearOfStudy': (data['AvgYearOfStudy'] as num).toDouble(),
             'AvgCleanliness': (data['AvgCleanliness'] as num).toDouble(),
             'AvgNoisiness': (data['AvgNoisiness'] as num).toDouble(),
@@ -80,6 +114,7 @@ class _ScrollerState extends State<Scroller> {
     groupData = groups;
     sortGroupsByPreferences();
     setState(() {
+      _groupDisplay = (!groupData.isEmpty ? nextGroup() : const NoGroups())!;
       _loadApp = true;
     });
   }
@@ -87,7 +122,7 @@ class _ScrollerState extends State<Scroller> {
   @override
   void initState() {
     getGroups();
-    _loadAd();
+    //_loadAd();
     super.initState();
   }
 
@@ -98,42 +133,38 @@ class _ScrollerState extends State<Scroller> {
   }
 
   @override
-  void didChangeMetrics() {
-    setState(() {
-      _showApp = true;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Builder(
       builder: (context) {
         final navigator = Navigator.of(context);
-        bool loadAd = ((_adCountdown == 0) & _isAdLoaded);
+        bool loadAd = ((_adCountdown == 0) &
+            _isAdLoaded &
+            (UserPreferences.getAppsMax() == 2));
         if (loadAd) {
           Future.delayed(const Duration(seconds: 1), () {
             _timerController.start();
           });
         }
+
         return Scaffold(
+          // backgroundColor: LAppTheme.lightTheme.primaryColor,
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,
-          body: (!_loadApp & !_showApp)
-              ? Center(
-                  child: SizedBox(
-                    width: MediaQuery.of(context)
-                        .size
-                        .width * 0.8, // Adjust the width to control the size
-                    height: MediaQuery.of(context)
-                        .size
-                        .width * 0.8, // Adjust the height to control the size
-                    child: const CircularProgressIndicator(),
-                  ),
-                )
-              : Stack(
-                  children: [
-                    Container(
-                      alignment: Alignment.center,
+          body: Stack(
+            children: [
+              (!_loadApp)
+                  ? Center(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width *
+                            0.8, // Adjust the width to control the size
+                        height: MediaQuery.of(context).size.width *
+                            0.8, // Adjust the height to control the size
+                        child: const CircularProgressIndicator(),
+                      ),
+                    )
+                  : SizedBox(
+                      height: MediaQuery.of(context).size.height,
+                      width: MediaQuery.of(context).size.width,
                       child: (groupData.isEmpty)
                           ? const NoGroups()
                           : loadAd
@@ -156,238 +187,318 @@ class _ScrollerState extends State<Scroller> {
                                           child: AdWidget(ad: _ad)),
                                   ],
                                 )
-                              : Gscroller(
-                                  groupName: groupData[index]['GroupName'],
-                                  groupPicture: groupData[index]
-                                      ['GroupPicture'],
-                                  members: groupData[index]['Members'],
-                                  avgBedTime: groupData[index]['AvgBedTime'],
-                                  avgNoisiness: groupData[index]
-                                      ['AvgNoisiness'],
-                                  avgYearOfStudy: groupData[index]['AvgYearOfStudy'],
-                                  avgCleanliness: groupData[index]
-                                      ['AvgCleanliness'],
-                                  avgNightLife: groupData[index]
-                                      ['AvgNightLife'],
-                                  showFriend: true,
-                                ),
-                    ),
-                    Align(
-                        alignment: Alignment.topRight,
-                        child: Padding(
-                            padding: const EdgeInsets.all(15),
-                            child: IconButton(
-                              splashRadius: 35,
-                              icon: Icon(
-                                LineAwesomeIcons.horizontal_sliders,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(
-                                        top: Radius.circular(
-                                            20)), // Rounded top corners
-                                  ),
-                                  builder: (BuildContext context) {
-                                    return const FiltersScreen(); // Using the extracted widget here
+                              : AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 400),
+                                  switchInCurve: Curves.easeInSine,
+                                  switchOutCurve: Curves.easeOutSine,
+                                  transitionBuilder: (widget, animation) {
+                                    if (widget.key == ValueKey(index)) {
+                                      return SlideTransition(
+                                        position: Tween<Offset>(
+                                          begin: const Offset(1, 0),
+                                          end: Offset.zero,
+                                        ).animate(animation),
+                                        child: widget,
+                                      );
+                                    } else {
+                                      return SlideTransition(
+                                        position: Tween<Offset>(
+                                          begin: const Offset(-1, 0),
+                                          end: Offset.zero,
+                                        ).animate(animation),
+                                        child: widget,
+                                      );
+                                    }
                                   },
-                                );
-                              },
-                            ))),
-                  ],
-                ),
-          floatingActionButton: Visibility(
-            visible: groupData.isNotEmpty,
-            child: loadAd
-                ? FloatingActionButton(
-                    heroTag: "Skip",
-                    backgroundColor: _isButtonEnabled
-                        ? Theme.of(context).primaryColor.withOpacity(0.5)
-                        : Colors.grey.withOpacity(0.5),
-                    onPressed: _isButtonEnabled
-                        ? () {
-                            _loadAd();
-                            _adCountdown = 2;
-                            setState(() {
-                              _showApp = false;
-                            });
-                          }
-                        : null,
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 9),
-                        const Icon(LineAwesomeIcons.angle_right,
-                            color: Colors.white),
-                        Countdown(
-                          controller: _timerController,
-                          seconds: 4,
-                          build: (_, double time) => Text(time.toString(),
-                              style: GoogleFonts.redHatDisplay(
-                                  color: Colors.white, fontSize: 8)),
-                          interval: const Duration(milliseconds: 100),
-                          onFinished: () {
-                            setState(() {
-                              _isButtonEnabled = true;
-                            });
-                          },
-                        ),
-                      ],
+                                  child: _groupDisplay),
                     ),
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      FloatingActionButton(
-                        heroTag: "Block",
-                        backgroundColor:
-                            Theme.of(context).primaryColor.withOpacity(0.5),
+              Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: IconButton(
+                        splashRadius: 35,
+                        icon: Icon(
+                          LineAwesomeIcons.horizontal_sliders,
+                          color: Theme.of(context).primaryColor,
+                        ),
                         onPressed: () {
-                          if (!loadAd & (_adCountdown != 0)) {
-                            _adCountdown--;
-                          }
-                          addToBlacklist(groupData[index]['Id']).then((_) {
-                            if (index < groupData.length - 1) {
-                              setState(() {
-                                index++;
-                                _showApp = false;
-                              });
-                            } else {
-                              setState(() {
-                                groupData = [];
-                              });
-                            }
-                          }).catchError((e) {
-                            throw FirebaseException(
-                              message: 'Error calling addToBlacklist: $e',
-                              plugin: 'cloud_firestore',
-                            );
-                          });
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(
+                                      20)), // Rounded top corners
+                            ),
+                            builder: (BuildContext context) {
+                              return const FiltersScreen(); // Using the extracted widget here
+                            },
+                          );
                         },
-                        child: Column(children: [
-                          const SizedBox(height: 9),
-                          const Icon(LineAwesomeIcons.times,
-                              color: Colors.white),
-                          Text(
-                            "block".tr,
-                            style: GoogleFonts.redHatDisplay(
-                                color: Colors.white, fontSize: 8),
-                          )
-                        ]),
-                      ),
-                      FloatingActionButton(
-                        heroTag: "Next",
-                        backgroundColor:
-                            Theme.of(context).primaryColor.withOpacity(0.5),
-                        onPressed: () {
-                          if (!loadAd & (_adCountdown != 0)) {
-                            _adCountdown--;
-                          }
-                          if (index < groupData.length - 1) {
-                            setState(() {
-                              index++;
-                              _showApp = false;
-                            });
-                          } else {
-                            setState(() {
-                              groupData = [];
-                            });
-                          }
-                        },
-                        child: Column(children: [
-                          const SizedBox(height: 9),
-                          const Icon(LineAwesomeIcons.angle_right,
-                              color: Colors.white),
-                          Text(
-                            "next".tr,
-                            style: GoogleFonts.redHatDisplay(
-                                color: Colors.white, fontSize: 8),
-                          )
-                        ]),
-                      ),
-                      FloatingActionButton(
-                        heroTag: "Shortlist",
-                        backgroundColor:
-                            Theme.of(context).primaryColor.withOpacity(0.5),
-                        onPressed: () {
-                          if (!loadAd & (_adCountdown != 0)) {
-                            _adCountdown--;
-                          }
-                          addToShortList(groupData[index]['Id']).then((_) {
-                            if (index < groupData.length - 1) {
-                              setState(() {
-                                index++;
-                                _showApp = false;
-                              });
-                            } else {
-                              setState(() {
-                                groupData = [];
-                              });
-                            }
-                          }).catchError((e) {
-                            throw FirebaseException(
-                              message: 'Error calling addToShortlist: $e',
-                              plugin: 'cloud_firestore',
-                            );
-                          });
-                        },
-                        child: Column(children: [
-                          const SizedBox(height: 9),
-                          const Icon(LineAwesomeIcons.archive,
-                              color: Colors.white),
-                          Text(
-                            "sList".tr,
-                            style: GoogleFonts.redHatDisplay(
-                                color: Colors.white, fontSize: 8),
-                          )
-                        ]),
-                      ),
-                      FloatingActionButton(
-                        heroTag: "Apply",
-                        backgroundColor:
-                            Theme.of(context).primaryColor.withOpacity(0.5),
-                        onPressed: () {
-                          if (!loadAd & (_adCountdown != 0)) {
-                            _adCountdown--;
-                          }
-                          addToApplicants(groupData[index]['Id']).then((_) {
-                            if (index < groupData.length - 1) {
-                              setState(() {
-                                index++;
-                                _showApp = false;
-                              });
-                            } else {
-                              setState(() {
-                                groupData = [];
-                              });
-                            }
-                          }).catchError((e) {
-                            throw FirebaseException(
-                              message: 'Error calling addToApplicants: $e',
-                              plugin: 'cloud_firestore',
-                            );
-                          });
-                        },
-                        child: Column(children: [
-                          const SizedBox(height: 9),
-                          const Icon(LineAwesomeIcons.check,
-                              color: Colors.white),
-                          Text(
-                            "apply".tr,
-                            style: GoogleFonts.redHatDisplay(
-                                color: Colors.white, fontSize: 8),
-                          )
-                        ]),
-                      ),
-                    ],
-                  ),
+                      ))),
+            ],
           ),
           bottomNavigationBar: CustomNavbar(
             onItemSelected: (route) {
+              switch (route) {
+                case '/Scroller':
+                  Navigator.pushReplacement(
+                      context,
+                      PageTransition(
+                          type: PageTransitionType.fade,
+                          child: const Scroller(),
+                          duration: const Duration(milliseconds: 200)));
+                  break;
+
+                case '/Friends':
+                  Navigator.pushReplacement(
+                      context,
+                      PageTransition(
+                          type: PageTransitionType.rightToLeftJoined,
+                          child: const Friends(),
+                          childCurrent: widget,
+                          duration: const Duration(milliseconds: 200)));
+                  break;
+
+                case '/Profile':
+                  Navigator.pushReplacement(
+                      context,
+                      PageTransition(
+                          type: PageTransitionType.rightToLeftJoined,
+                          child: const Profile(),
+                          childCurrent: widget,
+                          duration: const Duration(milliseconds: 200)));
+              }
               navigator.pushReplacementNamed(route);
             },
+          ),
+          floatingActionButton: Visibility(
+            visible: groupData.isNotEmpty,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
+              child: loadAd
+                  ? FloatingActionButton(
+                      heroTag: "Skip",
+                      backgroundColor: _isButtonEnabled
+                          ? LAppTheme.lightTheme.primaryColor.withOpacity(0.5)
+                          : Colors.grey.withOpacity(0.5),
+                      onPressed: _isButtonEnabled
+                          ? () {
+                              _loadAd();
+                              _adCountdown = 2;
+                              setState(() {
+                                //_showApp = false;
+                              });
+                            }
+                          : null,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 9),
+                          const Icon(LineAwesomeIcons.angle_right,
+                              color: Colors.white),
+                          Countdown(
+                            controller: _timerController,
+                            seconds: 4,
+                            build: (_, double time) => Text(time.toString(),
+                                style: GoogleFonts.redHatDisplay(
+                                    color: Colors.white, fontSize: 8)),
+                            interval: const Duration(milliseconds: 100),
+                            onFinished: () {
+                              setState(() {
+                                _isButtonEnabled = true;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        FloatingActionButton(
+                          heroTag: "Block",
+                          backgroundColor: LAppTheme.lightTheme.primaryColor
+                              .withOpacity(0.5),
+                          onPressed: () {
+                            if (!loadAd & (_adCountdown != 0)) {
+                              _adCountdown--;
+                            }
+                            addToBlacklist(groupData[index]['Id'], true)
+                                .then((_) {
+                              if (index < groupData.length - 1) {
+                                index++;
+                                setState(() {
+                                  _groupDisplay = nextGroup();
+                                  //_showApp = false;
+                                });
+                              } else {
+                                setState(() {
+                                  groupData = [];
+                                });
+                              }
+                            }).catchError((e) {
+                              throw FirebaseException(
+                                message: 'Error calling addToBlacklist: $e',
+                                plugin: 'cloud_firestore',
+                              );
+                            });
+                          },
+                          child: Column(children: [
+                            const SizedBox(height: 9),
+                            const Icon(LineAwesomeIcons.times,
+                                color: Colors.white),
+                            Text(
+                              "block".tr,
+                              style: GoogleFonts.redHatDisplay(
+                                  color: Colors.white, fontSize: 8),
+                            )
+                          ]),
+                        ),
+                        FloatingActionButton(
+                          heroTag: "Next",
+                          backgroundColor: LAppTheme.lightTheme.primaryColor
+                              .withOpacity(0.5),
+                          onPressed: () {
+                            if (!loadAd & (_adCountdown != 0)) {
+                              _adCountdown--;
+                            }
+                            if (index < groupData.length - 1) {
+                              index++;
+                              setState(() {
+                                _groupDisplay = nextGroup();
+                                //_showApp = false;
+                              });
+                            } else {
+                              setState(() {
+                                groupData = [];
+                              });
+                            }
+                          },
+                          child: Column(children: [
+                            const SizedBox(height: 9),
+                            const Icon(LineAwesomeIcons.angle_right,
+                                color: Colors.white),
+                            Text(
+                              "next".tr,
+                              style: GoogleFonts.redHatDisplay(
+                                  color: Colors.white, fontSize: 8),
+                            )
+                          ]),
+                        ),
+                        FloatingActionButton(
+                          heroTag: "Shortlist",
+                          backgroundColor: LAppTheme.lightTheme.primaryColor
+                              .withOpacity(0.5),
+                          onPressed: () {
+                            if (!loadAd & (_adCountdown != 0)) {
+                              _adCountdown--;
+                            }
+                            addToShortList(groupData[index]['Id']).then((_) {
+                              if (index < groupData.length - 1) {
+                                index++;
+                                setState(() {
+                                  _groupDisplay = nextGroup();
+                                  //_showApp = false;
+                                });
+                              } else {
+                                setState(() {
+                                  groupData = [];
+                                });
+                              }
+                            }).catchError((e) {
+                              throw FirebaseException(
+                                message: 'Error calling addToShortlist: $e',
+                                plugin: 'cloud_firestore',
+                              );
+                            });
+                          },
+                          child: Column(children: [
+                            const SizedBox(height: 9),
+                            const Icon(LineAwesomeIcons.archive,
+                                color: Colors.white),
+                            Text(
+                              "sList".tr,
+                              style: GoogleFonts.redHatDisplay(
+                                  color: Colors.white, fontSize: 8),
+                            )
+                          ]),
+                        ),
+                        FloatingActionButton(
+                          heroTag: "Apply",
+                          backgroundColor: LAppTheme.lightTheme.primaryColor
+                              .withOpacity(0.5),
+                          onPressed: () {
+                            if (!loadAd & (_adCountdown != 0)) {
+                              _adCountdown--;
+                            }
+                            addToApplicants(groupData[index]['Id'])
+                                .then((result) {
+                              if (result == true) {
+                                if (index < groupData.length - 1) {
+                                  index++;
+                                  setState(() {
+                                    _groupDisplay = nextGroup();
+                                    //_showApp = false;
+                                  });
+                                } else {
+                                  setState(() {
+                                    groupData = [];
+                                  });
+                                }
+                              } else {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text(
+                                        'max_groups_title'.tr,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium,
+                                      ),
+                                      content: Text('max_groups_desc'.tr,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(
+                                                context); // Close the dialog
+                                          },
+                                          child: Text('ok'.tr,
+                                              style: GoogleFonts.redHatDisplay(
+                                                  color: LAppTheme
+                                                      .lightTheme.primaryColor,
+                                                  fontSize: 16.5)),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
+                            }).catchError((e) {
+                              throw FirebaseException(
+                                message: 'Error calling addToApplicants: $e',
+                                plugin: 'cloud_firestore',
+                              );
+                            });
+                          },
+                          child: Column(children: [
+                            const SizedBox(height: 9),
+                            const Icon(LineAwesomeIcons.check,
+                                color: Colors.white),
+                            Text(
+                              "apply".tr,
+                              style: GoogleFonts.redHatDisplay(
+                                  color: Colors.white, fontSize: 8),
+                            )
+                          ]),
+                        ),
+                      ],
+                    ),
+            ),
           ),
         );
       },
@@ -461,11 +572,21 @@ class _ScrollerState extends State<Scroller> {
     const double nightWeight = 2;
     const double yearWeight = 1;
 
-    double memberScore = memPref != 0 ? ((group['Members'] as List).length - memPref).abs() * memberWeight : 0;
-    double cleanScore = cleanPref != 0 ? ((group['AvgCleanliness'] as double) - cleanPref).abs() * cleanWeight : 0;
-    double noiseScore = noisePref != 0 ? ((group['AvgNoisiness'] as double) - noisePref).abs() * noiseWeight : 0;
-    double nightScore = nightPref != 0 ? ((group['AvgNightLife'] as double) - nightPref).abs() * nightWeight : 0;
-    double yearScore = yearPref != 0 ? ((group['AvgYearOfStudy'] as double) - yearPref).abs() * yearWeight : 0;
+    double memberScore = memPref != 0
+        ? ((group['Members'] as List).length - memPref).abs() * memberWeight
+        : 0;
+    double cleanScore = cleanPref != 0
+        ? ((group['AvgCleanliness'] as double) - cleanPref).abs() * cleanWeight
+        : 0;
+    double noiseScore = noisePref != 0
+        ? ((group['AvgNoisiness'] as double) - noisePref).abs() * noiseWeight
+        : 0;
+    double nightScore = nightPref != 0
+        ? ((group['AvgNightLife'] as double) - nightPref).abs() * nightWeight
+        : 0;
+    double yearScore = yearPref != 0
+        ? ((group['AvgYearOfStudy'] as double) - yearPref).abs() * yearWeight
+        : 0;
     return memberScore + cleanScore + noiseScore + nightScore + yearScore;
   }
 
@@ -505,8 +626,7 @@ class NoGroups extends StatelessWidget {
           const SizedBox(height: 20),
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.7,
-            child: Text(
-                "You've seen to have run out of groups for now, Consider making your own or refresh to try and have another look",
+            child: Text('scrolls-empty'.tr,
                 style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center),
           ),
@@ -520,7 +640,12 @@ class NoGroups extends StatelessWidget {
             ),
             child: ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pushReplacementNamed('/Scroller');
+                Navigator.pushReplacement(
+                    context,
+                    PageTransition(
+                        type: PageTransitionType.fade,
+                        child: const Scroller(),
+                        duration: const Duration(milliseconds: 200)));
               },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -543,7 +668,7 @@ class NoGroups extends StatelessWidget {
   }
 }
 
-Future<void> addToBlacklist(String groupId) async {
+Future<void> addToBlacklist(String groupId, bool block) async {
   final CollectionReference groupCollection =
       FirebaseFirestore.instance.collection('Groups');
   final CollectionReference userCollection =
@@ -559,17 +684,18 @@ Future<void> addToBlacklist(String groupId) async {
         'BlackList': FieldValue.arrayUnion([Auth().currentUser()])
       });
 
-      // Access the user document
-      DocumentSnapshot userSnapshot =
-          await userCollection.doc(Auth().currentUser()).get();
-      if (userSnapshot.exists) {
-        // Perform array union on BlockedGroups field within the user document
-        await userCollection.doc(Auth().currentUser()).update({
-          'BlockedGroups': FieldValue.arrayUnion([groupId])
-        });
-      } else {
-        throw FirebaseException(
-            message: 'Error: User Does not exist', plugin: 'cloud_firestore');
+      if (block) {
+        DocumentSnapshot userSnapshot =
+            await userCollection.doc(Auth().currentUser()).get();
+        if (userSnapshot.exists) {
+          // Perform array union on BlockedGroups field within the user document
+          await userCollection.doc(Auth().currentUser()).update({
+            'BlockedGroups': FieldValue.arrayUnion([groupId])
+          });
+        } else {
+          throw FirebaseException(
+              message: 'Error: User Does not exist', plugin: 'cloud_firestore');
+        }
       }
     } else {
       throw FirebaseException(
@@ -584,6 +710,8 @@ Future<void> addToBlacklist(String groupId) async {
 Future<void> addToShortList(String groupId) async {
   final CollectionReference usersCollection =
       FirebaseFirestore.instance.collection('Users');
+  final CollectionReference groupsCollection =
+      FirebaseFirestore.instance.collection('Groups');
 
   usersCollection.doc(Auth().currentUser()).update({
     'ShortList': FieldValue.arrayUnion([groupId])
@@ -591,36 +719,50 @@ Future<void> addToShortList(String groupId) async {
     throw FirebaseException(
         message: 'Error adding to shortlist: $e', plugin: 'cloud_firestore');
   });
-  addToBlacklist(groupId);
+  addToBlacklist(groupId, false);
 }
 
-Future<void> addToApplicants(String groupId) async {
+Future<bool> addToApplicants(String groupId) async {
   final CollectionReference groupsCollection =
       FirebaseFirestore.instance.collection('Groups');
-
   final DocumentReference groupDocRef = groupsCollection.doc(groupId);
 
-  groupDocRef.update({
-    'Applicants': FieldValue.arrayUnion([Auth().currentUser()]),
-    'AppVals.${Auth().currentUser()}': {},
-  }).catchError((e) {
-    throw FirebaseException(
-        message: 'Error adding to group field "Applicants": $e',
-        plugin: 'cloud_firestore');
-  });
+  final DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(Auth().currentUser())
+          .get();
 
-  final DocumentReference userDocRef =
-      FirebaseFirestore.instance.collection('Users').doc(Auth().currentUser());
+  final int joinedGroups = userSnapshot.data()?['Joined'].length +
+      userSnapshot.data()?['Applications'].length;
 
-  userDocRef.update({
-    'Applications': FieldValue.arrayUnion([groupId])
-  }).catchError((e) {
-    throw FirebaseException(
-        message: 'Error adding to user field "Applications": $e',
-        plugin: 'cloud_firestore');
-  });
+  if (joinedGroups == UserPreferences.getAppsMax()) {
+    return false;
+  } else {
+    groupDocRef.update({
+      'Applicants': FieldValue.arrayUnion([Auth().currentUser()]),
+      'AppVals.${Auth().currentUser()}': {},
+    }).catchError((e) {
+      throw FirebaseException(
+          message: 'Error adding to group field "Applicants": $e',
+          plugin: 'cloud_firestore');
+    });
 
-  addToBlacklist(groupId);
+    final DocumentReference userDocRef = FirebaseFirestore.instance
+        .collection('Users')
+        .doc(Auth().currentUser());
+
+    userDocRef.update({
+      'Applications': FieldValue.arrayUnion([groupId])
+    }).catchError((e) {
+      throw FirebaseException(
+          message: 'Error adding to user field "Applications": $e',
+          plugin: 'cloud_firestore');
+    });
+
+    await addToBlacklist(groupId, false);
+    return true;
+  }
 }
 
 class FiltersScreen extends StatefulWidget {
@@ -659,12 +801,12 @@ class _FiltersScreenState extends State<FiltersScreen> {
             const SizedBox(height: 15),
             SizedBox(
               width: MediaQuery.of(context).size.width,
-              child: Text("Group Preference Filters",
+              child: Text("filt-title".tr,
                   style: Theme.of(context).textTheme.headlineMedium),
             ),
             SizedBox(
               width: MediaQuery.of(context).size.width,
-              child: Text("Leave as 0 for no filter",
+              child: Text('filt-desc'.tr,
                   style: Theme.of(context).textTheme.bodySmall),
             ),
             FormBuilder(
@@ -678,8 +820,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     max: 15,
                     initialValue: UserPreferences.getMemPref().toDouble(),
                     divisions: 15,
-                    decoration:
-                        const InputDecoration(labelText: 'number of Members'),
+                    decoration: InputDecoration(labelText: 'mem-num'.tr),
                   ),
                   FormBuilderSlider(
                     name: 'averageCleanliness',
@@ -687,8 +828,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     max: 5,
                     initialValue: UserPreferences.getCleanPref().toDouble(),
                     divisions: 5,
-                    decoration:
-                        const InputDecoration(labelText: 'Average Cleanliness'),
+                    decoration: InputDecoration(labelText: 'avg-cln'.tr),
                   ),
                   FormBuilderSlider(
                     name: 'averageNoisiness',
@@ -696,8 +836,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     max: 5,
                     initialValue: UserPreferences.getNoisePref().toDouble(),
                     divisions: 5,
-                    decoration:
-                        const InputDecoration(labelText: 'Average Noisiness'),
+                    decoration: InputDecoration(labelText: 'avg-noi'.tr),
                   ),
                   FormBuilderSlider(
                     name: 'averageNightLife',
@@ -705,8 +844,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     max: 5,
                     initialValue: UserPreferences.getNightPref().toDouble(),
                     divisions: 5,
-                    decoration:
-                        const InputDecoration(labelText: 'Average NightLife'),
+                    decoration: InputDecoration(labelText: 'avg-night'.tr),
                   ),
                   FormBuilderSlider(
                     name: 'averageYearOfStudy',
@@ -714,8 +852,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                     max: 7,
                     initialValue: UserPreferences.getYearPref().toDouble(),
                     divisions: 7,
-                    decoration:
-                        const InputDecoration(labelText: 'Average Year of Study'),
+                    decoration: InputDecoration(labelText: 'avg-yos'.tr),
                   ),
                 ],
               ),
@@ -724,18 +861,27 @@ class _FiltersScreenState extends State<FiltersScreen> {
               onPressed: () async {
                 await changePreferences(
                   _formKey.currentState?.fields['members']?.value.toInt(),
-                  _formKey.currentState?.fields['averageCleanliness']?.value.toInt(),
-                  _formKey.currentState?.fields['averageNoisiness']?.value.toInt(),
-                  _formKey.currentState?.fields['averageNightLife']?.value.toInt(),
-                  _formKey.currentState?.fields['averageYearOfStudy']?.value.toInt(),
+                  _formKey.currentState?.fields['averageCleanliness']?.value
+                      .toInt(),
+                  _formKey.currentState?.fields['averageNoisiness']?.value
+                      .toInt(),
+                  _formKey.currentState?.fields['averageNightLife']?.value
+                      .toInt(),
+                  _formKey.currentState?.fields['averageYearOfStudy']?.value
+                      .toInt(),
                 );
-                Navigator.of(context).pushReplacementNamed('/Scroller');
+                Navigator.pushReplacement(
+                    context,
+                    PageTransition(
+                        type: PageTransitionType.fade,
+                        child: const Scroller(),
+                        duration: const Duration(milliseconds: 200)));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).primaryColor,
               ),
               child: Text(
-                'Submit Filters',
+                'sub-filt'.tr,
                 style: GoogleFonts.redHatDisplay(
                     color: Colors.white, fontSize: 16.5),
               ),
@@ -754,7 +900,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
       await UserPreferences.setNightPref(value4 ?? 0);
       await UserPreferences.setYearPref(value5 ?? 0);
     } catch (e) {
-      print("Error setting preferences: $e");
+      throw Exception("Error while updating preferences: $e");
     }
   }
 }

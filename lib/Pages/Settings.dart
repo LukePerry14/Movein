@@ -1,10 +1,23 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:movein/UserPreferences.dart';
 import 'package:movein/navbar.dart';
-
+import 'package:page_transition/page_transition.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
+import '../Pages/Profile.dart';
+import '../Auth code/auth.dart';
+import 'package:http/http.dart' as http;
+import '../Friend And Groups Code/FriendFunctions.dart';
 import '../Themes/lMode.dart';
+import '../main.dart';
+import 'PremiumPage.dart';
 
 class SettingsScaffold extends StatefulWidget {
   const SettingsScaffold({Key? key}) : super(key: key);
@@ -32,37 +45,10 @@ class _SettingsScaffoldState extends State<SettingsScaffold> {
                   Navigator.pop(context);
                 },
               ),
-              actions: [
-                PopupMenuButton(
-                  icon: Icon(LineAwesomeIcons.vertical_ellipsis, color: Theme.of(context).primaryColor,),
-                  color: Colors.grey[200],
-                  itemBuilder: (context)=>[
-                    const PopupMenuItem<int>(
-                      value: 0,
-                      child: Text('About'),
-                    ),
-                    const PopupMenuItem<int>(
-                      value: 1,
-                      child: Text('FAQs'),
-                    ),
-                    const PopupMenuItem(
-                      value: 2,
-                      child: Text('TBC'),
-                    )
-                  ],
-                  onSelected: (item)=>chosenItem(context, item),
-                )
-              ],
             ),
             body: 
               SettingsPage()
             ,
-            bottomNavigationBar: CustomNavbar(
-              onItemSelected: (route) {
-                navigator.pushReplacementNamed(route);
-              },
-            ),
-
           );
         }
     );
@@ -95,16 +81,164 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const Divider(height: 20, thickness: 1),
           const SizedBox(height: 10),
-          buildChangePassword(context, 'Change Password'),
           //buildChangeEmail(context, 'Change Email'),
+          //buildReviewAds(context, 'premium'.tr),
           buildChangeLanguage(context, 'language'.tr),
-          buildReviewAds(context, 'premium'.tr),
-          buildAccountOption(context, 'privacy'.tr),
-          buildAccountOption(context, 't&c'.tr),
+          buildAccountOption(context, 'p,t,c'.tr),
+          buildAccountOption(context, 'contact'.tr),
+          buildDeleteAccount(context, 'delete'.tr),
+
         ],
       ),
     );
   }
+
+  buildDeleteAccount(BuildContext context, String title) {
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              contentPadding: const EdgeInsets.all(0),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height:5),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: IconButton(
+                            icon: Icon(LineAwesomeIcons.angle_left, color: Theme.of(context).primaryColor),
+                            color: Colors.grey[500],
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                      ),
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text("delete-account-title".tr, style: GoogleFonts.lexend(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 23),),
+                        const SizedBox(height: 10),
+                        Text("delete-account-desc".tr, style: GoogleFonts.redHatDisplay(color: Colors.red[800], fontWeight: FontWeight.bold, fontSize: 16),),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text("cancel".tr, style: Theme.of(context).textTheme.bodyMedium),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: ElevatedButton(
+                                  onPressed: () async{
+                                    await deleteDocumentAndAccount().then((_) => Navigator.pushReplacement(
+                                      context, PageTransition(
+                                      type: PageTransitionType.fade,
+                                      child: const LoginScreen(),
+                                      duration: const Duration(milliseconds: 400),
+                                    ),));
+                                  },
+                                  child: Text("confirm".tr, style: Theme.of(context).textTheme.bodyMedium)
+                              ),
+                            ),
+
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.red
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, color: Colors.red)
+          ],
+        ),
+      ),
+    );
+  }
+  Future<void> deleteDocumentAndAccount() async {
+    await storageReset();
+    try {
+
+      // Delete document from Firestore's "Users" collection
+      String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance.collection('Users').doc(currentUserId).get();
+
+
+      // Access "Joined" and "Applications" arrays
+      List<String> joinedGroups = List.from(userSnapshot.get('Joined'));
+      List<String> applications = List.from(userSnapshot.get('Applications'));
+      String stripeId = userSnapshot.get('Applications').toString();
+      if (stripeId != ""){
+        await deleteStripeCustomer(stripeId);
+      }
+      // Remove groups from user's Joined and Applications arrays
+      for (String groupId in joinedGroups) {
+        await removeGroupFromUser("Joined", groupId, currentUserId);
+      }
+
+      for (String groupId in applications) {
+        await removeGroupFromUser("Applications", groupId, currentUserId);
+      }
+
+      // Delete the document
+      await FirebaseFirestore.instance.collection('Users').doc(currentUserId).delete();
+
+    } catch (e) {
+      throw FirebaseException(message: 'Error deleting user document: $e', plugin: 'cloud_firestore');
+    }
+
+    try {
+      // Delete user's account from Firebase Authentication
+      await FirebaseAuth.instance.currentUser!.delete();
+    } catch (e) {
+      throw FirebaseAuthException(code: 'unknown-error', message: 'An unknown error occurred while deleting the account.');
+    }
+  }
+  Future<void> deleteStripeCustomer(String customerId) async {
+
+    final url = Uri.parse('https://europe-west2-test-7a857.cloudfunctions.net/deleteStripeCustomer'); // Replace with your Cloud Function URL
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({'customerId': customerId}),
+    );
+
+    if (response.statusCode == 200) {
+      // Successful response
+      return;
+    } else {
+      throw Exception("unable to delete stripe account");
+    }
+  }
+
 }
 
 
@@ -112,26 +246,7 @@ class _SettingsPageState extends State<SettingsPage> {
 GestureDetector buildAccountOption(BuildContext context, String title) {
   return GestureDetector(
     onTap: () {
-      showDialog(context: context, builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: const Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Option'),
-              Text('Option')
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Close'),
-            )
-          ],
-        );
-      });
+      launchWebsite();
     },
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
@@ -153,77 +268,10 @@ GestureDetector buildAccountOption(BuildContext context, String title) {
   );
 }
 
-// For Change password button
-GestureDetector buildChangePassword(BuildContext context, String title) {
-  return GestureDetector(
-    onTap: () {
-      showDialog(context: context, builder: (BuildContext context) {
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Theme.of(context).primaryColor,
-            centerTitle: true,
-            elevation: 0,
-            leading: IconButton(
-                icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.white),
-                color: Colors.grey[500],
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-          ),
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: [
-                  Text('change-password'.tr, style: Theme.of(context).textTheme.headlineMedium),
-                  const SizedBox(height: 20),
-                  TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
-                      labelText: 'password'.tr
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Confirm Password'
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {print('The password has changed');},
-                    child: const Text('Change Password'),
-                  )
-                ],
-              ),
-            ),
-          )
-        );
-      });
-    },
-    child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600]
-            ),
-          ),
-          const Icon(Icons.arrow_forward_ios, color: Colors.grey)
-        ],
-      ),
-    ),
-  );
-}
+// GestureDetector buildContactUs(BuildContext context, String title) {
+//   return 
+// }
+
 
 GestureDetector buildChangeEmail(BuildContext context, String title) {
   return GestureDetector(
@@ -304,12 +352,15 @@ GestureDetector buildChangeLanguage(BuildContext context, String title) {
                   children: [
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        icon: Icon(LineAwesomeIcons.angle_left, color: Theme.of(context).primaryColor),
-                        color: Colors.grey[500],
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: IconButton(
+                          icon: Icon(LineAwesomeIcons.angle_left, color: Theme.of(context).primaryColor),
+                          color: Colors.grey[500],
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
                       ),
                     ),
                     Align(
@@ -358,39 +409,7 @@ GestureDetector buildChangeLanguage(BuildContext context, String title) {
 GestureDetector buildReviewAds(BuildContext context, String title) {
   return GestureDetector(
     onTap: () {
-      showDialog(context: context, builder: (BuildContext context) {
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Theme.of(context).primaryColor,
-            centerTitle: true,
-            elevation: 0,
-            leading: IconButton(
-                icon: const Icon(LineAwesomeIcons.angle_left, color: Colors.white),
-                color: Colors.grey[500],
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-          ),
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Column(
-                children: [
-                  const Text('Advertisements', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-                  const SizedBox(height: 20),
-                  const Text('Information about how ads work here'),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: ElevatedButton(onPressed: () => {print('Takes them to unime website to update adveritsement')}, child: const Text('Upgrade Account', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),)),
-                  )
-                ],
-              ),
-            ),
-          )
-        );
-      });
+      Navigator.push(context,PageTransition(curve:Curves.linear,type: PageTransitionType.bottomToTop, child:const Premium()));
     },
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
@@ -545,5 +564,12 @@ class _RadioLanguageState extends State<RadioLanguage> {
         )
       ],
     );
+  }
+}
+
+launchWebsite() async {
+  final Uri url = Uri.parse('https://moveinwebsite.azurewebsites.net');
+  if (!await launchUrl(url)) {
+    throw Exception('Could not launch $url');
   }
 }
